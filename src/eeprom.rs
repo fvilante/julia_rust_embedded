@@ -1,5 +1,16 @@
 use ruduino::prelude::without_interrupts;
 
+use crate::register:: {
+    write_register,
+    read_register,
+};
+
+use crate::core:: {
+    word_to_byte,
+    get_bit_at,
+};
+
+
 //EEPROM registers addresses and bits
 const EEARH: *mut u8 = 0x42 as *mut u8;
 const EEARL: *mut u8 = 0x41 as *mut u8;
@@ -8,33 +19,6 @@ const EEDR: *mut u8 = 0x40 as *mut u8;
 const EEPE: u8 =  0b0000010;
 const EEMPE: u8 = 0b0000100;
 const EERE: u8 =  0b0000001;
-
-
-fn write_register(reg_address: *mut u8, value: u8) -> () {
-    unsafe {
-        core::ptr::write_volatile(reg_address, value);
-    }
-}
-
-fn read_register(reg_address: *const u8) -> u8 {
-    unsafe {
-        core::ptr::read_volatile(reg_address)
-    }
-}
-
-// return (byteLow, byteHigh)
-fn word_to_byte(word: u16) -> (u8, u8) {
-    let low_ = word & 0x00FF;
-    let byte_low  = low_ as u8;
-    let high_ = (word >> 8) & 0x00FF;
-    let byte_high = high_ as u8;
-    (byte_low, byte_high)
-}
-
-// position 0 = bit0, position 1 = bit1, ...
-fn get_bit_at(data: u8, position: u8) -> u8 {
-    data & (1 << 0)
-}
 
 // normalize is to clamp the 16 bits address to a 9 bits address (1+8)
 fn normalize_eeprom_address(address: u16) -> (u8, u8) {

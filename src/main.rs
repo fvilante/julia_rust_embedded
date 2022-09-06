@@ -3,6 +3,8 @@
 
 extern crate avr_std_stub;
 
+mod core;
+mod register;
 mod eeprom;
 
 use ruduino::Pin;
