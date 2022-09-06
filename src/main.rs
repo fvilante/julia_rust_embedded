@@ -24,6 +24,17 @@ const EEMPE: u8 = 0b0000100;
 const EERE: u8 =  0b0000001;
 
 
+fn write_register(reg_address: *mut u8, value: u8) -> () {
+    unsafe {
+        core::ptr::write_volatile(reg_address, value);
+    }
+}
+
+fn read_register(reg_address: *const u8) -> u8 {
+    unsafe {
+        core::ptr::read_volatile(reg_address)
+    }
+}
 
 #[no_mangle]
 pub extern fn main() {
@@ -34,22 +45,22 @@ pub extern fn main() {
         let dataToWrite: u8 = 0x77+1; // data to write in EEPROM
 
         // set EEPROM address and data register
-        core::ptr::write_volatile(EEARH, 0x00);
-        core::ptr::write_volatile(EEARL, address);
-        core::ptr::write_volatile(EEDR, dataToWrite);
+        write_register(EEARH, 0x00);
+        write_register(EEARL, address);
+        write_register(EEDR, dataToWrite);
 
         // write operation
-        while (core::ptr::read_volatile(EECR) & (1<<EEPE)) == 1 { }; // wait until EEPE become to zero
+        while (read_register(EECR) & (1<<EEPE)) == 1 { }; // wait until EEPE become to zero
         without_interrupts(|| {
-            core::ptr::write_volatile(EECR, core::ptr::read_volatile(EECR) | (1<<EEMPE));
-            core::ptr::write_volatile(EECR, core::ptr::read_volatile(EECR) | (1<<EEPE));
+            write_register(EECR, read_register(EECR) | (1<<EEMPE));
+            write_register(EECR, read_register(EECR) | (1<<EEPE));
         });
 
 
         // read operation
-        while (core::ptr::read_volatile(EECR) & (1<<EEPE)) == 1 { }; // wait until EEPE become to zero
-        core::ptr::write_volatile(EECR, core::ptr::read_volatile(EECR) | (1<<EERE));
-        let dataRead = core::ptr::read_volatile(EEDR);
+        while (read_register(EECR) & (1<<EEPE)) == 1 { }; // wait until EEPE become to zero
+        write_register(EECR, read_register(EECR) | (1<<EERE));
+        let dataRead = read_register(EEDR);
 
         // if ok blink led fast, otherwise slow
         if(dataToWrite==dataRead) {
