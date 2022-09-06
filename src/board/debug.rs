@@ -2,11 +2,11 @@
 
 use ruduino::Pin;
 use ruduino::cores::atmega328p::{port};
-use ruduino::delay::{delay_ms};
 
-use crate::microcontroler::eeprom::{
-    read_eeprom,
-    write_eeprom,
+use crate::microcontroler:: {
+    eeprom::read_eeprom,
+    eeprom::write_eeprom,
+    delay::delay_ms,
 };
 
 // -------------------------------------------------------------------------------------------------------
@@ -27,12 +27,12 @@ pub fn set_led3(state: bool) -> () {
     }
 }
 
-pub fn blink_led3(on_interval_ms: u16, off_interval_ms: u16) -> ! {
+pub fn blink_led3(on_interval_ms: u64, off_interval_ms: u64) -> ! {
     loop {
         set_led3(LED_ON);
-        delay_ms(on_interval_ms.into());
+        delay_ms(on_interval_ms);
         set_led3(LED_OFF);
-        delay_ms(off_interval_ms.into());
+        delay_ms(off_interval_ms);
     }
 }
 
