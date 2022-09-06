@@ -5,11 +5,10 @@
 extern crate avr_std_stub;
 
 mod common;
-mod register;
-mod eeprom;
+mod microcontroler;
 mod board;
 
-use board::set_led3;
+use board::debug::set_led3;
 
 // This example was from here: https://github.com/Rahix/avr-hal/blob/main/examples/arduino-uno/src/bin/uno-timer.rs
 

@@ -1,6 +1,6 @@
 use ruduino::prelude::without_interrupts;
 
-use crate::register:: {
+use crate::microcontroler::register:: {
     write_register,
     read_register,
 };
@@ -9,11 +9,6 @@ use crate::common:: {
     word_to_byte,
     get_bit_at,
 };
-
-use crate::board:: {
-    blink_led3,
-};
-
 
 //EEPROM registers addresses and bits
 const EEARH: *mut u8 = 0x42 as *mut u8;
@@ -56,36 +51,7 @@ pub fn write_eeprom(address: u16, data: u8) -> () {
     });
 }
 
-// ATTENTION: This routine erases EEPROM
-// write and read all eeprom addresses twice, return true if success
-fn test_eeprom() -> bool {
-    let data = 0x77;
-    let mut result: bool = true;
-    let eeprom_size: u16 = 1024; //1K bytes
-    for address in 0..eeprom_size {
-        write_eeprom(address, data);
-        let data_read = read_eeprom(address);
-        if data_read != data {
-            result = false;
-            break;
-        }
-    }
-    result
-}
 
-
-
-
-// ATTENTION: This routine erases EEPROM
-pub fn hard_test_eeprom() -> ! {
-    fn blink_led_fast() -> ! { blink_led3(100, 100) }
-    fn blink_led_slow() -> ! { blink_led3(1000, 1000) }
-    if test_eeprom() {
-        blink_led_fast()
-    } else {
-        blink_led_slow()
-    }
-}
 
 
 
