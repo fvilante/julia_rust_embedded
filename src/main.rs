@@ -17,13 +17,6 @@ use eeprom:: {
     test_eeprom,
 };
 
-/// The data direction register for PORT B, which is mapped to 0x24 in memory on the atmega328.
-const DDRB: *mut u8 = 0x24 as *mut u8;
-/// The pin status register for PORT B, which is mapped to 0x25 in memory on the atmega328.
-const PORTB: *mut u8 = 0x25 as *mut u8;
-
-
-
 #[no_mangle]
 pub extern fn main() {
     port::B5::set_output();
@@ -53,6 +46,11 @@ pub extern fn main() {
 
 use ruduino::Pin;
 use ruduino::cores::current::{port};
+
+/// The data direction register for PORT B, which is mapped to 0x24 in memory on the atmega328.
+const DDRB: *mut u8 = 0x24 as *mut u8;
+/// The pin status register for PORT B, which is mapped to 0x25 in memory on the atmega328.
+const PORTB: *mut u8 = 0x25 as *mut u8;
 
 #[no_mangle]
 pub extern fn main() {
