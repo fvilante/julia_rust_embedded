@@ -2,11 +2,27 @@
 name = "Julia_AVR_Rust"
 version = "0.1.0"
 authors = ["Flavio Vilante <https://twitter.com/FlavioVilante>"]
-edition = '2018'
+edition = '2021'
 
 [dependencies]
 avr-std-stub = "1.0.3"
 ruduino = {  git = "https://github.com/avr-rust/ruduino", rev = "c057499" }
+panic-halt = "0.2.0"
+embedded-hal = "0.2.3"
+avr-device = "0.3.4"
+arduino-hal = { git = "https://github.com/rahix/avr-hal", rev = "1aacefb335517f85d0de858231e11055d9768cdf", features = ["arduino-uno"] }
+
+
+# Configure the build for minimal size - AVRs have very little program memory
+[profile.dev]
+panic = "abort"
+lto = true
+opt-level = "s"
 
 [profile.release]
+panic = "abort"
+codegen-units = 1
+debug = true
 lto = true
+opt-level = "s"
+

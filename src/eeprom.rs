@@ -5,7 +5,7 @@ use crate::register:: {
     read_register,
 };
 
-use crate::core:: {
+use crate::common:: {
     word_to_byte,
     get_bit_at,
 };
