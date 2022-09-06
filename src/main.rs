@@ -6,35 +6,26 @@ extern crate avr_std_stub;
 mod core;
 mod register;
 mod eeprom;
+mod board;
 
-use ruduino::Pin;
-use ruduino::cores::current::{port};
-
-use ruduino::delay::delay_ms;
 use eeprom:: {
     write_eeprom,
     read_eeprom,
     test_eeprom,
 };
+use board:: {
+    blink_led3,
+};
+
+fn blink_led_fast() { blink_led3(100, 100) }
+fn blink_led_slow() { blink_led3(1000, 1000); }
 
 #[no_mangle]
 pub extern fn main() {
-    port::B5::set_output();
-    // if ok blink led fast, otherwise slow
     if test_eeprom() {
-        loop {
-            port::B5::set_high();
-            ruduino::delay::delay_ms(100);          
-            port::B5::set_low();
-            ruduino::delay::delay_ms(100);     
-        }
+        blink_led_fast();
     } else {
-        loop {
-            port::B5::set_high();
-            ruduino::delay::delay_ms(1000);
-            port::B5::set_low();
-            ruduino::delay::delay_ms(1000);
-        }
+        blink_led_slow();
     }
 }
 
