@@ -12,7 +12,7 @@ upload:
 	#avrdude -v -F -c usbasp -p m328p -Uflash:w:target/avr-atmega328p/release/Julia_AVR_Rust:e
 	avrdude  -v -F -c usbasp -p m328p -Uflash:w:target/avr-atmega328p/release/Julia_AVR_Rust.elf -U lfuse:w:0xFF:m -U hfuse:w:0xDE:m -U efuse:w:0xFD:m  
 
-show_size:
+size:
 	@$(AVR_SIZE) --format=sysv $(BUILD_DIR)/Julia_AVR_Rust.elf
 	@$(AVR_SIZE) --mcu=$(MCU) $(BUILD_DIR)/Julia_AVR_Rust.elf
 	@$(AVR_SIZE) -C --mcu=$(MCU) $(BUILD_DIR)/Julia_AVR_Rust.elf
