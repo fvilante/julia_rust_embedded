@@ -9,24 +9,12 @@ mod eeprom;
 mod board;
 
 use eeprom:: {
-    write_eeprom,
-    read_eeprom,
-    test_eeprom,
+    hard_test_eeprom,
 };
-use board:: {
-    blink_led3,
-};
-
-fn blink_led_fast() { blink_led3(100, 100) }
-fn blink_led_slow() { blink_led3(1000, 1000); }
 
 #[no_mangle]
-pub extern fn main() {
-    if test_eeprom() {
-        blink_led_fast();
-    } else {
-        blink_led_slow();
-    }
+pub extern fn main() -> ! {
+    hard_test_eeprom();
 }
 
 

@@ -16,7 +16,7 @@ fn set_led3(state: bool) -> () {
     }
 }
 
-pub fn blink_led3(on_interval_ms: u16, off_interval_ms: u16) -> () {
+pub fn blink_led3(on_interval_ms: u16, off_interval_ms: u16) -> ! {
     loop {
         set_led3(LED_ON);
         delay_ms(on_interval_ms.into());

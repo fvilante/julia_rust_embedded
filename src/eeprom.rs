@@ -10,6 +10,10 @@ use crate::core:: {
     get_bit_at,
 };
 
+use crate::board:: {
+    blink_led3,
+};
+
 
 //EEPROM registers addresses and bits
 const EEARH: *mut u8 = 0x42 as *mut u8;
@@ -54,7 +58,7 @@ pub fn write_eeprom(address: u16, data: u8) -> () {
 
 // ATTENTION: This routine erases EEPROM
 // write and read all eeprom addresses twice, return true if success
-pub fn test_eeprom() -> bool {
+fn test_eeprom() -> bool {
     let data = 0x77;
     let mut result: bool = true;
     let eeprom_size: u16 = 1024; //1K bytes
@@ -68,6 +72,21 @@ pub fn test_eeprom() -> bool {
     }
     result
 }
+
+
+
+
+// ATTENTION: This routine erases EEPROM
+pub fn hard_test_eeprom() -> ! {
+    fn blink_led_fast() -> ! { blink_led3(100, 100) }
+    fn blink_led_slow() -> ! { blink_led3(1000, 1000) }
+    if test_eeprom() {
+        blink_led_fast()
+    } else {
+        blink_led_slow()
+    }
+}
+
 
 
 
