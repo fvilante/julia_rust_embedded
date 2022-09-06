@@ -9,6 +9,8 @@ mod register;
 mod eeprom;
 mod board;
 
+use board::set_led3;
+
 // This example was from here: https://github.com/Rahix/avr-hal/blob/main/examples/arduino-uno/src/bin/uno-timer.rs
 
 /*
@@ -25,9 +27,9 @@ use core::mem;
 //use panic_halt as _;
 
 struct InterruptState {
-    blinker: Pin<Output>,
     counter: u32,
-    nextcount: u32,
+    step: u32,
+    led_state: bool,
 }
 
 static mut INTERRUPT_STATE: mem::MaybeUninit<InterruptState> = mem::MaybeUninit::uninit();
@@ -36,24 +38,20 @@ static mut INTERRUPT_STATE: mem::MaybeUninit<InterruptState> = mem::MaybeUninit:
 #[arduino_hal::entry]
 fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
-
-    let led = pins.d13.into_output();
-
     unsafe {
         // SAFETY: Interrupts are not enabled at this point so we can safely write the global
         // variable here.  A memory barrier afterwards ensures the compiler won't reorder this
         // after any operation that enables interrupts.
         INTERRUPT_STATE = mem::MaybeUninit::new(InterruptState {
-            blinker: led.downgrade(),
             counter: 0,
-            nextcount: 1,
+            step: 1,
+            led_state: false,
         });
         core::sync::atomic::compiler_fence(core::sync::atomic::Ordering::SeqCst);
     }
 
     //
-
+    
     let tmr1: TC1 = dp.TC1;
 
     rig_timer(&tmr1);
@@ -119,14 +117,17 @@ fn TIMER1_COMPA() {
         // initialized so this ISR will never run when LED is uninitialized.
         &mut *INTERRUPT_STATE.as_mut_ptr()
     };
-
-    //state.blinker.toggle();
+    
     state.counter += 1;
 
-    if state.counter >= state.nextcount {
+    if state.counter >= state.step {
         state.counter = 0;
-        state.nextcount = state.nextcount + 1;
-        state.blinker.toggle();
+        state.step = state.step + 1;
+        //togle_led
+        state.led_state = {
+            set_led3(!state.led_state);
+            !state.led_state
+        };
     } else {
         
     }
