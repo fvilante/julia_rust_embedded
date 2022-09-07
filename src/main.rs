@@ -2,6 +2,9 @@
 #![no_main]
 #![feature(abi_avr_interrupt)]
 
+#![allow(unused_imports)]
+#![allow(dead_code)]
+
 extern crate avr_std_stub;
 
 mod common;
