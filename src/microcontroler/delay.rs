@@ -2,7 +2,8 @@
 // here we will allow values greater than that.
 
 use ruduino::delay::{
-    delay_ms as delay_ms__
+    delay_ms as delay_ms__,
+    delay_us as delay_us__,
 };
 
 pub fn delay_ms(total_ms: u64) -> () {
@@ -23,5 +24,9 @@ pub fn delay_ms(total_ms: u64) -> () {
         delay_ms__(size);
     }
     */
+}
+
+pub fn delay_us(total_us: u64) -> () {
+    delay_us__(total_us)
 }
 
