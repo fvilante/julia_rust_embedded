@@ -336,7 +336,7 @@ fn lcd_begin(cols: u8, lines: u8) {
     command(LCD_FUNCTIONSET | unsafe { _displayfunction });
 
     // turn the display on with no cursor or blinking default
-    unsafe { _displaycontrol = LCD_DISPLAYON | LCD_CURSORON | LCD_BLINKON };  
+    unsafe { _displaycontrol = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF };  
     display();
 
     // clear it off
@@ -354,13 +354,12 @@ pub fn lcd_development_entry_point() -> ! {
     lcd_init();
 
     lcd_begin(40,2);
-    //noCursor();
+    // cursor(); // This function is not working properly must be debuged
     clear();
     setCursor(10, 0);
     print("Julia AVR Rust");
     setCursor(10, 1);
     print("@FlavioVilante");
-
 
 
     loop {
