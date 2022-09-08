@@ -16,30 +16,20 @@ use super::debug::{
 const HIGH: bool = true;
 const LOW: bool = false;
 
-const WAIT: u64 = 200;
-
 pub fn init_shiftout_pins() -> () {
-    //delay_ms(1);
     port::B0::set_output();
-    //delay_us(WAIT);
     port::B2::set_output();
-    //delay_us(WAIT);
     port::D6::set_output();
-    //delay_us(WAIT);
     port::C5::set_output();
-    //delay_us(WAIT);
     port::C4::set_output();
-    //delay_us(WAIT);
     //
     srenab_out(HIGH);
-    srclr_out(HIGH); // @@
     rclk_out(HIGH);
     srclk_out(HIGH);
     serial_out(LOW);
 }
 
 fn serial_out(value: bool) -> () {  
-    //delay_us(WAIT);
     if value == HIGH {
         port::B0::set_high();
     } else {
@@ -48,7 +38,6 @@ fn serial_out(value: bool) -> () {
 }
 
 fn srclk_out(value: bool) -> () {    
-    //delay_us(WAIT);
     if value == HIGH {
         port::B2::set_high();
     } else {
@@ -57,7 +46,6 @@ fn srclk_out(value: bool) -> () {
 }
 
 fn srclr_out(value: bool) -> () {    
-    //delay_us(WAIT);
     if value == HIGH {
         port::D6::set_high();
     } else {
@@ -66,7 +54,6 @@ fn srclr_out(value: bool) -> () {
 }
 
 fn rclk_out(value: bool) -> () {    
-    //delay_us(WAIT);
     if value == HIGH {
         port::C5::set_high();
     } else {
@@ -75,7 +62,6 @@ fn rclk_out(value: bool) -> () {
 }
 
 fn srenab_out(value: bool) -> () {  
-    //delay_us(WAIT); 
     if value == HIGH {
         port::C4::set_high();
     } else {
@@ -99,7 +85,6 @@ fn shiftout__(data_out: u8 ) {
     //prepare shift register for bit shifting
     serial_out(LOW);
     srclk_out(LOW);
-    //delay_us(50);
 
     let mut pin_state: bool;
 
@@ -110,7 +95,6 @@ fn shiftout__(data_out: u8 ) {
     for i in 0..8 {
 
         srclk_out(LOW);
-        //delay_us(50);
 
         if (data_out & (1<<(7-i)))>=1 {
             pin_state = HIGH;
@@ -120,13 +104,10 @@ fn shiftout__(data_out: u8 ) {
 
         //Sets the pin to HIGH or LOW depending on pin_state
         serial_out(pin_state);
-        //delay_us(50);
         //register shifts bits on upstroke of clock pin  
         srclk_out(HIGH);
-        //delay_us(50);
         //zero the data pin after shift to prevent bleed through
         serial_out(LOW);
-        //delay_us(50);
     }
 }
 
@@ -136,13 +117,10 @@ pub fn write_shiftout(data: ShiftOutData) -> () {
 
     //clear register
     srclr_out(LOW);
-    //delay_us(50);
     srclr_out(HIGH);
-    //delay_us(50);
     
     //latch
     rclk_out(LOW);
-    //delay_us(50);
 
     //the register attached to the microcontroller goes last
     shiftout__(data.byte3);
@@ -152,7 +130,6 @@ pub fn write_shiftout(data: ShiftOutData) -> () {
     
     //latch
     rclk_out(HIGH);
-    //delay_us(50);
 
 }
 
@@ -175,13 +152,6 @@ pub fn test_signal() -> ! {
         //delay_ms(100);
     }
 }
-
-
-pub fn test2() -> ! {
-    
-    init_shiftout_pins();
-
-    //test_signal();
 
 // OUTPUT_BUS0     KBD-SA                   BIT0 - SHIFT-REGISTER 1 BEGIN
 // OUTPUT_BUS1     KBD-SB                   BIT1             
@@ -216,6 +186,9 @@ pub fn test2() -> ! {
 // OUTPUT_BUS30    LED_EXECUCAO             BIT6
 // OUTPUT_BUS31    LED_MANUAL               BIT7
 
+pub fn test2() -> ! {
+    
+    init_shiftout_pins();
 
     loop {
     
@@ -225,16 +198,14 @@ pub fn test2() -> ! {
             byte2: (0x00), 
             byte3: (0x00), 
         };
-        //serial_out(true);
         write_shiftout(data); 
         //delay_ms(100);
         data = ShiftOutData { 
             byte0: (0x00), 
             byte1: (0x00), 
             byte2: (0x00), 
-            byte3: (1<<6), 
+            byte3: (1<<6), // this pulse has 230 usec of period and
         };
-        //serial_out(false);
         write_shiftout(data);
         //delay_ms(100);    
     }
