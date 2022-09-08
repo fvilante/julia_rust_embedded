@@ -21,7 +21,10 @@ use microcontroler::{
 #[no_mangle]
 #[arduino_hal::entry]
 fn main() -> ! {
-    
+
+    board::shiftout::test2();
+
+    /*    
     init_timer();
 
     //
@@ -30,6 +33,7 @@ fn main() -> ! {
          // infinite loop waiting for timer interruptions to occur
          // see function TIMER1_COMPA() in crate::microcontroler::timer
     }
+    */
 }
 
 

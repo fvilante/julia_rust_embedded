@@ -27,13 +27,27 @@ pub fn set_led3(state: bool) -> () {
     }
 }
 
-pub fn blink_led3(on_interval_ms: u64, off_interval_ms: u64) -> ! {
-    loop {
+pub fn blink_led3(on_interval_ms: u64, off_interval_ms: u64, repeat: Option<u64>) -> () {
+    
+    let blink_once = |on_interval_ms: u64, off_interval_ms: u64| {
         set_led3(LED_ON);
         delay_ms(on_interval_ms);
         set_led3(LED_OFF);
         delay_ms(off_interval_ms);
-    }
+    };
+
+    match repeat {
+        Some(n) => {
+            for _ in 0..n {
+                blink_once(on_interval_ms, off_interval_ms);
+            };
+        }
+        None => {
+            loop {
+                blink_once(on_interval_ms, off_interval_ms);
+            };
+        }
+    }   
 }
 
 //FUNCTION NOT WORKING! PROBLEM A PROBLEM IN THE ITS GLOBAL STATE
@@ -73,9 +87,9 @@ fn test_eeprom() -> bool {
 }
 
 // ATTENTION: This routine erases EEPROM data
-pub fn hard_test_eeprom() -> ! {
-    fn blink_led_fast() -> ! { blink_led3(100, 100) }
-    fn blink_led_slow() -> ! { blink_led3(1000, 1000) }
+pub fn hard_test_eeprom() -> () {
+    fn blink_led_fast() -> () { blink_led3(100, 100, None) }
+    fn blink_led_slow() -> () { blink_led3(1000, 1000, None) }
     if test_eeprom() {
         blink_led_fast()
     } else {
