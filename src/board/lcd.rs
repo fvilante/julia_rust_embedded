@@ -3,7 +3,7 @@
 use ruduino::Pin;
 use ruduino::cores::atmega328p::{port};
 
-use crate::microcontroler::delay::{delay_us};
+use crate::microcontroler::delay::{delay_us, delay_ms};
 
 use crate::common::get_bit_at_as_bool;
 
@@ -124,8 +124,14 @@ fn command(value: u8) -> () {
 }
 
 // print just one byte
-fn write(value: u8) -> () {
+fn write_u8(value: u8) -> () {
     send(value, HIGH);
+    //return 1; // assume sucess // @@ line removed by considered unecessary. (Please check and remove this line if possible)
+}
+
+// print just one byte
+fn write_char(value: char) -> () {
+    write_u8(value as u8);
     //return 1; // assume sucess // @@ line removed by considered unecessary. (Please check and remove this line if possible)
 }
 
@@ -135,7 +141,7 @@ fn write(value: u8) -> () {
 // prints a full string
 fn print(text: &str) -> () {
     for char in text.as_bytes() {
-        write(*char);
+        write_u8(*char);
     };
 }
 
@@ -355,15 +361,26 @@ pub fn lcd_development_entry_point() -> ! {
 
     lcd_begin(40,2);
     // cursor(); // This function is not working properly must be debuged
-    clear();
-    setCursor(10, 0);
-    print("Julia AVR Rust");
-    setCursor(10, 1);
-    print("@FlavioVilante");
 
+
+    let mut icon: char = 'X';
 
     loop {
-
+        clear();
+        setCursor(10, 0);
+        print("Julia AVR Rust");
+        setCursor(10, 1);
+        print("@FlavioVilante");
+        for row in 0..2 {
+            for col in 0..40 {
+                setCursor(col, row);
+                write_char(icon);
+                delay_ms(100);
+                setCursor(col, row);
+                write_char(' ');
+            };
+        };
+        
     }
 
 }
