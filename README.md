@@ -19,13 +19,11 @@ Designed for the ATmega328p.
 
 ## Usage
 
+Before start building, enter terminal go to the directory project and type `rustup override set nightly`.
 
-Now to build, enter your terminal and change to the directory of the project.
-
-Then type `make`.
-
-This will start the compilation proccess and after that automatically upload to the board.
-
+Then type `make`. This command will run the Makefile rules that compile, upload code to the board and show the total size of your compiled program.
+ 
+You can also type `make build upload size`, or if you prefer type only parts of this rules, exemple: `make upload` to just upload without compiling code, or `make build` to just compile code without upload it, etc. 
 
 
 # Building manually (details)
