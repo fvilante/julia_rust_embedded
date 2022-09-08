@@ -154,17 +154,27 @@ fn home() -> () {
 }
 
 fn setCursor(col: u8, row: u8) {
-  let max_lines: u8 = MAX_LINES; // @@ original code: "const size_t max_lines = sizeof(_row_offsets) / sizeof(*_row_offsets)"";
-  let mut row_temp: usize = 0x00;
-  // safe guard
-  if row >= max_lines  {
-    row_temp = (max_lines - 1) as usize;    // we count rows starting w/0
-  }
-  if row >= unsafe { _numlines }  {
-    row_temp = ( unsafe {_numlines } - 1 ) as usize;    // we count rows starting w/0
-  }
-  
-  command(LCD_SETDDRAMADDR | (col + unsafe{ _row_offsets[row_temp] } ));
+
+    //bugfix: I don't discoved why but row 1 is mapped to number 2 instead of number 1.
+    //        I'm implementing this simple workaround. This will not become an issue if
+    //        display stays with just 2 lines.
+    let row_bugfixed: u8 = match row {
+        0 => 0,
+        1 => 2,
+        2.. => 2,
+    };
+
+    let max_lines: u8 = MAX_LINES; // @@ original code: "const size_t max_lines = sizeof(_row_offsets) / sizeof(*_row_offsets)"";
+    let mut row_temp: usize = 0x00;
+    // safe guard
+    if row_bugfixed >= max_lines  {
+        row_temp = (max_lines - 1) as usize;    // we count rows starting w/0
+    }
+    if row_bugfixed >= unsafe { _numlines }  {
+        row_temp = ( unsafe {_numlines } - 1 ) as usize;    // we count rows starting w/0
+    }
+    
+    command(LCD_SETDDRAMADDR | (col + unsafe{ _row_offsets[row_temp] } ));
 }
 
 
@@ -348,7 +358,7 @@ pub fn lcd_development_entry_point() -> ! {
     clear();
     setCursor(10, 0);
     print("Julia AVR Rust");
-    setCursor(10, 2);
+    setCursor(10, 1);
     print("@FlavioVilante");
 
 
