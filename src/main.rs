@@ -22,7 +22,7 @@ use microcontroler::{
 #[arduino_hal::entry]
 fn main() -> ! {
 
-    board::shiftout::test2();
+    board::lcd::lcd_development_entry_point()
 
     /*    
     init_timer();
