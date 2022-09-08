@@ -186,6 +186,12 @@ pub fn test_signal() -> ! {
 // OUTPUT_BUS30    LED_EXECUCAO             BIT6
 // OUTPUT_BUS31    LED_MANUAL               BIT7
 
+
+// Speed Test Measurement Results:
+// 32bits I/O Expander (using 4 output shift-registers in the board) has max output frequency about => 5kHz
+// perid = 200usec / f = 5khz
+// high pulse width = 4usec
+// note: the focus was just to take a first measurement, no conclusions have beeing derived from that. 
 pub fn test2() -> ! {
     
     init_shiftout_pins();
