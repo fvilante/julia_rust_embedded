@@ -5,7 +5,7 @@ use ruduino::cores::atmega328p::{port};
 
 use crate::microcontroler::delay::{delay_us, delay_ms};
 
-use crate::common::get_bit_at_as_bool;
+use crate::common::{get_bit_at_as_bool, convert_u8_to_str_hex};
 
 const HIGH: bool = true;
 const LOW: bool = false;
@@ -19,7 +19,7 @@ static mut _numlines: u8 = 0x00;
 const MAX_LINES: u8 = 4;
 
 
-pub fn init_lcd_pins() -> () {
+fn init_lcd_pins() -> () {
     port::B4::set_output(); // lcd_rs = PB4
     port::B5::set_output(); // lcd_enable = PB5
     //
@@ -129,17 +129,31 @@ fn write_u8(value: u8) -> () {
     //return 1; // assume sucess // @@ line removed by considered unecessary. (Please check and remove this line if possible)
 }
 
+// --------------------------------------------------------------------------
+// Very high level user functions
+
 // print just one byte
-fn write_char(value: char) -> () {
+pub fn print_u8(value: u8) -> () {
+    write_u8(value);
+    //return 1; // assume sucess // @@ line removed by considered unecessary. (Please check and remove this line if possible)
+}
+
+pub fn print_u8_in_hex(value: u8) -> () {
+    let (high, low) = convert_u8_to_str_hex(value);
+    print_char(high);
+    print_char(low);
+    print_char('h');
+    //return 1; // assume sucess // @@ line removed by considered unecessary. (Please check and remove this line if possible)
+}
+
+// print just one byte
+pub fn print_char(value: char) -> () {
     write_u8(value as u8);
     //return 1; // assume sucess // @@ line removed by considered unecessary. (Please check and remove this line if possible)
 }
 
-// --------------------------------------------------------------------------
-// Very high level user functions
-
 // prints a full string
-fn print(text: &str) -> () {
+pub fn print(text: &str) -> () {
     for char in text.as_bytes() {
         write_u8(*char);
     };
@@ -149,7 +163,7 @@ fn print(text: &str) -> () {
 
 // --------------------------------------------------------------------------
 /********** high level commands, for the user! */
-fn clear() -> () {
+pub fn clear() -> () {
   command(LCD_CLEARDISPLAY);  // clear display, set cursor position to zero
   delay_us(2000);  // this command takes a long time!
 }
@@ -159,7 +173,7 @@ fn home() -> () {
   delay_us(2000);  // this command takes a long time!
 }
 
-fn setCursor(col: u8, row: u8) {
+pub fn setCursor(col: u8, row: u8) {
 
     //bugfix: I don't discoved why but row 1 is mapped to number 2 instead of number 1.
     //        I'm implementing this simple workaround. This will not become an issue if
@@ -355,11 +369,21 @@ fn lcd_begin(cols: u8, lines: u8) {
 
 }
 
-pub fn lcd_development_entry_point() -> ! {
+// API ---------------------------------------
 
+pub fn lcd_initialize() -> () {
     lcd_init();
-
     lcd_begin(40,2);
+}
+
+
+// ------------------------------------------
+// Examples
+
+
+pub fn example_01() -> ! {
+
+    lcd_initialize();
     // cursor(); // This function is not working properly must be debuged
 
 
@@ -374,10 +398,10 @@ pub fn lcd_development_entry_point() -> ! {
         for row in 0..2 {
             for col in 0..40 {
                 setCursor(col, row);
-                write_char(icon);
+                print_char(icon);
                 delay_ms(100);
                 setCursor(col, row);
-                write_char(' ');
+                print_char(' ');
             };
         };
         
