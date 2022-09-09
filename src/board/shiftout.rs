@@ -1,4 +1,4 @@
-// board io
+// Driver for output expander made of 4 serially connected shift registers
 
 use ruduino::Pin;
 use ruduino::cores::atmega328p::{port};
@@ -192,7 +192,7 @@ pub fn test_signal() -> ! {
 // perid = 200usec / f = 5khz
 // high pulse width = 4usec
 // note: the focus was just to take a first measurement, no conclusions have beeing derived from that. 
-pub fn test2() -> ! {
+pub fn example_1() -> ! {
     
     init_shiftout_pins();
 
