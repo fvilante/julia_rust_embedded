@@ -22,7 +22,7 @@ use microcontroler::{
 #[arduino_hal::entry]
 fn main() -> ! {
 
-    microcontroler::serial::serial_development_entry_point()
+    board::shiftin::entry_point_for_development()
 
     /*    
     init_timer();
