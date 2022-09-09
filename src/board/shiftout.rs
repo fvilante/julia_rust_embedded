@@ -87,10 +87,6 @@ fn shiftout__(data_out: u8 ) {
     srclk_out(LOW);
 
     let mut pin_state: bool;
-
-    let mut i = 7;
-    let end = 0;
-    let step = -1;
     
     for i in 0..8 {
 
