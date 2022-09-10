@@ -1,3 +1,5 @@
+// DEPRECATED: use lcd_2.rs instead!
+// FIX: When possible remove this deprecated model from project
 // driver for off-board lcd HITACH HD44780 display
 
 use ruduino::Pin;
@@ -10,13 +12,15 @@ use crate::common::{get_bit_at_as_bool, convert_u8_to_str_hex};
 const HIGH: bool = true;
 const LOW: bool = false;
 
+const MAX_LINES: u8 = 4;
+
 // lcd internal state
 static mut _displayfunction: u8 = 0x00;
 static mut _displaycontrol: u8 = 0x00;
 static mut _displaymode: u8 = 0x00;
 static mut _row_offsets: [u8;4] = [0;4];
 static mut _numlines: u8 = 0x00;
-const MAX_LINES: u8 = 4;
+
 
 
 fn init_lcd_pins() -> () {
