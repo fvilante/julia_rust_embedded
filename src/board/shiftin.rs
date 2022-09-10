@@ -68,7 +68,7 @@ fn shiftInA() -> u8 {
 
 }
 
-fn readShiftIn() -> ShiftInData {
+pub fn readShiftIn() -> ShiftInData {
 
     let mut data: ShiftInData = ShiftInData{byte0: 0x00, byte1: 0x00, byte2: 0x00 };
     
