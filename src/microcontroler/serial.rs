@@ -38,11 +38,11 @@ pub fn serial_development_entry_point() -> ! {
     let mut buf: [u8;12] = [0;12]; 
     let mut i=0;
     loop {
-        if (serial::ready_to_receive()) {
+        if serial::ready_to_receive() {
             let b = serial::receive();
             buf[i] = b;
             i = i + 1;
-            if (i>8) {
+            if i>8 {
                 for byte in buf {
                     lcd::print_u8_in_hex(byte);
                     lcd::print_char(';');

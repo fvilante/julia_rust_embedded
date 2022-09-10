@@ -41,10 +41,10 @@ fn serial_in() -> bool {
 
 //
 
-struct ShiftInData {
-    byte0: u8,
-    byte1: u8,
-    byte2: u8,
+pub struct ShiftInData {
+    pub byte0: u8,
+    pub byte1: u8,
+    pub byte2: u8,
 }
 
 fn shiftInA() -> u8 {
@@ -57,7 +57,7 @@ fn shiftInA() -> u8 {
         clk_in(LOW);
         delay_us(2);
         let bit_in = serial_in();
-        if (bit_in == true) {
+        if bit_in == true {
             data = data | ( 1 << (7-i));
         }
         clk_in(HIGH);

@@ -315,7 +315,7 @@ fn lcd_init() {
 
 fn lcd_begin(cols: u8, lines: u8) {
     
-    if (lines > 1) {
+    if lines > 1 {
         unsafe {_displayfunction |= LCD_2LINE; };
     } 
     unsafe { _numlines = lines; };
@@ -325,7 +325,7 @@ fn lcd_begin(cols: u8, lines: u8) {
     // SEE PAGE 45/46 FOR INITIALIZATION SPECIFICATION!
     // according to datasheet, we need at least 40ms after power rises above 2.7V
     // before sending commands. Arduino can turn on way before 4.5V so we'll wait 50
-    delay_us(50000);; // line 104
+    delay_us(50000); // line 104
 
     // Now we pull both RS and R/W low to begin commands
     lcd_rs(LOW);
@@ -387,7 +387,7 @@ pub fn example_01() -> ! {
     // cursor(); // This function is not working properly must be debuged
 
 
-    let mut icon: char = 'X';
+    let icon: char = 'X';
 
     loop {
         clear();

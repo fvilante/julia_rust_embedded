@@ -1,6 +1,6 @@
 // on-board circuit keyboard driver
 
-use std::thread::current;
+#![allow(non_camel_case_types)]
 
 use ruduino::Pin;
 use ruduino::cores::atmega328p::{port};
