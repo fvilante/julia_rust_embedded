@@ -1,6 +1,7 @@
 // mid-level abstraction for on-board shift registers input expanders
 
 #![allow(non_camel_case_types)]
+#![allow(non_snake_case)]
 
 use crate::common::get_bit_at_as_bool;
 
@@ -61,32 +62,32 @@ enum InputExpanderSignalRequest {
     INPUT_BUS23,
 }
 
-fn getAddress(signal: InputExpanderSignalRequest) -> Address {
+fn get_adddress(signal: InputExpanderSignalRequest) -> Address {
     match signal {
-        InputExpanderSignalRequest::START =>                   Address(ShiftRegister::IC0, Bit::D0),
-        InputExpanderSignalRequest::FC_MAIS_1 =>               Address(ShiftRegister::IC0, Bit::D1),
-        InputExpanderSignalRequest::FC_MAIS_2 =>               Address(ShiftRegister::IC0, Bit::D2),
-        InputExpanderSignalRequest::ENTRADA_START_OUTRO =>     Address(ShiftRegister::IC0, Bit::D3),
-        InputExpanderSignalRequest::EMERG =>                   Address(ShiftRegister::IC0, Bit::D4),
-        InputExpanderSignalRequest::BUSY =>                    Address(ShiftRegister::IC0, Bit::D5),
-        InputExpanderSignalRequest::FC_MENOS_2 =>              Address(ShiftRegister::IC0, Bit::D6),
-        InputExpanderSignalRequest::FC_MENOS_1 =>              Address(ShiftRegister::IC0, Bit::D7),
-        InputExpanderSignalRequest::KBD_E1 =>                  Address(ShiftRegister::IC1, Bit::D0),
-        InputExpanderSignalRequest::KBD_E2 =>                  Address(ShiftRegister::IC1, Bit::D1),
-        InputExpanderSignalRequest::KBD_E3 =>                  Address(ShiftRegister::IC1, Bit::D2),
-        InputExpanderSignalRequest::KBD_E4 =>                  Address(ShiftRegister::IC1, Bit::D3),
-        InputExpanderSignalRequest::KBD_E5 =>                  Address(ShiftRegister::IC1, Bit::D4),
-        InputExpanderSignalRequest::KBD_E6 =>                  Address(ShiftRegister::IC1, Bit::D5),
-        InputExpanderSignalRequest::KBD_E7 =>                  Address(ShiftRegister::IC1, Bit::D6),
-        InputExpanderSignalRequest::KBD_E8 =>                  Address(ShiftRegister::IC1, Bit::D7),
-        InputExpanderSignalRequest::REF_1 =>                   Address(ShiftRegister::IC2, Bit::D0),
-        InputExpanderSignalRequest::REF_2 =>                   Address(ShiftRegister::IC2, Bit::D1),
-        InputExpanderSignalRequest::ENTRADA_VAGO1 =>           Address(ShiftRegister::IC2, Bit::D2),
-        InputExpanderSignalRequest::ENTRADA_VAGO2 =>           Address(ShiftRegister::IC2, Bit::D3),
-        InputExpanderSignalRequest::INPUT_BUS20 =>             Address(ShiftRegister::IC2, Bit::D4),
-        InputExpanderSignalRequest::INPUT_BUS21 =>             Address(ShiftRegister::IC2, Bit::D5),
-        InputExpanderSignalRequest::INPUT_BUS22 =>             Address(ShiftRegister::IC2, Bit::D6),
-        InputExpanderSignalRequest::INPUT_BUS23 =>             Address(ShiftRegister::IC2, Bit::D7),
+        InputExpanderSignalRequest::START                   => Address(ShiftRegister::IC0, Bit::D0),
+        InputExpanderSignalRequest::FC_MAIS_1               => Address(ShiftRegister::IC0, Bit::D1),
+        InputExpanderSignalRequest::FC_MAIS_2               => Address(ShiftRegister::IC0, Bit::D2),
+        InputExpanderSignalRequest::ENTRADA_START_OUTRO     => Address(ShiftRegister::IC0, Bit::D3),
+        InputExpanderSignalRequest::EMERG                   => Address(ShiftRegister::IC0, Bit::D4),
+        InputExpanderSignalRequest::BUSY                    => Address(ShiftRegister::IC0, Bit::D5),
+        InputExpanderSignalRequest::FC_MENOS_2              => Address(ShiftRegister::IC0, Bit::D6),
+        InputExpanderSignalRequest::FC_MENOS_1              => Address(ShiftRegister::IC0, Bit::D7),
+        InputExpanderSignalRequest::KBD_E1                  => Address(ShiftRegister::IC1, Bit::D0),
+        InputExpanderSignalRequest::KBD_E2                  => Address(ShiftRegister::IC1, Bit::D1),
+        InputExpanderSignalRequest::KBD_E3                  => Address(ShiftRegister::IC1, Bit::D2),
+        InputExpanderSignalRequest::KBD_E4                  => Address(ShiftRegister::IC1, Bit::D3),
+        InputExpanderSignalRequest::KBD_E5                  => Address(ShiftRegister::IC1, Bit::D4),
+        InputExpanderSignalRequest::KBD_E6                  => Address(ShiftRegister::IC1, Bit::D5),
+        InputExpanderSignalRequest::KBD_E7                  => Address(ShiftRegister::IC1, Bit::D6),
+        InputExpanderSignalRequest::KBD_E8                  => Address(ShiftRegister::IC1, Bit::D7),
+        InputExpanderSignalRequest::REF_1                   => Address(ShiftRegister::IC2, Bit::D0),
+        InputExpanderSignalRequest::REF_2                   => Address(ShiftRegister::IC2, Bit::D1),
+        InputExpanderSignalRequest::ENTRADA_VAGO1           => Address(ShiftRegister::IC2, Bit::D2),
+        InputExpanderSignalRequest::ENTRADA_VAGO2           => Address(ShiftRegister::IC2, Bit::D3),
+        InputExpanderSignalRequest::INPUT_BUS20             => Address(ShiftRegister::IC2, Bit::D4),
+        InputExpanderSignalRequest::INPUT_BUS21             => Address(ShiftRegister::IC2, Bit::D5),
+        InputExpanderSignalRequest::INPUT_BUS22             => Address(ShiftRegister::IC2, Bit::D6),
+        InputExpanderSignalRequest::INPUT_BUS23             => Address(ShiftRegister::IC2, Bit::D7),
     }
 }
 
@@ -99,7 +100,7 @@ pub struct InputExpander {
 
 impl InputExpander {
 
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             cache: ShiftInData {
                 byte0: 0x00,
@@ -111,7 +112,7 @@ impl InputExpander {
     }
 
     // fetch data from the hardware and save it on memory cache
-    fn fetch(&mut self) -> &Self {
+    pub fn fetch(&mut self) -> &Self {
         let data_read = readShiftIn();
         self.cache = data_read;
         self
@@ -119,7 +120,7 @@ impl InputExpander {
 
     // NOTE: If first run fetch data from hardware else from cache.
     //       To pull data from hardware use 'fetch' method.
-    fn get_signal(&mut self, signal: InputExpanderSignalRequest) -> bool {
+    fn get_signal__(&mut self, signal: InputExpanderSignalRequest) -> bool {
         let cache = {
             if self.is_first_run == true {
                 self.is_first_run = false;
@@ -128,7 +129,7 @@ impl InputExpander {
                 &self.cache
             }
         };
-        let Address(register, position) = getAddress(signal);
+        let Address(register, position) = get_adddress(signal);
         let byte = match register {
             ShiftRegister::IC0 => cache.byte0,
             ShiftRegister::IC1 => cache.byte1,
@@ -138,77 +139,80 @@ impl InputExpander {
         bit
     }
 
-    fn START(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::START)
+
+    // Public api 
+
+    pub fn START(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::START)
     }
-    fn FC_MAIS_1(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::FC_MAIS_1)
+    pub fn FC_MAIS_1(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::FC_MAIS_1)
     }
-    fn FC_MAIS_2(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::FC_MAIS_2)
+    pub fn FC_MAIS_2(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::FC_MAIS_2)
     }
-    fn ENTRADA_START_OUTRO(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::ENTRADA_START_OUTRO)
+    pub fn ENTRADA_START_OUTRO(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::ENTRADA_START_OUTRO)
     }
-    fn EMERG(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::EMERG)
+    pub fn EMERG(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::EMERG)
     }
-    fn BUSY(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::BUSY)
+    pub fn BUSY(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::BUSY)
     }
-    fn FC_MENOS_2(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::FC_MENOS_2)
+    pub fn FC_MENOS_2(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::FC_MENOS_2)
     }
-    fn FC_MENOS_1(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::FC_MENOS_1)
+    pub fn FC_MENOS_1(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::FC_MENOS_1)
     }
-    fn KBD_E1(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::KBD_E1)
+    pub fn KBD_E1(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::KBD_E1)
     }
-    fn KBD_E2(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::KBD_E2)
+    pub fn KBD_E2(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::KBD_E2)
     }
-    fn KBD_E3(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::KBD_E3)
+    pub fn KBD_E3(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::KBD_E3)
     }
-    fn KBD_E4(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::KBD_E4)
+    pub fn KBD_E4(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::KBD_E4)
     }
-    fn KBD_E5(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::KBD_E5)
+    pub fn KBD_E5(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::KBD_E5)
     }
-    fn KBD_E6(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::KBD_E6)
+    pub fn KBD_E6(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::KBD_E6)
     }
-    fn KBD_E7(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::KBD_E7)
+    pub fn KBD_E7(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::KBD_E7)
     }
-    fn KBD_E8(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::KBD_E8)
+    pub fn KBD_E8(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::KBD_E8)
     }
-    fn REF_1(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::REF_1)
+    pub fn REF_1(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::REF_1)
     }
-    fn REF_2(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::REF_2)
+    pub fn REF_2(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::REF_2)
     }
-    fn ENTRADA_VAGO1(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::ENTRADA_VAGO1)
+    pub fn ENTRADA_VAGO1(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::ENTRADA_VAGO1)
     }
-    fn ENTRADA_VAGO2(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::ENTRADA_VAGO2)
+    pub fn ENTRADA_VAGO2(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::ENTRADA_VAGO2)
     }
-    fn INPUT_BUS20(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::INPUT_BUS20)
+    pub fn INPUT_BUS20(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::INPUT_BUS20)
     }
-    fn INPUT_BUS21(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::INPUT_BUS21)
+    pub fn INPUT_BUS21(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::INPUT_BUS21)
     }
-    fn INPUT_BUS22(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::INPUT_BUS22)
+    pub fn INPUT_BUS22(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::INPUT_BUS22)
     }
-    fn INPUT_BUS23(&mut self) -> bool {
-        self.get_signal(InputExpanderSignalRequest::INPUT_BUS23)
+    pub fn INPUT_BUS23(&mut self) -> bool {
+        self.get_signal__(InputExpanderSignalRequest::INPUT_BUS23)
     }
 } 
 

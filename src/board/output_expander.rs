@@ -1,53 +1,113 @@
 // high level abstraction over board ios
 
 #![allow(non_camel_case_types)]
+#![allow(non_snake_case)]
 
 use super::shiftout::ShiftOutData;
 
-use crate::{common::configure_bit, microcontroler::delay::delay_ms};
+use crate::{common::{configure_bit, get_bit_at_as_bool}, microcontroler::delay::delay_ms};
 
 use super::shiftout::{init_shiftout_pins, write_shiftout};
 
-
 pub enum OutputExpanderSignal {
-    KBD_SA(bool),              // OUTPUT_BUS0     KBD-SA                   BIT0 - SHIFT-REGISTER 1 BEGIN
-    KBD_SB(bool),              // OUTPUT_BUS1     KBD-SB                   BIT1             
-    KBD_S1(bool),              // OUTPUT_BUS2     KBD-S1                   BIT2
-    KBD_S2(bool),              // OUTPUT_BUS3     KBD-S2                   BIT3
-    KBD_S3(bool),              // OUTPUT_BUS4     KBD-S3                   BIT4
-    KBD_S4(bool),              // OUTPUT_BUS5     KBD-S4                   BIT5
-    KBD_S5(bool),              // OUTPUT_BUS6     KBD-S5                   BIT6
-    KBD_S6(bool),              // OUTPUT_BUS7     KBD-S6                   BIT7
-    KBD_S7(bool),              // OUTPUT_BUS8     KBD-S7                   BIT0 - SHIFT-REGISTER 2 BEGIN
-    KBD_S8(bool),              // OUTPUT_BUS9     KBD-S8                   BIT1
-    SAIDA_VAGO1(bool),         // OUTPUT_BUS10    SAIDA-VAGO1              BIT2
-    COPIA_SINAL_PTR(bool),     // OUTPUT_BUS11    COPIA-SINAL-PTR          BIT3
-    SAIDA_START_OUTRO(bool),   // OUTPUT_BUS12    SAIDA-START-OUTRO        BIT4
-    INVMEN(bool),              // OUTPUT_BUS13    INVMEN                   BIT5
-    P3(bool),                  // OUTPUT_BUS14    P3                       BIT6
-    P2(bool),                  // OUTPUT_BUS15    P2                       BIT7
-    P1(bool),                  // OUTPUT_BUS16    P1                       BIT0 - SHIFT-REGISTER 3 BEGIN
-    P0(bool),                  // OUTPUT_BUS17    P0                       BIT1
-    DMOTOR_1(bool),            // OUTPUT_BUS18    DMOTOR-1                 BIT2
-    DMOTOR_2(bool),            // OUTPUT_BUS19    DMOTOR-2                 BIT3
-    EMOTOR_1(bool),            // OUTPUT_BUS20    EMOTOR-1                 BIT4
-    EMOTOR_2(bool),            // OUTPUT_BUS21    EMOTOR-2                 BIT5
-    NMOTOR_1(bool),            // OUTPUT_BUS22    NMOTOR-1                 BIT6
-    NMOTOR_2(bool),            // OUTPUT_BUS23    NMOTOR-2                 BIT7
-    HF_1(bool),                // OUTPUT_BUS24    H/F-1                    BIT0 - SHIFT-REGISTER 4 BEGIN
-    HF_2(bool),                // OUTPUT_BUS25    H/F-2                    BIT1
-    BUZZER(bool),              // OUTPUT_BUS26    BUZZER                   BIT2
-    LED_POS_ALC(bool),         // OUTPUT_BUS27    LED_POS_ALC              BIT3
-    LED_PROGRAMA(bool),        // OUTPUT_BUS28    LED_PROGRAMA             BIT4
-    LED_ERRO(bool),            // OUTPUT_BUS29    LED_ERRO                 BIT5
-    LED_EXECUCAO(bool),        // OUTPUT_BUS30    LED_EXECUCAO             BIT6
-    LED_MANUAL(bool),          // OUTPUT_BUS31    LED_MANUAL               BIT7
+    KBD_SA,              // OUTPUT_BUS0     KBD-SA                   BIT0 - SHIFT-REGISTER 0 BEGIN
+    KBD_SB,              // OUTPUT_BUS1     KBD-SB                   BIT1             
+    KBD_S1,              // OUTPUT_BUS2     KBD-S1                   BIT2
+    KBD_S2,              // OUTPUT_BUS3     KBD-S2                   BIT3
+    KBD_S3,              // OUTPUT_BUS4     KBD-S3                   BIT4
+    KBD_S4,              // OUTPUT_BUS5     KBD-S4                   BIT5
+    KBD_S5,              // OUTPUT_BUS6     KBD-S5                   BIT6
+    KBD_S6,              // OUTPUT_BUS7     KBD-S6                   BIT7
+    KBD_S7,              // OUTPUT_BUS8     KBD-S7                   BIT0 - SHIFT-REGISTER 1 BEGIN
+    KBD_S8,              // OUTPUT_BUS9     KBD-S8                   BIT1
+    SAIDA_VAGO1,         // OUTPUT_BUS10    SAIDA-VAGO1              BIT2
+    COPIA_SINAL_PTR,     // OUTPUT_BUS11    COPIA-SINAL-PTR          BIT3
+    SAIDA_START_OUTRO,   // OUTPUT_BUS12    SAIDA-START-OUTRO        BIT4
+    INVMEN,              // OUTPUT_BUS13    INVMEN                   BIT5
+    P3,                  // OUTPUT_BUS14    P3                       BIT6
+    P2,                  // OUTPUT_BUS15    P2                       BIT7
+    P1,                  // OUTPUT_BUS16    P1                       BIT0 - SHIFT-REGISTER 2 BEGIN
+    P0,                  // OUTPUT_BUS17    P0                       BIT1
+    DMOTOR_1,            // OUTPUT_BUS18    DMOTOR-1                 BIT2
+    DMOTOR_2,            // OUTPUT_BUS19    DMOTOR-2                 BIT3
+    EMOTOR_1,            // OUTPUT_BUS20    EMOTOR-1                 BIT4
+    EMOTOR_2,            // OUTPUT_BUS21    EMOTOR-2                 BIT5
+    NMOTOR_1,            // OUTPUT_BUS22    NMOTOR-1                 BIT6
+    NMOTOR_2,            // OUTPUT_BUS23    NMOTOR-2                 BIT7
+    HF_1,                // OUTPUT_BUS24    H/F-1                    BIT0 - SHIFT-REGISTER 3 BEGIN
+    HF_2,                // OUTPUT_BUS25    H/F-2                    BIT1
+    BUZZER,              // OUTPUT_BUS26    BUZZER                   BIT2
+    LED_POS_ALC,         // OUTPUT_BUS27    LED_POS_ALC              BIT3
+    LED_PROGRAMA,        // OUTPUT_BUS28    LED_PROGRAMA             BIT4
+    LED_ERRO,            // OUTPUT_BUS29    LED_ERRO                 BIT5
+    LED_EXECUCAO,        // OUTPUT_BUS30    LED_EXECUCAO             BIT6
+    LED_MANUAL,          // OUTPUT_BUS31    LED_MANUAL               BIT7
+}
+
+// Represents each of the four 74HC595N Integrated Circuit present on the board
+#[derive(Copy, Clone)]
+enum ShiftRegister {
+    IC0,    // Board descriptor: U110 
+    IC1,    // Board descriptor: U101 
+    IC2,    // Board descriptor: U104 
+    IC3,    // Board descriptor: U103 
+}
+
+enum Bit {
+    D0=0,     // bit 0 of a byte
+    D1=1,     // bit 1 of a byte
+    D2=2,     // etc...
+    D3=3,
+    D4=4,
+    D5=5,
+    D6=6,
+    D7=7,
+}
+
+struct Address(ShiftRegister, Bit);
+
+// Signals setup
+fn getAddress__(signal: OutputExpanderSignal) -> Address {
+    match signal {
+        OutputExpanderSignal::KBD_SA                  => Address(ShiftRegister::IC0, Bit::D0),
+        OutputExpanderSignal::KBD_SB                  => Address(ShiftRegister::IC0, Bit::D1),
+        OutputExpanderSignal::KBD_S1                  => Address(ShiftRegister::IC0, Bit::D2),
+        OutputExpanderSignal::KBD_S2                  => Address(ShiftRegister::IC0, Bit::D3),
+        OutputExpanderSignal::KBD_S3                  => Address(ShiftRegister::IC0, Bit::D4),
+        OutputExpanderSignal::KBD_S4                  => Address(ShiftRegister::IC0, Bit::D5),
+        OutputExpanderSignal::KBD_S5                  => Address(ShiftRegister::IC0, Bit::D6),
+        OutputExpanderSignal::KBD_S6                  => Address(ShiftRegister::IC0, Bit::D7),
+        OutputExpanderSignal::KBD_S7                  => Address(ShiftRegister::IC1, Bit::D0),
+        OutputExpanderSignal::KBD_S8                  => Address(ShiftRegister::IC1, Bit::D1),
+        OutputExpanderSignal::SAIDA_VAGO1             => Address(ShiftRegister::IC1, Bit::D2),
+        OutputExpanderSignal::COPIA_SINAL_PTR         => Address(ShiftRegister::IC1, Bit::D3),
+        OutputExpanderSignal::SAIDA_START_OUTRO       => Address(ShiftRegister::IC1, Bit::D4),
+        OutputExpanderSignal::INVMEN                  => Address(ShiftRegister::IC1, Bit::D5),
+        OutputExpanderSignal::P3                      => Address(ShiftRegister::IC1, Bit::D6),
+        OutputExpanderSignal::P2                      => Address(ShiftRegister::IC1, Bit::D7),
+        OutputExpanderSignal::P1                      => Address(ShiftRegister::IC2, Bit::D0),
+        OutputExpanderSignal::P0                      => Address(ShiftRegister::IC2, Bit::D1),
+        OutputExpanderSignal::DMOTOR_1                => Address(ShiftRegister::IC2, Bit::D2),
+        OutputExpanderSignal::DMOTOR_2                => Address(ShiftRegister::IC2, Bit::D3),
+        OutputExpanderSignal::EMOTOR_1                => Address(ShiftRegister::IC2, Bit::D4),
+        OutputExpanderSignal::EMOTOR_2                => Address(ShiftRegister::IC2, Bit::D5),
+        OutputExpanderSignal::NMOTOR_1                => Address(ShiftRegister::IC2, Bit::D6),
+        OutputExpanderSignal::NMOTOR_2                => Address(ShiftRegister::IC2, Bit::D7),
+        OutputExpanderSignal::HF_1                    => Address(ShiftRegister::IC3, Bit::D0),
+        OutputExpanderSignal::HF_2                    => Address(ShiftRegister::IC3, Bit::D1),
+        OutputExpanderSignal::BUZZER                  => Address(ShiftRegister::IC3, Bit::D2),
+        OutputExpanderSignal::LED_POS_ALC             => Address(ShiftRegister::IC3, Bit::D3),
+        OutputExpanderSignal::LED_PROGRAMA            => Address(ShiftRegister::IC3, Bit::D4),
+        OutputExpanderSignal::LED_ERRO                => Address(ShiftRegister::IC3, Bit::D5),
+        OutputExpanderSignal::LED_EXECUCAO            => Address(ShiftRegister::IC3, Bit::D6),
+        OutputExpanderSignal::LED_MANUAL              => Address(ShiftRegister::IC3, Bit::D7),
+    }
 }
 
 
 pub struct OutputExpander {
-    stage_area: ShiftOutData,   
-    has_changed: bool,          // avoid to send data to hardware if it doesn't has changed since last commit
+    stage_area: ShiftOutData,
+    has_changed: bool,
 }
 
 impl OutputExpander {
@@ -65,130 +125,220 @@ impl OutputExpander {
             has_changed: true,  // first commit we must send all
         }
     }
-    
-    // send all signais in the staged area to hardware
-    pub fn commit(&self) -> &Self {
+
+    // send all signais from the staged_area area to hardware if there is something to send
+    pub fn commit(&mut self) -> () {
         // avoid to send data if nothing has changed
         if self.has_changed {
             write_shiftout(&self.stage_area);
+            self.has_changed = false; //reset flag
         };
-        self
     }
 
-    // helper function
-    pub fn set_signal__(&mut self, register: u8, position: u8, data_bit: bool) -> &mut Self {
-        //FIXME: Below code is unnecessary repetitive. Refactor it when possible!
+    fn get_byte_from_stage_area__(&self, register: ShiftRegister) -> u8 {
         match register {
-            0 => { 
-                let oldByte = self.stage_area.byte0;
-                let newByte = configure_bit(self.stage_area.byte0, position, data_bit);
-                if newByte==oldByte {
-                    self.has_changed = false;
-                } else {
-                    self.has_changed = true;
-                    self.stage_area.byte0 = newByte;
-                }
-            },
-            1 => { 
-                let oldByte = self.stage_area.byte1;
-                let newByte = configure_bit(self.stage_area.byte1, position, data_bit);
-                if newByte==oldByte {
-                    self.has_changed = false;
-                } else {
-                    self.has_changed = true;
-                    self.stage_area.byte1 = newByte;
-                }
-            },
-            2 => { 
-                let oldByte = self.stage_area.byte2;
-                let newByte = configure_bit(self.stage_area.byte2, position, data_bit);
-                if newByte==oldByte {
-                    self.has_changed = false;
-                } else {
-                    self.has_changed = true;
-                    self.stage_area.byte2 = newByte;
-                }
-            },
-            3 => { 
-                let oldByte = self.stage_area.byte3;
-                let newByte = configure_bit(self.stage_area.byte3, position, data_bit);
-                if newByte==oldByte {
-                    self.has_changed = false;
-                } else {
-                    self.has_changed = true;
-                    self.stage_area.byte3 = newByte;
-                }
-            },
-            _ => unreachable!("Error: trying to index an invalid shift register output"),
+            ShiftRegister::IC0 => self.stage_area.byte0,
+            ShiftRegister::IC1 => self.stage_area.byte1,
+            ShiftRegister::IC2 => self.stage_area.byte2,
+            ShiftRegister::IC3 => self.stage_area.byte3,
         }
+    }
+
+    fn get_bit_from_stage_area__(&self, address: Address) -> bool {
+        let Address(register, position) = address;
+        let byte = self.get_byte_from_stage_area__(register);
+        let bit = get_bit_at_as_bool(byte, position as u8);
+        bit
+    }
+
+    
+
+    fn set_bit_in_stage_area__(&mut self, address: Address, data_bit: bool) -> () {
+        let Address(register, position) = address;
+        let current_byte = self.get_byte_from_stage_area__(register);
+        let new_byte = configure_bit(current_byte, position as u8, data_bit);
+        // If there is nothing to modify than does nothing to avoid to unnecessary commits
+        if new_byte != current_byte {
+            self.has_changed = true;
+            match register {
+                ShiftRegister::IC0 => self.stage_area.byte0 = new_byte,
+                ShiftRegister::IC1 => self.stage_area.byte1 = new_byte,
+                ShiftRegister::IC2 => self.stage_area.byte2 = new_byte,
+                ShiftRegister::IC3 => self.stage_area.byte3 = new_byte,
+            };
+        }; 
+        
+    }
+
+    fn stage_signal__(&mut self, signal: OutputExpanderSignal, data_bit: bool) -> &mut Self {
+        let address = getAddress__(signal);
+        self.set_bit_in_stage_area__(address, data_bit);
         self
     }
 
-    // save signal to stage area but not send it to hardware
-    pub fn stage_signal(&mut self, signal: OutputExpanderSignal) -> &mut Self {
-        match signal {
-            OutputExpanderSignal::KBD_SA(data) =>              self.set_signal__(0, 0, data),
-            OutputExpanderSignal::KBD_SB(data) =>              self.set_signal__(0, 1, data),
-            OutputExpanderSignal::KBD_S1(data) =>              self.set_signal__(0, 2, data),
-            OutputExpanderSignal::KBD_S2(data) =>              self.set_signal__(0, 3, data),
-            OutputExpanderSignal::KBD_S3(data) =>              self.set_signal__(0, 4, data),
-            OutputExpanderSignal::KBD_S4(data) =>              self.set_signal__(0, 5, data),
-            OutputExpanderSignal::KBD_S5(data) =>              self.set_signal__(0, 6, data),
-            OutputExpanderSignal::KBD_S6(data) =>              self.set_signal__(0, 7, data),
-            OutputExpanderSignal::KBD_S7(data) =>              self.set_signal__(1, 0, data),
-            OutputExpanderSignal::KBD_S8(data) =>              self.set_signal__(1, 1, data),
-            OutputExpanderSignal::SAIDA_VAGO1(data) =>         self.set_signal__(1, 2, data),
-            OutputExpanderSignal::COPIA_SINAL_PTR(data) =>     self.set_signal__(1, 3, data),
-            OutputExpanderSignal::SAIDA_START_OUTRO(data) =>   self.set_signal__(1, 4, data),
-            OutputExpanderSignal::INVMEN(data) =>              self.set_signal__(1, 5, data),
-            OutputExpanderSignal::P3(data) =>                  self.set_signal__(1, 6, data),
-            OutputExpanderSignal::P2(data) =>                  self.set_signal__(1, 7, data),
-            OutputExpanderSignal::P1(data) =>                  self.set_signal__(2, 0, data),
-            OutputExpanderSignal::P0(data) =>                  self.set_signal__(2, 1, data),
-            OutputExpanderSignal::DMOTOR_1(data) =>            self.set_signal__(2, 2, data),
-            OutputExpanderSignal::DMOTOR_2(data) =>            self.set_signal__(2, 3, data),
-            OutputExpanderSignal::EMOTOR_1(data) =>            self.set_signal__(2, 4, data),
-            OutputExpanderSignal::EMOTOR_2(data) =>            self.set_signal__(2, 5, data),
-            OutputExpanderSignal::NMOTOR_1(data) =>            self.set_signal__(2, 6, data),
-            OutputExpanderSignal::NMOTOR_2(data) =>            self.set_signal__(2, 7, data),
-            OutputExpanderSignal::HF_1(data) =>                self.set_signal__(3, 0, data),
-            OutputExpanderSignal::HF_2(data) =>                self.set_signal__(3, 1, data),
-            OutputExpanderSignal::BUZZER(data) =>              self.set_signal__(3, 2, data),
-            OutputExpanderSignal::LED_POS_ALC(data) =>         self.set_signal__(3, 3, data),
-            OutputExpanderSignal::LED_PROGRAMA(data) =>        self.set_signal__(3, 4, data),
-            OutputExpanderSignal::LED_ERRO(data) =>            self.set_signal__(3, 5, data),
-            OutputExpanderSignal::LED_EXECUCAO(data) =>        self.set_signal__(3, 6, data),
-            OutputExpanderSignal::LED_MANUAL(data) =>          self.set_signal__(3, 7, data),
-        };
-        self
+    // Public api
+
+    pub fn KBD_SA(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::KBD_SA, data)
     }
 
+    pub fn KBD_SB(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::KBD_SB, data)
+    }
+
+    pub fn KBD_S1(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::KBD_S1, data)
+    }
+
+    pub fn KBD_S2(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::KBD_S2, data)
+    }
+
+    pub fn KBD_S3(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::KBD_S3, data)
+    }
+
+    pub fn KBD_S4(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::KBD_S4, data)
+    }
+
+    pub fn KBD_S5(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::KBD_S5, data)
+    }
+
+    pub fn KBD_S6(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::KBD_S6, data)
+    }
+
+    pub fn KBD_S7(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::KBD_S7, data)
+    }
+
+    pub fn KBD_S8(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::KBD_S8, data)
+    }
+
+    pub fn SAIDA_VAGO1(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::SAIDA_VAGO1, data)
+    }
+
+    pub fn COPIA_SINAL_PTR(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::COPIA_SINAL_PTR, data)
+    }
+
+    pub fn SAIDA_START_OUTRO(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::SAIDA_START_OUTRO, data)
+    }
+
+    pub fn INVMEN(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::INVMEN, data)
+    }
+
+    pub fn P3(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::P3, data)
+    }
+
+    pub fn P2(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::P2, data)
+    }
+
+    pub fn P1(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::P1, data)
+    }
+
+    pub fn P0(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::P0, data)
+    }
+
+    pub fn DMOTOR_1(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::DMOTOR_1, data)
+    }
+
+    pub fn DMOTOR_2(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::DMOTOR_2, data)
+    }
+
+    pub fn EMOTOR_1(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::EMOTOR_1, data)
+    }
+
+    pub fn EMOTOR_2(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::EMOTOR_2, data)
+    }
+
+    pub fn NMOTOR_1(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::NMOTOR_1, data)
+    }
+
+    pub fn NMOTOR_2(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::NMOTOR_2, data)
+    }
+
+    pub fn HF_1(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::HF_1, data)
+    }
+
+    pub fn HF_2(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::HF_2, data)
+    }
+
+    pub fn BUZZER(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::BUZZER, data)
+    }
+
+    pub fn LED_POS_ALC(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::LED_POS_ALC, data)
+    }
+
+    pub fn LED_PROGRAMA(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::LED_PROGRAMA, data)
+    }
+
+    pub fn LED_ERRO(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::LED_ERRO, data)
+    }
+
+    pub fn LED_EXECUCAO(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::LED_EXECUCAO, data)
+    }
+
+    pub fn LED_MANUAL(&mut self, data: bool) -> &mut Self {
+        self.stage_signal__(OutputExpanderSignal::LED_MANUAL, data)
+    }
 
 }
 
-
 //
+
+use crate::board::lcd::*;
 
 pub fn development_entry_point() -> ! {
 
-    type Output = OutputExpanderSignal;
-    
+    lcd_initialize();
+    print("iniciei");
+
     let mut output = OutputExpander::new();
 
     loop {
         output
-            .stage_signal(Output::BUZZER(false))
-            .stage_signal(Output::LED_MANUAL(true))
+            .BUZZER(true)
+            .LED_ERRO(true)
+            .LED_MANUAL(true)
+            .LED_POS_ALC(true)
+            .LED_PROGRAMA(true)
             .commit();
         
-        delay_ms(50);
+        delay_ms(2000);
 
         output
-            .stage_signal(Output::BUZZER(false))
-            .stage_signal(Output::LED_MANUAL(false))
+            .BUZZER(false)
+            .LED_ERRO(false)
+            .LED_MANUAL(false)
+            .LED_POS_ALC(false)
+            .LED_PROGRAMA(false)
             .commit();
         
-        delay_ms(50);
+        delay_ms(1000);
         
     }
     
