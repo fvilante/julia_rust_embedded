@@ -9,7 +9,7 @@ use crate::{common::configure_bit, microcontroler::delay::delay_ms};
 use super::shiftout::{init_shiftout_pins, write_shiftout};
 
 
-enum OutputExpanderSignal {
+pub enum OutputExpanderSignal {
     KBD_SA(bool),              // OUTPUT_BUS0     KBD-SA                   BIT0 - SHIFT-REGISTER 1 BEGIN
     KBD_SB(bool),              // OUTPUT_BUS1     KBD-SB                   BIT1             
     KBD_S1(bool),              // OUTPUT_BUS2     KBD-S1                   BIT2
@@ -45,7 +45,7 @@ enum OutputExpanderSignal {
 }
 
 
-struct OutputExpander {
+pub struct OutputExpander {
     stage_area: ShiftOutData,   
     has_changed: bool,          // avoid to send data to hardware if it doesn't has changed since last commit
 }
@@ -53,7 +53,7 @@ struct OutputExpander {
 impl OutputExpander {
 
     // call this function before all others
-    fn new() -> Self {
+    pub fn new() -> Self {
         init_shiftout_pins();
         OutputExpander {
             stage_area: ShiftOutData {
@@ -67,15 +67,16 @@ impl OutputExpander {
     }
     
     // send all signais in the staged area to hardware
-    fn commit(&self) -> () {
+    pub fn commit(&self) -> &Self {
         // avoid to send data if nothing has changed
         if self.has_changed {
             write_shiftout(&self.stage_area);
-        }
+        };
+        self
     }
 
     // helper function
-    fn set_signal__(&mut self, register: u8, position: u8, data_bit: bool) -> () {
+    pub fn set_signal__(&mut self, register: u8, position: u8, data_bit: bool) -> &mut Self {
         //FIXME: Below code is unnecessary repetitive. Refactor it when possible!
         match register {
             0 => { 
@@ -119,11 +120,12 @@ impl OutputExpander {
                 }
             },
             _ => unreachable!("Error: trying to index an invalid shift register output"),
-        };
+        }
+        self
     }
 
     // save signal to stage area but not send it to hardware
-    fn stage_signal(&mut self, signal: OutputExpanderSignal) -> () {
+    pub fn stage_signal(&mut self, signal: OutputExpanderSignal) -> &mut Self {
         match signal {
             OutputExpanderSignal::KBD_SA(data) =>              self.set_signal__(0, 0, data),
             OutputExpanderSignal::KBD_SB(data) =>              self.set_signal__(0, 1, data),
@@ -157,7 +159,8 @@ impl OutputExpander {
             OutputExpanderSignal::LED_ERRO(data) =>            self.set_signal__(3, 5, data),
             OutputExpanderSignal::LED_EXECUCAO(data) =>        self.set_signal__(3, 6, data),
             OutputExpanderSignal::LED_MANUAL(data) =>          self.set_signal__(3, 7, data),
-        }
+        };
+        self
     }
 
 
@@ -167,17 +170,24 @@ impl OutputExpander {
 //
 
 pub fn development_entry_point() -> ! {
+
+    type Output = OutputExpanderSignal;
     
     let mut output = OutputExpander::new();
 
     loop {
-        output.stage_signal(OutputExpanderSignal::BUZZER(false));
-        output.stage_signal(OutputExpanderSignal::LED_MANUAL(true));
-        output.commit();
+        output
+            .stage_signal(Output::BUZZER(false))
+            .stage_signal(Output::LED_MANUAL(true))
+            .commit();
+        
         delay_ms(50);
-        output.stage_signal(OutputExpanderSignal::BUZZER(false));
-        output.stage_signal(OutputExpanderSignal::LED_MANUAL(false));
-        output.commit();
+
+        output
+            .stage_signal(Output::BUZZER(false))
+            .stage_signal(Output::LED_MANUAL(false))
+            .commit();
+        
         delay_ms(50);
         
     }
