@@ -22,7 +22,7 @@ use microcontroler::{
 #[arduino_hal::entry]
 fn main() -> ! {
 
-    board::shiftin::entry_point_for_development()
+    board::keyboard::entry_point_for_development()
 
     /*    
     init_timer();
