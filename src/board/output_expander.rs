@@ -44,12 +44,6 @@ enum OutputExpanderSignal {
     LED_MANUAL(bool),          // OUTPUT_BUS31    LED_MANUAL               BIT7
 }
 
-enum ShiftRegister {
-    Register0=0,
-    Register1=1,
-    Register2=2,
-    Register3=3,
-}
 
 struct OutputExpander {
     stage_area: ShiftOutData,   
@@ -57,8 +51,6 @@ struct OutputExpander {
 }
 
 impl OutputExpander {
-
-  
 
     // call this function before all others
     fn new() -> Self {
