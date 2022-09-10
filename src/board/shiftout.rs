@@ -107,7 +107,7 @@ fn shiftout__(data_out: u8 ) {
     }
 }
 
-pub fn write_shiftout(data: ShiftOutData) -> () {
+pub fn write_shiftout(data: &ShiftOutData) -> () {
     //enable chips
     srenab_out(LOW);
 
@@ -200,7 +200,7 @@ pub fn example_1() -> ! {
             byte2: (0x00), 
             byte3: (0x00), 
         };
-        write_shiftout(data); 
+        write_shiftout(&data); 
         //delay_ms(100);
         data = ShiftOutData { 
             byte0: (0x00), 
@@ -208,7 +208,7 @@ pub fn example_1() -> ! {
             byte2: (0x00), 
             byte3: (1<<6), // this pulse has 230 usec of period and
         };
-        write_shiftout(data);
+        write_shiftout(&data);
         //delay_ms(100);    
     }
 }
