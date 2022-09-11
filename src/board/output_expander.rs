@@ -7,7 +7,7 @@ use super::shiftout::ShiftOutData;
 
 use crate::{common::{configure_bit, get_bit_at_as_bool}, microcontroler::delay::delay_ms};
 
-use super::shiftout::{init_shiftout_pins, write_shiftout};
+use super::shiftout::{write_shiftout};
 
 pub enum OutputExpanderSignal {
     KBD_SA,              // OUTPUT_BUS0     KBD-SA                   BIT0 - SHIFT-REGISTER 0 BEGIN
@@ -114,7 +114,6 @@ impl OutputExpander {
 
     // call this function before all others
     pub fn new() -> Self {
-        init_shiftout_pins();
         OutputExpander {
             stage_area: ShiftOutData {
                 byte0: 0x00,

@@ -7,7 +7,7 @@ use crate::board::lcd;
 use crate::microcontroler::delay::{delay_us, delay_ms};
 
 use super::output_expander;
-use super::shiftout::{ShiftOutData, write_shiftout, init_shiftout_pins};
+use super::shiftout::{ShiftOutData, write_shiftout};
 
 const HIGH: bool = true;
 const LOW: bool = false;
@@ -72,6 +72,9 @@ fn shiftInA() -> u8 {
 
 pub fn readShiftIn() -> ShiftInData {
 
+    //FIX: When possible make this initialization execute once on first execution.
+    init_shiftin_pins();
+
     let mut data: ShiftInData = ShiftInData{byte0: 0x00, byte1: 0x00, byte2: 0x00 };
     
     //Pulse the latch pin:
@@ -98,19 +101,7 @@ pub fn readShiftIn() -> ShiftInData {
 pub fn development_entry_point() -> ! {
 
     lcd::lcd_initialize();
-
-/* 
-    port::D4::set_input();
-    //PD4 = printgo = pino 6 (uPC) (configurado como entrada)
-    loop {
-        while port::D4::is_low() {
-            output_expander::OutputExpander::new().BUZZER(true).commit();
-        }
-    }
-*/
-
-    init_shiftout_pins();
-    init_shiftin_pins();
+    
     let mut data: ShiftOutData = ShiftOutData { 
         byte0: (0x00), 
         byte1: (0x00), 

@@ -16,7 +16,7 @@ use super::debug::{
 const HIGH: bool = true;
 const LOW: bool = false;
 
-pub fn init_shiftout_pins() -> () {
+fn init_shiftout_pins() -> () {
     port::B0::set_output();
     port::B2::set_output();
     port::D6::set_output();
@@ -109,6 +109,10 @@ fn shiftout__(data_out: u8 ) {
 }
 
 pub fn write_shiftout(data: ShiftOutData) -> () {
+
+    //FIX: When possible make this initialization execute once on first execution.
+    init_shiftout_pins();
+
     //enable chips
     srenab_out(LOW);
 
@@ -190,8 +194,6 @@ pub fn test_signal() -> ! {
 // high pulse width = 4usec
 // note: the focus was just to take a first measurement, no conclusions have beeing derived from that. 
 pub fn example_1() -> ! {
-    
-    init_shiftout_pins();
 
     loop {
     
