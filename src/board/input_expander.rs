@@ -112,7 +112,7 @@ impl InputExpander {
     }
 
     // fetch data from the hardware and save it on memory cache
-    pub fn fetch(&mut self) -> &Self {
+    pub fn fetch(&mut self) -> &mut Self {
         let data_read = readShiftIn();
         self.cache = data_read;
         self

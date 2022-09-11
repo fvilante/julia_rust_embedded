@@ -4,7 +4,10 @@ use ruduino::Pin;
 use ruduino::cores::atmega328p::{port};
 
 use crate::board::lcd;
-use crate::microcontroler::delay::delay_us;
+use crate::microcontroler::delay::{delay_us, delay_ms};
+
+use super::output_expander;
+use super::shiftout::{ShiftOutData, write_shiftout, init_shiftout_pins};
 
 const HIGH: bool = true;
 const LOW: bool = false;
@@ -35,12 +38,11 @@ fn latch_in(value: bool) -> () {
 }
 
 fn serial_in() -> bool {  
-    let result = port::D7::is_high();
-    result
+    port::D7::is_high()
 }
 
 //
-
+#[derive(PartialEq)]
 pub struct ShiftInData {
     pub byte0: u8,
     pub byte1: u8,
@@ -93,21 +95,44 @@ pub fn readShiftIn() -> ShiftInData {
 
 //
 
-pub fn entry_point_for_development() -> ! {
+pub fn development_entry_point() -> ! {
 
     lcd::lcd_initialize();
 
-    lcd::print("Inicializado");
+/* 
+    port::D4::set_input();
+    //PD4 = printgo = pino 6 (uPC) (configurado como entrada)
+    loop {
+        while port::D4::is_low() {
+            output_expander::OutputExpander::new().BUZZER(true).commit();
+        }
+    }
+*/
 
-    let data = readShiftIn();
+    init_shiftout_pins();
+    init_shiftin_pins();
+    let mut data: ShiftOutData = ShiftOutData { 
+        byte0: (0x00), 
+        byte1: (0x00), 
+        byte2: (0x00), 
+        byte3: (0x00), 
+    };
+    write_shiftout(data);
 
-    lcd::print_u8_in_hex(data.byte0);
-    lcd::print_u8_in_hex(data.byte1);
-    lcd::print_u8_in_hex(data.byte1);
-    
 
+    loop {
+        let current = readShiftIn();
+        lcd::clear();
+        lcd::print_u8_in_hex(current.byte0);
+        lcd::print(";");
+        lcd::print_u8_in_hex(current.byte1);
+        lcd::print(";");
+        lcd::print_u8_in_hex(current.byte2);
+        lcd::print(";");
 
-    loop { }
+        delay_ms(1000);
+
+     }
 
 }
 

@@ -130,7 +130,7 @@ impl OutputExpander {
     pub fn commit(&mut self) -> () {
         // avoid to send data if nothing has changed
         if self.has_changed {
-            write_shiftout(&self.stage_area);
+            write_shiftout(self.stage_area);
             self.has_changed = false; //reset flag
         };
     }
