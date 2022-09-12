@@ -1,6 +1,8 @@
+#![allow(non_snake_case)] // remove this line when possible
 #![no_std]
 #![no_main]
 #![feature(abi_avr_interrupt)]
+
 
 #![allow(unused_imports)]
 #![allow(dead_code)]
@@ -22,7 +24,8 @@ use microcontroler::{
 #[arduino_hal::entry]
 fn main() -> ! {
 
-    board::shiftin::development_entry_point()
+    board::keyboard::development_entry_point()
+
 
     /*    
     init_timer();

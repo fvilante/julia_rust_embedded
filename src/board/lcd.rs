@@ -7,7 +7,7 @@ use ruduino::cores::atmega328p::{port};
 
 use crate::microcontroler::delay::{delay_us, delay_ms};
 
-use crate::common::{get_bit_at_as_bool, convert_u8_to_str_hex};
+use crate::common::{get_bit_at_as_bool, convert_u8_to_str_hex, convert_u16_to_str_hex};
 
 const HIGH: bool = true;
 const LOW: bool = false;
@@ -137,9 +137,17 @@ fn write_u8(value: u8) -> () {
 // Very high level user functions
 
 // print just one byte
+pub fn print_bit(bit: bool) -> () {
+    if bit == true {
+        print_char('1');
+    } else {
+        print_char('0');
+    }
+}
+
+// print just one byte
 pub fn print_u8(value: u8) -> () {
     write_u8(value);
-    //return 1; // assume sucess // @@ line removed by considered unecessary. (Please check and remove this line if possible)
 }
 
 pub fn print_u8_in_hex(value: u8) -> () {
@@ -147,13 +155,20 @@ pub fn print_u8_in_hex(value: u8) -> () {
     print_char(high);
     print_char(low);
     print_char('h');
-    //return 1; // assume sucess // @@ line removed by considered unecessary. (Please check and remove this line if possible)
+}
+
+pub fn print_u16_in_hex(value: u16) -> () {
+    let (Q3, Q2, Q1, Q0) = convert_u16_to_str_hex(value);
+    print_char(Q3);
+    print_char(Q2);
+    print_char(Q1);
+    print_char(Q0);
+    print_char('h');
 }
 
 // print just one byte
 pub fn print_char(value: char) -> () {
     write_u8(value as u8);
-    //return 1; // assume sucess // @@ line removed by considered unecessary. (Please check and remove this line if possible)
 }
 
 // prints a full string

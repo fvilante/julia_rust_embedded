@@ -1,17 +1,19 @@
-// on-board circuit keyboard driver
+// low-level driver for keypad
 
-#![allow(non_camel_case_types)]
+use arduino_hal::pac::AC;
 
-use ruduino::Pin;
-use ruduino::cores::atmega328p::{port};
+use crate::{board::lcd, common::set_bit_at};
 
-use crate::board::lcd;
-use crate::microcontroler::delay::delay_us;
+use super::{shiftout::{write_shiftout, ShiftOutData}, shiftin::readShiftIn, output_expander::OutputExpander, input_expander::InputExpander};
 
-const HIGH: bool = true;
-const LOW: bool = false;
+use crate::microcontroler::delay::delay_ms;
 
-enum KEY_CODES {
+const ACTIVATED: bool = false; //low level
+const DEACTIVATE: bool = true; //true level
+
+// 
+#[derive(Copy, Clone)]
+enum KeyCode {
     //Some key codes try to imitate ASCII table codes (ie: ESC, Enter and numerals digitis )
     //Other codes on this table was arbitrary assigned.
     //Key codes are grouped by family of keys
@@ -73,135 +75,103 @@ enum KEY_CODES {
     KEY_HIDDEN_KEY = 0x90,    
 }
 
-
-struct KeypadSize {
-    rows: u8,
-    collumns: u8
-}
-
-enum KeypadState {
-    IDLE=0,
-    PRESSED,
-    RELEASED,
-    HOLD,
-}
-
-enum INPUT_PIN {
-    KBD_E1,
-    KBD_E2,
-    KBD_E3,
-    KBD_E4,
-}
-
-enum OUTPUT_PIN {
-    KBD_S1(bool),
-    KBD_S2(bool),
-    KBD_S3(bool),
-    KBD_S4(bool),
-    KBD_S5(bool),
-    KBD_S6(bool),
-    KBD_S7(bool),
-    KBD_S8(bool),
-}
-
-    
-
-fn set_output(pin: OUTPUT_PIN) -> () {
-    match pin {
-        OUTPUT_PIN::KBD_S1(value) => unimplemented!(),
-        OUTPUT_PIN::KBD_S2(value) => unimplemented!(),
-        OUTPUT_PIN::KBD_S3(value) => unimplemented!(),
-        OUTPUT_PIN::KBD_S4(value) => unimplemented!(),
-        OUTPUT_PIN::KBD_S5(value) => unimplemented!(),
-        OUTPUT_PIN::KBD_S6(value) => unimplemented!(),
-        OUTPUT_PIN::KBD_S7(value) => unimplemented!(),
-        OUTPUT_PIN::KBD_S8(value) => unimplemented!(),
-    }
-}
-
-fn read_input(pin: INPUT_PIN) -> bool {
-    match pin {
-        INPUT_PIN::KBD_E1 => unimplemented!(),
-        INPUT_PIN::KBD_E2 => unimplemented!(),
-        INPUT_PIN::KBD_E3 => unimplemented!(),
-        INPUT_PIN::KBD_E4 => unimplemented!(),
-    }
-}
-
 //constants
-const keymap: [[KEY_CODES;4];8] = [
-    [KEY_CODES::KEY_F1,  KEY_CODES::KEY_7,  KEY_CODES::KEY_8,  KEY_CODES::KEY_9,       KEY_CODES::KEY_EXECUCAO,               KEY_CODES::KEY_INS,                       KEY_CODES::KEY_ESC,                        KEY_CODES::KEY_HIDDEN_KEY],
-    [KEY_CODES::KEY_F2,  KEY_CODES::KEY_4,  KEY_CODES::KEY_5,  KEY_CODES::KEY_6,       KEY_CODES::KEY_MAIS_OU_MENOS,          KEY_CODES::KEY_DIRECIONAL_PARA_ESQUERDA,  KEY_CODES::KEY_DIRECIONAL_PARA_CIMA,       KEY_CODES::KEY_START],
-    [KEY_CODES::KEY_F3,  KEY_CODES::KEY_1,  KEY_CODES::KEY_2,  KEY_CODES::KEY_3,       KEY_CODES::KEY_SETA_BRANCA_DIREITA,    KEY_CODES::KEY_DIRECIONAL_PARA_BAIXO,     KEY_CODES::KEY_DIRECIONAL_PARA_DIREITA,    KEY_CODES::KEY_MANUAL],
-    [KEY_CODES::KEY_F4,  KEY_CODES::KEY_0,  KEY_CODES::KEY_0,  KEY_CODES::KEY_ENTER,   KEY_CODES::KEY_SETA_BRANCA_ESQUERDA,   KEY_CODES::KEY_DEL,                       KEY_CODES::KEY_STOP,                       KEY_CODES::KEY_PROGRAMA],
-];
-const ROWS: u8 = 8; // eight rows (inputs)
-const COLS: u8 = 8; // eight columns (outputs)
-const size: KeypadSize = KeypadSize { rows: ROWS, collumns: COLS };
-const rowPins: [INPUT_PIN;4] = [ 
-    INPUT_PIN::KBD_E1, 
-    INPUT_PIN::KBD_E2, 
-    INPUT_PIN::KBD_E3, 
-    INPUT_PIN::KBD_E4 
-];
-const colPins: [OUTPUT_PIN;8] = [ 
-    OUTPUT_PIN::KBD_S1,
-    OUTPUT_PIN::KBD_S2,
-    OUTPUT_PIN::KBD_S3,
-    OUTPUT_PIN::KBD_S4,
-    OUTPUT_PIN::KBD_S5,
-    OUTPUT_PIN::KBD_S6,
-    OUTPUT_PIN::KBD_S7,
-    OUTPUT_PIN::KBD_S8,
-];
-const DEACTIVATE: u8 = HIGH;
-const ACTIVATE: u8 = LOW;
 
-//keyboard internal state
-static state: KeypadState = KeypadState::IDLE;
-static currentKey: KEY_CODES = KEY_CODES::NO_KEY;
-static lastUpdate: u64 = 0;    // milisecs?
-static debounceTime: u32 = 50; // microseconds
-static holdTime: u32 = 1000; // milisecs?
-
-fn init_keyboard() -> () {
-
-    for each_pin in colPins {
-        set_output(each_pin(DEACTIVATE));
-    };
-
+struct Keypad { 
+    output: OutputExpander,
+    input: InputExpander,
+    //last_keycode_read: KeyCode,
 }
 
-// Returns the key code of the pressed key, or NO_KEY if no key is pressed
-fn getKey() -> KEY_CODES {
+const keymap: [[KeyCode;8];4] = [
+    [KeyCode::KEY_F1,  KeyCode::KEY_7,  KeyCode::KEY_8,  KeyCode::KEY_9,       KeyCode::KEY_EXECUCAO,               KeyCode::KEY_INS,                       KeyCode::KEY_ESC,                        KeyCode::KEY_HIDDEN_KEY],
+    [KeyCode::KEY_F2,  KeyCode::KEY_4,  KeyCode::KEY_5,  KeyCode::KEY_6,       KeyCode::KEY_MAIS_OU_MENOS,          KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA,  KeyCode::KEY_DIRECIONAL_PARA_CIMA,       KeyCode::KEY_START],
+    [KeyCode::KEY_F3,  KeyCode::KEY_1,  KeyCode::KEY_2,  KeyCode::KEY_3,       KeyCode::KEY_SETA_BRANCA_DIREITA,    KeyCode::KEY_DIRECIONAL_PARA_BAIXO,     KeyCode::KEY_DIRECIONAL_PARA_DIREITA,    KeyCode::KEY_MANUAL],
+    [KeyCode::KEY_F4,  KeyCode::KEY_0,  KeyCode::KEY_0,  KeyCode::KEY_ENTER,   KeyCode::KEY_SETA_BRANCA_ESQUERDA,   KeyCode::KEY_DEL,                       KeyCode::KEY_STOP,                       KeyCode::KEY_PROGRAMA],
+];
 
-    //assume that no key is pressed, this is the default return for getKey()
-    let key: KEY_CODES = KEY_CODES::NO_KEY;
 
-        for col_pin in OUTPUT_PIN {
-            set_output(col_pin(ACTIVATE)); // Activate the current collumn
-            for row_pin in INPUT_PIN {
-                key_read = read_input(row_pin);
-                if key_read == true {
-                    //currentKey = keymap[]
-                    Beep();
-                }
+impl Keypad {
 
-            }
-            set_output(col_pin(DEACTIVATE));
-
+    pub fn new() -> Self {
+        let output = OutputExpander::new();
+        let input = InputExpander::new();
+        Keypad { 
+            output,
+            input,
         }
+    }
 
+    fn set_output(&mut self, n: u8, value: bool) -> () {
+        //ATTENTION: Do call commit() after write.
+        match n {
+            0 => self.output.KBD_S1(value).commit(),
+            1 => self.output.KBD_S2(value).commit(),
+            2 => self.output.KBD_S3(value).commit(),
+            3 => self.output.KBD_S4(value).commit(),
+            4 => self.output.KBD_S5(value).commit(),
+            5 => self.output.KBD_S6(value).commit(),
+            6 => self.output.KBD_S7(value).commit(),
+            7 => self.output.KBD_S8(value).commit(),
+            _ => unreachable!(),
+        };
+    }
 
+    fn get_input(&mut self, n: u8) -> bool {
+        //ATTENTION: Do call fetch() before read.
+        match n {
+            0 => self.input.fetch().KBD_E1(),
+            1 => self.input.fetch().KBD_E2(),
+            2 => self.input.fetch().KBD_E3(),
+            3 => self.input.fetch().KBD_E4(),
+            4 => self.input.fetch().KBD_E5(),
+            5 => self.input.fetch().KBD_E6(),
+            6 => self.input.fetch().KBD_E7(),
+            7 => self.input.fetch().KBD_E8(),
+            _ => unreachable!(),            
+        }
+    }
+
+    fn scan(&mut self) -> KeyCode {
+        let mut key_code: KeyCode = KeyCode::NO_KEY;       
+        for collumn in 0..=7 {
+            self.set_output(collumn, ACTIVATED);
+            for row in 0..=3 {
+                let bit = self.get_input(row);
+                if bit == ACTIVATED {
+                    key_code = keymap[row as usize][collumn as usize];
+                }
+            }
+            self.set_output(collumn, DEACTIVATE);
+        };
+        key_code
+  
+    }
 
 
 }
 
 
 
+pub fn development_entry_point() -> ! {
 
-// 
+    lcd::lcd_initialize();
+    lcd::clear();
+    lcd::print("Pressione qualquer tecla");
 
-pub fn entry_point_for_development() -> ! {
+    let mut keypad = Keypad::new();
+
+    loop {
+        let keycode = keypad.scan();
+        lcd::setCursor(0, 1);
+        lcd::print_u8_in_hex(keycode as u8);
+        delay_ms(100);
+    }
 
 }
+
+
+
+
+
+
