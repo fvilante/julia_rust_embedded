@@ -12,6 +12,7 @@ extern crate avr_std_stub;
 mod common;
 mod microcontroler;
 mod board;
+mod protocol;
 
 
 use microcontroler::{
@@ -24,7 +25,7 @@ use microcontroler::{
 #[arduino_hal::entry]
 fn main() -> ! {
 
-    board::keyboard::development_entry_point()
+    protocol::parser1::development_entry_point()
 
 
     /*    

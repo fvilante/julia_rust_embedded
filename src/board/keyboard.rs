@@ -12,6 +12,8 @@ const ACTIVATED: bool = false; //low level
 const DEACTIVATE: bool = true; //true level
 
 // 
+
+#[allow(non_camel_case_types)]
 #[derive(Copy, Clone)]
 enum KeyCode {
     //Some key codes try to imitate ASCII table codes (ie: ESC, Enter and numerals digitis )
