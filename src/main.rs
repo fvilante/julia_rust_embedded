@@ -25,7 +25,7 @@ use microcontroler::{
 #[arduino_hal::entry]
 fn main() -> ! {
 
-    microcontroler::serial::development_entry_point();
+    protocol::datalink_comm::development_entry_point();
 
 
 
