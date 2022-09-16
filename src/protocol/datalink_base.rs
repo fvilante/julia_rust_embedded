@@ -64,3 +64,19 @@ pub enum ProtoStates {
     SUCESSFUL,
     ERROR, //fix: not implmented yet
 }
+
+pub fn protoStates_toString(state: ProtoStates) -> &'static str {
+    match state {
+         ProtoStates::INITIAL_ESC =>    "ESA", 
+         ProtoStates::START_BYTE => "STB", 
+         ProtoStates::DIRECTION_AND_CHANNEL =>  "D&C", 
+         ProtoStates::COMMAND =>    "CMD", 
+         ProtoStates::DATA_LOW =>   "DL", 
+         ProtoStates::DATA_HIGH =>  "DH", 
+         ProtoStates::FINAL_ESC =>  "ESB", 
+         ProtoStates::ETX_BYTE =>   "ETX", 
+         ProtoStates::CHECKSUM =>   "CHK", 
+         ProtoStates::SUCESSFUL =>  "SUCESSFUL", 
+         ProtoStates::ERROR =>  "ERROR", 
+    }
+}

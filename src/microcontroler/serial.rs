@@ -46,7 +46,7 @@ pub fn receive() -> u8 {
     serial::receive()
 }
 
-// non-blocking try to receive Some(byte) else None byte available yet
+/// non-blocking try to read one byte from serial, if `Some` byte available returns it, else returns `None`
 pub fn try_receive() -> Option<u8> {
    serial::try_receive()
 }

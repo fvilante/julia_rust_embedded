@@ -4,7 +4,7 @@ use crate::board::lcd;
 
 use super::datalink_base::{StartByte, PacketBaseStructure, ProtoStates, ProtoControl};
 
-struct PacketOutgoingService {
+pub struct PacketOutgoingService {
     startByte_: StartByte,
     basePack_: PacketBaseStructure,
     duplicateESC_: bool,

@@ -8,25 +8,6 @@ use super::datalink_base::{
 };
 
 
-fn protoStates_toString(state: ProtoStates) -> &'static str {
-    match state {
-         ProtoStates::INITIAL_ESC =>    "INITIAL_ESC", 
-         ProtoStates::START_BYTE => "START_BYTE", 
-         ProtoStates::DIRECTION_AND_CHANNEL =>  "DIRECTION_AND_CHANNEL", 
-         ProtoStates::COMMAND =>    "COMMAND", 
-         ProtoStates::DATA_LOW =>   "DATA_LOW", 
-         ProtoStates::DATA_HIGH =>  "DATA_HIGH", 
-         ProtoStates::FINAL_ESC =>  "FINAL_ESC", 
-         ProtoStates::ETX_BYTE =>   "ETX_BYTE", 
-         ProtoStates::CHECKSUM =>   "CHECKSUM", 
-         ProtoStates::SUCESSFUL =>  "SUCESSFUL", 
-         ProtoStates::ERROR =>  "ERROR", 
-    }
-}
-
-
-
-
 pub struct PacketIncommingService {
     //resultPack_: &mut PacketBaseStructure,
     tempPack_: PacketBaseStructure,
