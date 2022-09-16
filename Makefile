@@ -6,7 +6,7 @@ BUILD_DIR=target/avr-atmega328p/release
 all: build upload size
 
 build:
-	cargo build --target avr-atmega328p.json -Z build-std=core --all --release
+	cargo build -Z build-std=core --all --release
 
 upload:
 	#avrdude -v -F -c usbasp -p m328p -Uflash:w:target/avr-atmega328p/release/Julia_AVR_Rust:e
