@@ -2,6 +2,7 @@
 
 members = [
     "avr_main",
+    "lib_1",
 ]
 
 
