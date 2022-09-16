@@ -1,0 +1,17 @@
+[package]
+name = "avr_main"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+avr-std-stub = "1.0.3"
+ruduino = {  git = "https://github.com/avr-rust/ruduino", rev = "c057499" }
+panic-halt = "0.2.0"
+embedded-hal = "0.2.3"
+avr-device = "0.3.4"
+arduino-hal = { git = "https://github.com/rahix/avr-hal", rev = "1aacefb335517f85d0de858231e11055d9768cdf", features = ["arduino-uno"] }
+
+
+

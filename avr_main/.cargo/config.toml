@@ -1,0 +1,12 @@
+[build]
+target = "avr-specs/avr-atmega328p.json"
+
+[target.'cfg(target_arch = "avr")']
+runner = "ravedude uno -cb 57600"
+
+[unstable]
+build-std = ["core"]
+
+# Cargo versions before 2021-02-23 won't recognize this: https://github.com/rust-lang/cargo/pull/9175
+[env]
+AVR_CPU_FREQUENCY_HZ = "16_000_000"

@@ -3,18 +3,6 @@
 version = 3
 
 [[package]]
-name = "Julia_AVR_Rust"
-version = "0.1.0"
-dependencies = [
- "arduino-hal",
- "avr-device",
- "avr-std-stub",
- "embedded-hal",
- "panic-halt",
- "ruduino",
-]
-
-[[package]]
 name = "arduino-hal"
 version = "0.1.0"
 source = "git+https://github.com/rahix/avr-hal?rev=1aacefb335517f85d0de858231e11055d9768cdf#1aacefb335517f85d0de858231e11055d9768cdf"
@@ -109,6 +97,18 @@ version = "0.4.2"
 source = "git+https://github.com/avr-rust/delay?rev=849918a8dfb2#849918a8dfb2f6211787bd8ff69c4083d685cf54"
 dependencies = [
  "avr-config",
+]
+
+[[package]]
+name = "avr_main"
+version = "0.1.0"
+dependencies = [
+ "arduino-hal",
+ "avr-device",
+ "avr-std-stub",
+ "embedded-hal",
+ "panic-halt",
+ "ruduino",
 ]
 
 [[package]]
@@ -329,9 +329,9 @@ checksum = "e87a2ed6b42ec5e28cc3b94c09982969e9227600b2e3dcbc1db927a84c06bd69"
 
 [[package]]
 name = "unicode-ident"
-version = "1.0.3"
+version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4f5b37a154999a8f3f98cc23a628d850e154479cd94decf3414696e12e31aaf"
+checksum = "dcc811dc4066ac62f84f11307873c4850cb653bfa9b1719cee2bd2204a4bc5dd"
 
 [[package]]
 name = "vcell"
