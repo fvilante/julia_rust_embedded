@@ -3,7 +3,10 @@ AVR_SIZE=C:\avr\avr8-gnu-toolchain-win32_x86/bin/avr-size
 MCU=atmega328p
 BUILD_DIR=target/avr-atmega328p/release
 
-all: build upload size
+all: test build upload size
+
+test: 
+	cargo test --package lib_1 --release
 
 build:
 	cargo build --package avr_main -Z build-std=core --target .\avr_main\avr-specs\avr-atmega328p.json --release 
