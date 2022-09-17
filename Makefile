@@ -5,6 +5,11 @@ BUILD_DIR=target/avr-atmega328p/release
 
 all: fast
 
+# watch executes the tests if any file on the project change (note: ignore files in target and .git folder)
+# if you do not have cargo-watch instaled type "cargo install cargo-watch" to install from source.
+watch: 
+	cargo watch -c --why -s "make test"
+
 fast: build upload size
 
 full: check test build upload size
