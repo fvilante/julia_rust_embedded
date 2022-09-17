@@ -28,7 +28,7 @@ impl PacketIncommingService {
     }
 
     #[allow(unreachable_code)]
-    pub fn process_next_byte(&mut self, _byte: u8) -> (ProtoStates, Option<PacketBaseStructure>) {
+    pub fn parse_next(&mut self, _byte: u8) -> (ProtoStates, Option<PacketBaseStructure>) {
 
         let is_not_final_or_initial_esc: bool = (self.state_ != ProtoStates::InitialEsc) && (self.state_ != ProtoStates::FinalEsc);
         let is_check_sum: bool = self.state_ != ProtoStates::Checksum;
@@ -132,3 +132,35 @@ impl PacketIncommingService {
 
 }
 
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+
+
+    #[test]
+    fn it_can_accept_a_valid_segment() {
+        #[allow(arithmetic_overflow)]
+        let direcao = 0xC0;
+        let canal = 0x01;
+        let cmd = 0x50;
+        let dado_high = 0x61;
+        let dado_low = 0x03;
+        let valid_segment: [u8;9] = [0x1B, 0x06, direcao+canal, cmd, dado_low, dado_high, 0x1B, 0x03, 0x87];
+        let mut parser = PacketIncommingService::new();
+        let mut success: bool = false;
+        for byte in valid_segment {
+            let (_state, result) = parser.parse_next(byte);
+            if let Some(output) = result {
+                success = true;
+                assert_eq!(output.canal, canal);
+                assert_eq!(output.direcao, direcao);
+                assert_eq!(output.cmd, cmd);
+                assert_eq!(output.dado_high, dado_high);
+                assert_eq!(output.dado_low, dado_low);
+            };
+        }
+        assert_eq!(success, true);
+    }
+}
