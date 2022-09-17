@@ -1,92 +1,90 @@
 // low-level driver for transmiting data from the cmpp board
 
-use crate::board::lcd;
-
 use super::datalink_base::{StartByte, PacketBaseStructure, ProtoStates, ProtoControl};
 
 pub struct PacketOutgoingService {
-    startByte_: StartByte,
-    basePack_: PacketBaseStructure,
-    duplicateESC_: bool,
+    start_byte: StartByte,
+    base_pack: PacketBaseStructure,
+    duplicate_esc: bool,
     state_: ProtoStates,
-    checkSum_: u8,
+    check_sum: u8,
 }
 
 impl PacketOutgoingService {
 
-    pub fn new(startByte: StartByte, p: PacketBaseStructure) -> Self {
+    pub fn new(start_byte: StartByte, p: PacketBaseStructure) -> Self {
         Self {
-            startByte_: StartByte::STX,
-            basePack_: p,
-            duplicateESC_: false,
-            state_: ProtoStates::INITIAL_ESC,
-            checkSum_: 0x00,
+            start_byte,
+            base_pack: p,
+            duplicate_esc: false,
+            state_: ProtoStates::InitialEsc,
+            check_sum: 0x00,
         }
     }
 
-    pub fn readNextByte(&mut self) -> Option<u8> {
+    pub fn read_next_byte(&mut self) -> Option<u8> {
         //if Has Finished return None, otherwise return the next byte.    
-        if self.state_ == ProtoStates::SUCESSFUL {
+        if self.state_ == ProtoStates::Sucessful {
             return None
         };
 
-        if self.duplicateESC_ { 
-            self.duplicateESC_ = false; 
+        if self.duplicate_esc { 
+            self.duplicate_esc = false; 
             // earlier return on duplicated esc so it is not considered in checksum calculation
             return Some(ProtoControl::ESC as u8) 
         };
 
-        let mut nextState: ProtoStates = ProtoStates::ERROR;
-        let mut result: u8 = ProtoControl::ESC as u8;
+        let next_state: ProtoStates;
+        let  result: u8;
 
         match self.state_ {
 
-            ProtoStates::INITIAL_ESC => {
+            ProtoStates::InitialEsc => {
                 result = ProtoControl::ESC as u8;
-                nextState = ProtoStates::START_BYTE ;
+                next_state = ProtoStates::StartByte ;
             }
 
-            ProtoStates::START_BYTE => {
-                result = self.startByte_ as u8;
-                nextState = ProtoStates::DIRECTION_AND_CHANNEL ;
+            ProtoStates::StartByte => {
+                result = self.start_byte as u8;
+                next_state = ProtoStates::DirectionAndChannel ;
             }
 
-            ProtoStates::DIRECTION_AND_CHANNEL => {
-                let direcao = self.basePack_.direcao;
-                let canal = self.basePack_.canal;
+            ProtoStates::DirectionAndChannel => {
+                let direcao = self.base_pack.direcao;
+                let canal = self.base_pack.canal;
                 let direcao_canal = direcao + canal;
                 result = direcao_canal;
-                nextState = ProtoStates::COMMAND ;
+                next_state = ProtoStates::Command ;
             }
 
-            ProtoStates::COMMAND => {
-                result = self.basePack_.cmd;
-                nextState = ProtoStates::DATA_LOW ;
+            ProtoStates::Command => {
+                result = self.base_pack.cmd;
+                next_state = ProtoStates::DataLow ;
             }
 
-            ProtoStates::DATA_LOW => {
-                result = self.basePack_.dadoLow;
-                nextState = ProtoStates::DATA_HIGH ;
+            ProtoStates::DataLow => {
+                result = self.base_pack.dado_low;
+                next_state = ProtoStates::DataHigh ;
             }
 
-            ProtoStates::DATA_HIGH => {
-                result = self.basePack_.dadoHigh;
-                nextState = ProtoStates::FINAL_ESC ;
+            ProtoStates::DataHigh => {
+                result = self.base_pack.dado_high;
+                next_state = ProtoStates::FinalEsc ;
             }
 
-            ProtoStates::FINAL_ESC => {
+            ProtoStates::FinalEsc => {
                 result = ProtoControl::ESC as u8;
-                nextState = ProtoStates::ETX_BYTE ;
+                next_state = ProtoStates::EtxByte ;
             }
 
-            ProtoStates::ETX_BYTE => {
+            ProtoStates::EtxByte => {
                 result = ProtoControl::ETX as u8;
-                nextState = ProtoStates::CHECKSUM ;
+                next_state = ProtoStates::Checksum ;
             }
 
-            ProtoStates::CHECKSUM => {
-                result = 0x00 - self.checkSum_; //checksum two's-complement 
-                nextState = ProtoStates::SUCESSFUL ;
+            ProtoStates::Checksum => {
+                result = 0x00 - self.check_sum; //checksum two's-complement 
+                next_state = ProtoStates::Sucessful ;
             }
             
             
@@ -98,50 +96,25 @@ impl PacketOutgoingService {
 
         //calculates checksum and esc_dup
 
-        let isNotFinalOrInitialEsc: bool = self.state_ != ProtoStates::INITIAL_ESC && self.state_ != ProtoStates::FINAL_ESC;
-        let isCheckSum: bool  = self.state_ != ProtoStates::CHECKSUM;
-        let isEsc: bool = result == ProtoControl::ESC as u8;
-        if isNotFinalOrInitialEsc {
+        let is_not_final_or_initial_esc: bool = self.state_ != ProtoStates::InitialEsc && self.state_ != ProtoStates::FinalEsc;
+        let is_check_sum: bool  = self.state_ != ProtoStates::Checksum;
+        let is_esc: bool = result == ProtoControl::ESC as u8;
+        if is_not_final_or_initial_esc {
             // do not compute checksum on control ESC's: initial esc, final esc or duplicated esc
-            if isCheckSum  {
-                self.checkSum_ = self.checkSum_ + result;
+            if is_check_sum  {
+                self.check_sum = self.check_sum + result;
             };
             // duplicate ESC if current byte is ESC but it is not a kind of control ESC byte but a Data ESC
-            if isEsc  {
-                self.duplicateESC_ = true;
+            if is_esc  {
+                self.duplicate_esc = true;
             };
         }
 
         // update state
-        self.state_ = nextState;
+        self.state_ = next_state;
         
         Some(result)
     }
 
 }
 
-
-
-pub fn development_entry_point() -> ! {
-
-    lcd::lcd_initialize();
-    lcd::clear();
-    lcd::print("Running  ");
-
-    
-    let mut frame = PacketBaseStructure::new();
-    frame.canal = 0b11000000;
-    frame.cmd = 0x77;
-    frame.dadoLow = 0x78;
-    frame.dadoHigh = 0x12;
-
-    let mut parser = PacketOutgoingService::new(StartByte::STX, frame);
-
-    while let Some(byte) = parser.readNextByte() {
-        lcd::print_u8_in_hex(byte);
-    }
-    
-    
-    loop { }
-
-}

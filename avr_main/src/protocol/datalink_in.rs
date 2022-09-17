@@ -1,5 +1,4 @@
 // low-level driver for receiving data from the cmpp board
-use crate::{board::lcd, microcontroler::delay::delay_ms};
 
 use super::datalink_base::{ 
     PacketBaseStructure, 
@@ -10,10 +9,10 @@ use super::datalink_base::{
 
 pub struct PacketIncommingService {
     //resultPack_: &mut PacketBaseStructure,
-    tempPack_: PacketBaseStructure,
+    temp_pack: PacketBaseStructure,
     state_: ProtoStates,
-    checkSum_: u8,
-    duplicateEsc_: bool,
+    check_sum: u8,
+    duplicate_esc: bool,
 } 
 
 impl PacketIncommingService {
@@ -21,114 +20,110 @@ impl PacketIncommingService {
     pub fn new() -> Self {
         PacketIncommingService {
             //resultPack_: _p,
-            tempPack_: PacketBaseStructure::new(),
-            state_: ProtoStates::INITIAL_ESC,
-            checkSum_: 0x00,
-            duplicateEsc_: false,
+            temp_pack: PacketBaseStructure::new(),
+            state_: ProtoStates::InitialEsc,
+            check_sum: 0x00,
+            duplicate_esc: false,
         }
     }
 
     #[allow(unreachable_code)]
-    pub fn processNextByte(&mut self, _byte: u8) -> (ProtoStates, Option<PacketBaseStructure>) {
+    pub fn process_next_byte(&mut self, _byte: u8) -> (ProtoStates, Option<PacketBaseStructure>) {
 
-        let isNotFinalOrInitialEsc: bool = (self.state_ != ProtoStates::INITIAL_ESC) && (self.state_ != ProtoStates::FINAL_ESC);
-        let isCheckSum: bool = self.state_ != ProtoStates::CHECKSUM;
-        let isEsc: bool = _byte == (ProtoControl::ESC as u8);
-        let mustDuplicateEsc: bool = self.duplicateEsc_;
+        let is_not_final_or_initial_esc: bool = (self.state_ != ProtoStates::InitialEsc) && (self.state_ != ProtoStates::FinalEsc);
+        let is_check_sum: bool = self.state_ != ProtoStates::Checksum;
+        let is_esc: bool = _byte == (ProtoControl::ESC as u8);
+        let must_duplicate_esc: bool = self.duplicate_esc;
 
         // //duplicate ESC and do earlier return
-        if mustDuplicateEsc && isEsc {
-            self.duplicateEsc_ = false;
+        if must_duplicate_esc && is_esc {
+            self.duplicate_esc = false;
             return (self.state_, None)
         } 
 
-        if isNotFinalOrInitialEsc {
-            if isCheckSum  {
+        if is_not_final_or_initial_esc {
+            if is_check_sum  {
                 // do not compute checksum on control ESC's: initial esc, final esc or duplicated esc
-                self.checkSum_ = self.checkSum_ + _byte;
+                self.check_sum = self.check_sum + _byte;
             };
-            if isEsc  {
+            if is_esc  {
                 // duplicate ESC if current byte is ESC (but not a kind of control ESC byte but a Data ESC)
-                self.duplicateEsc_ = true;
+                self.duplicate_esc = true;
             };
         }
 
         match self.state_ {
         
-            ProtoStates::INITIAL_ESC => {
+            ProtoStates::InitialEsc => {
                 if _byte == ProtoControl::ESC as u8 { 
-                    self.state_ = ProtoStates::START_BYTE; 
+                    self.state_ = ProtoStates::StartByte; 
                 }   
             }
                   
-            ProtoStates::START_BYTE => {
+            ProtoStates::StartByte => {
                 // FIX: Consider also stx and nack as start byte
                 if _byte == ProtoControl::ACK as u8 { 
-                    self.state_ = ProtoStates::DIRECTION_AND_CHANNEL; 
+                    self.state_ = ProtoStates::DirectionAndChannel; 
                 }  
             }        
                 
-            ProtoStates::DIRECTION_AND_CHANNEL => {
-                self.tempPack_.direcao = _byte & 0b11000000;
-                self.tempPack_.canal = _byte &   0b00111111;
-                self.state_ = ProtoStates::COMMAND
+            ProtoStates::DirectionAndChannel => {
+                self.temp_pack.direcao = _byte & 0b11000000;
+                self.temp_pack.canal = _byte &   0b00111111;
+                self.state_ = ProtoStates::Command
             }
              
-            ProtoStates::COMMAND => {
-                self.tempPack_.cmd = _byte;
-                self.state_ = ProtoStates::DATA_LOW
+            ProtoStates::Command => {
+                self.temp_pack.cmd = _byte;
+                self.state_ = ProtoStates::DataLow
             }
                 
-            ProtoStates::DATA_LOW => {
-                self.tempPack_.dadoLow = _byte;
-                self.state_ = ProtoStates::DATA_HIGH  
+            ProtoStates::DataLow => {
+                self.temp_pack.dado_low = _byte;
+                self.state_ = ProtoStates::DataHigh  
             }
                 
-            ProtoStates::DATA_HIGH => {
-                self.tempPack_.dadoHigh = _byte;
-                self.state_ = ProtoStates::FINAL_ESC
+            ProtoStates::DataHigh => {
+                self.temp_pack.dado_high = _byte;
+                self.state_ = ProtoStates::FinalEsc
             }
 
-            ProtoStates::FINAL_ESC => {
+            ProtoStates::FinalEsc => {
                 if _byte == ProtoControl::ESC as u8 { 
-                    self.state_ = ProtoStates::ETX_BYTE; 
+                    self.state_ = ProtoStates::EtxByte; 
                 } 
             }
 
-            ProtoStates::ETX_BYTE => {
+            ProtoStates::EtxByte => {
                 if _byte == ProtoControl::ETX as u8 { 
-                    self.state_ = ProtoStates::CHECKSUM; 
+                    self.state_ = ProtoStates::Checksum; 
                 }
             }
 
-            ProtoStates::CHECKSUM => {
-                self.checkSum_ = !self.checkSum_; // note: not sure "!" operator will work here
+            ProtoStates::Checksum => {
+                self.check_sum = !self.check_sum; // note: not sure "!" operator will work here
                 //FIX: implement checksum check
                 //if (checkSum_ == byte) {
                     //*resultPack_ = tempPack_;
-                    self.state_ = ProtoStates::SUCESSFUL;
+                    self.state_ = ProtoStates::Sucessful;
                 //}
             }
              
-            ProtoStates::SUCESSFUL => {
+            ProtoStates::Sucessful => {
                 //??
                 !unreachable!()
             }
                 
-            ProtoStates::ERROR => {
+            ProtoStates::Error => {
                 //FIX: not implemented
                 !unimplemented!()
             }
-                
-            _ => { 
-                // should never happen
-                !unreachable!()
-            }
+
                   
         };
 
-        if self.state_ == ProtoStates::CHECKSUM {
-            (self.state_, Some(self.tempPack_))
+        if self.state_ == ProtoStates::Checksum {
+            (self.state_, Some(self.temp_pack))
         } else {
             (self.state_, None)
         }
@@ -137,36 +132,3 @@ impl PacketIncommingService {
 
 }
 
-
-
-
-
-pub fn development_entry_point() -> ! {
-
-    lcd::lcd_initialize();
-    lcd::clear();
-    lcd::print("Running  ");
-
-    let mut parser = PacketIncommingService::new();
-    
-    #[allow(arithmetic_overflow)]
-    let frame: [u8;12] = [0x1B, 0x06, 0xC1, 0x50, 0x61, 0x02, 0x1B, 0x03, 0x87,0x00,0x00,0x00];
-
-   
-    for byte in frame {
-        let (state, output) = parser.processNextByte(byte);
-        //lcd::print(protoStates_toString(state));
-        //lcd::print("; ");
-        if let Some(res) = output {
-            lcd::clear();
-            lcd::print("Juca");
-            lcd::print_u8_in_hex(res.direcao);
-            lcd::print_u8_in_hex(res.canal);
-            lcd::print_u8_in_hex(res.cmd);
-            lcd::print_u8_in_hex(res.dadoHigh);
-            lcd::print_u8_in_hex(res.dadoLow);
-        }
-        //delay_ms(2000);
-    }
-    loop { }
-}

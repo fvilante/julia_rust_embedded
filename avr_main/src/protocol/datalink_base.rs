@@ -19,7 +19,6 @@ pub enum StartByte {
 type Direcao = u8; // just 2 bits most significatives are used
 type Canal = u8; 
 type Cmd = u8; // just 6 bits least significatives are used 
-type Dado = u16;
 type DadoLow = u8;
 type DadoHigh = u8;
 
@@ -30,8 +29,8 @@ pub struct PacketBaseStructure {
     pub direcao: Direcao,
     pub canal: Canal,
     pub cmd: Cmd,
-    pub dadoHigh: DadoHigh,
-    pub dadoLow: DadoLow,
+    pub dado_high: DadoHigh,
+    pub dado_low: DadoLow,
 }
 
 
@@ -41,42 +40,42 @@ impl PacketBaseStructure {
             direcao: 0x00,
             canal: 0x00,
             cmd: 0x00, 
-            dadoHigh: 0x00,
-            dadoLow: 0x00,
+            dado_high: 0x00,
+            dado_low: 0x00,
         }
     }
 }
 
 
-#[allow(non_camel_case_types)]
+
 #[derive(PartialEq, Clone, Copy)]
 pub enum ProtoStates {
     //States of protocol posijet1 
-    INITIAL_ESC = 0,
-    START_BYTE,
-    DIRECTION_AND_CHANNEL,
-    COMMAND,
-    DATA_LOW,
-    DATA_HIGH,
-    FINAL_ESC,
-    ETX_BYTE,
-    CHECKSUM,
-    SUCESSFUL,
-    ERROR, //fix: not implmented yet
+    InitialEsc = 0,
+    StartByte,
+    DirectionAndChannel,
+    Command,
+    DataLow,
+    DataHigh,
+    FinalEsc,
+    EtxByte,
+    Checksum,
+    Sucessful,
+    Error, //fix: not implmented yet
 }
 
-pub fn protoStates_toString(state: ProtoStates) -> &'static str {
+pub fn proto_states_to_string(state: ProtoStates) -> &'static str {
     match state {
-         ProtoStates::INITIAL_ESC =>    "ESA", 
-         ProtoStates::START_BYTE => "STB", 
-         ProtoStates::DIRECTION_AND_CHANNEL =>  "D&C", 
-         ProtoStates::COMMAND =>    "CMD", 
-         ProtoStates::DATA_LOW =>   "DL", 
-         ProtoStates::DATA_HIGH =>  "DH", 
-         ProtoStates::FINAL_ESC =>  "ESB", 
-         ProtoStates::ETX_BYTE =>   "ETX", 
-         ProtoStates::CHECKSUM =>   "CHK", 
-         ProtoStates::SUCESSFUL =>  "SUCESSFUL", 
-         ProtoStates::ERROR =>  "ERROR", 
+         ProtoStates::InitialEsc =>    "ESA", 
+         ProtoStates::StartByte => "STB", 
+         ProtoStates::DirectionAndChannel =>  "D&C", 
+         ProtoStates::Command =>    "CMD", 
+         ProtoStates::DataLow =>   "DL", 
+         ProtoStates::DataHigh =>  "DH", 
+         ProtoStates::FinalEsc =>  "ESB", 
+         ProtoStates::EtxByte =>   "ETX", 
+         ProtoStates::Checksum =>   "CHK", 
+         ProtoStates::Sucessful =>  "SUCESSFUL", 
+         ProtoStates::Error =>  "ERROR", 
     }
 }
