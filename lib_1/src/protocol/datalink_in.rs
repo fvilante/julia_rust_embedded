@@ -137,8 +137,7 @@ impl PacketIncommingService {
 mod tests {
     use super::*;
 
-
-
+    
     #[test]
     fn it_can_accept_a_valid_segment() {
         #[allow(arithmetic_overflow)]

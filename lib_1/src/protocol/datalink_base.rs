@@ -51,9 +51,9 @@ impl PacketBaseStructure {
 #[derive(PartialEq, Clone, Copy)]
 pub enum ProtoStates {
     //States of protocol posijet1 
-    InitialEsc = 0,
-    StartByte,
-    DirectionAndChannel,
+    InitialEsc = 0,             // waiting initial esc...
+    StartByte,                  // waiting start byte...
+    DirectionAndChannel,        // etc...
     Command,
     DataLow,
     DataHigh,
