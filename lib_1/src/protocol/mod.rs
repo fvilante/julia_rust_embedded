@@ -1,3 +1,3 @@
 mod common;
-mod input_parser;
-mod output_parser;
+mod decoder;
+mod encoder;
