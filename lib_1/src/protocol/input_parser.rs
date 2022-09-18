@@ -2,14 +2,28 @@ use super::common::*;
 
 const MAX_BUFFER_LEN: usize = 4; // max data length buffer
 
-struct InputParser {
+pub enum SegmentError {
+    InvalidStartByte(u8),
+    BufferOverFlow,
+    ExpectedEtxOrEscDupButFoundOtherThing(u8),
+    ChecksumIsEscButNotDuplicated(u8),
+}
+
+pub enum State {
+    WaitingFirstEsc,
+    WaitingStartByte,
+    ReceivingData,
+    WaitingChecksum,
+}
+
+pub struct Decoder {
     state: State,
     buffer_index: usize,
     buffer: [u8;MAX_BUFFER_LEN],
     last_was_esc: bool,
 }
 
-impl InputParser {
+impl Decoder {
 
     pub fn new() -> Self {
         Self {
@@ -73,7 +87,7 @@ impl InputParser {
                         self.state = State::WaitingChecksum;
                         Ok(None)    
                     } else {
-                        Err(SegmentError::ExpectedEtxOrEscDupBufFoundOtherThing(byte))
+                        Err(SegmentError::ExpectedEtxOrEscDupButFoundOtherThing(byte))
                     }
                 } else {
                     if byte == ESC {
@@ -126,10 +140,10 @@ mod tests {
     use super::*;
 
     fn perform_test(input_probe: &[u8], expected: Frame) -> () { 
-        let mut parser = InputParser::new();
+        let mut decoder = Decoder::new();
         let mut success: bool = false;
         for byte in input_probe {
-            let result = parser.parse_next(*byte);
+            let result = decoder.parse_next(*byte);
             if let Ok(Some(frame)) = result {
                 assert_eq!(frame, expected);
                 success = true;
