@@ -1,4 +1,5 @@
-use super::common::*;
+
+use super::{common::*, checksum::calc_checksum, encoder::StartByte};
 
 const MAX_BUFFER_LEN: usize = 4; // max data length buffer
 
@@ -7,6 +8,7 @@ pub enum SegmentError {
     BufferOverFlow,
     ExpectedEtxOrEscDupButFoundOtherThing(u8),
     ChecksumIsEscButNotDuplicated(u8),
+    InvalidChecksum { expected: u8, received: u8 },
 }
 
 pub enum State {
@@ -17,6 +19,7 @@ pub enum State {
 }
 
 pub struct Decoder {
+    start_byte: StartByte,
     state: State,
     buffer_index: usize,
     buffer: [u8;MAX_BUFFER_LEN],
@@ -27,6 +30,7 @@ impl Decoder {
 
     pub fn new() -> Self {
         Self {
+            start_byte: StartByte::STX,
             state: State::WaitingFirstEsc,
             buffer_index: 0,
             buffer: [0x00; MAX_BUFFER_LEN],
@@ -45,13 +49,19 @@ impl Decoder {
         
     }
 
-    fn success(&self, _checksum: u8) -> Frame {
-        //Fix: consider checksum in calc
+    fn success(&self, checksum: u8) -> Result<Option<Frame>, SegmentError> {
         let b0 = self.buffer[0];
         let b1 = self.buffer[1];
         let b2 = self.buffer[2];
         let b3 = self.buffer[3];
-        Frame(b0,b1,b2,b3)
+        let obj = [b0, b1, b2, b3];
+        let expected = calc_checksum(&obj, self.start_byte);
+        if checksum == expected {
+            Ok(Some(Frame(b0,b1,b2,b3)))
+        } else {
+            Err(SegmentError::InvalidChecksum { expected, received: (checksum) })
+        }
+        
     }
 
     pub fn parse_next(&mut self, byte: u8) -> Result<Option<Frame>, SegmentError> {
@@ -62,13 +72,22 @@ impl Decoder {
             }
 
             State::WaitingStartByte => {
-                let is_start_byte = byte == STX || byte == ACK || byte == NACK;
-                if is_start_byte {
-                    self.state = State::ReceivingData;
-                    Ok(None)
-                } else {
-                    Err(SegmentError::InvalidStartByte(byte))
+                let start_byte: Result<StartByte, SegmentError> = match byte {
+                    STX     => Ok(StartByte::STX),
+                    ACK     => Ok(StartByte::ACK),
+                    NACK    => Ok(StartByte::NACK),
+                    _       => Err(SegmentError::InvalidStartByte(byte)),
+                };
+                match start_byte {
+                    Ok(valid) => {
+                        self.state = State::ReceivingData;
+                        self.start_byte = valid;
+                        Ok(None)
+                    }
+
+                    Err(e) => Err(e),
                 }
+             
             }
 
             State::ReceivingData => {
@@ -110,7 +129,7 @@ impl Decoder {
                         //Escdup
                         self.last_was_esc = false;
                         let checksum = ESC;
-                        Ok(Some(self.success(checksum)))
+                        self.success(checksum)
                     } else {
                         Err(SegmentError::ChecksumIsEscButNotDuplicated(byte))
                     }
@@ -121,8 +140,8 @@ impl Decoder {
                     } else {
                         // non-esc checksum
                         self.last_was_esc = false;
-                        let checksum = ESC;
-                        Ok(Some(self.success(checksum)))
+                        let checksum = byte;
+                        self.success(checksum)
                     }
                 }
             }
@@ -139,61 +158,46 @@ mod tests {
 
     use super::*;
 
-    fn perform_test(input_probe: &[u8], expected: Frame) -> () { 
+    fn perform_test(input_probe: &[u8]) ->  Result<Frame, SegmentError> { 
         let mut decoder = Decoder::new();
-        let mut success: bool = false;
         for byte in input_probe {
             let result = decoder.parse_next(*byte);
-            if let Ok(Some(frame)) = result {
-                assert_eq!(frame, expected);
-                success = true;
-            } 
+            match result {
+                Ok(val) => {
+                    match val  {
+                        Some(frame) => return Ok(frame),
+                        None => { /* nop */ }
+                    }
+                }
+
+                Err(e) => return Err(e),
+            }
         }
-        assert_eq!(success, true);
+        unreachable!()
     }
 
     #[test]
-    fn it_can_parse_a_segment() {
-        let input_probe = [ESC,STX,0,1,2,3,ESC,ETX,0];
-        let expected = Frame(0,1,2,3);
-        perform_test(&input_probe, expected);
+    fn it_parse_a_segment() {
+        // 1B 02 C1 50 61 02 1B 03 87  
+        let input_probe = [0x1B, 0x02, 0xC1, 0x50, 0x61, 0x02, 0x1B, 0x03, 0x87, ];
+        let expected = Frame(0xC1, 0x50, 0x61, 0x02,);
+        if let Ok(frame) = perform_test(&input_probe) {
+            assert_eq!(expected, frame);
+        } else {
+            assert_eq!(true, false); // Returned an SegmentError
+        }
     }
 
     #[test]
-    fn it_can_parse_a_segment_with_esc_dup_in_data_position_0() {
-        let input_probe = [ESC,STX,27,27,1,2,3,ESC,ETX,0];
-        let expected = Frame(27,1,2,3);
-        perform_test(&input_probe, expected);
+    fn it_parse_a_segment_with_esc_dup() {
+        // 1B 06 01 86 03 1B 1B 03 52 
+        let input_probe = [0x1B, 0x06, 0x01, 0x86, 0x03, 0x1B, 0x1B, 0x1B, 0x03, 0x52 ];
+        let expected = Frame(0x01, 0x86, 0x03, 0x1B,);
+        if let Ok(frame) = perform_test(&input_probe) {
+            assert_eq!(expected, frame);
+        } else {
+            assert_eq!(true, false); // Returned an SegmentError
+        }
     }
-
-    #[test]
-    fn it_can_parse_a_segment_with_esc_dup_in_data_position_1() {
-        let input_probe = [ESC,STX,0,27,27,2,3,ESC,ETX,0];
-        let expected = Frame(0,27,2,3);
-        perform_test(&input_probe, expected);
-    }
-
-    #[test]
-    fn it_can_parse_a_segment_with_esc_dup_in_data_position_2() {
-        let input_probe = [ESC,STX,0,1,27,27,3,ESC,ETX,0];
-        let expected = Frame(0,1,27,3);
-        perform_test(&input_probe, expected);
-    }
-
-    #[test]
-    fn it_can_parse_a_segment_with_esc_dup_in_data_position_3() {
-        let input_probe = [ESC,STX,0,1,2,27,27,ESC,ETX,0];
-        let expected = Frame(0,1,2,27);
-        perform_test(&input_probe, expected);
-    }
-
-    #[test]
-    fn it_can_parse_a_segment_with_esc_dup_in_checksum_position() {
-        let input_probe = [ESC,STX,0,1,2,3,ESC,ETX,27,27];
-        let expected = Frame(0,1,2,3);
-        perform_test(&input_probe, expected);
-    }
-
-
 
 }
