@@ -14,7 +14,7 @@ pub fn calc_checksum(obj: &[u8], start_byte: StartByte) -> u8 {
     type Size = u16;
     let mut objsum: Size = 0x00;
     for each_byte in obj {
-        objsum = objsum + (each_byte.clone() as Size);
+        objsum = objsum + (*each_byte as Size);
     };
     let extra = (start_byte as Size) + ETX as Size; 
     let totalsum = objsum + extra;
