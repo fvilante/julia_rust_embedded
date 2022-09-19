@@ -1,3 +1,4 @@
+use super::checksum::calc_checksum;
 #[allow(unused_imports)]
 
 
@@ -19,7 +20,8 @@ pub enum State {
     Finish,
 }
 
-enum StartByte {
+#[derive(Copy, Clone)]
+pub enum StartByte {
     STX = 0x02,
     ACK = 0x06,
     NACK = 0x15,
@@ -31,7 +33,6 @@ struct Encoder {
     state: State, 
     buffer_index: usize,
     last_was_esc: bool,
-    checksum: u8,
 }
 
 const MAX_PAYLOAD_SIZE: usize = 4;
@@ -45,7 +46,6 @@ impl Encoder {
             state: State::WaitingFirstEsc,
             buffer_index: 0,
             last_was_esc: false,
-            checksum: 0x00,
         }
     }
 
@@ -86,32 +86,27 @@ impl Encoder {
 
             State::WaitingStartByte => {
                 let start_byte = self.start_byte as u8;
-                self.checksum += start_byte;
                 self.state = State::WaitingData0;
                 Some(start_byte)
             }
 
             State::WaitingData0 => {
                 let byte = self.read_buffer(0);
-                self.checksum += byte;
                 self.duplicate_esc_if_necessary(byte, State::WaitingData1)
             }
 
             State::WaitingData1 => {
                 let byte = self.read_buffer(1);
-                self.checksum += byte;
                 self.duplicate_esc_if_necessary(byte, State::WaitingData2)
             }
 
             State::WaitingData2 => {
                 let byte = self.read_buffer(2);
-                self.checksum += byte;
                 self.duplicate_esc_if_necessary(byte, State::WaitingData3)
             }
 
             State::WaitingData3 => {
                 let byte = self.read_buffer(3);
-                self.checksum += byte;
                 self.duplicate_esc_if_necessary(byte, State::WaitingFinalEsc)
             }
             
@@ -121,17 +116,15 @@ impl Encoder {
             }
 
             State::WaitingEtx => {
-                self.checksum += ETX;
                 self.state = State::WaitingChecksum;
                 Some(ETX)
             }
 
             State::WaitingChecksum => {
-                let checksum: u8 = self.checksum;
-                // two's compliment of checksum
-                let checksum__ = checksum.wrapping_neg()+1;
-                self.state = State::Finish;
-                self.duplicate_esc_if_necessary(checksum__, State::Finish)
+                let Frame(data0, data1, data2, data3) = self.frame;
+                let obj = [data0, data1, data2, data3];
+                let checksum = calc_checksum(&obj, self.start_byte);
+                self.duplicate_esc_if_necessary(checksum, State::Finish)
             }
 
             State::Finish => {
@@ -154,21 +147,33 @@ pub fn add(left: u8, right: u8) -> u8 {
 mod tests {
     use super::*;
 
-
     #[test]
-    fn it_can_completely_parse_a_simple_frame() {
-        let frame = Frame(0xC1, 0x50, 0x61, 0x03);
+    fn it_can_parse_a_simple_frame_without_esc_dup() {
+        // 1B 02 C1 50 61 02 1B 03 87  
+        let frame = Frame(0xC1, 0x50, 0x61, 0x02, );
         let mut encoder = Encoder::new(StartByte::STX, frame);
-        let expected = [ESC, STX, 0xC1, 0x50, 0x61, 0x03, ESC, ETX, 0x87];
+        let expected = [0x1B, 0x02, 0xC1, 0x50, 0x61, 0x02, 0x1B, 0x03, 0x87, ];
         let mut buffer = [0x00; 9];
         for index in 0..buffer.len() {
             if let Some(byte) = encoder.get_next() {
                 buffer[index] = byte;
             }
         }
-        //for index in 0..buffer.len() {
-        //    assert_eq!(expected[index], buffer[index]);
-        //}
+        assert_eq!(expected, buffer);
+    }
+
+    #[test]
+    fn it_can_parse_a_simple_frame_with_esc_dup() {
+        // 1B 06 01 86 03 1B 1B 03 52 
+        let frame = Frame(0x01, 0x86, 0x03, 0x1B);
+        let mut encoder = Encoder::new(StartByte::ACK, frame);
+        let expected = [0x1B, 0x06, 0x01, 0x86, 0x03, 0x1B, 0x1B, 0x1B, 0x03, 0x52 ];
+        let mut buffer = [0x00; 10];
+        for index in 0..buffer.len() {
+            if let Some(byte) = encoder.get_next() {
+                buffer[index] = byte;
+            }
+        }
         assert_eq!(expected, buffer);
     }
 }
