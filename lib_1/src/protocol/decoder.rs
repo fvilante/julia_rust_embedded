@@ -1,5 +1,5 @@
 
-use super::{common::*, checksum::calc_checksum, encoder::StartByte};
+use super::{common::*, checksum::calc_checksum};
 
 const MAX_BUFFER_LEN: usize = 4; // max data length buffer
 
@@ -50,14 +50,10 @@ impl Decoder {
     }
 
     fn success(&self, checksum: u8) -> Result<Option<Frame>, SegmentError> {
-        let b0 = self.buffer[0];
-        let b1 = self.buffer[1];
-        let b2 = self.buffer[2];
-        let b3 = self.buffer[3];
-        let obj = [b0, b1, b2, b3];
+        let obj = self.buffer as [u8; 4];
         let expected = calc_checksum(&obj, self.start_byte);
         if checksum == expected {
-            Ok(Some(Frame(b0,b1,b2,b3)))
+            Ok(Some(Frame::from_array(&obj)))
         } else {
             Err(SegmentError::InvalidChecksum { expected, received: (checksum) })
         }

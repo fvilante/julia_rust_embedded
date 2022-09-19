@@ -1,6 +1,6 @@
 #![allow(unused_imports)]
 #![allow(unused_variables)]
-use super::{encoder::StartByte, common::ETX};
+use super::{common::StartByte, common::ETX};
 
 // NOTE:
 //

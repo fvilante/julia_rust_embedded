@@ -1,4 +1,4 @@
-use super::checksum::calc_checksum;
+use super::{checksum::calc_checksum, common::StartByte};
 #[allow(unused_imports)]
 
 
@@ -18,13 +18,6 @@ pub enum State {
     WaitingEtx,
     WaitingChecksum,
     Finish,
-}
-
-#[derive(Copy, Clone)]
-pub enum StartByte {
-    STX = 0x02,
-    ACK = 0x06,
-    NACK = 0x15,
 }
 
 struct Encoder {
@@ -49,7 +42,7 @@ impl Encoder {
         }
     }
 
-    fn read_buffer(&self, index: usize) -> u8{
+    fn read_buffer(&self, index: usize) -> u8 {
         let Frame(b0,b1,b2,b3) = self.frame;
         match index {
             0 => b0,
