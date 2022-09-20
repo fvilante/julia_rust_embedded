@@ -1,7 +1,7 @@
 #![no_std]
 #![allow(dead_code)]
 
-mod protocol;
+pub mod protocol;
 
 pub fn add(left: u8, right: u8) -> u8 {
     left + right + 2

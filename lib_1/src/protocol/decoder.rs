@@ -11,6 +11,19 @@ pub enum SegmentError {
     InvalidChecksum { expected: u8, received: u8 },
 }
 
+impl SegmentError {
+    pub fn to_string(&self) -> &'static str {
+        match *self {
+            SegmentError::InvalidStartByte(u8) => "InvalidStartByte",
+            SegmentError::BufferOverFlow => "BufferOverFlow",
+            SegmentError::ExpectedEtxOrEscDupButFoundOtherThing(u8) => "ExpectedEtxOrEscDupButFoundOtherThing",
+            SegmentError::ChecksumIsEscButNotDuplicated(u8) => "ChecksumIsEscButNotDuplicated",
+            SegmentError::InvalidChecksum { expected, received } => "InvalidChecksum",
+        }
+    }
+}
+
+
 pub enum State {
     WaitingFirstEsc,
     WaitingStartByte,

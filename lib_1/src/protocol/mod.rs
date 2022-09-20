@@ -1,4 +1,4 @@
-mod common;
+pub mod common;
 mod checksum;
-mod decoder;
-mod encoder;
+pub mod decoder;
+pub mod encoder;

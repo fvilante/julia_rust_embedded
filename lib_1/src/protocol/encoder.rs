@@ -20,7 +20,7 @@ pub enum State {
     Finish,
 }
 
-struct Encoder {
+pub struct Encoder {
     start_byte: StartByte,
     frame: Frame,
     state: State, 
