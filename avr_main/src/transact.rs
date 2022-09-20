@@ -63,9 +63,7 @@ fn send(frame: Frame, connection: &impl SerialConnection)  {
     } 
 }
 
-fn receive(connection: impl SerialConnection, timeout_us: u64) {
 
-}
 
 fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) -> Result<TransactResult, ReceptionError> {
 
