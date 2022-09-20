@@ -13,7 +13,7 @@ use crate::{
     microcontroler::serial
 };
 
-trait SerialConnection {
+pub trait SerialConnection {
     fn new(baud_rate: u32) -> Self;
     fn transmit(&self, byte: u8);
     fn ready_to_receive(&self) -> bool;
@@ -45,12 +45,12 @@ impl SerialConnection for ConcreteSerialPort {
 
 }
 
-enum ReceptionError {
+pub enum ReceptionError {
     SegmentError(SegmentError),
     ReceptionTimeout{elapsed_time: u64},
 }
 
-struct TransactResult {
+pub struct TransactResult {
     frame: Frame,
     response_time_us: u64 // microseconds (aprox)
 }
@@ -63,23 +63,14 @@ fn send(frame: Frame, connection: &impl SerialConnection)  {
     } 
 }
 
-
-
-fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) -> Result<TransactResult, ReceptionError> {
-
-   
+fn receive(connection: impl SerialConnection, timeout_us: u64) -> Result<TransactResult, ReceptionError> {
     let mut decoder = Decoder::new();
-
-    // transmit
-    send(frame, &connection);
-
     let mut elapsed_time: u64 = 0x00; // microseconds counter
     
     //receive
     loop {
         if connection.ready_to_receive() {
             let byte = connection.receive();
-            lcd::print_u8_in_hex(byte);
             let output = decoder.parse_next(byte);
             match output {
                 Ok(data) => {
@@ -95,12 +86,12 @@ fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) ->
                 }
 
                 Err(e) => {
-                    lcd::print(e.to_string());
                     return Err(ReceptionError::SegmentError(e));
                 }
             }
             
         }
+        // check for timeout
         delay_us(1);
         elapsed_time += 1; //
         if elapsed_time > timeout_us {
@@ -108,8 +99,13 @@ fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) ->
         }
 
     }
+}
 
- }
+
+pub fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) -> Result<TransactResult, ReceptionError> {
+    send(frame, &connection);
+    receive(connection, timeout_us)
+}
 
 pub fn development_entry_point() -> ! {
     lcd::lcd_initialize();
