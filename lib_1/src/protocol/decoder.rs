@@ -1,4 +1,4 @@
-
+#[warn(unused_variables)]
 use super::{common::*, checksum::calc_checksum};
 
 const MAX_BUFFER_LEN: usize = 4; // max data length buffer
@@ -12,6 +12,7 @@ pub enum SegmentError {
 }
 
 impl SegmentError {
+    
     pub fn to_string(&self) -> &'static str {
         match *self {
             SegmentError::InvalidStartByte(u8) => "InvalidStartByte",
