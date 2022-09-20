@@ -1,4 +1,5 @@
-#[warn(unused_variables)]
+#[allow(unused_variables)]
+
 use super::{common::*, checksum::calc_checksum};
 
 const MAX_BUFFER_LEN: usize = 4; // max data length buffer
@@ -12,7 +13,7 @@ pub enum SegmentError {
 }
 
 impl SegmentError {
-    
+   
     pub fn to_string(&self) -> &'static str {
         match *self {
             SegmentError::InvalidStartByte(u8) => "InvalidStartByte",
@@ -22,6 +23,12 @@ impl SegmentError {
             SegmentError::InvalidChecksum { expected, received } => "InvalidChecksum",
         }
     }
+}
+
+
+pub struct SegmentResult {
+    pub start_byte: StartByte,
+    pub frame: Frame,
 }
 
 
@@ -63,18 +70,21 @@ impl Decoder {
         
     }
 
-    fn success(&self, checksum: u8) -> Result<Option<Frame>, SegmentError> {
+    fn success(&self, checksum: u8) -> Result<Option<SegmentResult>, SegmentError> {
         let obj = self.buffer as [u8; 4];
         let expected = calc_checksum(&obj, self.start_byte);
         if checksum == expected {
-            Ok(Some(Frame::from_array(&obj)))
+            Ok(Some( SegmentResult { 
+                start_byte: self.start_byte,
+                frame: Frame::from_array(&obj), 
+            }))
         } else {
             Err(SegmentError::InvalidChecksum { expected, received: (checksum) })
         }
         
     }
 
-    pub fn parse_next(&mut self, byte: u8) -> Result<Option<Frame>, SegmentError> {
+    pub fn parse_next(&mut self, byte: u8) -> Result<Option<SegmentResult>, SegmentError> {
         match self.state {
             State::WaitingFirstEsc => {
                 self.state = State::WaitingStartByte;
@@ -168,14 +178,14 @@ mod tests {
 
     use super::*;
 
-    fn perform_test(input_probe: &[u8]) ->  Result<Frame, SegmentError> { 
+    fn run_decoder(input_probe: &[u8]) ->  Result<SegmentResult, SegmentError> { 
         let mut decoder = Decoder::new();
         for byte in input_probe {
             let result = decoder.parse_next(*byte);
             match result {
                 Ok(val) => {
                     match val  {
-                        Some(frame) => return Ok(frame),
+                        Some(segment) => return Ok(segment),
                         None => { /* nop */ }
                     }
                 }
@@ -188,25 +198,31 @@ mod tests {
 
     #[test]
     fn it_parse_a_segment() {
-        // 1B 02 C1 50 61 02 1B 03 87  
-        let input_probe = [0x1B, 0x02, 0xC1, 0x50, 0x61, 0x02, 0x1B, 0x03, 0x87, ];
+        // 1B 02 C1 50 61 02 1B 03 87 
+        let start_byte__ = StartByte::STX; 
+        let input_probe = [0x1B, start_byte__ as u8, 0xC1, 0x50, 0x61, 0x02, 0x1B, 0x03, 0x87, ];
         let expected = Frame(0xC1, 0x50, 0x61, 0x02,);
-        if let Ok(frame) = perform_test(&input_probe) {
+        if let Ok(segment) = run_decoder(&input_probe) {
+            let SegmentResult { start_byte, frame }= segment;
             assert_eq!(expected, frame);
+            assert_eq!(start_byte, start_byte__);
         } else {
-            assert_eq!(true, false); // Returned an SegmentError
+            assert_eq!(true, false); // Unexpected behaviour, Returned an SegmentError
         }
     }
 
     #[test]
     fn it_parse_a_segment_with_esc_dup() {
         // 1B 06 01 86 03 1B 1B 03 52 
+        let start_byte__ = StartByte::ACK; 
         let input_probe = [0x1B, 0x06, 0x01, 0x86, 0x03, 0x1B, 0x1B, 0x1B, 0x03, 0x52 ];
         let expected = Frame(0x01, 0x86, 0x03, 0x1B,);
-        if let Ok(frame) = perform_test(&input_probe) {
+        if let Ok(segment) = run_decoder(&input_probe) {
+            let SegmentResult { start_byte, frame }= segment;
             assert_eq!(expected, frame);
+            assert_eq!(start_byte, start_byte__);
         } else {
-            assert_eq!(true, false); // Returned an SegmentError
+            assert_eq!(true, false); // Unexpected behaviour, Returned an SegmentError
         }
     }
 

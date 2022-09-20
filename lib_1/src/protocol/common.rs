@@ -23,7 +23,7 @@ impl Frame {
 }
 
 
-#[derive(Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum StartByte {
     STX = 0x02,
     ACK = 0x06,

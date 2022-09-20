@@ -1,5 +1,5 @@
 
-use lib_1::protocol::{common::StartByte, decoder::SegmentError};
+use lib_1::protocol::{common::StartByte, decoder::{SegmentError, SegmentResult}};
 use crate::microcontroler::serial::transmit;
 use crate::microcontroler::delay::delay_us;
 use super::serial_connection::SerialConnection;
@@ -21,7 +21,9 @@ pub enum DatalinkError {
     ReceptionTimeout{elapsed_time: u64},
 }
 
+#[derive(Debug)]
 pub struct DatalinkResult {
+    start_byte: StartByte,
     frame: Frame,
     response_time_us: u64 // microseconds (aprox)
 }
@@ -46,8 +48,9 @@ fn receive(connection: impl SerialConnection, timeout_us: u64) -> Result<Datalin
             match output {
                 Ok(data) => {
                     match data {
-                        Some(frame) => {
-                            return Ok(DatalinkResult{frame, response_time_us: elapsed_time});
+                        Some(segment) => {
+                            let SegmentResult {start_byte, frame} = segment;
+                            return Ok(DatalinkResult{start_byte, frame, response_time_us: elapsed_time});
                         }
 
                         None => {
