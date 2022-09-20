@@ -12,7 +12,7 @@ extern crate avr_std_stub;
 mod common;
 mod microcontroler;
 mod board;
-mod transact;
+mod datalink;
 //mod protocol;
 
 use lib_1;
@@ -28,7 +28,7 @@ fn main() -> ! {
 
     //protocol::datalink_comm::development_entry_point();
     //board::lcd::example_01();
-    transact::development_entry_point();
+    datalink::transact::development_entry_point();
 
 
 

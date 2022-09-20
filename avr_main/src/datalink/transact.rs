@@ -1,6 +1,6 @@
 
 use lib_1::protocol::{common::StartByte, decoder::SegmentError};
-use super::microcontroler::serial::transmit;
+use crate::microcontroler::serial::transmit;
 use crate::microcontroler::delay::delay_us;
 
 use crate::{
