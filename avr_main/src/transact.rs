@@ -55,15 +55,25 @@ struct TransactResult {
     response_time_us: u64 // microseconds (aprox)
 }
 
-fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) -> Result<TransactResult, ReceptionError> {
-
+fn send(frame: Frame, connection: &impl SerialConnection)  {
     let mut encoder = Encoder::new(StartByte::STX, frame);
-    let mut decoder = Decoder::new();
-
     // transmit
     while let Some(byte) = encoder.get_next() {
         connection.transmit(byte);
     } 
+}
+
+fn receive(connection: impl SerialConnection, timeout_us: u64) {
+
+}
+
+fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) -> Result<TransactResult, ReceptionError> {
+
+   
+    let mut decoder = Decoder::new();
+
+    // transmit
+    send(frame, &connection);
 
     let mut elapsed_time: u64 = 0x00; // microseconds counter
     
