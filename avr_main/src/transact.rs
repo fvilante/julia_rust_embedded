@@ -45,35 +45,25 @@ impl SerialConnection for ConcreteSerialPort {
 
 }
 
-enum TransactionError {
+enum ReceptionError {
     SegmentError(SegmentError),
     ReceptionTimeout{elapsed_time: u64},
 }
 
+struct TransactResult {
+    frame: Frame,
+    response_time_us: u64 // microseconds (aprox)
+}
 
-
-fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) -> Result<Frame, TransactionError> {
+fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) -> Result<TransactResult, ReceptionError> {
 
     let mut encoder = Encoder::new(StartByte::STX, frame);
     let mut decoder = Decoder::new();
 
-    lcd::print("Send>");
-
     // transmit
-    loop {
-        let data = encoder.get_next();
-        if let Some(byte) = data {
-            lcd::print_u8_in_hex(byte);
-            lcd::print(";");
-            connection.transmit(byte);
-        } else {
-            break; // no more bytes to transmit
-        }
-    }
-
-    lcd::clear();
-
-    lcd::print(" Recv>Frame>");
+    while let Some(byte) = encoder.get_next() {
+        connection.transmit(byte);
+    } 
 
     let mut elapsed_time: u64 = 0x00; // microseconds counter
     
@@ -87,13 +77,7 @@ fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) ->
                 Ok(data) => {
                     match data {
                         Some(frame) => {
-                            let Frame(d0,d1,d2,d3) = frame;
-                            lcd::print("frame_ok=");
-                            lcd::print_u8_in_hex(d0);
-                            lcd::print_u8_in_hex(d1);
-                            lcd::print_u8_in_hex(d2);
-                            lcd::print_u8_in_hex(d3);
-                            return Ok(frame);
+                            return Ok(TransactResult{frame, response_time_us: elapsed_time});
                         }
 
                         None => {
@@ -104,7 +88,7 @@ fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) ->
 
                 Err(e) => {
                     lcd::print(e.to_string());
-                    return Err(TransactionError::SegmentError(e));
+                    return Err(ReceptionError::SegmentError(e));
                 }
             }
             
@@ -112,8 +96,7 @@ fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) ->
         delay_us(1);
         elapsed_time += 1; //
         if elapsed_time > timeout_us {
-            lcd::print("Timeout");
-            return Err(TransactionError::ReceptionTimeout { elapsed_time });
+            return Err(ReceptionError::ReceptionTimeout { elapsed_time });
         }
 
     }
@@ -127,7 +110,14 @@ pub fn development_entry_point() -> ! {
     let frame = Frame(0x00, 0x50, 0x61, 0x02, );
     let baud_rate = 2400;
     let serial = ConcreteSerialPort::new(baud_rate);
-    transact(frame, serial, 200000);
+    let result = transact(frame, serial, 200000);
+    if let Ok(data) = result {
+        lcd::print("FrameOk->");
+        for byte in data.frame.to_array() {
+            lcd::print_u8_in_hex(byte);
+            lcd::print(";");
+        }
+    }
 
     loop { }
 
