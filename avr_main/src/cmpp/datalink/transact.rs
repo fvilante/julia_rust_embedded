@@ -16,12 +16,12 @@ use crate::{
 };
 
 
-pub enum ReceptionError {
+pub enum DatalinkError {
     SegmentError(SegmentError),
     ReceptionTimeout{elapsed_time: u64},
 }
 
-pub struct TransactResult {
+pub struct DatalinkResult {
     frame: Frame,
     response_time_us: u64 // microseconds (aprox)
 }
@@ -34,7 +34,7 @@ fn send(frame: Frame, connection: &impl SerialConnection)  {
     } 
 }
 
-fn receive(connection: impl SerialConnection, timeout_us: u64) -> Result<TransactResult, ReceptionError> {
+fn receive(connection: impl SerialConnection, timeout_us: u64) -> Result<DatalinkResult, DatalinkError> {
     let mut decoder = Decoder::new();
     let mut elapsed_time: u64 = 0x00; // microseconds counter
     
@@ -47,7 +47,7 @@ fn receive(connection: impl SerialConnection, timeout_us: u64) -> Result<Transac
                 Ok(data) => {
                     match data {
                         Some(frame) => {
-                            return Ok(TransactResult{frame, response_time_us: elapsed_time});
+                            return Ok(DatalinkResult{frame, response_time_us: elapsed_time});
                         }
 
                         None => {
@@ -57,7 +57,7 @@ fn receive(connection: impl SerialConnection, timeout_us: u64) -> Result<Transac
                 }
 
                 Err(e) => {
-                    return Err(ReceptionError::SegmentError(e));
+                    return Err(DatalinkError::SegmentError(e));
                 }
             }
             
@@ -66,14 +66,14 @@ fn receive(connection: impl SerialConnection, timeout_us: u64) -> Result<Transac
         delay_us(1);
         elapsed_time += 1; //
         if elapsed_time > timeout_us {
-            return Err(ReceptionError::ReceptionTimeout { elapsed_time });
+            return Err(DatalinkError::ReceptionTimeout { elapsed_time });
         }
 
     }
 }
 
 
-pub fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) -> Result<TransactResult, ReceptionError> {
+pub fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) -> Result<DatalinkResult, DatalinkError> {
     send(frame, &connection);
     receive(connection, timeout_us)
 }

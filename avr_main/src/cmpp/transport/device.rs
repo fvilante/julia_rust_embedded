@@ -1,4 +1,4 @@
-use crate::{board::lcd, cmpp::datalink::transact::ReceptionError};
+use crate::{board::lcd, cmpp::datalink::transact::DatalinkError};
 
 pub enum AddressMask {
     ByteLow,
@@ -34,15 +34,15 @@ pub enum Choice {
     ContinumPassToPass
 }
 
-pub enum Dimension {
+pub enum DataType {
     Displacement,
     Duration,
     Velocity,
     Acceleration,
-    Adimensional,
+    Quantity,
     Choice(Choice),
     //
-    Pulses  // exemplo: Janela de protecao do giro
+    Pulses  // exemple: "Janela de protecao do giro"
 }
 
 
@@ -52,7 +52,7 @@ pub enum Dimension {
 pub struct Parameter {
     index: Index,
     address: Address,
-    dimension: Dimension, 
+    data_type: DataType, 
 }
 
 // Programa de Eixo
@@ -109,7 +109,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x50,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Displacement,
+        data_type: DataType::Displacement,
     },
 
     Parameter { 
@@ -118,7 +118,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x51,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Displacement,
+        data_type: DataType::Displacement,
     },
 
     Parameter { 
@@ -127,7 +127,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x52,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Acceleration,
+        data_type: DataType::Acceleration,
     },
 
     Parameter { 
@@ -136,7 +136,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x53,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Acceleration,
+        data_type: DataType::Acceleration,
     },
 
     Parameter { 
@@ -145,7 +145,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x54,
             address_mask: AddressMask::Word,
         },
-        dimension:  Dimension::Velocity,
+        data_type:  DataType::Velocity,
     },
 
     Parameter { 
@@ -154,7 +154,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x55,
             address_mask: AddressMask::Word,
         },
-        dimension:  Dimension::Velocity,
+        data_type:  DataType::Velocity,
     },
     
     //PARAMETROS DE IMPRESSAO
@@ -165,7 +165,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x56,
             address_mask: AddressMask::ByteHigh,
         },
-        dimension: Dimension::Adimensional,
+        data_type: DataType::Quantity,
     },
 
     Parameter { 
@@ -174,7 +174,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x56,
             address_mask: AddressMask::ByteLow,
         },
-        dimension: Dimension::Adimensional,
+        data_type: DataType::Quantity,
     },
 
     Parameter { 
@@ -183,7 +183,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x57,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Displacement,
+        data_type: DataType::Displacement,
     },
 
     Parameter { 
@@ -192,7 +192,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x58,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Displacement,
+        data_type: DataType::Displacement,
     },
 
     Parameter { 
@@ -201,7 +201,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x59,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Displacement,
+        data_type: DataType::Displacement,
     },
 
     Parameter { 
@@ -210,7 +210,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x5A,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Displacement,
+        data_type: DataType::Displacement,
     },
 
     Parameter { 
@@ -219,7 +219,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit9,
         },
-        dimension: Dimension::Adimensional,
+        data_type: DataType::Quantity,
     },
 
     //PARAMETROS DA IMPRESSORA
@@ -230,7 +230,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit8,
         },
-        dimension: Dimension::Choice(Choice::OpenedClosed),
+        data_type: DataType::Choice(Choice::OpenedClosed),
     },
 
     Parameter { 
@@ -239,7 +239,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x5B,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Duration,
+        data_type: DataType::Duration,
     },
 
     Parameter { 
@@ -248,7 +248,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit11,
         },
-        dimension: Dimension::Choice(Choice::OnOff),
+        data_type: DataType::Choice(Choice::OnOff),
     },
 
     Parameter { 
@@ -257,7 +257,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit10,
         },
-        dimension: Dimension::Choice(Choice::OnOff),
+        data_type: DataType::Choice(Choice::OnOff),
     },
 
     //PARAMETROS DE CICLO
@@ -268,7 +268,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x5C,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Duration,
+        data_type: DataType::Duration,
     },
 
     Parameter { 
@@ -277,7 +277,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x5D,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Duration,
+        data_type: DataType::Duration,
     },
 
     Parameter { 
@@ -286,7 +286,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit0,
         },
-        dimension: Dimension::Choice(Choice::OnOff),
+        data_type: DataType::Choice(Choice::OnOff),
     },
 
     Parameter { 
@@ -295,7 +295,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit1,
         },
-        dimension: Dimension::Choice(Choice::OnOff),
+        data_type: DataType::Choice(Choice::OnOff),
     },
 
     Parameter { 
@@ -304,7 +304,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit15,
         },
-        dimension: Dimension::Choice(Choice::ContinumPassToPass),
+        data_type: DataType::Choice(Choice::ContinumPassToPass),
     },
 
     //INTERTRAVAMENTO PARA DOIS EIXOS
@@ -315,7 +315,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x5E,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Displacement,
+        data_type: DataType::Displacement,
     },
 
     Parameter { 
@@ -324,7 +324,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit2,
         },
-        dimension: Dimension::Choice(Choice::OnOff),
+        data_type: DataType::Choice(Choice::OnOff),
     },
 
     Parameter { 
@@ -333,7 +333,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit3,
         },
-        dimension: Dimension::Choice(Choice::OnOff),
+        data_type: DataType::Choice(Choice::OnOff),
     },
 
     Parameter { 
@@ -342,7 +342,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit6,
         },
-        dimension: Dimension::Choice(Choice::OnOff),
+        data_type: DataType::Choice(Choice::OnOff),
     },
 
     Parameter { 
@@ -351,7 +351,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit7,
         },
-        dimension: Dimension::Choice(Choice::OnOff),
+        data_type: DataType::Choice(Choice::OnOff),
     },
 
     // CONFIGURACAO DE EIXO
@@ -366,7 +366,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x62,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Displacement, // better than Adimensional?
+        data_type: DataType::Displacement, // better than Quantity?
     },
 
     Parameter { 
@@ -375,7 +375,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x61,
             address_mask: AddressMask::Word,
         },
-        dimension:  Dimension::Pulses, // better than Adimensional?
+        data_type:  DataType::Pulses, // better than Quantity?
     },
 
     //
@@ -388,7 +388,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit2,
         },
-        dimension: Dimension::Choice(Choice::OnOff),
+        data_type: DataType::Choice(Choice::OnOff),
     },
 
     Parameter { 
@@ -397,7 +397,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit13,
         },
-        dimension: Dimension::Choice(Choice::OnOff),
+        data_type: DataType::Choice(Choice::OnOff),
     },
 
     Parameter { 
@@ -406,7 +406,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit5,
         },
-        dimension: Dimension::Choice(Choice::OpenedClosed),
+        data_type: DataType::Choice(Choice::OpenedClosed),
     },
 
     Parameter { 
@@ -415,7 +415,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x63,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Displacement, // better than Adimensional?
+        data_type: DataType::Displacement, // better than Quantity?
     },
 
     Parameter { 
@@ -424,7 +424,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x65,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Velocity, // better than Adimensional?
+        data_type: DataType::Velocity, // better than Quantity?
     },
 
     Parameter { 
@@ -433,7 +433,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x64,
             address_mask: AddressMask::Word,
         },
-        dimension: Dimension::Acceleration, // better than Adimensional?
+        data_type: DataType::Acceleration, // better than Quantity?
     },
 
     Parameter { 
@@ -442,7 +442,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit14,
         },
-        dimension: Dimension::Choice(Choice::OnOff),
+        data_type: DataType::Choice(Choice::OnOff),
     },
 
     Parameter { 
@@ -451,7 +451,7 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
             word_address: 0x60,
             address_mask: AddressMask::Bit4,
         },
-        dimension: Dimension::Choice(Choice::OnOff),
+        data_type: DataType::Choice(Choice::OnOff),
     },
 
 ];
