@@ -2,6 +2,8 @@
 use lib_1::protocol::{common::StartByte, decoder::SegmentError};
 use crate::microcontroler::serial::transmit;
 use crate::microcontroler::delay::delay_us;
+use super::serial_connection::SerialConnection;
+use super::concrete_serial::ConcreteSerialPort;
 
 use crate::{
     lib_1::protocol::{
@@ -13,37 +15,6 @@ use crate::{
     microcontroler::serial
 };
 
-pub trait SerialConnection {
-    fn new(baud_rate: u32) -> Self;
-    fn transmit(&self, byte: u8);
-    fn ready_to_receive(&self) -> bool;
-    fn receive(&self) -> u8;
-}
-
-pub struct ConcreteSerialPort {
-    baud_rate: u32,
-}
-
-impl SerialConnection for ConcreteSerialPort {
-
-    fn new(baud_rate: u32) -> Self {
-        serial::init(baud_rate);
-        Self { 
-            baud_rate,
-        }
-    }
-
-    fn transmit(&self, byte: u8) {
-        serial::transmit(byte)
-    }
-    fn ready_to_receive(&self) -> bool {
-        serial::ready_to_receive()
-    }
-    fn receive(&self) -> u8 {
-        serial::receive()
-    }
-
-}
 
 pub enum ReceptionError {
     SegmentError(SegmentError),
