@@ -2,7 +2,7 @@
 use lib_1::protocol::{common::StartByte, decoder::{SegmentError, SegmentResult}};
 use crate::microcontroler::serial::transmit;
 use crate::microcontroler::delay::delay_us;
-use super::serial_connection::SerialConnection;
+use crate::lib_1::types::serial_connection::SerialConnection;
 use super::concrete_serial::ConcreteSerialPort;
 
 use crate::{

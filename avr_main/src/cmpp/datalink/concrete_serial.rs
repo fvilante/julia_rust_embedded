@@ -1,5 +1,5 @@
 use crate::microcontroler::serial;
-use super::serial_connection::SerialConnection;
+use crate::lib_1::types::serial_connection::SerialConnection;
 
 
 pub struct ConcreteSerialPort {

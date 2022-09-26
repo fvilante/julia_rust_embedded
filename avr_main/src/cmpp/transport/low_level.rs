@@ -1,6 +1,6 @@
 use lib_1::protocol::common::Frame;
 
-use crate::{board::lcd, cmpp::datalink::{transact::{DatalinkError, transact}, serial_connection::SerialConnection}, common::get_bit_at};
+use crate::{board::lcd, cmpp::datalink::{transact::{DatalinkError, transact}}, common::get_bit_at};
 
 // // utils
 // 
