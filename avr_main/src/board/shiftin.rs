@@ -102,7 +102,7 @@ pub fn development_entry_point() -> ! {
 
     lcd::lcd_initialize();
     
-    let mut data: ShiftOutData = ShiftOutData { 
+    let data: ShiftOutData = ShiftOutData { 
         byte0: (0x00), 
         byte1: (0x00), 
         byte2: (0x00), 

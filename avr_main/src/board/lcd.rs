@@ -15,11 +15,11 @@ const LOW: bool = false;
 const MAX_LINES: u8 = 4;
 
 // lcd internal state
-static mut _displayfunction: u8 = 0x00;
-static mut _displaycontrol: u8 = 0x00;
-static mut _displaymode: u8 = 0x00;
-static mut _row_offsets: [u8;4] = [0;4];
-static mut _numlines: u8 = 0x00;
+static mut _DISPLAYFUNCTIO: u8 = 0x00;
+static mut _DISPLAYCONTROL: u8 = 0x00;
+static mut _DISPLAYMODE: u8 = 0x00;
+static mut _ROW_OFFSETS: [u8;4] = [0;4];
+static mut _NUMLINES: u8 = 0x00;
 
 
 
@@ -218,45 +218,45 @@ pub fn setCursor(col: u8, row: u8) {
     if row_bugfixed >= max_lines  {
         row_temp = (max_lines - 1) as usize;    // we count rows starting w/0
     }
-    if row_bugfixed >= unsafe { _numlines }  {
-        row_temp = ( unsafe {_numlines } - 1 ) as usize;    // we count rows starting w/0
+    if row_bugfixed >= unsafe { _NUMLINES }  {
+        row_temp = ( unsafe {_NUMLINES } - 1 ) as usize;    // we count rows starting w/0
     }
     
-    command(LCD_SETDDRAMADDR | (col + unsafe{ _row_offsets[row_temp] } ));
+    command(LCD_SETDDRAMADDR | (col + unsafe{ _ROW_OFFSETS[row_temp] } ));
 }
 
 
 // Turn the display on/off (quickly)
 fn noDisplay() {
-    unsafe { _displaycontrol &= !LCD_DISPLAYON; }; // @@ check if in rust the equivalent of clang negation symbol '~' is '!' (Please check and remove this line if possible)
-    command(LCD_DISPLAYCONTROL | unsafe { _displaycontrol });
+    unsafe { _DISPLAYCONTROL &= !LCD_DISPLAYON; }; // @@ check if in rust the equivalent of clang negation symbol '~' is '!' (Please check and remove this line if possible)
+    command(LCD_DISPLAYCONTROL | unsafe { _DISPLAYCONTROL });
 }
 
 fn display() -> () {
-    unsafe { _displaycontrol |= LCD_DISPLAYON; }
-    command(LCD_DISPLAYCONTROL | unsafe {_displaycontrol });
+    unsafe { _DISPLAYCONTROL |= LCD_DISPLAYON; }
+    command(LCD_DISPLAYCONTROL | unsafe {_DISPLAYCONTROL });
 }
 
 // Turns the underline cursor on/off
 fn noCursor() -> () {
-    unsafe { _displaycontrol &= !LCD_CURSORON; }; // @@ check if in rust the equivalent of clang negation symbol '~' is '!' (Please check and remove this line if possible)
-    command(LCD_DISPLAYCONTROL | unsafe { _displaycontrol }); 
+    unsafe { _DISPLAYCONTROL &= !LCD_CURSORON; }; // @@ check if in rust the equivalent of clang negation symbol '~' is '!' (Please check and remove this line if possible)
+    command(LCD_DISPLAYCONTROL | unsafe { _DISPLAYCONTROL }); 
 }
 
 fn cursor() -> () {
-    unsafe { _displaycontrol |= LCD_CURSORON; };
-    command(LCD_DISPLAYCONTROL | unsafe {_displaycontrol});
+    unsafe { _DISPLAYCONTROL |= LCD_CURSORON; };
+    command(LCD_DISPLAYCONTROL | unsafe {_DISPLAYCONTROL});
 }
 
 // Turn on and off the blinking cursor
 fn noBlink() -> () {
-    unsafe { _displaycontrol &= !LCD_BLINKON; }; // @@ check if in rust the equivalent of clang negation symbol '~' is '!' (Please check and remove this line if possible)
-    command(LCD_DISPLAYCONTROL | unsafe { _displaycontrol });
+    unsafe { _DISPLAYCONTROL &= !LCD_BLINKON; }; // @@ check if in rust the equivalent of clang negation symbol '~' is '!' (Please check and remove this line if possible)
+    command(LCD_DISPLAYCONTROL | unsafe { _DISPLAYCONTROL });
 }
 
 fn blink() -> () {
-    unsafe {_displaycontrol |= LCD_BLINKON;};
-    command(LCD_DISPLAYCONTROL | unsafe{_displaycontrol});
+    unsafe {_DISPLAYCONTROL |= LCD_BLINKON;};
+    command(LCD_DISPLAYCONTROL | unsafe{_DISPLAYCONTROL});
 }
 
 // These commands scroll the display without changing the RAM
@@ -286,10 +286,10 @@ or
 fn setRowOffsets(row0: u8, row1: u8, row2: u8, row3: u8) -> () {
     //setRowOffsets(0x00, 0x40, 0x00 + cols, 0x40 + cols); <-- call example
     unsafe {
-        _row_offsets[0] = row0;
-        _row_offsets[1] = row1;
-        _row_offsets[2] = row2;
-        _row_offsets[3] = row3;
+        _ROW_OFFSETS[0] = row0;
+        _ROW_OFFSETS[1] = row1;
+        _ROW_OFFSETS[2] = row2;
+        _ROW_OFFSETS[3] = row3;
     }
 }
 
@@ -335,7 +335,7 @@ fn lcd_init() {
 
     init_lcd_pins();
 
-    unsafe { _displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5X8DOTS; }
+    unsafe { _DISPLAYFUNCTIO = LCD_4BITMODE | LCD_1LINE | LCD_5X8DOTS; }
 
     //lcd_begin(16,1);
 
@@ -344,9 +344,9 @@ fn lcd_init() {
 fn lcd_begin(cols: u8, lines: u8) {
     
     if lines > 1 {
-        unsafe {_displayfunction |= LCD_2LINE; };
+        unsafe {_DISPLAYFUNCTIO |= LCD_2LINE; };
     } 
-    unsafe { _numlines = lines; };
+    unsafe { _NUMLINES = lines; };
 
     setRowOffsets(0x00, 0x40, 0x00 + cols, 0x40 + cols);
 
@@ -381,19 +381,19 @@ fn lcd_begin(cols: u8, lines: u8) {
     // ==========================
 
     // finally, set # lines, font size, etc.
-    command(LCD_FUNCTIONSET | unsafe { _displayfunction });
+    command(LCD_FUNCTIONSET | unsafe { _DISPLAYFUNCTIO });
 
     // turn the display on with no cursor or blinking default
-    unsafe { _displaycontrol = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF };  
+    unsafe { _DISPLAYCONTROL = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF };  
     display();
 
     // clear it off
     clear();
 
     // Initialize to default text direction (for romance languages)
-    unsafe { _displaymode = LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT };
+    unsafe { _DISPLAYMODE = LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT };
     // set the entry mode
-    command(LCD_ENTRYMODESET | unsafe {_displaymode } );
+    command(LCD_ENTRYMODESET | unsafe {_DISPLAYMODE } );
 
 }
 

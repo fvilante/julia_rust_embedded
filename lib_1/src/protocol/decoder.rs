@@ -16,11 +16,11 @@ impl SegmentError {
    
     pub fn to_string(&self) -> &'static str {
         match *self {
-            SegmentError::InvalidStartByte(u8) => "InvalidStartByte",
+            SegmentError::InvalidStartByte(_u8) => "InvalidStartByte",
             SegmentError::BufferOverFlow => "BufferOverFlow",
-            SegmentError::ExpectedEtxOrEscDupButFoundOtherThing(u8) => "ExpectedEtxOrEscDupButFoundOtherThing",
-            SegmentError::ChecksumIsEscButNotDuplicated(u8) => "ChecksumIsEscButNotDuplicated",
-            SegmentError::InvalidChecksum { expected, received } => "InvalidChecksum",
+            SegmentError::ExpectedEtxOrEscDupButFoundOtherThing(_u8) => "ExpectedEtxOrEscDupButFoundOtherThing",
+            SegmentError::ChecksumIsEscButNotDuplicated(_u8) => "ChecksumIsEscButNotDuplicated",
+            SegmentError::InvalidChecksum { expected: _a, received: _b } => "InvalidChecksum",
         }
     }
 }

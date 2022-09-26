@@ -85,7 +85,7 @@ struct Keypad {
     //last_keycode_read: KeyCode,
 }
 
-const keymap: [[KeyCode;8];4] = [
+const KEYMAP: [[KeyCode;8];4] = [
     [KeyCode::KEY_F1,  KeyCode::KEY_7,  KeyCode::KEY_8,  KeyCode::KEY_9,       KeyCode::KEY_EXECUCAO,               KeyCode::KEY_INS,                       KeyCode::KEY_ESC,                        KeyCode::KEY_HIDDEN_KEY],
     [KeyCode::KEY_F2,  KeyCode::KEY_4,  KeyCode::KEY_5,  KeyCode::KEY_6,       KeyCode::KEY_MAIS_OU_MENOS,          KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA,  KeyCode::KEY_DIRECIONAL_PARA_CIMA,       KeyCode::KEY_START],
     [KeyCode::KEY_F3,  KeyCode::KEY_1,  KeyCode::KEY_2,  KeyCode::KEY_3,       KeyCode::KEY_SETA_BRANCA_DIREITA,    KeyCode::KEY_DIRECIONAL_PARA_BAIXO,     KeyCode::KEY_DIRECIONAL_PARA_DIREITA,    KeyCode::KEY_MANUAL],
@@ -141,7 +141,7 @@ impl Keypad {
             for row in 0..=3 {
                 let bit = self.get_input(row);
                 if bit == ACTIVATED {
-                    key_code = keymap[row as usize][collumn as usize];
+                    key_code = KEYMAP[row as usize][collumn as usize];
                 }
             }
             self.set_output(collumn, DEACTIVATE);
