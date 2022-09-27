@@ -5,15 +5,15 @@ pub enum RingBufferError {
     BufferEmpty,
 }
 
-pub struct RingBuffer<'a>{
-    buffer: &'a mut [u8],
+pub struct RingBuffer<T: Copy, const SIZE: usize> {
+    buffer: [T; SIZE],
     write_index: usize,
     read_index: usize,
     is_full: bool,
 }
 
-impl<'a> RingBuffer<'a> {
-    pub fn new(buffer: &'a mut [u8]) -> Self {
+impl<T: Copy,const SIZE: usize> RingBuffer<T,SIZE> {
+    pub fn new(buffer: [T; SIZE]) -> Self {
         Self {
             buffer,
             write_index: 0x00,
@@ -43,7 +43,7 @@ impl<'a> RingBuffer<'a> {
         self.is_full
     }
 
-    pub fn write(&mut self, data: u8) -> Result<(),RingBufferError> {
+    pub fn write(&mut self, data: T) -> Result<(),RingBufferError> {
         // check if it is full
         if self.is_full() {
             return Err(RingBufferError::BufferFull);
@@ -61,7 +61,7 @@ impl<'a> RingBuffer<'a> {
         
     }
 
-    pub fn read(&mut self) -> Result<u8,RingBufferError>  {
+    pub fn read(&mut self) -> Result<T,RingBufferError>  {
         // if buffer empty emit error
         if self.is_empty() {
             return Err(RingBufferError::BufferEmpty);
@@ -84,8 +84,8 @@ impl<'a> RingBuffer<'a> {
 macro_rules! make_ring_buffer {
     ($var_name:ident, $buffer_size:literal) => {
         const BUFFER_SIZE: usize = $buffer_size;
-        let mut buffer = [0x00 as u8; BUFFER_SIZE];
-        let mut $var_name = RingBuffer::new(&mut buffer);
+        let buffer = [0x00 as u8; BUFFER_SIZE];
+        let mut $var_name = RingBuffer::new(buffer);
     }
 }
 
