@@ -5,7 +5,7 @@ pub const NACK: u8 = 0x15;
 pub const ETX: u8 = 0x03;
 
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug,Copy,Clone,PartialEq)]
 pub struct Frame(pub u8, pub u8, pub u8, pub u8);
 
 impl Frame {

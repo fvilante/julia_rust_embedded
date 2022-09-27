@@ -4,6 +4,7 @@ use super::{common::*, checksum::calc_checksum};
 
 const MAX_BUFFER_LEN: usize = 4; // max data length buffer
 
+#[derive(Debug)]
 pub enum SegmentError {
     InvalidStartByte(u8),
     BufferOverFlow,
