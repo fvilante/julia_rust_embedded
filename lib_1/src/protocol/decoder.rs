@@ -1,5 +1,5 @@
 use super::{ checksum::calc_checksum, common::{ESC, STX, ACK, NACK, ETX, StartByte}};
-use super::frame::Frame as Frame2;
+use super::frame::Frame;
 
 const MAX_BUFFER_LEN: usize = 4; // max data length buffer
 
@@ -63,9 +63,9 @@ impl Decoder {
         
     }
 
-    fn success(&self, checksum: u8) -> Result<Option<Frame2<4>>, SegmentError> {
+    fn success(&self, checksum: u8) -> Result<Option<Frame<4>>, SegmentError> {
        
-        let frame = Frame2{
+        let frame = Frame{
             start_byte: self.start_byte,
             payload: self.buffer ,
         };
@@ -78,7 +78,7 @@ impl Decoder {
         
     }
 
-    pub fn parse_next(&mut self, byte: u8) -> Result<Option<Frame2<4>>, SegmentError> {
+    pub fn parse_next(&mut self, byte: u8) -> Result<Option<Frame<4>>, SegmentError> {
         match self.state {
             State::WaitingFirstEsc => {
                 self.state = State::WaitingStartByte;
@@ -170,7 +170,7 @@ mod tests {
 
     use super::*;
 
-    fn run_decoder<const SIZE: usize>(input: [u8; SIZE]) ->  Result<Frame2<4>, SegmentError> { 
+    fn run_decoder<const SIZE: usize>(input: [u8; SIZE]) ->  Result<Frame<4>, SegmentError> { 
         let mut decoder = Decoder::new();
         for byte in input {
             match decoder.parse_next(byte) {
@@ -193,7 +193,7 @@ mod tests {
         let start_byte = StartByte::STX; 
         let start_byte_ = start_byte as u8;
         let probe = [0x1B, start_byte_, 0xC1, 0x50, 0x61, 0x02, 0x1B, 0x03, 0x87, ];
-        let expected = Frame2{
+        let expected = Frame{
             start_byte,
             payload: [0xC1, 0x50, 0x61, 0x02],
         };
@@ -207,7 +207,7 @@ mod tests {
         let start_byte = StartByte::ACK; 
         let start_byte_ = start_byte as u8;
         let probe = [0x1B, start_byte_, 0x01, 0x86, 0x03, 0x1B, 0x1B, 0x1B, 0x03, 0x52 ];
-        let expected = Frame2{
+        let expected = Frame{
             start_byte,
             payload: [0x01, 0x86, 0x03, 0x1B]
         };

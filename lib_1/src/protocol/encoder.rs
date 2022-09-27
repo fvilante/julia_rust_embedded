@@ -1,5 +1,5 @@
 use super::{checksum::calc_checksum};
-use super::frame::Frame as  Frame2;
+use super::frame::Frame;
 
 
 use super::common:: {
@@ -20,7 +20,7 @@ pub enum State {
 }
 
 pub struct Encoder {
-    frame: Frame2<4>,
+    frame: Frame<4>,
     state: State, 
     buffer_index: usize,
     last_was_esc: bool,
@@ -29,7 +29,7 @@ pub struct Encoder {
 
 impl Encoder {
     
-    pub fn new(frame: Frame2<4>) -> Self {
+    pub fn new(frame: Frame<4>) -> Self {
         Self {
             frame,
             state: State::WaitingFirstEsc,
@@ -130,7 +130,7 @@ mod tests {
     #[test]
     fn it_can_parse_a_simple_frame_without_esc_dup() {
         // 1B 02 C1 50 61 02 1B 03 87  
-        let frame = Frame2{
+        let frame = Frame{
             start_byte: StartByte::STX,
             payload: [0xC1, 0x50, 0x61, 0x02],
         };
@@ -144,7 +144,7 @@ mod tests {
     #[test]
     fn it_can_parse_a_simple_frame_with_esc_dup() {
         // 1B 06 01 86 03 1B 1B 03 52 
-        let frame = Frame2{
+        let frame = Frame{
             start_byte:StartByte::ACK,
             payload: [0x01, 0x86, 0x03, 0x1B],
         };

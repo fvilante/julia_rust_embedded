@@ -1,5 +1,5 @@
 use crate::types::serial_connection::SerialConnection;
-use super::{common::{Frame, StartByte}, encoder::Encoder, decoder::{SegmentResult, Decoder, SegmentError}};
+use super::{common::StartByte, encoder::Encoder, decoder::{Decoder, SegmentError}};
 
 
 #[derive(Debug)]
@@ -10,7 +10,6 @@ pub enum DatalinkError {
 
 #[derive(Debug, PartialEq)]
 pub struct DatalinkResult {
-    start_byte: StartByte,
     frame: Frame,
     response_time_us: u64 // microseconds (aprox)
 }
