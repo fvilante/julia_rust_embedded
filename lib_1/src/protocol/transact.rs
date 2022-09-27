@@ -1,6 +1,6 @@
 use crate::types::serial_connection::SerialConnection;
-use super::{common::StartByte, encoder::Encoder, decoder::{Decoder, SegmentError}};
-
+use super::{encoder::Encoder, decoder::{Decoder, SegmentError}};
+use super::frame::Frame;
 
 #[derive(Debug)]
 pub enum DatalinkError {
@@ -10,14 +10,14 @@ pub enum DatalinkError {
 
 #[derive(Debug, PartialEq)]
 pub struct DatalinkResult {
-    frame: Frame,
+    frame: Frame<4>,
     response_time_us: u64 // microseconds (aprox)
 }
 
-fn send(frame: Frame, connection: &impl SerialConnection)  {
-    let mut encoder = Encoder::new(StartByte::STX, frame);
+fn send(frame: Frame<4>, connection: &impl SerialConnection)  {
+    let encoder = Encoder::new(frame);
     // transmit
-    while let Some(byte) = encoder.get_next() {
+    for byte in encoder {
         connection.transmit(byte);
     } 
 }
@@ -34,13 +34,12 @@ fn receive(connection: impl SerialConnection, _timeout_us: u64) -> Result<Datali
             match output {
                 Ok(data) => {
                     match data {
-                        Some(segment) => {
-                            let SegmentResult {start_byte, frame} = segment;
-                            return Ok(DatalinkResult{start_byte, frame, response_time_us: elapsed_time});
+                        Some(frame) => {
+                            return Ok(DatalinkResult{frame, response_time_us: elapsed_time});
                         }
 
                         None => {
-                            
+                            // empty cycle => processing,
                         }
                     }
                 }
@@ -62,7 +61,7 @@ fn receive(connection: impl SerialConnection, _timeout_us: u64) -> Result<Datali
 }
 
 
-pub fn transact(frame: Frame, connection: impl SerialConnection, timeout_us: u64) -> Result<DatalinkResult, DatalinkError> {
+pub fn transact(frame: Frame<4>, connection: impl SerialConnection, timeout_us: u64) -> Result<DatalinkResult, DatalinkError> {
     send(frame, &connection);
     receive(connection, timeout_us)
 }
@@ -75,18 +74,20 @@ pub fn add(left: u8, right: u8) -> u8 {
 
 #[cfg(test)]
 mod tests {
-    use crate::mock::seria_connection_mock::MockedSerialConnection;
+    use crate::{mock::seria_connection_mock::MockedSerialConnection, protocol::common::StartByte};
 
     use super::*;
 
     #[test]
     fn it_transact() {
         // prepare
+        let start_byte = StartByte::STX;
+        let payload = [1,2,3,4];
         let timeout_us: u64 = 500;
-        let frame = Frame(1,2,3,4);
+        let frame = Frame { start_byte, payload };
         let connection = MockedSerialConnection::new(9600);
+        let expected = DatalinkResult{frame, response_time_us: 0x00};
         // act
-        let expected = DatalinkResult{start_byte: StartByte::STX, frame, response_time_us: 0x00};
         let actual = transact(frame, connection, timeout_us).unwrap();
         // check
         assert_eq!(expected, actual);
