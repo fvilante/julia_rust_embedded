@@ -3,6 +3,7 @@
 
 pub mod protocol;
 pub mod types;
+pub mod mock;
 
 pub fn add(left: u8, right: u8) -> u8 {
     left + right + 2
