@@ -80,14 +80,6 @@ impl<T: Copy,const SIZE: usize> RingBuffer<T,SIZE> {
 
 }
 
-#[macro_export]
-macro_rules! make_ring_buffer {
-    ($var_name:ident, $buffer_size:literal) => {
-        const BUFFER_SIZE: usize = $buffer_size;
-        let buffer = [0x00 as u8; BUFFER_SIZE];
-        let mut $var_name = RingBuffer::new(buffer);
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -95,7 +87,7 @@ mod tests {
     
     #[test]
     fn it_write_read_one_byte() {
-        make_ring_buffer!(ring, 3);
+        let mut ring = RingBuffer::new([0x00;3]);
         // can write and read one byte
         let probe = 0x77;
         let expected = probe;
@@ -106,14 +98,14 @@ mod tests {
 
     #[test]
     fn it_signals_buffer_empty() {
-        make_ring_buffer!(ring, 3);
+        let mut ring = RingBuffer::new([0x00;3]);
         let actual = ring.read().unwrap_err();
         assert_eq!(RingBufferError::BufferEmpty, actual)
     }
 
     #[test]
     fn it_signals_buffer_full() {
-        make_ring_buffer!(ring, 3);
+        let mut ring = RingBuffer::new([0x00;3]);
         ring.write(0x01).unwrap();
         ring.write(0x02).unwrap();
         ring.write(0x03).unwrap();
@@ -123,7 +115,7 @@ mod tests {
 
     #[test]
     fn it_not_signals_buffer_full() {
-        make_ring_buffer!(ring, 3);
+        let mut ring = RingBuffer::new([0x00;3]);
         ring.write(0x01).unwrap();
         ring.read().unwrap();
         ring.write(0x02).unwrap();
@@ -134,7 +126,7 @@ mod tests {
 
     #[test]
     fn it_clears_buffer_full_signal() {
-        make_ring_buffer!(ring, 3);
+        let mut ring = RingBuffer::new([0x00;3]);
         ring.write(0x01).unwrap();
         ring.write(0x02).unwrap();
         ring.write(0x03).unwrap();
@@ -148,7 +140,7 @@ mod tests {
     #[test]
     fn it_write_and_ready_dynamically() {
         // prepare
-        make_ring_buffer!(ring, 3);
+        let mut ring = RingBuffer::new([0x00;3]);
         let probe = [0,1,2,3,4,5,6];
         // act
         ring.write(probe[0]).unwrap();
