@@ -30,3 +30,20 @@ pub enum StartByte {
     NACK = 0x15,
 }
 
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_frame_works() {
+        let expected: [u8; 4] = [1,2,3,4];
+        let frame = Frame::from_array(&expected);
+        let actual = frame.to_array();
+        assert_eq!(expected, actual);
+    }
+}
+
+
+
