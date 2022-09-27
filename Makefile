@@ -10,6 +10,9 @@ all: fast
 watch: 
 	cargo watch -c --why -s "make test"
 
+watch_avr: 
+	cargo watch -c --why -s "make check"
+
 fast: build upload size
 
 full: check test build upload size
