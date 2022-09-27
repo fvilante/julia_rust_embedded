@@ -1,4 +1,4 @@
-use crate::{board::lcd, cmpp::datalink::transact::DatalinkError};
+use crate::{board::lcd};
 
 pub enum AddressMask {
     ByteLow,
