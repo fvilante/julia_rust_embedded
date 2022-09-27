@@ -5,7 +5,7 @@ pub struct Array<T: Copy,const SIZE:usize> {
 
 impl<T: Copy,const SIZE: usize> Array<T,SIZE> {
 
-    pub fn from_array(init: [T; SIZE]) -> Array<T,SIZE> {
+    pub const fn from_array(init: [T; SIZE]) -> Array<T,SIZE> {
         Self {
             array: init,
         }

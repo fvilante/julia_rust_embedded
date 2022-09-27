@@ -1,3 +1,3 @@
 pub mod array;
 pub mod ring_buffer;
-//pub mod seria_connection_mock;
+pub mod seria_connection_mock;

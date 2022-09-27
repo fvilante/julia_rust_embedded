@@ -13,7 +13,7 @@ pub struct RingBuffer<T: Copy, const SIZE: usize> {
 }
 
 impl<T: Copy,const SIZE: usize> RingBuffer<T,SIZE> {
-    pub fn new(buffer: [T; SIZE]) -> Self {
+    pub const fn new(buffer: [T; SIZE]) -> Self {
         Self {
             buffer,
             write_index: 0x00,
