@@ -1,6 +1,7 @@
 #[allow(unused_variables)]
 
 use super::{common::*, checksum::calc_checksum};
+use super::frame::Frame as Frame2;
 
 const MAX_BUFFER_LEN: usize = 4; // max data length buffer
 
@@ -72,12 +73,16 @@ impl Decoder {
     }
 
     fn success(&self, checksum: u8) -> Result<Option<SegmentResult>, SegmentError> {
-        let obj = self.buffer as [u8; 4];
-        let expected = calc_checksum(&obj, self.start_byte);
+       
+        let frame = Frame2{
+            start_byte: self.start_byte,
+            payload: self.buffer ,
+        };
+        let expected = calc_checksum(frame);
         if checksum == expected {
             Ok(Some( SegmentResult { 
                 start_byte: self.start_byte,
-                frame: Frame::from_array(&obj), 
+                frame: Frame::from_array(&frame.payload), 
             }))
         } else {
             Err(SegmentError::InvalidChecksum { expected, received: (checksum) })
