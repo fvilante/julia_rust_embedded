@@ -1,6 +1,4 @@
-#[allow(unused_variables)]
-
-use super::{common::*, checksum::calc_checksum};
+use super::{ checksum::calc_checksum, common::{ESC, STX, ACK, NACK, ETX, StartByte}};
 use super::frame::Frame as Frame2;
 
 const MAX_BUFFER_LEN: usize = 4; // max data length buffer
@@ -26,13 +24,6 @@ impl SegmentError {
         }
     }
 }
-
-// deprecate!
-pub struct SegmentResult {
-    pub start_byte: StartByte,
-    pub frame: Frame,
-}
-
 
 pub enum State {
     WaitingFirstEsc,

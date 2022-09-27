@@ -1,10 +1,9 @@
-use super::{checksum::calc_checksum, common::StartByte};
-#[allow(unused_imports)]
+use super::{checksum::calc_checksum};
+use super::frame::Frame as  Frame2;
 
 
 use super::common:: {
-    Frame,
-    ESC, STX, ACK, NACK, ETX,
+    ESC, /*STX, ACK, NACK,*/ ETX,
 };
 
 pub enum State {
@@ -21,35 +20,21 @@ pub enum State {
 }
 
 pub struct Encoder {
-    start_byte: StartByte,
-    frame: Frame,
+    frame: Frame2<4>,
     state: State, 
     buffer_index: usize,
     last_was_esc: bool,
 }
 
-const MAX_PAYLOAD_SIZE: usize = 4;
 
 impl Encoder {
     
-    pub fn new(start_byte: StartByte, frame: Frame) -> Self {
+    pub fn new(frame: Frame2<4>) -> Self {
         Self {
-            start_byte,
             frame,
             state: State::WaitingFirstEsc,
             buffer_index: 0,
             last_was_esc: false,
-        }
-    }
-
-    fn read_buffer(&self, index: usize) -> u8 {
-        let Frame(b0,b1,b2,b3) = self.frame;
-        match index {
-            0 => b0,
-            1 => b1,
-            2 => b2,
-            3 => b3,
-            _ => unreachable!(),
         }
     }
 
@@ -78,28 +63,28 @@ impl Encoder {
             }
 
             State::WaitingStartByte => {
-                let start_byte = self.start_byte as u8;
+                let start_byte = self.frame.start_byte as u8;
                 self.state = State::WaitingData0;
                 Some(start_byte)
             }
 
             State::WaitingData0 => {
-                let byte = self.read_buffer(0);
+                let byte = self.frame.payload[0];
                 self.duplicate_esc_if_necessary(byte, State::WaitingData1)
             }
 
             State::WaitingData1 => {
-                let byte = self.read_buffer(1);
+                let byte = self.frame.payload[1];
                 self.duplicate_esc_if_necessary(byte, State::WaitingData2)
             }
 
             State::WaitingData2 => {
-                let byte = self.read_buffer(2);
+                let byte = self.frame.payload[2];
                 self.duplicate_esc_if_necessary(byte, State::WaitingData3)
             }
 
             State::WaitingData3 => {
-                let byte = self.read_buffer(3);
+                let byte = self.frame.payload[3];
                 self.duplicate_esc_if_necessary(byte, State::WaitingFinalEsc)
             }
             
@@ -114,9 +99,7 @@ impl Encoder {
             }
 
             State::WaitingChecksum => {
-                let Frame(data0, data1, data2, data3) = self.frame;
-                let obj = [data0, data1, data2, data3];
-                let checksum = calc_checksum(&obj, self.start_byte);
+                let checksum = calc_checksum(self.frame);
                 self.duplicate_esc_if_necessary(checksum, State::Finish)
             }
 
@@ -130,44 +113,46 @@ impl Encoder {
 
 }
 
-
-
-pub fn add(left: u8, right: u8) -> u8 {
-    left + right + 2
+impl Iterator for Encoder {
+    type Item = u8;
+    fn next(&mut self) -> Option<<Self as Iterator>::Item> { 
+         self.get_next()
+    }
 }
+
 
 #[cfg(test)]
 mod tests {
+    use crate::protocol::common::StartByte;
+
     use super::*;
 
     #[test]
     fn it_can_parse_a_simple_frame_without_esc_dup() {
         // 1B 02 C1 50 61 02 1B 03 87  
-        let frame = Frame(0xC1, 0x50, 0x61, 0x02, );
-        let mut encoder = Encoder::new(StartByte::STX, frame);
-        let expected = [0x1B, 0x02, 0xC1, 0x50, 0x61, 0x02, 0x1B, 0x03, 0x87, ];
-        let mut buffer = [0x00; 9];
-        for index in 0..buffer.len() {
-            if let Some(byte) = encoder.get_next() {
-                buffer[index] = byte;
-            }
-        }
-        assert_eq!(expected, buffer);
+        let frame = Frame2{
+            start_byte: StartByte::STX,
+            payload: [0xC1, 0x50, 0x61, 0x02],
+        };
+        let mut encoder = Encoder::new(frame);
+        let expected = [0x1B, 0x02, 0xC1, 0x50, 0x61, 0x02, 0x1B, 0x03, 0x87 ];
+        let buffer: [u8;9] = [0x00;9];
+        let actual = buffer.map(|_| encoder.next().unwrap());
+        assert_eq!(expected, actual);
     }
 
     #[test]
     fn it_can_parse_a_simple_frame_with_esc_dup() {
         // 1B 06 01 86 03 1B 1B 03 52 
-        let frame = Frame(0x01, 0x86, 0x03, 0x1B);
-        let mut encoder = Encoder::new(StartByte::ACK, frame);
+        let frame = Frame2{
+            start_byte:StartByte::ACK,
+            payload: [0x01, 0x86, 0x03, 0x1B],
+        };
+        let mut encoder = Encoder::new(frame);
         let expected = [0x1B, 0x06, 0x01, 0x86, 0x03, 0x1B, 0x1B, 0x1B, 0x03, 0x52 ];
-        let mut buffer = [0x00; 10];
-        for index in 0..buffer.len() {
-            if let Some(byte) = encoder.get_next() {
-                buffer[index] = byte;
-            }
-        }
-        assert_eq!(expected, buffer);
+        let buffer = [0x00; 10];
+        let actual = buffer.map(|_| encoder.next().unwrap());
+        assert_eq!(expected, actual);
     }
 }
 
