@@ -1,3 +1,6 @@
+#TODO: To build no_std and std in some project see https://stackoverflow.com/questions/69378710/how-to-write-a-crate-so-that-std-and-no-std-can-coexist-in-different-modules
+
+
 # I'm using an old version of avr-size (v2.26 (2015)) because the updated version is not as better in my opinion. (some useful parameters seem to being removed)
 AVR_SIZE=C:\avr\avr8-gnu-toolchain-win32_x86/bin/avr-size
 MCU=atmega328p
