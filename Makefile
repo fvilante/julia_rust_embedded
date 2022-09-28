@@ -22,6 +22,10 @@ watch:
 watch_avr: 
 	cargo watch -c --why -s "make div check"
 
+watch_avr_upload:
+	cargo watch -c --why -s "make div fast"
+
+
 fast: build upload size
 
 full: check test build upload size
