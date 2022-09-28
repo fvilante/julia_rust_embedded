@@ -5,13 +5,19 @@ BUILD_DIR=target/avr-atmega328p/release
 
 all: fast
 
+# just a division marker
+div:
+	@echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	@echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	@echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+
 # watch executes the tests if any file on the project change (note: ignore files in target and .git folder)
 # if you do not have cargo-watch instaled type "cargo install cargo-watch" to install from source.
 watch: 
-	cargo watch -c --why -s "make test"
+	cargo watch -c --why -s "make div test"
 
 watch_avr: 
-	cargo watch -c --why -s "make check"
+	cargo watch -c --why -s "make div check"
 
 fast: build upload size
 
