@@ -3,7 +3,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use crate::common::get_bit_at_as_bool;
+use lib_1::utils::common::get_bit_at_as_bool;
 
 use super::shiftin::{ShiftInData, self, readShiftIn};
 

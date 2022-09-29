@@ -5,6 +5,7 @@
 pub mod protocol;
 pub mod types;
 pub mod mock;
+pub mod utils;
 
 
 #[allow(unused_imports)]

@@ -5,7 +5,9 @@
 
 use super::shiftout::ShiftOutData;
 
-use crate::{common::{configure_bit, get_bit_at_as_bool}, microcontroler::delay::delay_ms};
+use crate::{microcontroler::delay::delay_ms};
+
+use lib_1::utils::common::{configure_bit, get_bit_at_as_bool};
 
 use super::shiftout::{write_shiftout};
 

@@ -5,7 +5,7 @@ use crate::microcontroler::register:: {
     read_register,
 };
 
-use crate::common:: {
+use lib_1::utils::common:: {
     word_to_byte,
     get_bit_at,
 };

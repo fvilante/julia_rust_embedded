@@ -3,7 +3,6 @@ use ruduino::legacy::serial;
 
 use crate::{
     board::lcd, 
-    common::convert_u8_to_str_hex,
 };
 
 use super::delay::delay_ms;

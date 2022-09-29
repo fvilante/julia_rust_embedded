@@ -2,7 +2,7 @@
 
 use arduino_hal::pac::AC;
 
-use crate::{board::lcd, common::set_bit_at};
+use crate::{board::lcd};
 
 use super::{shiftout::{write_shiftout, ShiftOutData}, shiftin::readShiftIn, output_expander::OutputExpander, input_expander::InputExpander};
 

@@ -9,7 +9,6 @@
 
 extern crate avr_std_stub;
 
-mod common;
 mod microcontroler;
 mod board;
 mod cmpp;

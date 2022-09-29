@@ -31,7 +31,7 @@ pub fn set_bit_at(byte: u8, position: u8) -> u8 {
     byte | (1 << position)
 }
 
-pub fn invet(byte: u8) -> u8 {
+pub fn invert(byte: u8) -> u8 {
     !byte
 }
 
