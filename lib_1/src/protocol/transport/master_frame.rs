@@ -1,8 +1,9 @@
 use crate::protocol::{frame::Frame, common::StartByte};
 
+use super::word_16::Word16;
+
 type Channel = u8;
 type WordAddress = u8;
-type Word16 = u16;
 type BitMask16 = u16;
 
 #[repr(u8)]
@@ -22,7 +23,7 @@ pub enum MasterFrame {
     SetWord{
         channel: Channel,
         waddr: WordAddress,
-        data: BitMask16,
+        data: Word16,
     },
     SetBitmask{
         channel: Channel,
