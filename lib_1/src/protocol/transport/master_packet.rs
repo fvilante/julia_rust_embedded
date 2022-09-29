@@ -2,7 +2,8 @@ use crate::protocol::{frame::Frame, common::StartByte};
 
 use super::word_16::{Word16, BitMask16};
 
-type Channel = u8;
+use super::channel::Channel;
+
 type WordAddress = u8;
 
 

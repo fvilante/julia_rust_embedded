@@ -6,6 +6,9 @@ use crate::protocol::transact::transact;
 use super::master_packet::make_frame;
 use super::master_packet::MasterPacket;
 
+//enum TransportError = {
+//    InvalidChannel(Channel);
+//}
 
 
 pub fn transact_packet(master_packet: MasterPacket, connection: impl SerialConnection, timeout_us: u64, delay_us: DelayFn) -> Result<DatalinkResult, DatalinkError> {
