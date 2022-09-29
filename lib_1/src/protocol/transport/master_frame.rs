@@ -37,9 +37,8 @@ pub enum MasterFrame {
 }
 
 
-pub fn make_frame(message: MasterFrame) -> Frame<4> {
-    let start_byte = StartByte::STX;
-    let payload: [u8;4] = match message {
+fn make_payload(message: MasterFrame) -> [u8; 4] {
+    match message {
         MasterFrame::GetWord { channel, waddr } => {
             [channel+Direction::GetWord as u8, waddr, 0x00, 0x00]
         }
@@ -55,7 +54,12 @@ pub fn make_frame(message: MasterFrame) -> Frame<4> {
         MasterFrame::SetBitmask { channel, waddr, bitmask } => {
             [channel+Direction::SetBitmask as u8, waddr, 0x00, 0x00]
         }
-    };
+    }
+}
+
+pub fn make_frame(message: MasterFrame) -> Frame<4> {
+    let start_byte = StartByte::STX;
+    let payload: [u8;4] = make_payload(message);
     Frame{start_byte, payload}
 }
 
