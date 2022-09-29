@@ -73,7 +73,7 @@ pub fn transact(frame: Frame<4>, connection: impl SerialConnection, timeout_us: 
 
 #[cfg(test)]
 mod tests {
-    use crate::{mock::seria_connection_mock::MockedSerialConnection, protocol::common::StartByte, types::delay::delay_us};
+    use crate::{mock::serial_connection_mock::MockedSerialConnection, protocol::common::StartByte, types::delay::delay_us};
 
     use super::*;
 
