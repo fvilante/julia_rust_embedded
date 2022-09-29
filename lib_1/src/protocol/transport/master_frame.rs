@@ -1,10 +1,10 @@
 use crate::protocol::{frame::Frame, common::StartByte};
 
-use super::word_16::Word16;
+use super::word_16::{Word16, BitMask16};
 
 type Channel = u8;
 type WordAddress = u8;
-type BitMask16 = u16;
+
 
 #[repr(u8)]
 enum Direction {
@@ -45,15 +45,18 @@ fn make_payload(message: MasterFrame) -> [u8; 4] {
         }
 
         MasterFrame::SetWord { channel, waddr, data } => {
-            [channel+Direction::SetWord as u8, waddr, 0x00, 0x00]
+            let Word16 { data_high, data_low } = data;
+            [channel+Direction::SetWord as u8, waddr, data_low, data_high]
         }
 
         MasterFrame::ResetBitmask { channel, waddr, bitmask } => {
-            [channel+Direction::ResetBitmask as u8, waddr, 0x00, 0x00]
+            let Word16 { data_high, data_low } =Word16::from_bitmask(bitmask);
+            [channel+Direction::ResetBitmask as u8, waddr, data_low, data_high]
         }
 
         MasterFrame::SetBitmask { channel, waddr, bitmask } => {
-            [channel+Direction::SetBitmask as u8, waddr, 0x00, 0x00]
+            let Word16 { data_high, data_low } = Word16::from_bitmask(bitmask);
+            [channel+Direction::SetBitmask as u8, waddr, data_low, data_high]
         }
     }
 }

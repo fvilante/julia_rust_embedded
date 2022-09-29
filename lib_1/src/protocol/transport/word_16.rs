@@ -3,19 +3,26 @@ use crate::utils::common::{
     word_to_byte,
 };
 
+//NOTE: In future this type may be extended
+pub type BitMask16 = u16;
+
 pub struct Word16  {
     pub data_high: u8,
     pub data_low: u8,
 }
 
 impl Word16 {
-    pub fn new(dataLow: u8, dataHigh: u8) -> Self {
-        Self { data_high: dataHigh, data_low: dataLow }
+    pub fn new(data_low: u8, data_high: u8) -> Self {
+        Self { data_high, data_low }
     }
 
     pub fn from_u16(data: u16) -> Self {
         let (data_low, data_high) = word_to_byte(data);
         Self { data_low, data_high }
+    }
+
+    pub fn from_bitmask(bitmask: BitMask16) -> Self {
+        Self::from_u16(bitmask)
     }
 
 
