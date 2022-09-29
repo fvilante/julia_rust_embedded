@@ -15,7 +15,7 @@ enum Direction {
 }
 
 
-pub enum MasterFrame {
+pub enum MasterPacket {
     GetWord{
         channel: Channel,
         waddr: WordAddress
@@ -38,30 +38,30 @@ pub enum MasterFrame {
 }
 
 
-fn make_payload(message: MasterFrame) -> [u8; 4] {
+fn make_payload(message: MasterPacket) -> [u8; 4] {
     match message {
-        MasterFrame::GetWord { channel, waddr } => {
+        MasterPacket::GetWord { channel, waddr } => {
             [channel+Direction::GetWord as u8, waddr, 0x00, 0x00]
         }
 
-        MasterFrame::SetWord { channel, waddr, data } => {
+        MasterPacket::SetWord { channel, waddr, data } => {
             let Word16 { data_high, data_low } = data;
             [channel+Direction::SetWord as u8, waddr, data_low, data_high]
         }
 
-        MasterFrame::ResetBitmask { channel, waddr, bitmask } => {
+        MasterPacket::ResetBitmask { channel, waddr, bitmask } => {
             let Word16 { data_high, data_low } =Word16::from_bitmask(bitmask);
             [channel+Direction::ResetBitmask as u8, waddr, data_low, data_high]
         }
 
-        MasterFrame::SetBitmask { channel, waddr, bitmask } => {
+        MasterPacket::SetBitmask { channel, waddr, bitmask } => {
             let Word16 { data_high, data_low } = Word16::from_bitmask(bitmask);
             [channel+Direction::SetBitmask as u8, waddr, data_low, data_high]
         }
     }
 }
 
-pub fn make_frame(message: MasterFrame) -> Frame<4> {
+pub fn make_frame(message: MasterPacket) -> Frame<4> {
     let start_byte = StartByte::STX;
     let payload: [u8;4] = make_payload(message);
     Frame{start_byte, payload}
@@ -81,7 +81,7 @@ mod tests {
             start_byte: StartByte::STX,
             payload: [channel+Direction::GetWord as u8, waddr, 0x00, 0x00],
         };
-        let frame = make_frame(MasterFrame::GetWord { channel, waddr });
+        let frame = make_frame(MasterPacket::GetWord { channel, waddr });
         assert_eq!(expected, frame);
     }
 }

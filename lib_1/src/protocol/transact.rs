@@ -3,7 +3,7 @@ use crate::types::serial_connection::SerialConnection;
 use super::{encoder::Encoder, decoder::{Decoder, SegmentError}};
 use super::frame::Frame;
 
-type DelayFn = fn(u64) -> () ;
+pub type DelayFn = fn(u64) -> () ;
 
 #[derive(Debug)]
 pub enum DatalinkError {
@@ -13,8 +13,8 @@ pub enum DatalinkError {
 
 #[derive(Debug, PartialEq)]
 pub struct DatalinkResult {
-    frame: Frame<4>,
-    response_time_us: u64 // microseconds (aprox)
+    pub frame: Frame<4>,
+    pub response_time_us: u64 // microseconds (aprox)
 }
 
 fn send(frame: Frame<4>, connection: &impl SerialConnection)  {
