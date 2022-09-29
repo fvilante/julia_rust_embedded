@@ -14,10 +14,14 @@ div:
 	@echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 	@echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
+# watch platform-dependent (avr-side) and platform-independent (x86-side)
+watch_all:
+	cargo watch -c --why -s "make div x86_test check"
+
 # watch executes the tests if any file on the project change (note: ignore files in target and .git folder)
 # if you do not have cargo-watch instaled type "cargo install cargo-watch" to install from source.
-watch: 
-	cargo watch -c --why -s "make div test"
+watch_x86: 
+	cargo watch -c --why -s "make div x86_test"
 
 watch_avr: 
 	cargo watch -c --why -s "make div check"
@@ -33,7 +37,9 @@ full: check test build upload size
 check:
 	cargo check --package avr_main -Z build-std=core --target .\avr_main\avr-specs\avr-atmega328p.json --release 
 
-test: 
+
+# tests in the platform agnostic lib are performed in x86 host
+x86_test: 
 	cargo test --package lib_1 --release
 
 build:
