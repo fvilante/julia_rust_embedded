@@ -1,8 +1,9 @@
 use crate::protocol::{frame::Frame, common::StartByte};
 
+use super::transport_error::TransportError;
 use super::word_16::{Word16, BitMask16};
 
-use super::channel::Channel;
+use crate::protocol::transport::channel::Channel;
 
 type WordAddress = u8;
 
@@ -18,71 +19,76 @@ enum Direction {
 
 pub enum MasterPacket {
     GetWord{
-        channel: Channel,
         waddr: WordAddress
     },
     SetWord{
-        channel: Channel,
         waddr: WordAddress,
         data: Word16,
     },
     SetBitmask{
-        channel: Channel,
         waddr: WordAddress,
         bitmask: BitMask16,
     },
     ResetBitmask{
-        channel: Channel,
         waddr: WordAddress,
         bitmask: BitMask16,
     },
 }
 
 
-fn make_payload(message: MasterPacket) -> [u8; 4] {
-    match message {
-        MasterPacket::GetWord { channel, waddr } => {
-            [channel+Direction::GetWord as u8, waddr, 0x00, 0x00]
+fn make_payload(channel: Channel, message: MasterPacket) -> Result<[u8; 4],TransportError> {
+
+    let [direction, waddr, byte_low, byte_high] = match message {
+        MasterPacket::GetWord { waddr } => {
+            [Direction::GetWord as u8, waddr, 0x00, 0x00]
         }
 
-        MasterPacket::SetWord { channel, waddr, data } => {
+        MasterPacket::SetWord { waddr, data } => {
             let Word16 { data_high, data_low } = data;
-            [channel+Direction::SetWord as u8, waddr, data_low, data_high]
+            [Direction::SetWord as u8, waddr, data_low, data_high]
         }
 
-        MasterPacket::ResetBitmask { channel, waddr, bitmask } => {
-            let Word16 { data_high, data_low } =Word16::from_bitmask(bitmask);
-            [channel+Direction::ResetBitmask as u8, waddr, data_low, data_high]
-        }
-
-        MasterPacket::SetBitmask { channel, waddr, bitmask } => {
+        MasterPacket::ResetBitmask { waddr, bitmask } => {
             let Word16 { data_high, data_low } = Word16::from_bitmask(bitmask);
-            [channel+Direction::SetBitmask as u8, waddr, data_low, data_high]
+            [Direction::ResetBitmask as u8,waddr, data_low, data_high]
         }
-    }
+
+        MasterPacket::SetBitmask { waddr, bitmask } => {
+            let Word16 { data_high, data_low } = Word16::from_bitmask(bitmask);
+            [Direction::SetBitmask as u8,waddr, data_low, data_high]
+        }
+    };
+
+    channel
+        .as_u8()
+        .map(|channel| [channel+direction, waddr, byte_low, byte_high])
+        .ok_or_else(|| TransportError::InvalidChannel(channel))
+
+
 }
 
-pub fn make_frame(message: MasterPacket) -> Frame<4> {
+pub fn make_frame(channel: Channel, message: MasterPacket) -> Result<Frame<4>, TransportError> {
     let start_byte = StartByte::STX;
-    let payload: [u8;4] = make_payload(message);
-    Frame{start_byte, payload}
+    let payload = make_payload(channel,message);
+    payload.map(|payload| Frame{start_byte, payload} )
 }
 
 
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
 
     #[test]
     fn it_create_get_word_frame() {
-        let channel = 0x01;
+        let channel = Channel::new(0x01);
         let waddr = 0x50;
         let expected = Frame{
             start_byte: StartByte::STX,
-            payload: [channel+Direction::GetWord as u8, waddr, 0x00, 0x00],
+            payload: [channel.as_u8().unwrap()+Direction::GetWord as u8, waddr, 0x00, 0x00],
         };
-        let frame = make_frame(MasterPacket::GetWord { channel, waddr });
-        assert_eq!(expected, frame);
+        let frame = make_frame(channel, MasterPacket::GetWord {waddr});
+        assert_eq!(expected, frame.unwrap());
     }
 }
