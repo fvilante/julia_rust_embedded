@@ -17,7 +17,7 @@ enum Direction {
 }
 
 
-pub enum MasterPacket {
+pub enum CmppMessage {
     GetWord{
         waddr: WordAddress
     },
@@ -36,24 +36,24 @@ pub enum MasterPacket {
 }
 
 
-fn make_payload(channel: Channel, message: MasterPacket) -> Result<[u8; 4],TransportError> {
+fn make_payload(channel: Channel, message: CmppMessage) -> Result<[u8; 4],TransportError> {
 
     let [direction, waddr, byte_low, byte_high] = match message {
-        MasterPacket::GetWord { waddr } => {
+        CmppMessage::GetWord { waddr } => {
             [Direction::GetWord as u8, waddr, 0x00, 0x00]
         }
 
-        MasterPacket::SetWord { waddr, data } => {
+        CmppMessage::SetWord { waddr, data } => {
             let Word16 { data_high, data_low } = data;
             [Direction::SetWord as u8, waddr, data_low, data_high]
         }
 
-        MasterPacket::ResetBitmask { waddr, bitmask } => {
+        CmppMessage::ResetBitmask { waddr, bitmask } => {
             let Word16 { data_high, data_low } = Word16::from_bitmask(bitmask);
             [Direction::ResetBitmask as u8,waddr, data_low, data_high]
         }
 
-        MasterPacket::SetBitmask { waddr, bitmask } => {
+        CmppMessage::SetBitmask { waddr, bitmask } => {
             let Word16 { data_high, data_low } = Word16::from_bitmask(bitmask);
             [Direction::SetBitmask as u8,waddr, data_low, data_high]
         }
@@ -67,7 +67,7 @@ fn make_payload(channel: Channel, message: MasterPacket) -> Result<[u8; 4],Trans
 
 }
 
-pub fn make_frame(channel: Channel, message: MasterPacket) -> Result<Frame<4>, TransportError> {
+pub fn make_frame(channel: Channel, message: CmppMessage) -> Result<Frame<4>, TransportError> {
     let start_byte = StartByte::STX;
     let payload = make_payload(channel,message);
     payload.map(|payload| Frame{start_byte, payload} )
@@ -88,7 +88,7 @@ mod tests {
             start_byte: StartByte::STX,
             payload: [channel.as_u8().unwrap()+Direction::GetWord as u8, waddr, 0x00, 0x00],
         };
-        let frame = make_frame(channel, MasterPacket::GetWord {waddr});
+        let frame = make_frame(channel, CmppMessage::GetWord {waddr});
         assert_eq!(expected, frame.unwrap());
     }
 }
