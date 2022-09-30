@@ -1,5 +1,6 @@
 #![no_std]
 #![allow(dead_code)]
+#![feature(result_flattening)]
 
 
 pub mod protocol;
