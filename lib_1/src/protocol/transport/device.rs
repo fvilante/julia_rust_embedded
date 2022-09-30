@@ -1,4 +1,3 @@
-use crate::{board::lcd};
 
 pub enum AddressMask {
     ByteLow,
@@ -456,10 +455,3 @@ pub const CASTING: [Parameter; MAX_SIZE ] = [
 
 ];
 
-
-pub fn development_entry_point() -> ! {
-    lcd::lcd_initialize();
-    lcd::print("oi");
-
-    loop { }
-}
