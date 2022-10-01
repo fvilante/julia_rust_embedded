@@ -2,7 +2,7 @@
 #![no_std]
 #![no_main]
 #![feature(abi_avr_interrupt)]
-#![feature(alloc_error_handler)] // see file alloc/alloc_error_handler.rs
+#![feature(alloc_error_handler)] // necessary to execute file ./custom_alloc/alloc_error_handler.rs
 
 #![allow(unused_imports)]
 #![allow(dead_code)]

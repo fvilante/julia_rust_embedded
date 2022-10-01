@@ -1,22 +1,22 @@
 extern crate alloc;
 use alloc::boxed::Box;
 
-struct Reader<'a,A> {
+pub struct Reader<'a,A> {
     f: Box<dyn FnMut(A) -> () + 'a>
 }
 
 impl<'a,A> Reader<'a, A> {
-    fn new(f: impl FnMut(A) -> () + 'a) -> Self {
+    pub fn new(f: impl FnMut(A) -> () + 'a) -> Self {
         Self {
             f: Box::new(f),
         }
     }
 
-    fn unwrap(&mut self, data: A) -> () {
+    pub fn unwrap(&mut self, data: A) -> () {
         (self.f)(data)
     }
 
-    fn contra_map<A0>(&mut self, mut f: impl FnMut(A0) -> A + 'a ) -> Reader<A0> {
+    pub fn contra_map<A0>(&mut self, mut f: impl FnMut(A0) -> A + 'a ) -> Reader<A0> {
         let g = move |a0: A0| {
             let a = f(a0);
             self.unwrap(a);
