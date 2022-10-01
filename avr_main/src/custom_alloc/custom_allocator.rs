@@ -6,7 +6,7 @@
 // ==============================================================================
 
 
-use crate::board::lcd;
+//use crate::board::lcd;
 
 use alloc::alloc::{
     GlobalAlloc,
@@ -15,22 +15,39 @@ use alloc::alloc::{
 
 use core::ptr::null_mut;
 
+use crate::board::lcd;
+
 
 pub struct Dummy {
     val: u8,
 }
 
-//ATTENTION: I don't know why but this Handler is necessary in code but is not being executed
+struct Reservation {
+    start_position: u8,
+    size: u8,
+}
+
+//static mut INDEX: Option<[Reservation; 5]> = None;
+static mut HEAP_MEMORY: [u8;200] = [0x00;200]; //heap memory
+
 unsafe impl GlobalAlloc for Dummy {
-    unsafe fn alloc(&self, _layout: Layout) -> *mut u8 {
-        lcd::lcd_initialize(); 
-        lcd::print("Inside Allocator. Lets halt it");
-        loop { };
-        null_mut()
+    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+        //lcd::lcd_initialize(); 
+        //lcd::print("Inside Allocator. Size/Alignment");
+        //lcd::print_u16_in_hex(layout.size().try_into().unwrap());
+        //lcd::print("/");
+        //lcd::print_u16_in_hex(layout.align().try_into().unwrap());
+        //loop {};
+        //
+        //null_mut()
+        let a = HEAP_MEMORY.as_mut_ptr();
+        a
+
+
     }
 
     unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {
-        unreachable!();
+        //unreachable!();
     }
 }
 
