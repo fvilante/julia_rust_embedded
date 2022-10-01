@@ -1,7 +1,7 @@
 extern crate alloc;
 use alloc::boxed::Box;
 
-struct Profunctor<'a,A,B> {
+pub struct Profunctor<'a,A,B> {
     f: Box<dyn FnMut(A) -> B + 'a>
 }
 

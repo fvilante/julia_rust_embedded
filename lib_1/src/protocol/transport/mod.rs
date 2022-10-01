@@ -5,7 +5,7 @@ pub mod channel;
 pub mod transport_error;
 pub mod device;
 pub mod profunctor;
-
+pub mod reader;
 
 
 
