@@ -8,7 +8,8 @@
 //      https://docs.rust-embedded.org/book/collections/
 //      https://docs.rs/alloc-shim/latest/alloc/
 #[cfg(all(feature = "alloc", not(feature = "std")))]
-extern crate alloc;  
+extern crate alloc;
+
 #[cfg(feature = "std")]
 extern crate std as alloc;
 
@@ -18,8 +19,7 @@ pub mod types;
 pub mod mock;
 pub mod utils;
 pub mod adt;
-//pub mod menu;
-
+//pub mod alloc;
 
 
 #[allow(unused_imports)]

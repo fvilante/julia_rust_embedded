@@ -2,17 +2,19 @@
 #![no_std]
 #![no_main]
 #![feature(abi_avr_interrupt)]
-
+#![feature(alloc_error_handler)] // see file alloc/alloc_error_handler.rs
 
 #![allow(unused_imports)]
 #![allow(dead_code)]
 
+extern crate alloc;
 extern crate avr_std_stub;
 
 mod microcontroler;
 mod board;
 mod cmpp;
-//mod protocol;
+mod menu;
+mod custom_alloc;
 
 use lib_1;
 use microcontroler::{
@@ -27,7 +29,7 @@ fn main() -> ! {
 
     //protocol::datalink_comm::development_entry_point();
     //board::lcd::example_01();
-    cmpp::datalink::transact_test::development_entry_point();
+    menu::menu_lcd::development_entry_point();
 
 
 
