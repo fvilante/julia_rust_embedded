@@ -15,12 +15,12 @@ use avr_device::atmega328p::TC1;
 use core::mem;
 //use panic_halt as _;
 
-use crate::board::debug::set_led3; // NOTE: THIS LINE MUST BE REMOVED IN FUTURE TO MAKE POSSIBLE TO CONTROL LCD BECAUSE LED3 CONFLICTS WITH LCD_ENABLE PIN
+use crate::board::debug::set_led3;
+use crate::board::lcd;
+use crate::board::output_expander::{self, OutputExpander}; // NOTE: THIS LINE MUST BE REMOVED IN FUTURE TO MAKE POSSIBLE TO CONTROL LCD BECAUSE LED3 CONFLICTS WITH LCD_ENABLE PIN
 
 struct InterruptState {
-    counter: u32,
-    step: u32,
-    led_state: bool,
+    counter: u64,       // for example: ticks every milisecond
 }
 
 static mut INTERRUPT_STATE: mem::MaybeUninit<InterruptState> = mem::MaybeUninit::uninit();
@@ -41,7 +41,7 @@ fn rig_timer(tmr1: &TC1) {
     use arduino_hal::clock::Clock;
 
     const ARDUINO_UNO_CLOCK_FREQUENCY_HZ: u32 = arduino_hal::DefaultClock::FREQ;
-    const CLOCK_SOURCE: CS1_A = CS1_A::PRESCALE_8;
+    const CLOCK_SOURCE: CS1_A = CS1_A::PRESCALE_256;
     let clock_divisor: u32 = match CLOCK_SOURCE {
         CS1_A::DIRECT => 1,
         CS1_A::PRESCALE_8 => 8,
@@ -53,7 +53,7 @@ fn rig_timer(tmr1: &TC1) {
         }
     };
 
-    let ticks = calc_overflow(ARDUINO_UNO_CLOCK_FREQUENCY_HZ, 10, clock_divisor) as u16;
+    let ticks = calc_overflow(ARDUINO_UNO_CLOCK_FREQUENCY_HZ, 1, clock_divisor) as u16;
 
     tmr1.tccr1a.write(|w| w.wgm1().bits(0b00));
     tmr1.tccr1b.write(|w| {
@@ -97,8 +97,6 @@ pub fn init_timer() -> () {
     //Do all
     set_initial_state(InterruptState {
         counter: 0,
-        step: 1,
-        led_state: false,
     });
     configure_timer();
     enable_interrupts_globally();
@@ -115,15 +113,8 @@ fn TIMER1_COMPA() {
     
     state.counter += 1;
 
-    if state.counter >= state.step {
-        state.counter = 0;
-        state.step = state.step + 1;
-        //togle_led
-        state.led_state = {
-            set_led3(!state.led_state);
-            !state.led_state
-        };
-    } else {
-        
-    }
+    lcd::clear();
+    lcd::print_u16_in_hex(state.counter.try_into().unwrap_or(0x6666));
+
+
 }

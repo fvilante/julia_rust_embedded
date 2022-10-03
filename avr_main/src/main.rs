@@ -17,6 +17,7 @@ mod menu;
 mod custom_alloc;
 mod enviroment;
 
+use board::lcd;
 use lib_1;
 use microcontroler::{
     timer::init_timer,
@@ -30,11 +31,11 @@ fn main() -> ! {
 
     //protocol::datalink_comm::development_entry_point();
     //board::lcd::example_01();
-    menu::menu_lcd::development_entry_point();
+    //menu::menu_lcd::development_entry_point();
     //crate::enviroment::front_panel::development_entry_point();
 
 
-    /*    
+    lcd::lcd_initialize();
     init_timer();
 
     //
@@ -43,7 +44,7 @@ fn main() -> ! {
          // infinite loop waiting for timer interruptions to occur
          // see function TIMER1_COMPA() in crate::microcontroler::timer
     }
-    */
+    
 }
 
 
