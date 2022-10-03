@@ -15,12 +15,8 @@ use avr_device::atmega328p::TC1;
 use core::mem;
 //use panic_halt as _;
 
-use crate::board::debug::set_led3;
-use crate::board::lcd;
-use crate::board::output_expander::{self, OutputExpander}; // NOTE: THIS LINE MUST BE REMOVED IN FUTURE TO MAKE POSSIBLE TO CONTROL LCD BECAUSE LED3 CONFLICTS WITH LCD_ENABLE PIN
-
 struct InterruptState {
-    counter: u64,       // for example: ticks every milisecond
+    clock_counter: ClockCounter,       // increments on each tick of the clock
 }
 
 static mut INTERRUPT_STATE: mem::MaybeUninit<InterruptState> = mem::MaybeUninit::uninit();
@@ -94,9 +90,11 @@ pub fn init_timer() -> () {
         }
     }
 
+    let mut clock_counter = ClockCounter::new();
+
     //Do all
     set_initial_state(InterruptState {
-        counter: 0,
+        clock_counter,
     });
     configure_timer();
     enable_interrupts_globally();
@@ -111,10 +109,40 @@ fn TIMER1_COMPA() {
         &mut *INTERRUPT_STATE.as_mut_ptr()
     };
     
-    state.counter += 1;
+    state.clock_counter.increment();
 
-    lcd::clear();
-    lcd::print_u16_in_hex(state.counter.try_into().unwrap_or(0x6666));
+    //lcd::clear();
+    //lcd::print_u16_in_hex(state.clock_counter.read().try_into().unwrap());
+
+}
+
+//
+
+struct ClockCounter {
+    count: u64
+}
+
+impl ClockCounter {
+    fn new() -> Self {
+        Self {
+            count: 0x00,
+        }
+    }
+
+    fn increment(&mut self) {
+        self.count += 1;
+    }
+
+    fn read(&self) -> u64 {
+        self.count.clone()
+    }
+}
 
 
+pub fn now() -> u64 {
+    let state = unsafe {
+        &mut *INTERRUPT_STATE.as_mut_ptr()
+    };
+
+    state.clock_counter.read()
 }

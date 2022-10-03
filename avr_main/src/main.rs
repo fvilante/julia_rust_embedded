@@ -41,6 +41,9 @@ fn main() -> ! {
     //
 
     loop {
+
+        //lcd::clear();
+        lcd::print_u16_in_hex(microcontroler::timer::now().try_into().unwrap());
          // infinite loop waiting for timer interruptions to occur
          // see function TIMER1_COMPA() in crate::microcontroler::timer
     }
