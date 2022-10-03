@@ -14,7 +14,7 @@ const DEACTIVATE: bool = true; //true level
 // 
 
 #[allow(non_camel_case_types)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum KeyCode {
     //Some key codes try to imitate ASCII table codes (ie: ESC, Enter and numerals digitis )
     //Other codes on this table was arbitrary assigned.
@@ -75,6 +75,80 @@ pub enum KeyCode {
 
     //secret key
     KEY_HIDDEN_KEY = 0x90,    
+}
+
+impl KeyCode {
+    pub fn is_numeral(self) -> bool {
+        match self {
+            Self::KEY_0 => true,
+            Self::KEY_1 => true,
+            Self::KEY_2 => true,
+            Self::KEY_3 => true,
+            Self::KEY_4 => true,
+            Self::KEY_5 => true,
+            Self::KEY_6 => true,
+            Self::KEY_7 => true,
+            Self::KEY_8 => true,
+            Self::KEY_9 => true,
+            _ => false,
+        }
+    }
+
+    // if key is a numerical digit, return its numeric char
+    pub fn as_numerical_char(self) -> Option<char> {
+        match self {
+            Self::KEY_0 => Some('0'),
+            Self::KEY_1 => Some('1'),
+            Self::KEY_2 => Some('2'),
+            Self::KEY_3 => Some('3'),
+            Self::KEY_4 => Some('4'),
+            Self::KEY_5 => Some('5'),
+            Self::KEY_6 => Some('6'),
+            Self::KEY_7 => Some('7'),
+            Self::KEY_8 => Some('8'),
+            Self::KEY_9 => Some('9'),
+            _ => None,
+        }
+    }
+
+    pub fn to_string(self) -> &'static str{
+        match self {
+            Self::NO_KEY => "NO_KEY",
+            Self::KEY_ENTER => "KEY_ENTER",
+            Self::KEY_ESC => "KEY_ESC",
+            Self::KEY_SETA_BRANCA_ESQUERDA => "KEY_SETA_BRANCA_ESQUERDA", 
+            Self::KEY_SETA_BRANCA_DIREITA => "KEY_SETA_BRANCA_DIREITA",
+            Self::KEY_MAIS_OU_MENOS => "KEY_MAIS_OU_MENOS",
+            Self::KEY_PONTO => "KEY_PONTO",
+            Self::KEY_0 => "KEY_0",
+            Self::KEY_1 => "KEY_1",
+            Self::KEY_2 => "KEY_2",
+            Self::KEY_3 => "KEY_3",
+            Self::KEY_4 => "KEY_4",
+            Self::KEY_5 => "KEY_5",
+            Self::KEY_6 => "KEY_6",
+            Self::KEY_7 => "KEY_7",
+            Self::KEY_8 => "KEY_8",
+            Self::KEY_9 => "KEY_9",
+            Self::KEY_START => "KEY_START",
+            Self::KEY_STOP => "KEY_STOP",
+            Self::KEY_MANUAL => "KEY_MANUAL",
+            Self::KEY_EXECUCAO => "KEY_EXECUCAO",
+            Self::KEY_PROGRAMA => "KEY_PROGRAMA",
+            Self::KEY_F1 => "KEY_F1",
+            Self::KEY_F2 => "KEY_F2",
+            Self::KEY_F3 => "KEY_F3",
+            Self::KEY_F4 => "KEY_F4",
+            Self::KEY_DIRECIONAL_PARA_CIMA => "KEY_DIRECIONAL_PARA_CIMA",
+            Self::KEY_DIRECIONAL_PARA_BAIXO => "KEY_DIRECIONAL_PARA_BAIXO",
+            Self::KEY_DIRECIONAL_PARA_DIREITA => "KEY_DIRECIONAL_PARA_DIREITA",
+            Self::KEY_DIRECIONAL_PARA_ESQUERDA => "KEY_DIRECIONAL_PARA_ESQUERDA",
+            Self::KEY_INS => "KEY_INS",
+            Self::KEY_DEL => "KEY_DEL",
+            Self::KEY_CTRL => "KEY_CTRL",
+            Self::KEY_HIDDEN_KEY => "KEY_HIDDEN_KEY",    
+        }
+    }
 }
 
 //constants
