@@ -15,7 +15,7 @@ const DEACTIVATE: bool = true; //true level
 
 #[allow(non_camel_case_types)]
 #[derive(Copy, Clone)]
-enum KeyCode {
+pub enum KeyCode {
     //Some key codes try to imitate ASCII table codes (ie: ESC, Enter and numerals digitis )
     //Other codes on this table was arbitrary assigned.
     //Key codes are grouped by family of keys
@@ -79,7 +79,7 @@ enum KeyCode {
 
 //constants
 
-struct Keypad { 
+pub struct Keypad { 
     output: OutputExpander,
     input: InputExpander,
     //last_keycode_read: KeyCode,
@@ -134,7 +134,7 @@ impl Keypad {
         }
     }
 
-    fn scan(&mut self) -> KeyCode {
+    pub fn scan(&mut self) -> KeyCode {
         let mut key_code: KeyCode = KeyCode::NO_KEY;       
         for collumn in 0..=7 {
             self.set_output(collumn, ACTIVATED);
