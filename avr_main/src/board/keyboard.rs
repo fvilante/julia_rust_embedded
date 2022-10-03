@@ -78,75 +78,88 @@ pub enum KeyCode {
 }
 
 impl KeyCode {
-    pub fn is_numeral(self) -> bool {
+    pub fn is_numeral(&self) -> bool {
         match self {
-            Self::KEY_0 => true,
-            Self::KEY_1 => true,
-            Self::KEY_2 => true,
-            Self::KEY_3 => true,
-            Self::KEY_4 => true,
-            Self::KEY_5 => true,
-            Self::KEY_6 => true,
-            Self::KEY_7 => true,
-            Self::KEY_8 => true,
-            Self::KEY_9 => true,
+            KeyCode::KEY_0 => true,
+            KeyCode::KEY_1 => true,
+            KeyCode::KEY_2 => true,
+            KeyCode::KEY_3 => true,
+            KeyCode::KEY_4 => true,
+            KeyCode::KEY_5 => true,
+            KeyCode::KEY_6 => true,
+            KeyCode::KEY_7 => true,
+            KeyCode::KEY_8 => true,
+            KeyCode::KEY_9 => true,
             _ => false,
         }
     }
 
-    // if key is a numerical digit, return its numeric char
-    pub fn as_numerical_char(self) -> Option<char> {
+    pub fn is_navigation(&self) -> bool {
         match self {
-            Self::KEY_0 => Some('0'),
-            Self::KEY_1 => Some('1'),
-            Self::KEY_2 => Some('2'),
-            Self::KEY_3 => Some('3'),
-            Self::KEY_4 => Some('4'),
-            Self::KEY_5 => Some('5'),
-            Self::KEY_6 => Some('6'),
-            Self::KEY_7 => Some('7'),
-            Self::KEY_8 => Some('8'),
-            Self::KEY_9 => Some('9'),
+            KeyCode::KEY_SETA_BRANCA_ESQUERDA => true, 
+            KeyCode::KEY_SETA_BRANCA_DIREITA => true,
+            KeyCode::KEY_DIRECIONAL_PARA_CIMA => true,
+            KeyCode::KEY_DIRECIONAL_PARA_BAIXO => true,
+            KeyCode::KEY_DIRECIONAL_PARA_DIREITA => true,
+            KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => true,
+            _ => false,
+        }
+    }
+    
+
+    // if key is a numerical digit, return its numeric char
+    pub fn as_numerical_char(&self) -> Option<char> {
+        match self {
+            KeyCode::KEY_0 => Some('0'),
+            KeyCode::KEY_1 => Some('1'),
+            KeyCode::KEY_2 => Some('2'),
+            KeyCode::KEY_3 => Some('3'),
+            KeyCode::KEY_4 => Some('4'),
+            KeyCode::KEY_5 => Some('5'),
+            KeyCode::KEY_6 => Some('6'),
+            KeyCode::KEY_7 => Some('7'),
+            KeyCode::KEY_8 => Some('8'),
+            KeyCode::KEY_9 => Some('9'),
             _ => None,
         }
     }
 
-    pub fn to_string(self) -> &'static str{
+    pub fn to_string(&self) -> &'static str{
         match self {
-            Self::NO_KEY => "NO_KEY",
-            Self::KEY_ENTER => "KEY_ENTER",
-            Self::KEY_ESC => "KEY_ESC",
-            Self::KEY_SETA_BRANCA_ESQUERDA => "KEY_SETA_BRANCA_ESQUERDA", 
-            Self::KEY_SETA_BRANCA_DIREITA => "KEY_SETA_BRANCA_DIREITA",
-            Self::KEY_MAIS_OU_MENOS => "KEY_MAIS_OU_MENOS",
-            Self::KEY_PONTO => "KEY_PONTO",
-            Self::KEY_0 => "KEY_0",
-            Self::KEY_1 => "KEY_1",
-            Self::KEY_2 => "KEY_2",
-            Self::KEY_3 => "KEY_3",
-            Self::KEY_4 => "KEY_4",
-            Self::KEY_5 => "KEY_5",
-            Self::KEY_6 => "KEY_6",
-            Self::KEY_7 => "KEY_7",
-            Self::KEY_8 => "KEY_8",
-            Self::KEY_9 => "KEY_9",
-            Self::KEY_START => "KEY_START",
-            Self::KEY_STOP => "KEY_STOP",
-            Self::KEY_MANUAL => "KEY_MANUAL",
-            Self::KEY_EXECUCAO => "KEY_EXECUCAO",
-            Self::KEY_PROGRAMA => "KEY_PROGRAMA",
-            Self::KEY_F1 => "KEY_F1",
-            Self::KEY_F2 => "KEY_F2",
-            Self::KEY_F3 => "KEY_F3",
-            Self::KEY_F4 => "KEY_F4",
-            Self::KEY_DIRECIONAL_PARA_CIMA => "KEY_DIRECIONAL_PARA_CIMA",
-            Self::KEY_DIRECIONAL_PARA_BAIXO => "KEY_DIRECIONAL_PARA_BAIXO",
-            Self::KEY_DIRECIONAL_PARA_DIREITA => "KEY_DIRECIONAL_PARA_DIREITA",
-            Self::KEY_DIRECIONAL_PARA_ESQUERDA => "KEY_DIRECIONAL_PARA_ESQUERDA",
-            Self::KEY_INS => "KEY_INS",
-            Self::KEY_DEL => "KEY_DEL",
-            Self::KEY_CTRL => "KEY_CTRL",
-            Self::KEY_HIDDEN_KEY => "KEY_HIDDEN_KEY",    
+            KeyCode::NO_KEY => "NO_KEY",
+            KeyCode::KEY_ENTER => "KEY_ENTER",
+            KeyCode::KEY_ESC => "KEY_ESC",
+            KeyCode::KEY_SETA_BRANCA_ESQUERDA => "KEY_SETA_BRANCA_ESQUERDA", 
+            KeyCode::KEY_SETA_BRANCA_DIREITA => "KEY_SETA_BRANCA_DIREITA",
+            KeyCode::KEY_MAIS_OU_MENOS => "KEY_MAIS_OU_MENOS",
+            KeyCode::KEY_PONTO => "KEY_PONTO",
+            KeyCode::KEY_0 => "KEY_0",
+            KeyCode::KEY_1 => "KEY_1",
+            KeyCode::KEY_2 => "KEY_2",
+            KeyCode::KEY_3 => "KEY_3",
+            KeyCode::KEY_4 => "KEY_4",
+            KeyCode::KEY_5 => "KEY_5",
+            KeyCode::KEY_6 => "KEY_6",
+            KeyCode::KEY_7 => "KEY_7",
+            KeyCode::KEY_8 => "KEY_8",
+            KeyCode::KEY_9 => "KEY_9",
+            KeyCode::KEY_START => "KEY_START",
+            KeyCode::KEY_STOP => "KEY_STOP",
+            KeyCode::KEY_MANUAL => "KEY_MANUAL",
+            KeyCode::KEY_EXECUCAO => "KEY_EXECUCAO",
+            KeyCode::KEY_PROGRAMA => "KEY_PROGRAMA",
+            KeyCode::KEY_F1 => "KEY_F1",
+            KeyCode::KEY_F2 => "KEY_F2",
+            KeyCode::KEY_F3 => "KEY_F3",
+            KeyCode::KEY_F4 => "KEY_F4",
+            KeyCode::KEY_DIRECIONAL_PARA_CIMA => "KEY_DIRECIONAL_PARA_CIMA",
+            KeyCode::KEY_DIRECIONAL_PARA_BAIXO => "KEY_DIRECIONAL_PARA_BAIXO",
+            KeyCode::KEY_DIRECIONAL_PARA_DIREITA => "KEY_DIRECIONAL_PARA_DIREITA",
+            KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => "KEY_DIRECIONAL_PARA_ESQUERDA",
+            KeyCode::KEY_INS => "KEY_INS",
+            KeyCode::KEY_DEL => "KEY_DEL",
+            KeyCode::KEY_CTRL => "KEY_CTRL",
+            KeyCode::KEY_HIDDEN_KEY => "KEY_HIDDEN_KEY",    
         }
     }
 }
