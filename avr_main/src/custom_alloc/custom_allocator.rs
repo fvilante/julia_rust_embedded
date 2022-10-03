@@ -31,7 +31,7 @@ struct Reservation {
 static mut HEAP_MEMORY: [u8;200] = [0x00;200]; //heap memory
 
 unsafe impl GlobalAlloc for Dummy {
-    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+    unsafe fn alloc(&self, _layout: Layout) -> *mut u8 {
         //lcd::lcd_initialize(); 
         //lcd::print("Inside Allocator. Size/Alignment");
         //lcd::print_u16_in_hex(layout.size().try_into().unwrap());
