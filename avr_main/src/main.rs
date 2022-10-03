@@ -15,6 +15,7 @@ mod board;
 mod cmpp;
 mod menu;
 mod custom_alloc;
+mod enviroment;
 
 use lib_1;
 use microcontroler::{
@@ -29,8 +30,8 @@ fn main() -> ! {
 
     //protocol::datalink_comm::development_entry_point();
     //board::lcd::example_01();
-    menu::menu_lcd::development_entry_point();
-
+    //menu::menu_lcd::development_entry_point();
+    crate::enviroment::front_panel::development_entry_point();
 
 
     /*    
