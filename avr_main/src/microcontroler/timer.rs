@@ -49,7 +49,7 @@ fn rig_timer(tmr1: &TC1) {
         }
     };
 
-    let ticks = calc_overflow(ARDUINO_UNO_CLOCK_FREQUENCY_HZ, 1, clock_divisor) as u16;
+    let ticks = calc_overflow(ARDUINO_UNO_CLOCK_FREQUENCY_HZ, 1000, clock_divisor) as u16;
 
     tmr1.tccr1a.write(|w| w.wgm1().bits(0b00));
     tmr1.tccr1b.write(|w| {
