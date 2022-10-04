@@ -6,6 +6,55 @@ use crate::microcontroler::delay::delay_ms;
 use crate::microcontroler::timer::now;
 
 
+pub struct RectangularWave {
+    up_interval: u64,
+    down_interval: u64,
+    next_interval: u64,
+    current_state: bool,
+}
+
+impl RectangularWave {
+    /// interval in miliseconds
+    pub fn new(up_interval: u64, down_interval: u64) -> Self {
+        Self {  
+            up_interval,
+            down_interval,
+            next_interval: now() + up_interval,
+            current_state: true,
+        }   
+    }
+
+    pub fn reset(&mut self) -> &mut Self {
+        self.next_interval = now() + self.up_interval;
+        self.current_state = true;
+        self
+    }
+
+    pub fn update(&mut self) -> &mut Self {
+        let is_it_moment_to_change_level = now() > self.next_interval;
+        if is_it_moment_to_change_level {
+            if self.current_state == true {
+                // up-down edge
+                self.current_state = false;
+                self.next_interval += self.down_interval; 
+            } else {
+                // down-up edge
+                self.current_state = true;
+                self.next_interval += self.up_interval; 
+            }
+        } else {
+            // no nothing
+        }
+        self
+    }
+
+    pub fn read(& self) -> bool {
+        self.current_state
+    }
+
+}
+
+
 struct Debounce {
     debounce_time: u64,
     last_key_time: u64,
@@ -227,6 +276,7 @@ struct Field<'a, const SIZE: usize> {
     canvas: &'a Canvas,
     buffer: BufferedCursor<'a,char,SIZE>,
     kind: FieldKind,
+    blink: RectangularWave,
 }
 
 impl<'a, const SIZE: usize> Field<'a, SIZE> {
@@ -235,34 +285,53 @@ impl<'a, const SIZE: usize> Field<'a, SIZE> {
             canvas,
             buffer,
             kind,
+            blink: RectangularWave::new(500,500),
         }
     }
 
-    fn update(&mut self, key: KeyCode) {
-        match key {
+    fn send_key(&mut self, key: KeyCode) {        
+
+        let effect = match key {
             // navigation_key left and right
-            KeyCode::KEY_SETA_BRANCA_ESQUERDA => { self.buffer.move_cursor_left(); }, 
-            KeyCode::KEY_SETA_BRANCA_DIREITA => { self.buffer.move_cursor_right(); },
-            KeyCode::KEY_DIRECIONAL_PARA_DIREITA => { self.buffer.move_cursor_right(); },
-            KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => { self.buffer.move_cursor_left(); },
-            KeyCode::KEY_0 => { self.buffer.change_cursor_item_to('0').move_cursor_right(); },
-            KeyCode::KEY_1 => { self.buffer.change_cursor_item_to('1').move_cursor_right(); },
-            KeyCode::KEY_2 => { self.buffer.change_cursor_item_to('2').move_cursor_right(); },
-            KeyCode::KEY_3 => { self.buffer.change_cursor_item_to('3').move_cursor_right(); },
-            KeyCode::KEY_4 => { self.buffer.change_cursor_item_to('4').move_cursor_right(); },
-            KeyCode::KEY_5 => { self.buffer.change_cursor_item_to('5').move_cursor_right(); },
-            KeyCode::KEY_6 => { self.buffer.change_cursor_item_to('6').move_cursor_right(); },
-            KeyCode::KEY_7 => { self.buffer.change_cursor_item_to('7').move_cursor_right(); },
-            KeyCode::KEY_8 => { self.buffer.change_cursor_item_to('8').move_cursor_right(); },
-            KeyCode::KEY_9 => { self.buffer.change_cursor_item_to('9').move_cursor_right(); },
-            _ => { },
+            KeyCode::KEY_SETA_BRANCA_ESQUERDA => { self.buffer.move_cursor_left(); Some(()) }, 
+            KeyCode::KEY_SETA_BRANCA_DIREITA => { self.buffer.move_cursor_right(); Some(()) },
+            KeyCode::KEY_DIRECIONAL_PARA_DIREITA => { self.buffer.move_cursor_right(); Some(()) },
+            KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => { self.buffer.move_cursor_left(); Some(()) },
+            KeyCode::KEY_0 => { self.buffer.change_cursor_item_to('0').move_cursor_right(); Some(()) },
+            KeyCode::KEY_1 => { self.buffer.change_cursor_item_to('1').move_cursor_right(); Some(()) },
+            KeyCode::KEY_2 => { self.buffer.change_cursor_item_to('2').move_cursor_right(); Some(()) },
+            KeyCode::KEY_3 => { self.buffer.change_cursor_item_to('3').move_cursor_right(); Some(()) },
+            KeyCode::KEY_4 => { self.buffer.change_cursor_item_to('4').move_cursor_right(); Some(()) },
+            KeyCode::KEY_5 => { self.buffer.change_cursor_item_to('5').move_cursor_right(); Some(()) },
+            KeyCode::KEY_6 => { self.buffer.change_cursor_item_to('6').move_cursor_right(); Some(()) },
+            KeyCode::KEY_7 => { self.buffer.change_cursor_item_to('7').move_cursor_right(); Some(()) },
+            KeyCode::KEY_8 => { self.buffer.change_cursor_item_to('8').move_cursor_right(); Some(()) },
+            KeyCode::KEY_9 => { self.buffer.change_cursor_item_to('9').move_cursor_right(); Some(()) },
+            _ => { None },
+        };
+
+        if let Some(_) = effect {
+            self.blink.reset();
         }
+            
+        
+    }
+
+    fn update(&mut self) {
+        self.blink.update();
     }
 
     fn draw(&self) {
         self.canvas.clear();
-        for digit in self.buffer.as_array() {
-            self.canvas.print_char(digit.clone());
+        for (position,digit) in self.buffer.as_array().iter().enumerate() {
+            let blink_char = '_';
+            let mut current_char = digit.clone();
+            let is_current_char_over_cursor = position == self.buffer.cursor;
+            let is_time_to_blink = self.blink.read();
+            if is_current_char_over_cursor && is_time_to_blink {
+                current_char = blink_char;
+            } 
+            self.canvas.print_char(current_char);
         };
     }
 
@@ -274,29 +343,39 @@ pub fn development_entry_point() -> ! {
 
     //temp
     let mut output_expander = OutputExpander::new();
-    let front_panel = FrontPanel::new(&mut output_expander).reset();
+    let _front_panel = FrontPanel::new(&mut output_expander).reset();
 
     // initialization
     let beep = |on:bool| { OutputExpander::new().BUZZER(on).commit(); };
     let mut keyboard = Keyboard::new(beep);
     let canvas = Canvas::new();
     
-    
     let caption = Caption::new("My name is...", &canvas);
 
     caption.draw();
 
+
+    // test retangular weveform generator
+    //let mut wave_form = RectangularWave::new(1000,1000);
+    //let signal = wave_form.update().read();
+    //loop {
+    //    let signal = wave_form.update().read();
+    //    lcd::print_bit(signal);
+    //}
+
+
     let mut buffer = ['x';5];
-    let  cursor = BufferedCursor::new(&mut buffer);
+    let cursor = BufferedCursor::new(&mut buffer);
     let mut field = Field::new(cursor, FieldKind::Numeric, &canvas);
 
     loop { 
         // scan: read one key on keyboard
         // update: send key to the Field
         if let Some(key) = keyboard.get_key() {
-            field.update(key);
-            field.draw();
+            field.send_key(key);
         }
+        field.update();
+        field.draw();
         // draw: draw the Field
     }
 }
