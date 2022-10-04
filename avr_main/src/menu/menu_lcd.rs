@@ -232,7 +232,7 @@ impl Canvas  {
         Self {
             is_initialized: true,
             cursor_position: CursorPosition::new_from_point(Point::new(0,0)),
-            screen_buffer_input: ['x' as u8; 80],
+            screen_buffer_input: [' ' as u8; 80],
             screen_buffer_output: ['x' as u8; 80],
         }
     }
@@ -253,7 +253,7 @@ impl Canvas  {
     }
 
     fn clear(&mut self) {
-        self.screen_buffer_input = ['x' as u8; 80];
+        self.screen_buffer_input = [' ' as u8; 80];
         self.cursor_position.set_point(Point::new(0,0));
         //lcd::clear();
     }
@@ -264,18 +264,21 @@ impl Canvas  {
     /// The purpose of this routine is to avoid unecessary writings to LCD.
     /// It swaps two lcd buffers: The output_buffer represents current state of lcd and
     /// input_buffer represent the desired state of lcd
-    fn swap(&mut self) {
+    fn render(&mut self) {
+        let mut last_printed_index: isize = -1;
         for (index, input_byte) in self.screen_buffer_input.iter().enumerate() {
             let output_byte = self.screen_buffer_output[index].borrow_mut();
             if input_byte != output_byte {
-                let col: u8 = (index % 40).try_into().unwrap_or(0);
-                let row: u8 = (index / 40).try_into().unwrap_or(0);
+                let Point{x:col, y:row } = CursorPosition::from_index(index).point;
                 //write input to screen
-                lcd::setCursor(col, row);
+                let does_must_move_cursor_manually = (index - 1) as isize != last_printed_index;
+                if does_must_move_cursor_manually {
+                    lcd::setCursor(col, row);
+                };
                 lcd::print_u8(*input_byte);
                 //update output buffer
                 *output_byte = *input_byte;
-            
+                last_printed_index = index as isize;
             }
         }
     }
@@ -388,7 +391,7 @@ impl<const SIZE: usize> Field<SIZE> {
         Self {
             buffer: BufferedCursor::new(array),
             kind,
-            blink: RectangularWave::new(500,500),
+            blink: RectangularWave::new(400,700),
         }
     }
 
@@ -454,7 +457,7 @@ pub fn development_entry_point() -> ! {
     canvas.print_char('A');
     canvas.print_char('B');
 
-    canvas.swap();
+    canvas.render();
 
     //loop { }
     
@@ -468,7 +471,7 @@ pub fn development_entry_point() -> ! {
         if let Some(key) = keyboard.get_key() {
             field.send_key(key);
         }
-        canvas.swap();
+        canvas.render();
         field.update();
         canvas.clear();
         caption.draw(&mut canvas);
