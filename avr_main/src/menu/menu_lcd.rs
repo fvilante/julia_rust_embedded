@@ -153,8 +153,14 @@ impl Keyboard {
     }
 }
 
+
+struct CursorPosition { col: u8, row: u8 }
+
 struct Canvas {
     is_initialized: bool,
+    cursor_position: CursorPosition, // for screen_buffer_input
+    screen_buffer_input: [u8; 80],
+    screen_buffer_output: [u8; 80],
 }
 
 impl Canvas  {
@@ -163,11 +169,10 @@ impl Canvas  {
         lcd::lcd_initialize();
         Self {
             is_initialized: true,
+            cursor_position: CursorPosition { col: 0, row: 0 },
+            screen_buffer_input: ['x' as u8; 80],
+            screen_buffer_output: ['x' as u8; 80],
         }
-    }
-
-    fn print(&self, info: &str) {
-        lcd::print(info);
     }
 
     fn print_char(&self, char: char) {
@@ -175,7 +180,8 @@ impl Canvas  {
     }
 
 
-    fn set_cursor(&self, col: u8, row: u8) {
+    fn set_cursor(&mut self, col: u8, row: u8) {
+        //self.cursor_position = CursorPosition{col, row};
         lcd::setCursor(col, row);
     }
 
@@ -187,33 +193,41 @@ impl Canvas  {
 
 
 struct Caption<'a> {
-    canvas: &'a Canvas,
     text: &'a str,
 }
 
 impl<'a> Caption<'a> {
-    fn new(text: &'a str, canvas: &'a Canvas) -> Self {
+    fn new(text: &'a str) -> Self {
         Self {
             text,
-            canvas,
         }
     }
 
-    fn draw(&self) {
-        self.canvas.print(self.text);
+    fn send_key(&mut self, _key: KeyCode) { 
+        // ignore key
+    }
+
+    fn update() {
+        // do nothing
+    }
+
+    fn draw(&self, canvas: &'a Canvas) {
+        for char_ in self.text.chars() {
+            canvas.print_char(char_);
+        }
     }
 }
 
 //
 
 
-struct BufferedCursor<'a,T, const SIZE: usize> {
-    buffer: &'a mut [T;SIZE],
+struct BufferedCursor<T, const SIZE: usize> {
+    buffer: [T;SIZE],
     cursor: usize, // buffer index
 }
 
-impl<'a,T, const SIZE: usize> BufferedCursor<'a,T, SIZE> {
-    pub fn new(buffer: &'a mut [T;SIZE]) -> Self {
+impl<T, const SIZE: usize> BufferedCursor<T, SIZE> {
+    pub fn new(buffer: [T;SIZE]) -> Self {
         Self {
             buffer,
             cursor: 0,
@@ -261,7 +275,7 @@ impl<'a,T, const SIZE: usize> BufferedCursor<'a,T, SIZE> {
     }
 
     pub fn as_array(&self) -> &[T; SIZE] {
-        self.buffer
+        &self.buffer
     }
 
 
@@ -272,18 +286,16 @@ enum FieldKind {
     Numeric,
 }
 
-struct Field<'a, const SIZE: usize> {
-    canvas: &'a Canvas,
-    buffer: BufferedCursor<'a,char,SIZE>,
+struct Field<const SIZE: usize> {
+    buffer: BufferedCursor<char,SIZE>,
     kind: FieldKind,
     blink: RectangularWave,
 }
 
-impl<'a, const SIZE: usize> Field<'a, SIZE> {
-    fn new(buffer: BufferedCursor<'a,char,SIZE>, kind: FieldKind, canvas: &'a Canvas) -> Self {
+impl<const SIZE: usize> Field<SIZE> {
+    fn new(array: [char;SIZE], kind: FieldKind) -> Self {
         Self {
-            canvas,
-            buffer,
+            buffer: BufferedCursor::new(array),
             kind,
             blink: RectangularWave::new(500,500),
         }
@@ -312,17 +324,15 @@ impl<'a, const SIZE: usize> Field<'a, SIZE> {
 
         if let Some(_) = effect {
             self.blink.reset();
-        }
-            
-        
+        }  
     }
 
     fn update(&mut self) {
         self.blink.update();
     }
 
-    fn draw(&self) {
-        self.canvas.clear();
+    fn draw(&self, canvas: &Canvas) {
+        //canvas.clear();
         for (position,digit) in self.buffer.as_array().iter().enumerate() {
             let blink_char = '_';
             let mut current_char = digit.clone();
@@ -331,7 +341,7 @@ impl<'a, const SIZE: usize> Field<'a, SIZE> {
             if is_current_char_over_cursor && is_time_to_blink {
                 current_char = blink_char;
             } 
-            self.canvas.print_char(current_char);
+            canvas.print_char(current_char);
         };
     }
 
@@ -348,25 +358,11 @@ pub fn development_entry_point() -> ! {
     // initialization
     let beep = |on:bool| { OutputExpander::new().BUZZER(on).commit(); };
     let mut keyboard = Keyboard::new(beep);
-    let canvas = Canvas::new();
+    let  canvas = Canvas::new();
     
-    let caption = Caption::new("My name is...", &canvas);
-
-    caption.draw();
-
-
-    // test retangular weveform generator
-    //let mut wave_form = RectangularWave::new(1000,1000);
-    //let signal = wave_form.update().read();
-    //loop {
-    //    let signal = wave_form.update().read();
-    //    lcd::print_bit(signal);
-    //}
-
-
-    let mut buffer = ['x';5];
-    let cursor = BufferedCursor::new(&mut buffer);
-    let mut field = Field::new(cursor, FieldKind::Numeric, &canvas);
+    //widgets
+    let caption = Caption::new("My name is...");
+    let mut field = Field::new(['x';5], FieldKind::Numeric);
 
     loop { 
         // scan: read one key on keyboard
@@ -375,7 +371,9 @@ pub fn development_entry_point() -> ! {
             field.send_key(key);
         }
         field.update();
-        field.draw();
+        canvas.clear();
+        caption.draw(&canvas);
+        field.draw(&canvas);
         // draw: draw the Field
     }
 }
