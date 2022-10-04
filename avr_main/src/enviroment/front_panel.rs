@@ -6,13 +6,13 @@ pub struct FrontPanel<'a> {
 
 impl<'a> FrontPanel<'a> {
 
-    fn new(output_expander: &'a mut OutputExpander) -> Self {
+    pub fn new(output_expander: &'a mut OutputExpander) -> Self {
         Self {
             output_expander,
         }
     }
 
-    fn all(&mut self, on: bool) -> &mut Self {
+    pub fn all(&mut self, on: bool) -> &mut Self {
         self.LED_ERRO(on);
         self.LED_POS_ALC(on);
         self.LED_MANUAL(on);
@@ -23,7 +23,7 @@ impl<'a> FrontPanel<'a> {
     }
 
     /// blink fast all leds including buzzer
-    fn auto_test(&mut self) -> &mut Self {
+    pub fn auto_test(&mut self) -> &mut Self {
         self.all(false);
         self.all(true);
         delay_ms(200);
@@ -31,44 +31,44 @@ impl<'a> FrontPanel<'a> {
         self
     }
 
-    fn reset(&mut self) -> &mut Self {
+    pub fn reset(&mut self) -> &mut Self {
         self.all(false);
         self
     }
 
-    fn LED_ERRO(&mut self, on: bool) -> &mut Self {
+    pub fn LED_ERRO(&mut self, on: bool) -> &mut Self {
         self.output_expander.LED_ERRO(on).commit();
         self
     }
 
-    fn LED_POS_ALC(&mut self, on: bool) -> &mut Self {
+    pub fn LED_POS_ALC(&mut self, on: bool) -> &mut Self {
         self.output_expander.LED_POS_ALC(on).commit();
         self
     }
 
-    fn BUZZER(&mut self, on: bool) -> &mut Self {
+    pub fn BUZZER(&mut self, on: bool) -> &mut Self {
         self.output_expander.BUZZER(on).commit();
         self
     }
 
-    fn LED_MANUAL(&mut self, on: bool) -> &mut Self {
+    pub fn LED_MANUAL(&mut self, on: bool) -> &mut Self {
         self.output_expander.LED_MANUAL(on).commit();
         self
     }
 
-    fn LED_EXECUCAO(&mut self, on: bool) -> &mut Self {
+    pub fn LED_EXECUCAO(&mut self, on: bool) -> &mut Self {
         self.output_expander.LED_EXECUCAO(on).commit();
         self
     }
 
-    fn LED_PROGRAMA(&mut self, on: bool) -> &mut Self {
+    pub fn LED_PROGRAMA(&mut self, on: bool) -> &mut Self {
         self.output_expander.LED_PROGRAMA(on).commit();
         self
     }
 
     //
 
-    fn Beep(&mut self) -> &mut Self {
+    pub fn Beep(&mut self) -> &mut Self {
         self.output_expander.BUZZER(true).commit();
         delay_ms(50);
         self.output_expander.BUZZER(false).commit();

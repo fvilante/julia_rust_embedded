@@ -90,7 +90,7 @@ pub fn init_timer() -> () {
         }
     }
 
-    let mut clock_counter = ClockCounter::new();
+    let clock_counter = ClockCounter::new();
 
     //Do all
     set_initial_state(InterruptState {

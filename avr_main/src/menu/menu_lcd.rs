@@ -3,12 +3,79 @@ use crate::board::{lcd, output_expander};
 use crate::board::keyboard::{ Keypad, KeyCode };
 use crate::enviroment::front_panel::FrontPanel;
 use crate::microcontroler::delay::delay_ms;
+use crate::microcontroler::timer::now;
 
+
+struct Debounce {
+    debounce_time: u64,
+    last_key_time: u64,
+    last_key: KeyCode,
+}
+
+impl Debounce {
+    fn new(debounce_time: u64) -> Self {
+        Self {
+            debounce_time,
+            last_key_time: now(),
+            last_key: KeyCode::NO_KEY,
+        }
+    }
+
+    fn debounce_key(&mut self, current_key: KeyCode) -> Option<KeyCode> {
+        let last_key_was_none = self.last_key == KeyCode::NO_KEY;
+        let current_key_is_some = current_key != KeyCode::NO_KEY;
+        if last_key_was_none {
+            if current_key_is_some {
+                // new key detected
+                // register it
+                self.last_key = current_key;
+                self.last_key_time = now();
+                // initial point
+                return Some(current_key);
+            } else {
+                // waiting key, no key has been pressed yet
+                return None;
+            }
+        } else {
+            // last key was some 
+            let current_and_last_key_are_equal = self.last_key == current_key;
+            let current_key_is_none = current_key == KeyCode::NO_KEY;
+            if current_key_is_none {
+                // key unpressed
+                // then reset debounce state
+                self.last_key = current_key;
+                self.last_key_time = now();
+                return None;
+            } else {
+                // last and current key are some
+                if current_and_last_key_are_equal {
+                    let has_debounce_time_been_passed = now() > (self.last_key_time + self.debounce_time);
+                    if has_debounce_time_been_passed {
+                        //TODO: PERFORM repetition code
+                        self.last_key = current_key;
+                        self.last_key_time = now();
+                        return Some(current_key);
+                    } else {
+                        return None;
+                    }
+                } else {
+                    // last and current key are some, but they are different
+                    // two keys pressed at same time
+                    // TODO: Implement 'ctrl + key' code
+                    return None;
+                }
+            }
+            
+        }
+    }
+
+}
 
 struct Keyboard {
     keypad: Keypad,
     last_key: KeyCode,
     beep: fn(bool),
+    debouncer: Debounce,
 }
 
 impl Keyboard {
@@ -17,21 +84,13 @@ impl Keyboard {
             keypad: Keypad::new(),
             last_key: KeyCode::NO_KEY,
             beep,
+            debouncer: Debounce::new(250),
         }
     }
 
     pub fn get_key(&mut self) -> Option<KeyCode> {
-        //TODO: Extract this code to a better place
-        (self.beep)(true); // init beep
-        delay_ms(200); // debounce the key
-        (self.beep)(false); // stop beep
-        //
-        let key = self.keypad.scan();
-        if key == KeyCode::NO_KEY {
-            None
-        } else {
-            Some(key)
-        }
+        let current_key = self.keypad.scan();
+        self.debouncer.debounce_key(current_key)
     }
 }
 
@@ -203,6 +262,10 @@ impl<'a, const SIZE: usize> Field<'a, SIZE> {
 
 pub fn development_entry_point() -> ! {
 
+    //temp
+    let mut output_expander = OutputExpander::new();
+    let front_panel = FrontPanel::new(&mut output_expander).reset();
+
     // initialization
     let beep = |on:bool| { OutputExpander::new().BUZZER(on).commit(); };
     let mut keyboard = Keyboard::new(beep);
@@ -214,7 +277,7 @@ pub fn development_entry_point() -> ! {
     caption.draw();
 
     let mut buffer = ['x';5];
-    let mut cursor = BufferedCursor::new(&mut buffer);
+    let  cursor = BufferedCursor::new(&mut buffer);
     let mut field = Field::new(cursor, FieldKind::Numeric, &canvas);
 
     loop { 
