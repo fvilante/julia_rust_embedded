@@ -89,8 +89,18 @@ impl Keyboard {
     }
 
     pub fn get_key(&mut self) -> Option<KeyCode> {
+        //TODO: put this beep code in a better place and make its timeing non-halting
+        let beep = |key| {
+            (self.beep)(true);
+            delay_ms(20);
+            (self.beep)(false);
+            key
+        };
+        
         let current_key = self.keypad.scan();
-        self.debouncer.debounce_key(current_key)
+        self.debouncer
+            .debounce_key(current_key)
+            .map(beep)
     }
 }
 
