@@ -201,7 +201,7 @@ impl<'a, const SIZE: usize> Field<'a, SIZE> {
 }
 
 
-pub fn development_entry_point() /* -> !*/ {
+pub fn development_entry_point() -> ! {
 
     // initialization
     let beep = |on:bool| { OutputExpander::new().BUZZER(on).commit(); };
