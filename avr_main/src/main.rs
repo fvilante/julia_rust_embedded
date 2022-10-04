@@ -31,22 +31,22 @@ fn main() -> ! {
 
     //protocol::datalink_comm::development_entry_point();
     //board::lcd::example_01();
-    //menu::menu_lcd::development_entry_point();
-    //crate::enviroment::front_panel::development_entry_point();
-
-
-    lcd::lcd_initialize();
-    init_timer();
+    
+    
+    init_timer(); // initialize timer couting (1khz)
 
     //
 
-    loop {
+    //crate::enviroment::front_panel::development_entry_point();
+    menu::menu_lcd::development_entry_point()
+
+    //loop {
 
         //lcd::clear();
-        lcd::print_u16_in_hex(microcontroler::timer::now().try_into().unwrap());
+        //lcd::print_u16_in_hex(microcontroler::timer::now().try_into().unwrap());
          // infinite loop waiting for timer interruptions to occur
          // see function TIMER1_COMPA() in crate::microcontroler::timer
-    }
+    //}
     
 }
 
