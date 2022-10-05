@@ -297,6 +297,40 @@ trait Widget {
 }
 
 
+trait Editable {
+    fn set_edit_mode(&mut self, value: bool);
+    fn is_in_edit_mode(&self) -> bool;
+    fn toggle_edit_mode(&mut self) {
+        if self.is_in_edit_mode() {
+            self.set_edit_mode(false);
+        } else {
+            self.set_edit_mode(true);
+        }
+    }
+}
+
+struct EditMode {
+    is_in_edit_mode: bool,
+}
+
+impl EditMode {
+    fn new(is_in_edit_mode: bool) -> Self {
+        Self {
+            is_in_edit_mode,
+        }
+    }
+}
+
+impl Editable for EditMode {
+    fn set_edit_mode(&mut self, value: bool) {
+        self.is_in_edit_mode = value;
+    }
+    fn is_in_edit_mode(&self) -> bool {
+        self.is_in_edit_mode
+    }
+}
+
+
 struct Caption<'a> {
     text: &'a str,
     start_point: Point,
@@ -401,6 +435,7 @@ struct Field<const SIZE: usize> {
     kind: FieldKind,
     blink: RectangularWave,
     start_point: Point,
+    edit_mode: EditMode,
 }
 
 impl<const SIZE: usize> Field<SIZE> {
@@ -410,37 +445,44 @@ impl<const SIZE: usize> Field<SIZE> {
             kind,
             blink: RectangularWave::new(400,700),
             start_point,
+            edit_mode: EditMode::new(false),
         }
     }
 }
 
 impl<const SIZE: usize> Widget for Field<SIZE> {
 
-    fn send_key(&mut self, key: KeyCode) {        
+    fn send_key(&mut self, key: KeyCode) {     
+        
+        if self.is_in_edit_mode() {
 
-        let effect = match key {
-            // navigation_key left and right
-            KeyCode::KEY_SETA_BRANCA_ESQUERDA => { self.buffer.move_cursor_left(); Some(()) }, 
-            KeyCode::KEY_SETA_BRANCA_DIREITA => { self.buffer.move_cursor_right(); Some(()) },
-            KeyCode::KEY_DIRECIONAL_PARA_DIREITA => { self.buffer.move_cursor_right(); Some(()) },
-            KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => { self.buffer.move_cursor_left(); Some(()) },
-            KeyCode::KEY_0 => { self.buffer.change_cursor_item_to('0').move_cursor_right(); Some(()) },
-            KeyCode::KEY_1 => { self.buffer.change_cursor_item_to('1').move_cursor_right(); Some(()) },
-            KeyCode::KEY_2 => { self.buffer.change_cursor_item_to('2').move_cursor_right(); Some(()) },
-            KeyCode::KEY_3 => { self.buffer.change_cursor_item_to('3').move_cursor_right(); Some(()) },
-            KeyCode::KEY_4 => { self.buffer.change_cursor_item_to('4').move_cursor_right(); Some(()) },
-            KeyCode::KEY_5 => { self.buffer.change_cursor_item_to('5').move_cursor_right(); Some(()) },
-            KeyCode::KEY_6 => { self.buffer.change_cursor_item_to('6').move_cursor_right(); Some(()) },
-            KeyCode::KEY_7 => { self.buffer.change_cursor_item_to('7').move_cursor_right(); Some(()) },
-            KeyCode::KEY_8 => { self.buffer.change_cursor_item_to('8').move_cursor_right(); Some(()) },
-            KeyCode::KEY_9 => { self.buffer.change_cursor_item_to('9').move_cursor_right(); Some(()) },
-            _ => { None },
-        };
-
-        // reset the blinker when some key is pressed makes a better visual effect
-        if let Some(_) = effect {
-            self.blink.reset();
-        }  
+            let effect = match key {
+                // navigation_key left and right
+                KeyCode::KEY_SETA_BRANCA_ESQUERDA => { self.buffer.move_cursor_left(); Some(()) }, 
+                KeyCode::KEY_SETA_BRANCA_DIREITA => { self.buffer.move_cursor_right(); Some(()) },
+                KeyCode::KEY_DIRECIONAL_PARA_DIREITA => { self.buffer.move_cursor_right(); Some(()) },
+                KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => { self.buffer.move_cursor_left(); Some(()) },
+                KeyCode::KEY_0 => { self.buffer.change_cursor_item_to('0').move_cursor_right(); Some(()) },
+                KeyCode::KEY_1 => { self.buffer.change_cursor_item_to('1').move_cursor_right(); Some(()) },
+                KeyCode::KEY_2 => { self.buffer.change_cursor_item_to('2').move_cursor_right(); Some(()) },
+                KeyCode::KEY_3 => { self.buffer.change_cursor_item_to('3').move_cursor_right(); Some(()) },
+                KeyCode::KEY_4 => { self.buffer.change_cursor_item_to('4').move_cursor_right(); Some(()) },
+                KeyCode::KEY_5 => { self.buffer.change_cursor_item_to('5').move_cursor_right(); Some(()) },
+                KeyCode::KEY_6 => { self.buffer.change_cursor_item_to('6').move_cursor_right(); Some(()) },
+                KeyCode::KEY_7 => { self.buffer.change_cursor_item_to('7').move_cursor_right(); Some(()) },
+                KeyCode::KEY_8 => { self.buffer.change_cursor_item_to('8').move_cursor_right(); Some(()) },
+                KeyCode::KEY_9 => { self.buffer.change_cursor_item_to('9').move_cursor_right(); Some(()) },
+                KeyCode::KEY_ESC => { self.set_edit_mode(false); Some(()) },
+                _ => { None },
+            };
+    
+            // reset the blinker when some key is pressed makes a better visual effect
+            if let Some(_) = effect {
+                self.blink.reset();
+            }  
+        } else {
+            // ignore keys
+        }
     }
 
     fn update(&mut self) {
@@ -453,12 +495,64 @@ impl<const SIZE: usize> Widget for Field<SIZE> {
             let blink_char = '_';
             let mut current_char = digit.clone();
             let is_current_char_over_cursor = position == self.buffer.cursor;
-            let is_time_to_blink = self.blink.read();
+            let is_time_to_blink = self.blink.read() && self.is_in_edit_mode(); // do not blink if it is not in edit mode
             if is_current_char_over_cursor && is_time_to_blink {
                 current_char = blink_char;
             } 
             canvas.print_char(current_char);
         };
+    }
+}
+
+impl<const SIZE: usize> Editable for Field<SIZE> {
+    fn set_edit_mode(&mut self, value: bool) {
+        self.edit_mode.set_edit_mode(value);
+    }
+
+    fn is_in_edit_mode(&self) -> bool {
+        self.edit_mode.is_in_edit_mode
+    }
+}
+
+
+struct MenuItem<'a, const SIZE: usize> {
+    caption: Caption<'a>,
+    field: Field<SIZE>,
+}
+
+impl<'a, const SIZE: usize> MenuItem<'a,SIZE> {
+    /// NOTE: client should put point1 and point2 in the same line
+    fn new(point1: Point, text: &'a str, point2: Point, array: [char; SIZE]) -> Self {
+        Self {
+            caption: Caption ::new(point1, text),
+            field: Field::<SIZE>::new(point2, array, FieldKind::Numeric),
+        }
+    }
+}
+
+impl<'a, const SIZE: usize> Widget for MenuItem<'a,SIZE> {
+    fn send_key(&mut self, key: KeyCode) {
+        self.field.send_key(key);
+    }
+
+    fn update(&mut self) {
+        self.caption.update();
+        self.field.update();
+    }
+
+    fn draw(&self, canvas: &mut Canvas) {
+        self.caption.draw(canvas);
+        self.field.draw(canvas);
+    }
+}
+
+impl<'a, const SIZE: usize> Editable for MenuItem<'a,SIZE> {
+    fn set_edit_mode(&mut self, value: bool) {
+        self.field.set_edit_mode(value);
+    }
+
+    fn is_in_edit_mode(&self) -> bool {
+        self.field.is_in_edit_mode()
     }
 }
 
@@ -474,38 +568,36 @@ pub fn development_entry_point() -> ! {
     let mut keyboard = Keyboard::new(beep);
     let mut canvas = Canvas::new();
 
-    canvas.print_char('A');
-    canvas.print_char('B');
-
     canvas.render();
 
     //loop { }
     
     //widgets
-    let mut caption1 = Caption ::new(Point::new(5,0), "Posicao Inicial ");
-    let mut field1 = Field::new(Point::new(30,0), ['x';5], FieldKind::Numeric);
+    let mut menu_item1 = MenuItem::new(Point::new(1,0), "Posicao Final", Point::new(35,0), ['0';4]);
+    let mut menu_item2 = MenuItem::new(Point::new(1,1), "Aceleracao de avanco", Point::new(34,1), ['0';5]);
 
-    let mut caption2 = Caption::new(Point::new(5,1),"Posicao Final ");
-    let mut field2 = Field::new(Point::new(30,1), ['x';5], FieldKind::Numeric);
+    canvas.clear();
 
+    menu_item1.set_edit_mode(true);
 
     loop { 
         // scan: read one key on keyboard
         // update: send key to the Field
         if let Some(key) = keyboard.get_key() {
-            field1.send_key(key);
+            menu_item1.send_key(key);
         }
 
         // draw: draw the Field
         canvas.render();
-        field1.update();
-        canvas.clear();
-        caption1.update();
-        caption1.draw(&mut canvas);
-        field1.draw(&mut canvas);
-        caption2.update();
-        caption2.draw(&mut canvas);
-        field2.update();
-        field2.draw(&mut canvas);
+
+        // draw
+        menu_item1.update();
+        menu_item2.update();
+        menu_item1.draw(&mut canvas);
+        menu_item2.draw(&mut canvas);
+        
+        //
+        //canvas.clear();
+        
     }
 }
