@@ -156,6 +156,7 @@ impl Keyboard {
 }
 
 
+#[derive(Copy, Clone)]
 struct Point {
     x: u8,
     y: u8,
@@ -247,8 +248,8 @@ impl Canvas  {
     }
 
 
-    fn set_cursor(&mut self, col: u8, row: u8) {
-        self.cursor_position.set_point(Point::new(col, row));
+    fn set_cursor(&mut self, point: Point) {
+        self.cursor_position.set_point(point);
         //lcd::setCursor(col, row);
     }
 
@@ -286,26 +287,41 @@ impl Canvas  {
 }
 
 
+// 
+
+
+trait Widget {
+    fn send_key(&mut self, key: KeyCode);
+    fn update(&mut self);
+    fn draw(&self, canvas: &mut Canvas);
+}
+
+
 struct Caption<'a> {
     text: &'a str,
+    start_point: Point,
 }
 
 impl<'a> Caption<'a> {
-    fn new(text: &'a str) -> Self {
+    fn new(start_point: Point, text: &'a str) -> Self {
         Self {
             text,
+            start_point,
         }
     }
+}
 
+impl Widget for Caption<'_> {
     fn send_key(&mut self, _key: KeyCode) { 
         // ignore key
     }
 
-    fn update() {
+    fn update(&mut self) {
         // do nothing
     }
 
-    fn draw(&self, canvas: &'a mut Canvas) {
+    fn draw(&self, canvas: &mut Canvas) {
+        canvas.set_cursor(self.start_point);
         for char_ in self.text.chars() {
             canvas.print_char(char_);
         }
@@ -384,16 +400,21 @@ struct Field<const SIZE: usize> {
     buffer: BufferedCursor<char,SIZE>,
     kind: FieldKind,
     blink: RectangularWave,
+    start_point: Point,
 }
 
 impl<const SIZE: usize> Field<SIZE> {
-    fn new(array: [char;SIZE], kind: FieldKind) -> Self {
+    fn new(start_point: Point, array: [char;SIZE], kind: FieldKind) -> Self {
         Self {
             buffer: BufferedCursor::new(array),
             kind,
             blink: RectangularWave::new(400,700),
+            start_point,
         }
     }
+}
+
+impl<const SIZE: usize> Widget for Field<SIZE> {
 
     fn send_key(&mut self, key: KeyCode) {        
 
@@ -416,6 +437,7 @@ impl<const SIZE: usize> Field<SIZE> {
             _ => { None },
         };
 
+        // reset the blinker when some key is pressed makes a better visual effect
         if let Some(_) = effect {
             self.blink.reset();
         }  
@@ -426,7 +448,7 @@ impl<const SIZE: usize> Field<SIZE> {
     }
 
     fn draw(&self, canvas: &mut Canvas) {
-        //canvas.clear();
+        canvas.set_cursor(self.start_point);
         for (position,digit) in self.buffer.as_array().iter().enumerate() {
             let blink_char = '_';
             let mut current_char = digit.clone();
@@ -438,8 +460,6 @@ impl<const SIZE: usize> Field<SIZE> {
             canvas.print_char(current_char);
         };
     }
-
-  
 }
 
 
@@ -462,21 +482,30 @@ pub fn development_entry_point() -> ! {
     //loop { }
     
     //widgets
-    let caption = Caption::new("My name is...");
-    let mut field = Field::new(['x';5], FieldKind::Numeric);
+    let mut caption1 = Caption ::new(Point::new(5,0), "Posicao Inicial ");
+    let mut field1 = Field::new(Point::new(30,0), ['x';5], FieldKind::Numeric);
+
+    let mut caption2 = Caption::new(Point::new(5,1),"Posicao Final ");
+    let mut field2 = Field::new(Point::new(30,1), ['x';5], FieldKind::Numeric);
+
 
     loop { 
         // scan: read one key on keyboard
         // update: send key to the Field
         if let Some(key) = keyboard.get_key() {
-            field.send_key(key);
+            field1.send_key(key);
         }
-        canvas.render();
-        field.update();
-        canvas.clear();
-        caption.draw(&mut canvas);
-        field.draw(&mut canvas);
 
         // draw: draw the Field
+        canvas.render();
+        field1.update();
+        canvas.clear();
+        caption1.update();
+        caption1.draw(&mut canvas);
+        field1.draw(&mut canvas);
+        caption2.update();
+        caption2.draw(&mut canvas);
+        field2.update();
+        field2.draw(&mut canvas);
     }
 }
