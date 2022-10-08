@@ -332,13 +332,13 @@ impl Editable for EditMode {
 }
 
 
-struct Caption<'a> {
-    text: &'a str,
+struct Caption {
+    text: String<20>,
     start_point: Point,
 }
 
-impl<'a> Caption<'a> {
-    fn new(start_point: Point, text: &'a str) -> Self {
+impl Caption {
+    fn new(start_point: Point, text: String<20>) -> Self {
         Self {
             text,
             start_point,
@@ -346,7 +346,7 @@ impl<'a> Caption<'a> {
     }
 }
 
-impl Widget for Caption<'_> {
+impl Widget for Caption {
     fn send_key(&mut self, _key: KeyCode) { 
         // ignore key
     }
@@ -516,22 +516,22 @@ impl<const SIZE: usize> Editable for Field<SIZE> {
 }
 
 
-struct MenuItem<'a, const SIZE: usize> {
-    caption: Caption<'a>,
+struct MenuItem<const SIZE: usize> {
+    caption: Caption,
     field: Field<SIZE>,
 }
 
-impl<'a, const SIZE: usize> MenuItem<'a,SIZE> {
+impl<const SIZE: usize> MenuItem<SIZE> {
     /// NOTE: client should put point1 and point2 in the same line
-    fn new(point1: Point, text: &'a str, point2: Point, array: [char; SIZE]) -> Self {
+    fn new(point1: Point, text: String<20>, point2: Point, array: [char; SIZE]) -> Self {
         Self {
-            caption: Caption ::new(point1, text),
+            caption: Caption::new(point1, text),
             field: Field::<SIZE>::new(point2, array, FieldKind::Numeric),
         }
     }
 }
 
-impl<'a, const SIZE: usize> Widget for MenuItem<'a,SIZE> {
+impl<const SIZE: usize> Widget for MenuItem<SIZE> {
     fn send_key(&mut self, key: KeyCode) {
         self.field.send_key(key);
     }
@@ -547,7 +547,7 @@ impl<'a, const SIZE: usize> Widget for MenuItem<'a,SIZE> {
     }
 }
 
-impl<'a, const SIZE: usize> Editable for MenuItem<'a,SIZE> {
+impl<const SIZE: usize> Editable for MenuItem<SIZE> {
     fn set_edit_mode(&mut self, value: bool) {
         self.field.set_edit_mode(value);
     }
@@ -570,11 +570,12 @@ pub fn development_entry_point() -> ! {
     let mut canvas = Canvas::new();
 
     canvas.render();
-
     
     //widgets
-    let mut menu_item1 = MenuItem::new(Point::new(1,0), "Posicao Final", Point::new(35,0), ['0';4]);
-    let mut menu_item2 = MenuItem::new(Point::new(1,1), "Aceleracao de avanco", Point::new(34,1), ['0';5]);
+    let s1: String<20> = String::from("Posicao Final");
+    let s2: String<20> = String::from("Aceleracao de avanco");
+    let mut menu_item1 = MenuItem::new(Point::new(1,0), s1, Point::new(35,0), ['0';4]);
+    let mut menu_item2 = MenuItem::new(Point::new(1,1), s2, Point::new(34,1), ['0';5]);
 
     canvas.clear();
 
