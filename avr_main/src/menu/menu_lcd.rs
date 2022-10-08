@@ -1,4 +1,5 @@
 use core::borrow::BorrowMut;
+use heapless::String;
 
 use crate::board::output_expander::OutputExpander;
 use crate::board::{lcd, output_expander};
@@ -570,7 +571,6 @@ pub fn development_entry_point() -> ! {
 
     canvas.render();
 
-    //loop { }
     
     //widgets
     let mut menu_item1 = MenuItem::new(Point::new(1,0), "Posicao Final", Point::new(35,0), ['0';4]);
