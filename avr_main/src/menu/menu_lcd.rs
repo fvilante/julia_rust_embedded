@@ -433,17 +433,15 @@ enum FieldKind {
 
 struct Field<const SIZE: usize> {
     buffer: BufferedCursor<char,SIZE>,
-    kind: FieldKind,
     blink: RectangularWave,
     start_point: Point,
     edit_mode: EditMode,
 }
 
 impl<const SIZE: usize> Field<SIZE> {
-    fn new(start_point: Point, array: [char;SIZE], kind: FieldKind) -> Self {
+    fn new(start_point: Point, array: [char;SIZE]) -> Self {
         Self {
             buffer: BufferedCursor::new(array),
-            kind,
             blink: RectangularWave::new(400,700),
             start_point,
             edit_mode: EditMode::new(false),
@@ -526,7 +524,7 @@ impl<const SIZE: usize> MenuItem<SIZE> {
     fn new(point1: Point, text: String<20>, point2: Point, array: [char; SIZE]) -> Self {
         Self {
             caption: Caption::new(point1, text),
-            field: Field::<SIZE>::new(point2, array, FieldKind::Numeric),
+            field: Field::<SIZE>::new(point2, array),
         }
     }
 }
