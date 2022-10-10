@@ -1,4 +1,6 @@
-use core::borrow::BorrowMut;
+use core::borrow::{BorrowMut, Borrow};
+use core::str::FromStr;
+use alloc::borrow::ToOwned;
 use heapless::String;
 
 use crate::board::output_expander::OutputExpander;
@@ -366,13 +368,13 @@ impl Widget for Caption {
 //
 
 
-struct BufferedCursor<T, const SIZE: usize> {
-    buffer: [T;SIZE],
+struct BufferedCursor {
+    buffer: String<10>,
     cursor: usize, // buffer index
 }
 
-impl<T, const SIZE: usize> BufferedCursor<T, SIZE> {
-    pub fn new(buffer: [T;SIZE]) -> Self {
+impl BufferedCursor {
+    pub fn new(buffer: String<10>) -> Self {
         Self {
             buffer,
             cursor: 0,
@@ -380,9 +382,18 @@ impl<T, const SIZE: usize> BufferedCursor<T, SIZE> {
     }
 
 
-    pub fn change_cursor_item_to(&mut self, item: T) -> &mut Self {
-        self.buffer[self.cursor] = item;
-        self
+    pub fn change_cursor_item_to(&mut self, new_char: char) -> &mut Self {
+        let current_cursor = self.cursor;
+        let mut s: String<10> = String::new();
+        for (index, current_char) in self.buffer.char_indices() {
+            if index == current_cursor {
+                s.push(new_char).unwrap();
+            } else {
+                s.push(current_char).unwrap();
+            }
+        }
+        self.buffer = s.to_owned();
+        self  
     }
 
     /// increment_cursor_safe
@@ -413,16 +424,11 @@ impl<T, const SIZE: usize> BufferedCursor<T, SIZE> {
         self
     }
 
-    pub fn addAndMoveRight(&mut self, item: T) -> &mut Self {
+    pub fn addAndMoveRight(&mut self, item: char) -> &mut Self {
         self
             .change_cursor_item_to(item)
             .move_cursor_right()
     }
-
-    pub fn as_array(&self) -> &[T; SIZE] {
-        &self.buffer
-    }
-
 
 }
 
@@ -431,15 +437,15 @@ enum FieldKind {
     Numeric,
 }
 
-struct Field<const SIZE: usize> {
-    buffer: BufferedCursor<char,SIZE>,
+struct Field {
+    buffer: BufferedCursor,
     blink: RectangularWave,
     start_point: Point,
     edit_mode: EditMode,
 }
 
-impl<const SIZE: usize> Field<SIZE> {
-    fn new(start_point: Point, array: [char;SIZE]) -> Self {
+impl Field {
+    fn new(start_point: Point, array: String<10>) -> Self {
         Self {
             buffer: BufferedCursor::new(array),
             blink: RectangularWave::new(400,700),
@@ -449,7 +455,7 @@ impl<const SIZE: usize> Field<SIZE> {
     }
 }
 
-impl<const SIZE: usize> Widget for Field<SIZE> {
+impl Widget for Field {
 
     fn send_key(&mut self, key: KeyCode) {     
         
@@ -490,7 +496,7 @@ impl<const SIZE: usize> Widget for Field<SIZE> {
 
     fn draw(&self, canvas: &mut Canvas) {
         canvas.set_cursor(self.start_point);
-        for (position,digit) in self.buffer.as_array().iter().enumerate() {
+        for (position,digit) in self.buffer.buffer.char_indices() {
             let blink_char = '_';
             let mut current_char = digit.clone();
             let is_current_char_over_cursor = position == self.buffer.cursor;
@@ -503,7 +509,7 @@ impl<const SIZE: usize> Widget for Field<SIZE> {
     }
 }
 
-impl<const SIZE: usize> Editable for Field<SIZE> {
+impl Editable for Field {
     fn set_edit_mode(&mut self, value: bool) {
         self.edit_mode.set_edit_mode(value);
     }
@@ -514,22 +520,22 @@ impl<const SIZE: usize> Editable for Field<SIZE> {
 }
 
 
-struct MenuItem<const SIZE: usize> {
+struct MenuItem {
     caption: Caption,
-    field: Field<SIZE>,
+    field: Field,
 }
 
-impl<const SIZE: usize> MenuItem<SIZE> {
+impl MenuItem {
     /// NOTE: client should put point1 and point2 in the same line
-    fn new(point1: Point, text: String<20>, point2: Point, array: [char; SIZE]) -> Self {
+    fn new(point1: Point, text: String<20>, point2: Point, array: String<10>) -> Self {
         Self {
             caption: Caption::new(point1, text),
-            field: Field::<SIZE>::new(point2, array),
+            field: Field::new(point2, array),
         }
     }
 }
 
-impl<const SIZE: usize> Widget for MenuItem<SIZE> {
+impl Widget for MenuItem {
     fn send_key(&mut self, key: KeyCode) {
         self.field.send_key(key);
     }
@@ -545,7 +551,7 @@ impl<const SIZE: usize> Widget for MenuItem<SIZE> {
     }
 }
 
-impl<const SIZE: usize> Editable for MenuItem<SIZE> {
+impl Editable for MenuItem {
     fn set_edit_mode(&mut self, value: bool) {
         self.field.set_edit_mode(value);
     }
@@ -572,8 +578,10 @@ pub fn development_entry_point() -> ! {
     //widgets
     let s1: String<20> = String::from("Posicao Final");
     let s2: String<20> = String::from("Aceleracao de avanco");
-    let mut menu_item1 = MenuItem::new(Point::new(1,0), s1, Point::new(35,0), ['0';4]);
-    let mut menu_item2 = MenuItem::new(Point::new(1,1), s2, Point::new(34,1), ['0';5]);
+    let f1: String<10> = String::from("0000");
+    let f2: String<10> = String::from("00000");
+    let mut menu_item1 = MenuItem::new(Point::new(1,0), s1, Point::new(35,0), f1);
+    let mut menu_item2 = MenuItem::new(Point::new(1,1), s2, Point::new(34,1), f2);
 
     canvas.clear();
 
