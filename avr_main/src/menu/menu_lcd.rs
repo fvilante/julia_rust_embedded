@@ -1,7 +1,9 @@
 use core::borrow::{BorrowMut, Borrow};
 use core::str::FromStr;
+use core::ops::Range;
 use alloc::borrow::ToOwned;
 use heapless::String;
+use heapless::Vec;
 
 use crate::board::output_expander::OutputExpander;
 use crate::board::{lcd, output_expander};
@@ -333,18 +335,23 @@ impl Editable for EditMode {
     }
 }
 
+type Text = String<40>;
 
 struct Caption {
-    text: String<20>,
+    text: Text,
     start_point: Point,
 }
 
 impl Caption {
-    fn new(start_point: Point, text: String<20>) -> Self {
+    fn new(start_point: Point, text: Text) -> Self {
         Self {
             text,
             start_point,
         }
+    }
+
+    fn set_caption(&mut self, text: Text) {
+        self.text = text;
     }
 }
 
@@ -367,23 +374,71 @@ impl Widget for Caption {
 
 //
 
+struct Cursor {
+    current: usize,
+    range: Range<usize>,
+}
+
+impl Cursor {
+    fn new(range: Range<usize>) -> Self {
+        Self {
+            current: 0,
+            range,
+        }
+    }
+
+    fn get_current(&self) -> usize {
+        self.current
+    }
+
+    /// returns true if has reached the upper bound
+    fn next(&mut self) -> bool {
+        let last_index = self.range.end-1;
+        let current_index = self.current;
+        let has_reached_upper_bound = current_index >= last_index;
+        if has_reached_upper_bound == false  {
+            self.current += 1;
+        }
+        has_reached_upper_bound
+    }
+
+    /// returns true if has reached the lower bound
+    fn previous(&mut self) -> bool {
+        let first_index = self.range.start;
+        let current_index = self.current;
+        let has_reached_lower_bound = current_index <= first_index;
+        if has_reached_lower_bound == false {
+            self.current -= 1;
+        }
+        has_reached_lower_bound
+    }
+
+    //fn end(&mut self) {
+    //    self.current = self.range.end;
+    //}
+    //
+    //fn begin(&mut self) {
+    //    self.current = self.range.start;
+    //}
+}
+
 
 struct BufferedCursor {
     buffer: String<10>,
-    cursor: usize, // buffer index
+    cursor: Cursor,
 }
 
 impl BufferedCursor {
     pub fn new(buffer: String<10>) -> Self {
         Self {
+            cursor: Cursor::new(0..buffer.len()),
             buffer,
-            cursor: 0,
         }
     }
 
 
     pub fn change_cursor_item_to(&mut self, new_char: char) -> &mut Self {
-        let current_cursor = self.cursor;
+        let current_cursor = self.cursor.get_current();
         let mut s: String<10> = String::new();
         for (index, current_char) in self.buffer.char_indices() {
             if index == current_cursor {
@@ -398,31 +453,25 @@ impl BufferedCursor {
 
     /// increment_cursor_safe
     pub fn move_cursor_right(&mut self) -> &mut Self {
-        let upper_bound = self.buffer.len()-1;
-        if self.cursor < upper_bound {
-            self.cursor += 1;
-        };
+        self.cursor.next();
         self
     }
 
     /// decrement_cursor_safe
     pub fn move_cursor_left(&mut self) -> &mut Self {
-        let lower_bound = 0;
-        if self.cursor > lower_bound {
-            self.cursor -= 1;
-        };
+        self.cursor.previous();
         self
     }
 
-    pub fn move_cursor_begin(&mut self) -> &mut Self {
-        self.cursor = 0;
-        self
-    }
-
-    pub fn move_cursor_end(&mut self) -> &mut Self {
-        self.cursor = self.buffer.len()-1;
-        self
-    }
+    //pub fn move_cursor_begin(&mut self) -> &mut Self {
+    //    self.cursor.begin();
+    //    self
+    //}
+    //
+    //pub fn move_cursor_end(&mut self) -> &mut Self {
+    //   self.cursor.end();
+    //    self
+    //}
 
     pub fn addAndMoveRight(&mut self, item: char) -> &mut Self {
         self
@@ -499,7 +548,7 @@ impl Widget for Field {
         for (position,digit) in self.buffer.buffer.char_indices() {
             let blink_char = '_';
             let mut current_char = digit.clone();
-            let is_current_char_over_cursor = position == self.buffer.cursor;
+            let is_current_char_over_cursor = position == self.buffer.cursor.get_current();
             let is_time_to_blink = self.blink.read() && self.is_in_edit_mode(); // do not blink if it is not in edit mode
             if is_current_char_over_cursor && is_time_to_blink {
                 current_char = blink_char;
@@ -527,11 +576,15 @@ struct MenuItem {
 
 impl MenuItem {
     /// NOTE: client should put point1 and point2 in the same line
-    fn new(point1: Point, text: String<20>, point2: Point, array: String<10>) -> Self {
+    fn new(point1: Point, text: Text, point2: Point, array: String<10>) -> Self {
         Self {
             caption: Caption::new(point1, text),
             field: Field::new(point2, array),
         }
+    }
+
+    fn set_caption(&mut self, text: Text) {
+        self.caption.set_caption(text);
     }
 }
 
@@ -561,8 +614,118 @@ impl Editable for MenuItem {
     }
 }
 
+struct ClassicMenu {
+    items: Vec<Text, 10>,
+    item_cursor: Cursor,
+    display_cursor: Cursor,
+    is_in_edit_mode: bool,
+    displayed_items: [MenuItem; 2],
+}
+
+impl ClassicMenu {
+    fn new(items: Vec<Text, 10>) -> Self {
+        let s1: Text = String::from("Fake item 1");
+        let s2: Text = String::from("Fake item 2");
+        let f1: String<10> = String::from("0000");
+        let f2: String<10> = String::from("00000");
+        Self {
+            items: items.clone(),
+            item_cursor: Cursor::new(0..items.len()), // number of items to show
+            display_cursor: Cursor::new(0..2), // number of lines in the display 
+            is_in_edit_mode: false,
+            displayed_items: [
+                MenuItem::new(Point::new(2,0), s1, Point::new(35,0), f1),
+                MenuItem::new(Point::new(2,1), s2, Point::new(34,1), f2),
+            ]
+        }
+    }
+}
+
+impl Editable for ClassicMenu {
+    fn set_edit_mode(&mut self, value: bool) {
+        self.is_in_edit_mode = value;
+    }
+
+    fn is_in_edit_mode(&self) -> bool {
+        self.is_in_edit_mode
+    }
+}
+
+impl Widget for ClassicMenu {
+    fn send_key(&mut self, key: KeyCode) {
+        match key {
+            KeyCode::KEY_DIRECIONAL_PARA_CIMA => {
+                if self.is_in_edit_mode == false {
+                    let overflow = self.display_cursor.previous();
+                    if overflow {
+                        self.item_cursor.previous();
+                    }
+                    
+                };
+            }
+
+            KeyCode::KEY_DIRECIONAL_PARA_BAIXO => {
+                if self.is_in_edit_mode == false {
+                    let overflow = self.display_cursor.next();
+                    if overflow {
+                        self.item_cursor.next();
+                    }
+                };
+            }
+
+            KeyCode::KEY_ENTER => {
+                self.set_edit_mode(true);
+            }
+
+            KeyCode::KEY_ESC => {
+                self.set_edit_mode(false);
+            }
+
+            _ => {
+                // do nothing
+            }
+        }
+    }
+
+    fn update(&mut self) {
+        for (index, menu_item) in self.displayed_items.iter_mut().enumerate() {
+            let default: Text = String::from("Nao identificado");
+            let items = self.items.clone();
+            let index = self.item_cursor.get_current()+index;
+            let text: Text = items.get(index).unwrap_or(&default).clone();            
+            menu_item.set_caption(text);
+            menu_item.update();
+        }
+    }
+
+    fn draw(&self, canvas: &mut Canvas) {
+        // draw parameters
+        for item in self.displayed_items.iter() {
+            item.draw(canvas);
+        }
+        // draw item selector icon
+        // clear
+        for line in 0..2 {
+            lcd::setCursor(0, line);
+            if line as usize == self.display_cursor.get_current() {
+                if self.is_in_edit_mode {
+                    lcd::print_char('*');
+                } else {
+                    lcd::print_char('>');
+                }
+            } else {
+                lcd::print_char(' ');
+            }
+        };
+
+    }
+}
+
+
 
 pub fn development_entry_point() -> ! {
+
+    lcd::lcd_initialize();
 
     //temp
     let mut output_expander = OutputExpander::new();
@@ -576,35 +739,48 @@ pub fn development_entry_point() -> ! {
     canvas.render();
     
     //widgets
-    let s1: String<20> = String::from("Posicao Final");
-    let s2: String<20> = String::from("Aceleracao de avanco");
-    let f1: String<10> = String::from("0000");
-    let f2: String<10> = String::from("00000");
-    let mut menu_item1 = MenuItem::new(Point::new(1,0), s1, Point::new(35,0), f1);
-    let mut menu_item2 = MenuItem::new(Point::new(1,1), s2, Point::new(34,1), f2);
+    let default: Text = String::from("Erro de carga de parametro");
+    let mut items: Vec<Text, 10> = Vec::new();
+    let s0: Text = String::from_str("Posicao Inicial").unwrap_or(default.clone());
+    let s1: Text = String::from_str("Posicao Final").unwrap_or(default.clone());
+    let s2: Text = String::from_str("Aceleracao de Avanco").unwrap_or(default.clone());
+    let s3: Text = String::from_str("Aceleracao de Retorno").unwrap_or(default.clone());
+    items.push(s0);
+    items.push(s1);
+    items.push(s2);
+    items.push(s3);
+    
+    
+    let mut menu = ClassicMenu::new(items);
 
     canvas.clear();
 
-    menu_item1.set_edit_mode(true);
+    let mut c:u16=0;
 
     loop { 
+        //c += 1;
+        //lcd::clear();
+        //lcd::print_u16_in_hex(c);
+        //loop { }
         // scan: read one key on keyboard
         // update: send key to the Field
         if let Some(key) = keyboard.get_key() {
-            menu_item1.send_key(key);
+            menu.send_key(key);
         }
 
+  
         // draw: draw the Field
         canvas.render();
 
-        // draw
-        menu_item1.update();
-        menu_item2.update();
-        menu_item1.draw(&mut canvas);
-        menu_item2.draw(&mut canvas);
         
-        //
-        //canvas.clear();
+        // update & draw
+        menu.update();
+      
+        menu.draw(&mut canvas);
+       
+      
+
+        
         
     }
 }
