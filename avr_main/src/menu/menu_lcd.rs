@@ -271,21 +271,10 @@ impl Canvas  {
     /// It swaps two lcd buffers: The output_buffer represents current state of lcd and
     /// input_buffer represent the desired state of lcd
     fn render(&mut self) {
-        let mut last_printed_index: isize = -1;
-        for (index, input_byte) in self.screen_buffer_input.iter().enumerate() {
-            let output_byte = self.screen_buffer_output[index].borrow_mut();
-            if input_byte != output_byte {
-                let Point{x:col, y:row } = CursorPosition::from_index(index).point;
-                //write input to screen
-                let does_must_move_cursor_manually = (index - 1) as isize != last_printed_index;
-                if does_must_move_cursor_manually {
-                    lcd::setCursor(col, row);
-                };
-                lcd::print_u8(*input_byte);
-                //update output buffer
-                *output_byte = *input_byte;
-                last_printed_index = index as isize;
-            }
+        /// The current implementation of this function is very! very! simplified, it may be improved later    
+        lcd::setCursor(0, 0);
+        for byte in self.screen_buffer_input {
+            lcd::print_u8(byte);
         }
     }
 
@@ -699,6 +688,8 @@ impl Widget for ClassicMenu {
     }
 
     fn draw(&self, canvas: &mut Canvas) {
+        // clear screen
+        canvas.clear();
         // draw parameters
         for item in self.displayed_items.iter() {
             item.draw(canvas);
@@ -706,15 +697,15 @@ impl Widget for ClassicMenu {
         // draw item selector icon
         // clear
         for line in 0..2 {
-            lcd::setCursor(0, line);
+            canvas.set_cursor(Point::new(0, line));
             if line as usize == self.display_cursor.get_current() {
                 if self.is_in_edit_mode {
-                    lcd::print_char('*');
+                    canvas.print_char('*');
                 } else {
-                    lcd::print_char('>');
+                    canvas.print_char('>');
                 }
             } else {
-                lcd::print_char(' ');
+                canvas.print_char(' ');
             }
         };
 
