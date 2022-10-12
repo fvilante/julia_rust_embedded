@@ -3,6 +3,7 @@ use core::str::FromStr;
 use core::ops::Range;
 use alloc::borrow::ToOwned;
 
+use avr_progmem::wrapper::ProgMem;
 use heapless::String;
 use heapless::Vec;
 
@@ -18,27 +19,92 @@ use avr_progmem::progmem;
 use avr_progmem::string::PmString;
 
 
-type Text = String<30>; // Dependeing on string size the memory can be exauhsted
 
+progmem! {
+    static progmem string E0 = "Erro de carga de parametro";
+    static progmem string S0 = "Posicao Inicial";
+    static progmem string S1 = "Posicao Final";
+    static progmem string S2 = "Velocidade de Avanco";
+    static progmem string S3 = "Velocidade de Retorno";
+    static progmem string S4 = "Aceleracao de Avanco";
+    static progmem string S5 = "Aceleracao de Retorno";
+    static progmem string S6 = "Start Automatico no Avanco";
+    static progmem string S7 = "Start Automatico no Retorno";
+    //
+    static progmem string S8 = "b(8 )lablablalbblalblbalabbalbla";
+    static progmem string S9 = "b(9 )lablablalbblalblbalabbalbla";
+    static progmem string S10 = "(10)blablablalbblalblbalabbalbla";
+    static progmem string S11 = "(11)blablablalbblalblbalabbalbla";
+    static progmem string S12 = "(12)blablablalbblalblbalabbalbla";
+    static progmem string S13 = "(13)blablablalbblalblbalabbalbla";
+    static progmem string S14 = "(14)blablablalbblalblbalabbalbla";
+    static progmem string S15 = "(15)blablablalbblalblbalabbalbla";
+    static progmem string S16 = "(16)blablablalbblalblbalabbalbla";
+    static progmem string S17 = "(17)blablablalbblalblbalabbalbla";
+    static progmem string S18 = "(18)blablablalbblalblbalabbalbla";
+    static progmem string S19 = "(19)blablablalbblalblbalabbalbla";
+    static progmem string S20 = "(20)blablablalbblalblbalabbalbla";
+    static progmem string S21 = "(21)blablablalbblalblbalabbalbla";
+    static progmem string S22 = "(22)blablablalbblalblbalabbalbla";
+    static progmem string S23 = "(23)blablablalbblalblbalabbalbla";
+    static progmem string S24 = "(24)blablablalbblalblbalabbalbla";
+    static progmem string S25 = "(25)blablablalbblalblbalabbalbla";
+    static progmem string S26 = "(26)blablablalbblalblbalabbalbla";
+    static progmem string S27 = "(27)blablablalbblalblbalabbalbla";
+    static progmem string S28 = "(28)blablablalbblalblbalabbalbla";
+    static progmem string S29 = "(29)blablablalbblalblbalabbalbla";
+    static progmem string S30 = "(30)blablablalbblalblbalabbalbla";
+    static progmem string S31 = "(31)blablablalbblalblbalabbalbla";
+    static progmem string S32 = "(32)blablablalbblalblbalabbalbla";
+    //
+    static progmem string NOP1 = "nop1";
+    static progmem string NOP2 = "nop2";
+    static progmem string NAO_IDENTIFICADO = "Nao identificado";
 
-struct FlashString<'a, const N: usize> {
-    flash_ref: &'a PmString<N>,
+    //NOTE: it is possible to load any type in progmem not only strings
+    static progmem A0: [u8; 6] = [0,1,2,3,4,5];
 }
 
-impl<'a, const N: usize> FlashString<'a, N> {
-    fn new(flash_ref: &'a PmString<N>) -> Self {
+#[derive(Copy,Clone)]
+pub struct FlashString {
+    flash_ptr: *const u8,
+    size_N: u8, // size in quantity of u8's
+}
+
+impl FlashString {
+    pub fn new<const N: usize>(val: &PmString<N>) -> Self {
+        let ptr = val.as_bytes().as_ptr() as *const u8;
         Self {
-            flash_ref,
+            flash_ptr: ptr,
+            size_N: N as u8,
         }
     }
 
-    fn to_string(&self) -> Text {
-        let default = String::from("Loading Error");
-        let ram_loaded = self.flash_ref.load();
-        let str = &*ram_loaded;
-        Text::from_str(str).unwrap_or(default)
+    pub fn chars(self) -> FlashStringIterator {
+        FlashStringIterator { flash_string: (self), counter: (0) }
     }
 }
+
+pub struct FlashStringIterator {
+    flash_string: FlashString,
+    counter: u8,
+}
+
+impl Iterator for FlashStringIterator {
+    type Item = u8;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let is_running = self.counter < self.flash_string.size_N;
+        if is_running {
+            let byte = unsafe { ProgMem::new(self.flash_string.flash_ptr.add(self.counter as usize)).load() };
+            self.counter += 1;
+            Some(byte)
+        } else {
+            None
+        }
+    }
+}
+
 
 
 
@@ -281,12 +347,12 @@ impl Canvas  {
         //lcd::print_char(char);
     }
 
-    fn print_flash_str<const SIZE: usize>(&mut self, prog_mem_pointer: &PmString<SIZE>) {
-        let s = FlashString::new(prog_mem_pointer);
-        for char in s.to_string().chars() {
-            self.print_char(char);
-        }
-    }
+    //fn print_flash_str<const SIZE: usize>(&mut self, prog_mem_pointer: &PmString<SIZE>) {
+    //    let s = FlashString::new(prog_mem_pointer);
+    //    for char in s.to_string().chars() {
+    //        self.print_char(char);
+    //    }
+    //}
 
 
     fn set_cursor(&mut self, point: Point) {
@@ -361,19 +427,19 @@ impl Editable for EditMode {
 }
 
 struct Caption {
-    text: Text,
+    text: FlashString,
     start_point: Point,
 }
 
 impl Caption {
-    fn new(start_point: Point, text: Text) -> Self {
+    fn new(start_point: Point, text: FlashString) -> Self {
         Self {
             text,
             start_point,
         }
     }
 
-    fn set_caption(&mut self, text: Text) {
+    fn set_caption(&mut self, text: FlashString) {
         self.text = text;
     }
 }
@@ -389,8 +455,8 @@ impl Widget for Caption {
 
     fn draw(&self, canvas: &mut Canvas) {
         canvas.set_cursor(self.start_point);
-        for char_ in self.text.chars() {
-            canvas.print_char(char_);
+        for byte in self.text.chars() {
+            canvas.print_char(byte as char);
         }
     }
 }
@@ -599,14 +665,14 @@ struct MenuItem {
 
 impl MenuItem {
     /// NOTE: client should put point1 and point2 in the same line
-    fn new(point1: Point, text: Text, point2: Point, array: String<10>) -> Self {
+    fn new(point1: Point, text: FlashString, point2: Point, array: String<10>) -> Self {
         Self {
             caption: Caption::new(point1, text),
             field: Field::new(point2, array),
         }
     }
 
-    fn set_caption(&mut self, text: Text) {
+    fn set_caption(&mut self, text: FlashString) {
         self.caption.set_caption(text);
     }
 }
@@ -638,7 +704,7 @@ impl Editable for MenuItem {
 }
 
 struct ClassicMenu {
-    items: Vec<Text, 10>,
+    items: Vec<FlashString, 35>,
     item_cursor: Cursor,
     display_cursor: Cursor,
     is_in_edit_mode: bool,
@@ -646,9 +712,9 @@ struct ClassicMenu {
 }
 
 impl ClassicMenu {
-    fn new(items: Vec<Text, 10>) -> Self {
-        let s1: Text = String::from("Fake item 1");
-        let s2: Text = String::from("Fake item 2");
+    fn new(items: Vec<FlashString, 35>) -> Self {
+        let s1 = FlashString::new(&NOP1);
+        let s2 = FlashString::new(&NOP2);
         let f1: String<10> = String::from("0000");
         let f2: String<10> = String::from("00000");
         Self {
@@ -712,11 +778,11 @@ impl Widget for ClassicMenu {
 
     fn update(&mut self) {
         for (index, menu_item) in self.displayed_items.iter_mut().enumerate() {
-            let default: Text = String::from("Nao identificado");
+            let default = FlashString::new(&NAO_IDENTIFICADO);
             let items = self.items.clone();
             let index = self.item_cursor.get_current()+index;
-            let text: Text = items.get(index).unwrap_or(&default).clone();            
-            menu_item.set_caption(text);
+            let text = items.get(index).unwrap_or(&default); //_or(&default).clone();            
+            menu_item.set_caption(*text);
             menu_item.update();
         }
     }
@@ -747,18 +813,6 @@ impl Widget for ClassicMenu {
 }
 
 
-struct Sized_<const N: usize> {
-    size: [u8;N],
-}
-
-
-fn print_flash_string<const N: usize>(flash_string: &FlashString<N>) {
-    let str: Text = flash_string.to_string();
-    for char in str.chars() {
-        lcd::print_char(char);
-    }
-}
-
 
 pub fn development_entry_point() -> ! {
 
@@ -773,43 +827,47 @@ pub fn development_entry_point() -> ! {
     let mut keyboard = Keyboard::new(beep);
     let mut canvas = Canvas::new();
 
-    progmem! {
-        static progmem string S0 = "Posicao Inicial";
-        static progmem string S1 = "Posicao Final";
-        static progmem string S2 = "Velocidade de Avanco";
-        static progmem string S3 = "Velocidade de Retorno";
-        static progmem string S4 = "Aceleracao de Avanco";
-        static progmem string S5 = "Aceleracao de Retorno";
-    }
-
-    let s0_ = FlashString::new(&S0);
-    let s1_ = FlashString::new(&S1);
-    print_flash_string(&s0_);
-    lcd::print_u8_array(b" juca neles! ");
-    print_flash_string(&s1_);
-    loop { };
-
-
     canvas.render();
     
     //widgets
-    let default: Text = String::from("Erro de carga de parametro");
-    let mut items: Vec<Text, 10> = Vec::new();
-    let s0: Text = String::from_str("Posicao Inicial").unwrap_or(default.clone());
-    let s1: Text = String::from_str("Posicao Final").unwrap_or(default.clone());
-    let s2: Text = String::from_str("Velocidade de Avanco").unwrap_or(default.clone());
-    let s3: Text = String::from_str("Velocidade de Retorno").unwrap_or(default.clone());
-    let s4: Text = String::from_str("Aceleracao de Avanco").unwrap_or(default.clone());
-    let s5: Text = String::from_str("Aceleracao de Retorno").unwrap_or(default.clone());
-    let s6: Text = String::from_str("Start automatico no avanco").unwrap_or(default.clone());
-    let s7: Text = String::from_str("Start automatico no retorno").unwrap_or(default.clone());
-    
-    items.push(s0);
-    items.push(s1);
-    items.push(s2);
-    items.push(s3);
-    items.push(s4);
-    items.push(s5);
+    let mut items: Vec<FlashString, 35> = Vec::new();
+
+    items.push(FlashString::new(&S0));
+    items.push(FlashString::new(&S1));
+    items.push(FlashString::new(&S2));
+    items.push(FlashString::new(&S3));
+    items.push(FlashString::new(&S4));
+    items.push(FlashString::new(&S5));
+    items.push(FlashString::new(&S6));
+    items.push(FlashString::new(&S7));
+    items.push(FlashString::new(&S8));
+    items.push(FlashString::new(&S9));
+    items.push(FlashString::new(&S10));
+    items.push(FlashString::new(&S11));
+    items.push(FlashString::new(&S12));
+    items.push(FlashString::new(&S13));
+    items.push(FlashString::new(&S14));
+    items.push(FlashString::new(&S15));
+    items.push(FlashString::new(&S16));
+    items.push(FlashString::new(&S17));
+    items.push(FlashString::new(&S18));
+    items.push(FlashString::new(&S19));
+    items.push(FlashString::new(&S20));
+    items.push(FlashString::new(&S21));
+    items.push(FlashString::new(&S22));
+    items.push(FlashString::new(&S23));
+    items.push(FlashString::new(&S24));
+    items.push(FlashString::new(&S25));
+    items.push(FlashString::new(&S26));
+    items.push(FlashString::new(&S27));
+    items.push(FlashString::new(&S28));
+    items.push(FlashString::new(&S29));
+    items.push(FlashString::new(&S30));
+    items.push(FlashString::new(&S31));
+    items.push(FlashString::new(&S32));
+    //items.push(S3);
+    //items.push(S4);
+    //items.push(S5);
     //items.push(s6); 
     //items.push(s7);
     //ATTENTION: Se eu liberar uma das duas linhas comentadas acima da um erro (provavelmente stackoverflow)
