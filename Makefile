@@ -30,9 +30,9 @@ watch_avr_upload:
 	cargo watch -c --why -s "make div fast"
 
 
-fast: build upload size
+fast: build upload_fast size
 
-full: check test build upload size
+full: check test build upload_fast size
 
 check:
 	cargo check --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release 
@@ -45,9 +45,15 @@ x86_test:
 build:
 	cargo build --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release 
 
-upload:
+# slow because it verifies after write proccess
+upload_slow:
 	#avrdude -v -F -c usbasp -p m328p -Uflash:w:target/avr-atmega328p/release/avr_main:e
 	avrdude  -v -F -c usbasp -p m328p -Uflash:w:target/avr-atmega328p/release/avr_main.elf -U lfuse:w:0xFF:m -U hfuse:w:0xDE:m -U efuse:w:0xFD:m  
+
+# do not verify after write
+upload_fast:
+	avrdude  -V -v -F -c usbasp -p m328p -Uflash:w:target/avr-atmega328p/release/avr_main.elf -U lfuse:w:0xFF:m -U hfuse:w:0xDE:m -U efuse:w:0xFD:m  
+
 
 size:
 	@$(AVR_SIZE) --format=sysv $(BUILD_DIR)/avr_main.elf
