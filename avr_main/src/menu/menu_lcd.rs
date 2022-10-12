@@ -2,6 +2,7 @@ use core::borrow::{BorrowMut, Borrow};
 use core::str::FromStr;
 use core::ops::Range;
 use alloc::borrow::ToOwned;
+
 use heapless::String;
 use heapless::Vec;
 
@@ -11,6 +12,34 @@ use crate::board::keyboard::{ Keypad, KeyCode };
 use crate::enviroment::front_panel::FrontPanel;
 use crate::microcontroler::delay::delay_ms;
 use crate::microcontroler::timer::now;
+
+use avr_progmem::progmem_str as F;
+use avr_progmem::progmem;
+use avr_progmem::string::PmString;
+
+
+type Text = String<30>; // Dependeing on string size the memory can be exauhsted
+
+
+struct FlashString<'a, const N: usize> {
+    flash_ref: &'a PmString<N>,
+}
+
+impl<'a, const N: usize> FlashString<'a, N> {
+    fn new(flash_ref: &'a PmString<N>) -> Self {
+        Self {
+            flash_ref,
+        }
+    }
+
+    fn to_string(&self) -> Text {
+        let default = String::from("Loading Error");
+        let ram_loaded = self.flash_ref.load();
+        let str = &*ram_loaded;
+        Text::from_str(str).unwrap_or(default)
+    }
+}
+
 
 
 pub struct RectangularWave {
@@ -252,6 +281,13 @@ impl Canvas  {
         //lcd::print_char(char);
     }
 
+    fn print_flash_str<const SIZE: usize>(&mut self, prog_mem_pointer: &PmString<SIZE>) {
+        let s = FlashString::new(prog_mem_pointer);
+        for char in s.to_string().chars() {
+            self.print_char(char);
+        }
+    }
+
 
     fn set_cursor(&mut self, point: Point) {
         self.cursor_position.set_point(point);
@@ -323,8 +359,6 @@ impl Editable for EditMode {
         self.is_in_edit_mode
     }
 }
-
-type Text = String<40>;
 
 struct Caption {
     text: Text,
@@ -713,6 +747,12 @@ impl Widget for ClassicMenu {
 }
 
 
+struct Sized_<const N: usize> {
+    size: [u8;N],
+}
+
+
+
 
 pub fn development_entry_point() -> ! {
 
@@ -727,6 +767,27 @@ pub fn development_entry_point() -> ! {
     let mut keyboard = Keyboard::new(beep);
     let mut canvas = Canvas::new();
 
+    progmem! {
+        static progmem string S0 = "Posicao Inicial";
+        static progmem string S1 = "Posicao Final";
+        static progmem string S2 = "Velocidade de Avanco";
+        static progmem string S3 = "Velocidade de Retorno";
+        static progmem string S4 = "Aceleracao de Avanco";
+        static progmem string S5 = "Aceleracao de Retorno";
+    }
+
+    //lcd::print("Iniciado");
+    //let s0 = FlashString::new(&S0);
+    //for char in s0.to_string().chars() {
+    //    lcd::print_char(char);
+    //}
+    //
+    //canvas.print_flash_str(&S1);
+    //canvas.render();
+    //
+    //loop { }
+
+
     canvas.render();
     
     //widgets
@@ -734,13 +795,26 @@ pub fn development_entry_point() -> ! {
     let mut items: Vec<Text, 10> = Vec::new();
     let s0: Text = String::from_str("Posicao Inicial").unwrap_or(default.clone());
     let s1: Text = String::from_str("Posicao Final").unwrap_or(default.clone());
-    let s2: Text = String::from_str("Aceleracao de Avanco").unwrap_or(default.clone());
-    let s3: Text = String::from_str("Aceleracao de Retorno").unwrap_or(default.clone());
+    let s2: Text = String::from_str("Velocidade de Avanco").unwrap_or(default.clone());
+    let s3: Text = String::from_str("Velocidade de Retorno").unwrap_or(default.clone());
+    let s4: Text = String::from_str("Aceleracao de Avanco").unwrap_or(default.clone());
+    let s5: Text = String::from_str("Aceleracao de Retorno").unwrap_or(default.clone());
+    let s6: Text = String::from_str("Start automatico no avanco").unwrap_or(default.clone());
+    let s7: Text = String::from_str("Start automatico no retorno").unwrap_or(default.clone());
+    
     items.push(s0);
     items.push(s1);
     items.push(s2);
     items.push(s3);
-    
+    items.push(s4);
+    items.push(s5);
+    //items.push(s6); 
+    //items.push(s7);
+    //ATTENTION: Se eu liberar uma das duas linhas comentadas acima da um erro (provavelmente stackoverflow)
+    //A solucao é bolar uma forma de alocar todas estas strings na flash (progmem) e descarrega-las na ram lazelly
+    //conforme o uso. 
+
+
     
     let mut menu = ClassicMenu::new(items);
 

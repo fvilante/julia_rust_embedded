@@ -101,6 +101,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "avr-progmem"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d40dd576c3ebfdb9b2b0acd41787d2beb2dd77d1184077a13d8f6c79ab52aacf"
+dependencies = [
+ "cfg-if 1.0.0",
+ "ufmt",
+]
+
+[[package]]
 name = "avr-std-stub"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -120,6 +130,7 @@ version = "0.1.0"
 dependencies = [
  "arduino-hal",
  "avr-device",
+ "avr-progmem",
  "avr-std-stub",
  "embedded-hal",
  "heapless",
