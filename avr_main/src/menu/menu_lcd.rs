@@ -752,6 +752,12 @@ struct Sized_<const N: usize> {
 }
 
 
+fn print_flash_string<const N: usize>(flash_string: &FlashString<N>) {
+    let str: Text = flash_string.to_string();
+    for char in str.chars() {
+        lcd::print_char(char);
+    }
+}
 
 
 pub fn development_entry_point() -> ! {
@@ -776,16 +782,12 @@ pub fn development_entry_point() -> ! {
         static progmem string S5 = "Aceleracao de Retorno";
     }
 
-    //lcd::print("Iniciado");
-    //let s0 = FlashString::new(&S0);
-    //for char in s0.to_string().chars() {
-    //    lcd::print_char(char);
-    //}
-    //
-    //canvas.print_flash_str(&S1);
-    //canvas.render();
-    //
-    //loop { }
+    let s0_ = FlashString::new(&S0);
+    let s1_ = FlashString::new(&S1);
+    print_flash_string(&s0_);
+    lcd::print_u8_array(b" juca neles! ");
+    print_flash_string(&s1_);
+    loop { };
 
 
     canvas.render();

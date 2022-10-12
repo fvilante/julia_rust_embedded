@@ -179,10 +179,11 @@ pub fn print(text: &str) -> () {
 }
 
 // prints a full string
-pub fn print_u8_array(text: [u8;40]) -> () {
+pub fn print_u8_array<const N: usize>(text: &[u8; N]) -> () {
     for char in text {
-        if char > 0 {
-            write_u8(char);
+        let char_ = *char; // deref
+        if char_ > 0 {
+            write_u8(char_);
         }
     };
 }
