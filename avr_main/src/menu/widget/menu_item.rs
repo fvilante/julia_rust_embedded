@@ -7,12 +7,12 @@ use heapless::{
 };
 
 
-pub struct SubMenuItem {
+pub struct MenuItem {
     caption: Caption,
     field: Field,
 }
 
-impl SubMenuItem {
+impl MenuItem {
     /// NOTE: client should put point1 and point2 in the same line
     pub fn new(point1: Point, text: FlashString, point2: Point, array: String<10>) -> Self {
         Self {
@@ -26,7 +26,7 @@ impl SubMenuItem {
     }
 }
 
-impl Widget for SubMenuItem {
+impl Widget for MenuItem {
     fn send_key(&mut self, key: KeyCode) {
         self.field.send_key(key);
     }
@@ -42,7 +42,7 @@ impl Widget for SubMenuItem {
     }
 }
 
-impl Editable for SubMenuItem {
+impl Editable for MenuItem {
     fn set_edit_mode(&mut self, value: bool) {
         self.field.set_edit_mode(value);
     }

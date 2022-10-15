@@ -2,7 +2,7 @@ use avr_progmem::progmem;
 
 use crate::{menu::{flash::FlashString, point::Point, canvas::Canvas}, board::keyboard::KeyCode};
 
-use super::{cursor::Cursor, SubMenuItem, widget::Editable, Widget};
+use super::{cursor::Cursor, MenuItem, widget::Editable, Widget};
 
 use heapless::{
     String,
@@ -22,7 +22,7 @@ pub struct SubMenu {
     item_cursor: Cursor,
     display_cursor: Cursor,
     is_in_edit_mode: bool,
-    displayed_items: [SubMenuItem; 2],
+    displayed_items: [MenuItem; 2],
 }
 
 impl SubMenu {
@@ -37,8 +37,8 @@ impl SubMenu {
             display_cursor: Cursor::new(0..2), // number of lines in the display 
             is_in_edit_mode: false,
             displayed_items: [
-                SubMenuItem::new(Point::new(2,0), s1, Point::new(35,0), f1),
-                SubMenuItem::new(Point::new(2,1), s2, Point::new(34,1), f2),
+                MenuItem::new(Point::new(2,0), s1, Point::new(35,0), f1),
+                MenuItem::new(Point::new(2,1), s2, Point::new(34,1), f2),
             ]
         }
     }

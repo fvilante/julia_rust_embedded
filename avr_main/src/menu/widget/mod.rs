@@ -3,7 +3,7 @@ pub mod edit_mode;
 pub mod caption;
 pub mod field;
 mod cursor;
-pub mod submenu_item;
+pub mod menu_item;
 pub mod submenu;
 
 use crate::board::keyboard::KeyCode;
@@ -31,6 +31,6 @@ pub use widget::Widget;
 use widget::Editable;
 use edit_mode::EditMode;
 pub use caption::Caption;
-pub use submenu_item::SubMenuItem;
+pub use menu_item::MenuItem;
 pub use submenu::SubMenu;
 
