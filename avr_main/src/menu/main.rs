@@ -105,12 +105,13 @@ pub fn development_entry_point() -> ! {
             lcd::print(caption.as_str());
         },
         MenuItemParsed::CaptionWithOneField(first_caption, field_type, last_caption) => {
-            lcd::print("1-");
+            lcd::print("1-{");
             lcd::print(first_caption.as_str());
-            lcd::print("2-");
+            lcd::print("} 2-{");
             lcd::print(&field_type);
-            lcd::print("2-");
+            lcd::print("} 3-{");
             lcd::print(last_caption.as_str());
+            lcd::print("}");
         },
     }
   
