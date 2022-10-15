@@ -31,32 +31,6 @@ progmem! {
     static progmem string S6 = "Start Automatico no Avanco";
     static progmem string S7 = "Start Automatico no Retorno";
     //
-    static progmem string S8 = "b(8 )lablablalbblalblbalabbalbla";
-    static progmem string S9 = "b(9 )lablablalbblalblbalabbalbla";
-    static progmem string S10 = "(10)blablablalbblalblbalabbalbla";
-    static progmem string S11 = "(11)blablablalbblalblbalabbalbla";
-    static progmem string S12 = "(12)blablablalbblalblbalabbalbla";
-    static progmem string S13 = "(13)blablablalbblalblbalabbalbla";
-    static progmem string S14 = "(14)blablablalbblalblbalabbalbla";
-    static progmem string S15 = "(15)blablablalbblalblbalabbalbla";
-    static progmem string S16 = "(16)blablablalbblalblbalabbalbla";
-    static progmem string S17 = "(17)blablablalbblalblbalabbalbla";
-    static progmem string S18 = "(18)blablablalbblalblbalabbalbla";
-    static progmem string S19 = "(19)blablablalbblalblbalabbalbla";
-    static progmem string S20 = "(20)blablablalbblalblbalabbalbla";
-    static progmem string S21 = "(21)blablablalbblalblbalabbalbla";
-    static progmem string S22 = "(22)blablablalbblalblbalabbalbla";
-    static progmem string S23 = "(23)blablablalbblalblbalabbalbla";
-    static progmem string S24 = "(24)blablablalbblalblbalabbalbla";
-    static progmem string S25 = "(25)blablablalbblalblbalabbalbla";
-    static progmem string S26 = "(26)blablablalbblalblbalabbalbla";
-    static progmem string S27 = "(27)blablablalbblalblbalabbalbla";
-    static progmem string S28 = "(28)blablablalbblalblbalabbalbla";
-    static progmem string S29 = "(29)blablablalbblalblbalabbalbla";
-    static progmem string S30 = "(30)blablablalbblalblbalabbalbla";
-    static progmem string S31 = "(31)blablablalbblalblbalabbalbla";
-    static progmem string S32 = "(32)blablablalbblalblbalabbalbla";
-    //
     static progmem string NOP1 = "nop1";
     static progmem string NOP2 = "nop2";
     static progmem string NAO_IDENTIFICADO = "Nao identificado";
@@ -658,12 +632,12 @@ impl Editable for Field {
 }
 
 
-struct MenuItem {
+struct SubMenuItem {
     caption: Caption,
     field: Field,
 }
 
-impl MenuItem {
+impl SubMenuItem {
     /// NOTE: client should put point1 and point2 in the same line
     fn new(point1: Point, text: FlashString, point2: Point, array: String<10>) -> Self {
         Self {
@@ -677,7 +651,7 @@ impl MenuItem {
     }
 }
 
-impl Widget for MenuItem {
+impl Widget for SubMenuItem {
     fn send_key(&mut self, key: KeyCode) {
         self.field.send_key(key);
     }
@@ -693,7 +667,7 @@ impl Widget for MenuItem {
     }
 }
 
-impl Editable for MenuItem {
+impl Editable for SubMenuItem {
     fn set_edit_mode(&mut self, value: bool) {
         self.field.set_edit_mode(value);
     }
@@ -703,15 +677,15 @@ impl Editable for MenuItem {
     }
 }
 
-struct ClassicMenu {
+struct SubMenu {
     items: Vec<FlashString, 35>,
     item_cursor: Cursor,
     display_cursor: Cursor,
     is_in_edit_mode: bool,
-    displayed_items: [MenuItem; 2],
+    displayed_items: [SubMenuItem; 2],
 }
 
-impl ClassicMenu {
+impl SubMenu {
     fn new(items: Vec<FlashString, 35>) -> Self {
         let s1 = FlashString::new(&NOP1);
         let s2 = FlashString::new(&NOP2);
@@ -723,14 +697,14 @@ impl ClassicMenu {
             display_cursor: Cursor::new(0..2), // number of lines in the display 
             is_in_edit_mode: false,
             displayed_items: [
-                MenuItem::new(Point::new(2,0), s1, Point::new(35,0), f1),
-                MenuItem::new(Point::new(2,1), s2, Point::new(34,1), f2),
+                SubMenuItem::new(Point::new(2,0), s1, Point::new(35,0), f1),
+                SubMenuItem::new(Point::new(2,1), s2, Point::new(34,1), f2),
             ]
         }
     }
 }
 
-impl Editable for ClassicMenu {
+impl Editable for SubMenu {
     fn set_edit_mode(&mut self, value: bool) {
         self.is_in_edit_mode = value;
     }
@@ -740,7 +714,7 @@ impl Editable for ClassicMenu {
     }
 }
 
-impl Widget for ClassicMenu {
+impl Widget for SubMenu {
     fn send_key(&mut self, key: KeyCode) {
         match key {
             KeyCode::KEY_DIRECIONAL_PARA_CIMA => {
@@ -836,47 +810,8 @@ pub fn development_entry_point() -> ! {
     items.push(FlashString::new(&S1));
     items.push(FlashString::new(&S2));
     items.push(FlashString::new(&S3));
-    items.push(FlashString::new(&S4));
-    items.push(FlashString::new(&S5));
-    items.push(FlashString::new(&S6));
-    items.push(FlashString::new(&S7));
-    items.push(FlashString::new(&S8));
-    items.push(FlashString::new(&S9));
-    items.push(FlashString::new(&S10));
-    items.push(FlashString::new(&S11));
-    items.push(FlashString::new(&S12));
-    items.push(FlashString::new(&S13));
-    items.push(FlashString::new(&S14));
-    items.push(FlashString::new(&S15));
-    items.push(FlashString::new(&S16));
-    items.push(FlashString::new(&S17));
-    items.push(FlashString::new(&S18));
-    items.push(FlashString::new(&S19));
-    items.push(FlashString::new(&S20));
-    items.push(FlashString::new(&S21));
-    items.push(FlashString::new(&S22));
-    items.push(FlashString::new(&S23));
-    items.push(FlashString::new(&S24));
-    items.push(FlashString::new(&S25));
-    items.push(FlashString::new(&S26));
-    items.push(FlashString::new(&S27));
-    items.push(FlashString::new(&S28));
-    items.push(FlashString::new(&S29));
-    items.push(FlashString::new(&S30));
-    items.push(FlashString::new(&S31));
-    items.push(FlashString::new(&S32));
-    //items.push(S3);
-    //items.push(S4);
-    //items.push(S5);
-    //items.push(s6); 
-    //items.push(s7);
-    //ATTENTION: Se eu liberar uma das duas linhas comentadas acima da um erro (provavelmente stackoverflow)
-    //A solucao é bolar uma forma de alocar todas estas strings na flash (progmem) e descarrega-las na ram lazelly
-    //conforme o uso. 
-
-
     
-    let mut menu = ClassicMenu::new(items);
+    let mut menu = SubMenu::new(items);
 
     canvas.clear();
 
