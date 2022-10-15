@@ -1,6 +1,6 @@
 use crate::{menu::{flash::FlashString, point::Point, canvas::Canvas}, board::keyboard::KeyCode};
 
-use super::Widget;
+use super::widget::Widget;
 
 
 pub struct Caption {

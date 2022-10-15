@@ -2,7 +2,7 @@ use avr_progmem::progmem;
 
 use crate::{menu::{flash::FlashString, point::Point, canvas::Canvas}, board::keyboard::KeyCode};
 
-use super::{cursor::Cursor, MenuItem, widget::Editable, Widget};
+use super::{cursor::Cursor, menu_item::MenuItem, widget::Editable, widget::Widget};
 
 use heapless::{
     String,

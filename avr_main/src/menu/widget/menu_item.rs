@@ -1,6 +1,6 @@
 use crate::{menu::{point::Point, flash::FlashString, canvas::Canvas}, board::keyboard::KeyCode};
 
-use super::{Caption, field::Field, Widget, widget::Editable};
+use super::{caption::Caption, field::Field, widget::Widget, widget::Editable};
 
 use heapless::{
     String,

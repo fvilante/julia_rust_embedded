@@ -7,7 +7,7 @@ use heapless::{
 
 use crate::{menu::{point::Point, ratangular_wave::RectangularWave, canvas::Canvas}, board::keyboard::KeyCode};
 
-use super::{edit_mode::EditMode, Widget, widget::Editable, cursor::Cursor};
+use super::{edit_mode::EditMode, widget::Widget, widget::Editable, cursor::Cursor};
 
 
 

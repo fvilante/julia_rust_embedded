@@ -7,8 +7,8 @@ use crate::enviroment::front_panel::FrontPanel;
 use super::flash::FlashString;
 use super::keyboard::Keyboard;
 use super::canvas::Canvas;
-use super::widget::SubMenu;
-use crate::menu::widget::Widget;
+use super::widget::submenu::SubMenu;
+use crate::menu::widget::widget::Widget;
 
 
 // Load Some Flash strings
