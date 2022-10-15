@@ -13,7 +13,7 @@ use crate::menu::widget::Widget;
 
 // Load Some Flash strings
 use core::include;
-include!("classic_ttc_strings.rs");
+include!("ttc3100_strings.rs");
 
 
 pub fn development_entry_point() -> ! {
