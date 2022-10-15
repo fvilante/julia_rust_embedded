@@ -167,8 +167,8 @@ pub fn print_u16_in_hex(value: u16) -> () {
 }
 
 // print just one byte
-pub fn print_char(value: char) -> () {
-    write_u8(value as u8);
+pub fn print_char(char: char) -> () {
+    write_u8(char as u8);
 }
 
 // prints a full string
