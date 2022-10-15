@@ -1,4 +1,4 @@
-pub mod menu_lcd;
+pub mod main;
 pub mod flash;
 pub mod keyboard;
 pub mod point;

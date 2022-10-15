@@ -1,11 +1,11 @@
-use crate::{menu::{point::Point, flash::FlashString, canvas::Canvas}, board::keyboard::KeyCode};
-
-use super::{caption::Caption, field::Field, widget::Widget, widget::Editable};
-
-use heapless::{
-    String,
+use crate::{
+    board::keyboard::KeyCode,
+    menu::{canvas::Canvas, flash::FlashString, point::Point},
 };
 
+use super::{caption::Caption, field::Field, widget::Editable, widget::Widget};
+
+use heapless::String;
 
 pub struct MenuItem {
     caption: Caption,

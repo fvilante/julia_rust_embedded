@@ -39,7 +39,7 @@ fn main() -> ! {
     //
 
     //crate::enviroment::front_panel::development_entry_point();
-    menu::menu_lcd::development_entry_point()
+    menu::main::development_entry_point()
 
     //loop {
 
