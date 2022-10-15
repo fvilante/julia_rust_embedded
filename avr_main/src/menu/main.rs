@@ -7,6 +7,7 @@ use crate::enviroment::front_panel::FrontPanel;
 use super::flash::FlashString;
 use super::keyboard::Keyboard;
 use super::canvas::Canvas;
+use super::widget::submenu::Items;
 use super::widget::submenu::SubMenu;
 use crate::menu::widget::widget::Widget;
 
@@ -32,7 +33,7 @@ pub fn development_entry_point() -> ! {
     canvas.render();
     
     //widgets
-    let mut items: Vec<FlashString, 35> = Vec::new();
+    let mut items: Items = Vec::new();
 
     items.push(FlashString::new(&S0));
     items.push(FlashString::new(&S1));

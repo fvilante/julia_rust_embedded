@@ -3,7 +3,7 @@ use crate::{
     menu::{canvas::Canvas, flash::FlashString, point::Point},
 };
 
-use super::{caption::Caption, field::Field, widget::Editable, widget::Widget};
+use super::{caption::Caption, field::{Field, FieldBuffer}, widget::Editable, widget::Widget};
 
 use heapless::String;
 
@@ -14,7 +14,7 @@ pub struct MenuItem {
 
 impl MenuItem {
     /// NOTE: client should put point1 and point2 in the same line
-    pub fn new(point1: Point, text: FlashString, point2: Point, array: String<10>) -> Self {
+    pub fn new(point1: Point, text: FlashString, point2: Point, array: FieldBuffer) -> Self {
         Self {
             caption: Caption::new(point1, text),
             field: Field::new(point2, array),

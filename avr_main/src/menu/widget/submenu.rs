@@ -15,18 +15,21 @@ progmem! {
     static progmem string NAO_IDENTIFICADO = "Nao identificado";
 }
 
+const MAX_ITEMS_PER_SUB_MENU: usize = 12; 
+const NUMBER_OF_ROWS_IN_SUBMENU: usize = 2;
 
+pub type Items = Vec<FlashString, MAX_ITEMS_PER_SUB_MENU>;
 
 pub struct SubMenu {
-    items: Vec<FlashString, 35>,
+    items: Items,
     item_cursor: Cursor,
     display_cursor: Cursor,
     is_in_edit_mode: bool,
-    displayed_items: [MenuItem; 2],
+    displayed_items: [MenuItem; NUMBER_OF_ROWS_IN_SUBMENU],
 }
 
 impl SubMenu {
-    pub fn new(items: Vec<FlashString, 35>) -> Self {
+    pub fn new(items: Items) -> Self {
         let s1 = FlashString::new(&NOP1);
         let s2 = FlashString::new(&NOP2);
         let f1: String<10> = String::from("0000");
