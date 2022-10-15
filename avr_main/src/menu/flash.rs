@@ -1,8 +1,12 @@
 
 
+use core::str::FromStr;
+
+use alloc::borrow::ToOwned;
 use avr_progmem::wrapper::ProgMem;
 
 use avr_progmem::string::PmString;
+use heapless::String;
 
 #[derive(Copy,Clone)]
 pub struct FlashString {
@@ -22,6 +26,19 @@ impl FlashString {
     pub fn chars(self) -> FlashStringIterator {
         FlashStringIterator { flash_string: (self), counter: (0) }
     }
+
+    pub fn to_string<const T: usize>(&self) -> Option<String<T>> {
+        let mut s: String<T> = String::new();
+        if s.capacity() < self.size_N as usize {
+            return None;
+        } else {
+            for byte in self.chars() {
+                s.push(byte as char);
+            }
+            return Some(s.to_owned());
+        };
+        
+    } 
 }
 
 pub struct FlashStringIterator {
