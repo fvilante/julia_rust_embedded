@@ -21,7 +21,18 @@ use avr_progmem::progmem;
 
 progmem! {
 
-    static progmem string T0 = "Posicao inicial     ${nnnnn} mm/s";
+                              //123456789012345678901234567890123456789 -> 39 characters   
+    static progmem string T0 = "Posicao inicial             ${nnnnn} mm";
+    static progmem string T1 = "Posicao final               ${nnnnn} mm";
+    static progmem string T2 = "Velocidade de avanco      ${nnnnn} mm/s";
+    static progmem string T3 = "Velocidade de retorno     ${nnnnn} mm/s";
+    static progmem string T4 = "Aceleracao de avanco     ${nnnnn} mm/s2";
+    static progmem string T5 = "Aceleracao de reto       ${nnnnn} mm/s2";
+    static progmem string T6 = "Numero de mensagens no avanco     ${nn}";
+    static progmem string T7 = "Numero de mensagens no retorno    ${nn}";
+    static progmem string T8 = "Modo continuo ou passo-a-passo [${alt1}]";
+    static progmem string T9 = "Logica do start externo        [${alt2}]";
+
 
     static progmem string E0 = "Erro de carga de parametro";
     static progmem string S0 = "Posicao Inicial";
@@ -67,14 +78,12 @@ fn parse_menu_item_constructor_string(declaration: FlashString) -> MenuItemParse
                         String::from_str(last_caption).unwrap(),
                     )
                 }
-
                 None => {
                     //false open, everything is caption
                     let caption = s.as_str();
                     MenuItemParsed::PureCaption(String::from_str(caption).unwrap())
                 }
             }
-            
         }
 
         None => {
