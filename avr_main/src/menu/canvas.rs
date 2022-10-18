@@ -1,5 +1,5 @@
 use crate::board::lcd;
-use super::point::Point;
+use super::{point::Point, flash::FlashString};
 
 
 struct CursorPosition { 
@@ -77,13 +77,11 @@ impl Canvas  {
         //lcd::print_char(char);
     }
 
-    //fn print_flash_str<const SIZE: usize>(&mut self, prog_mem_pointer: &PmString<SIZE>) {
-    //    let s = FlashString::new(prog_mem_pointer);
-    //    for char in s.to_string().chars() {
-    //        self.print_char(char);
-    //    }
-    //}
-
+    pub fn print_flash_str(&mut self, flash_string: FlashString) {
+        for char in flash_string.chars() {
+            self.print_char(char as char);
+        }
+    }
 
     pub fn set_cursor(&mut self, point: Point) {
         self.cursor_position.set_point(point);

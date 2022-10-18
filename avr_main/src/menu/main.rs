@@ -12,6 +12,7 @@ use super::widget::caption::Caption;
 use super::widget::field::Field;
 use super::widget::menu_item::MenuItemParsed;
 use super::widget::menu_item::parse_menu_item_constructor_string;
+use super::widget::splash::Splash;
 use super::widget::submenu::Items;
 use super::widget::submenu::SubMenu;
 use crate::menu::widget::widget::Widget;
@@ -49,49 +50,37 @@ progmem! {
     static progmem string ERRO_01 = "Erro de construcao de string";
 }
 
-
-
 pub fn development_entry_point() -> ! {
 
+    // initialization
     lcd::lcd_initialize();
-
-    //temp
     let mut output_expander = OutputExpander::new();
     let _front_panel = FrontPanel::new(&mut output_expander).reset();
-
-    // initialization
     let beep = |on:bool| { OutputExpander::new().BUZZER(on).commit(); };
     let mut keyboard = Keyboard::new(beep);
-  
-    let parsed = parse_menu_item_constructor_string(FlashString::new(&T0));
-    match parsed {
-        MenuItemParsed::PureCaption(caption) => {
-            lcd::print(caption.as_str());
-        },
-        MenuItemParsed::CaptionWithOneField(first_caption, field_type, last_caption) => {
-            lcd::print("1-{");
-            lcd::print(first_caption.as_str());
-            lcd::print("} 2-{");
-            lcd::print(&field_type);
-            lcd::print("} 3-{");
-            lcd::print(last_caption.as_str());
-            lcd::print("}");
-        },
-    }
-  
-    loop { }
-
     let mut canvas = Canvas::new();
     canvas.render();  
     
-    //widgets
-    let mut items: Items = Vec::new();
+    //splash
+    let mut splash = Splash::new(4500);
+    loop {
+        if let Some(key) = keyboard.get_key() {
+            splash.send_key(key);
+        }
+        splash.update();
+        splash.draw(&mut canvas);
+        if splash.isRunningYet == false {
+            break;
+        }
+        canvas.render();
+    }
 
+    //submenu
+    let mut items: Items = Vec::new();
     items.push(FlashString::new(&S0));
     items.push(FlashString::new(&S1));
     items.push(FlashString::new(&S2));
     items.push(FlashString::new(&S3));
-    
     let mut menu = SubMenu::new(items);
 
     canvas.clear();

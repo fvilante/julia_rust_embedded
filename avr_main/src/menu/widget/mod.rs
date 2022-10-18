@@ -5,6 +5,7 @@ pub mod field;
 mod cursor;
 pub mod menu_item;
 pub mod submenu;
+pub mod splash;
 
 use crate::board::keyboard::KeyCode;
 use crate::alloc::borrow::ToOwned;

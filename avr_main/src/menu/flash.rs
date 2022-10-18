@@ -10,8 +10,8 @@ use heapless::String;
 
 #[derive(Copy,Clone)]
 pub struct FlashString {
-    pub(crate) flash_ptr: *const u8,
-    pub(crate) size_N: u8, // size in quantity of u8's
+    flash_ptr: *const u8,
+    size_N: u8, // size in quantity of u8's
 }
 
 impl FlashString {
@@ -25,6 +25,10 @@ impl FlashString {
 
     pub fn chars(self) -> FlashStringIterator {
         FlashStringIterator { flash_string: (self), counter: (0) }
+    }
+
+    pub fn len(&self) -> usize {
+        self.size_N as usize
     }
 
     pub fn to_string<const T: usize>(&self) -> Option<String<T>> {

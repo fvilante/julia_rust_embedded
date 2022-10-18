@@ -138,7 +138,8 @@ impl ClockCounter {
     }
 }
 
-
+// expected one tick every 1 milisec. NOTE: Period may change in future implementations.
+// this implemantation is to be considered an initial version.
 pub fn now() -> u64 {
     let state = unsafe {
         &mut *INTERRUPT_STATE.as_mut_ptr()
