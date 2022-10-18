@@ -7,6 +7,7 @@ pub mod menu_item;
 pub mod submenu;
 pub mod splash;
 pub mod main_menu;
+pub mod execucao;
 
 use crate::board::keyboard::KeyCode;
 use crate::alloc::borrow::ToOwned;

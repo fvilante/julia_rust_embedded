@@ -9,8 +9,11 @@ use super::flash::FlashString;
 use super::keyboard::Keyboard;
 use super::canvas::Canvas;
 use super::widget::caption::Caption;
+use super::widget::execucao;
+use super::widget::execucao::Execucao;
 use super::widget::field::Field;
 use super::widget::main_menu::MainMenu;
+use super::widget::main_menu::State;
 use super::widget::menu_item::MenuItemParsed;
 use super::widget::menu_item::parse_menu_item_constructor_string;
 use super::widget::splash::Splash;
@@ -81,12 +84,37 @@ pub fn development_entry_point() -> ! {
 
     //main menu
     let mut main_menu = MainMenu::new();
+    let mut execucao = Execucao::new();
+    execucao.is_running = true;
     loop {
-        if let Some(key) = keyboard.get_key() {
-            main_menu.send_key(key);
+        let current_state = main_menu.current_state;
+        match  current_state {
+            State::IDLE => {
+                if let Some(key) = keyboard.get_key() {
+                    main_menu.send_key(key);
+                }
+                main_menu.update();
+                main_menu.draw(&mut canvas);
+            }
+
+            State::EXECUCAO => {
+                if execucao.is_running {
+                    if let Some(key) = keyboard.get_key() {
+                        execucao.send_key(key);
+                    }
+                    execucao.update();
+                    execucao.draw(&mut canvas);
+                } else {
+                    main_menu.current_state = State::IDLE;
+                    execucao.is_running = true;
+                }
+            }
+
+            _ => {
+                canvas.clear();
+            }
         }
-        main_menu.update();
-        main_menu.draw(&mut canvas);
+
         canvas.render();
     }
 

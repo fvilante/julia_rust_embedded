@@ -1,32 +1,25 @@
+//menu "execucao"
+
 use avr_progmem::progmem;
 
 use crate::{board::keyboard::KeyCode, menu::{point::Point, flash::FlashString}};
 
 use super::widget::Widget;
 
-
 progmem! {
     //                             1234567890123456789012345678901234567890
-    static progmem string LINE0 = "Selecione modo de programacao desejado";
-    static progmem string LINE1 = "MANUAL    EXECUCAO    PROGRAMA";
+    static progmem string LINE0 = "Posicao atual:";
+    static progmem string LINE1 = "X=${nnnn}    Y=${nnnn}";
 }
 
-#[derive(PartialEq, Clone, Copy)]
-pub enum State {
-    IDLE,
-    MANUAL,
-    EXECUCAO,
-    PROGRAMA,
+pub struct Execucao {
+    pub is_running: bool,
 }
 
-pub struct MainMenu {
-    pub current_state: State,
-}
-
-impl MainMenu {
+impl Execucao {
     pub fn new() -> Self {
         Self {
-            current_state: State::IDLE,
+            is_running: false,
         }
     }
 
@@ -43,23 +36,14 @@ impl MainMenu {
     }
 }
 
-impl Widget for MainMenu {
-    
+impl Widget for Execucao {
     fn send_key(&mut self, key: crate::board::keyboard::KeyCode) {
         match key {
-            KeyCode::KEY_MANUAL => {
-                self.current_state = State::MANUAL;
+            KeyCode::KEY_ESC => {
+                self.is_running = false;
             }
 
-            KeyCode::KEY_EXECUCAO => {
-                self.current_state = State::EXECUCAO;
-            }
-
-            KeyCode::KEY_PROGRAMA => {
-                self.current_state = State::PROGRAMA;
-            }
-
-            _ => {
+            _ => { 
 
             }
         }
@@ -70,7 +54,7 @@ impl Widget for MainMenu {
     }
 
     fn draw(&self, canvas: &mut crate::menu::canvas::Canvas) {
-        if self.current_state == State::IDLE {
+        if self.is_running {
             canvas.clear();
             for line_number in 0..2 {
                 let ( point, flash_string ) = Self::get_line_helper(line_number);
@@ -78,7 +62,7 @@ impl Widget for MainMenu {
                 canvas.print_flash_str(flash_string);
             }
         } else {
-            //canvas.clear();
+
         }
         
     }
