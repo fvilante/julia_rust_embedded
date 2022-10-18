@@ -90,21 +90,28 @@ pub fn development_entry_point() -> ! {
     //main menu
     let mut manual_mode = ManualMode::new();
     let mut current_state: State = State::MAIN_MENU;
+    //submenu 'Programa'
+    let mut items: Items = Vec::new();
+    items.push(FlashString::new(&S0));
+    items.push(FlashString::new(&S1));
+    items.push(FlashString::new(&S2));
+    items.push(FlashString::new(&S3));
+    let mut menu = SubMenu::new(items);
+    // main loop
     loop {
         match  current_state {
+
             State::MAIN_MENU => {
+
                 MainMenu::draw(&mut canvas);
                 if let Some(key) = keyboard.get_key() {
                     match key {
                         KeyCode::KEY_MANUAL => current_state = State::MANUAL,
                         KeyCode::KEY_EXECUCAO => current_state = State::EXECUCAO,
                         KeyCode::KEY_PROGRAMA => current_state = State::PROGRAMA,
-                        _ => {
-            
-                        }
+                        _ => { }
                     }
                 }
-                
             }
 
             State::EXECUCAO => {
@@ -120,6 +127,7 @@ pub fn development_entry_point() -> ! {
             }
 
             State::MANUAL => {
+
                 if let Some(key) = keyboard.get_key() {
                     manual_mode.send_key(key)
                 }
@@ -127,48 +135,23 @@ pub fn development_entry_point() -> ! {
                     manual_mode.current_state = ManualModeState::FIRST_SCREEN;
                     current_state = State::MAIN_MENU;
                 }
-                manual_mode.draw(&mut canvas);              
+                manual_mode.draw(&mut canvas); 
+
             }
 
-            _ => {
-                canvas.clear();
+            State::PROGRAMA => {
+                
+                if let Some(key) = keyboard.get_key() {
+                    menu.send_key(key);
+                }
+                menu.update();
+                menu.draw(&mut canvas);
+
             }
         }
 
         canvas.render();
     }
 
-    //submenu
-    let mut items: Items = Vec::new();
-    items.push(FlashString::new(&S0));
-    items.push(FlashString::new(&S1));
-    items.push(FlashString::new(&S2));
-    items.push(FlashString::new(&S3));
-    let mut menu = SubMenu::new(items);
-
-    canvas.clear();
-
-    let mut c:u16=0;
-
-    loop { 
-        //c += 1;
-        //lcd::clear();
-        //lcd::print_u16_in_hex(c);
-        //loop { }
-        // scan: read one key on keyboard
-        // update: send key to the Field
-        if let Some(key) = keyboard.get_key() {
-            menu.send_key(key);
-        }
-
-  
-        // draw: draw the Field
-        canvas.render();
-
-        
-        // update & draw
-        menu.update();
-      
-        menu.draw(&mut canvas);
-    }
+    
 }
