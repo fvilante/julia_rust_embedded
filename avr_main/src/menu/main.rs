@@ -5,6 +5,7 @@ use crate::board::output_expander::OutputExpander;
 use crate::board::{lcd, output_expander};
 use crate::board::keyboard::KeyCode;
 use crate::enviroment::front_panel::FrontPanel;
+use super::database::DataBase;
 use super::flash::FlashString;
 use super::keyboard::Keyboard;
 use super::canvas::Canvas;
@@ -141,6 +142,13 @@ pub fn development_entry_point() -> ! {
 
             State::PROGRAMA => {
                 
+                lcd::clear();
+                let mut database = DataBase::new();
+                database.parameter_03().set(12);
+                let x = database.parameter_03().get();
+                lcd::print_u16_in_hex(x);
+                loop { }
+
                 if let Some(key) = keyboard.get_key() {
                     menu.send_key(key);
                 }
