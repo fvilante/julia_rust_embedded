@@ -13,22 +13,15 @@ progmem! {
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum State {
-    IDLE,
+    MAIN_MENU,
     MANUAL,
     EXECUCAO,
     PROGRAMA,
 }
 
-pub struct MainMenu {
-    pub current_state: State,
-}
+pub struct MainMenu;
 
 impl MainMenu {
-    pub fn new() -> Self {
-        Self {
-            current_state: State::IDLE,
-        }
-    }
 
     fn get_line_helper(line_number: u8) -> (Point, FlashString) {
         let line0 = FlashString::new(&LINE0);
@@ -41,45 +34,13 @@ impl MainMenu {
             (Point::new(col1,1), line1)
         }
     }
-}
 
-impl Widget for MainMenu {
-    
-    fn send_key(&mut self, key: crate::board::keyboard::KeyCode) {
-        match key {
-            KeyCode::KEY_MANUAL => {
-                self.current_state = State::MANUAL;
-            }
-
-            KeyCode::KEY_EXECUCAO => {
-                self.current_state = State::EXECUCAO;
-            }
-
-            KeyCode::KEY_PROGRAMA => {
-                self.current_state = State::PROGRAMA;
-            }
-
-            _ => {
-
-            }
+    pub fn draw(canvas: &mut crate::menu::canvas::Canvas) {
+        canvas.clear();
+        for line_number in 0..2 {
+            let ( point, flash_string ) = Self::get_line_helper(line_number);
+            canvas.set_cursor(point);
+            canvas.print_flash_str(flash_string);
         }
-    }
-
-    fn update(&mut self) {
-        
-    }
-
-    fn draw(&self, canvas: &mut crate::menu::canvas::Canvas) {
-        if self.current_state == State::IDLE {
-            canvas.clear();
-            for line_number in 0..2 {
-                let ( point, flash_string ) = Self::get_line_helper(line_number);
-                canvas.set_cursor(point);
-                canvas.print_flash_str(flash_string);
-            }
-        } else {
-            //canvas.clear();
-        }
-        
     }
 }

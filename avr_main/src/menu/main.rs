@@ -12,8 +12,11 @@ use super::widget::caption::Caption;
 use super::widget::execucao;
 use super::widget::execucao::Execucao;
 use super::widget::field::Field;
+use super::widget::main_menu;
 use super::widget::main_menu::MainMenu;
 use super::widget::main_menu::State;
+use super::widget::manual_mode::ManualMode;
+use super::widget::manual_mode::ManualModeState;
 use super::widget::menu_item::MenuItemParsed;
 use super::widget::menu_item::parse_menu_item_constructor_string;
 use super::widget::splash::Splash;
@@ -82,32 +85,49 @@ pub fn development_entry_point() -> ! {
         canvas.render();
     }
 
+    
+
     //main menu
-    let mut main_menu = MainMenu::new();
-    let mut execucao = Execucao::new();
-    execucao.is_running = true;
+    let mut manual_mode = ManualMode::new();
+    let mut current_state: State = State::MAIN_MENU;
     loop {
-        let current_state = main_menu.current_state;
         match  current_state {
-            State::IDLE => {
+            State::MAIN_MENU => {
+                MainMenu::draw(&mut canvas);
                 if let Some(key) = keyboard.get_key() {
-                    main_menu.send_key(key);
+                    match key {
+                        KeyCode::KEY_MANUAL => current_state = State::MANUAL,
+                        KeyCode::KEY_EXECUCAO => current_state = State::EXECUCAO,
+                        KeyCode::KEY_PROGRAMA => current_state = State::PROGRAMA,
+                        _ => {
+            
+                        }
+                    }
                 }
-                main_menu.update();
-                main_menu.draw(&mut canvas);
+                
             }
 
             State::EXECUCAO => {
-                if execucao.is_running {
-                    if let Some(key) = keyboard.get_key() {
-                        execucao.send_key(key);
+                
+                if let Some(key) = keyboard.get_key() {
+                    if key == KeyCode::KEY_ESC {
+                        current_state = State::MAIN_MENU;
+                    } else {
+                        // do nothing
                     }
-                    execucao.update();
-                    execucao.draw(&mut canvas);
-                } else {
-                    main_menu.current_state = State::IDLE;
-                    execucao.is_running = true;
                 }
+                Execucao::draw(&mut canvas);               
+            }
+
+            State::MANUAL => {
+                if let Some(key) = keyboard.get_key() {
+                    manual_mode.send_key(key)
+                }
+                if manual_mode.current_state == ManualModeState::DISABLED {
+                    manual_mode.current_state = ManualModeState::FIRST_SCREEN;
+                    current_state = State::MAIN_MENU;
+                }
+                manual_mode.draw(&mut canvas);              
             }
 
             _ => {
