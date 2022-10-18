@@ -10,6 +10,7 @@ use super::keyboard::Keyboard;
 use super::canvas::Canvas;
 use super::widget::caption::Caption;
 use super::widget::field::Field;
+use super::widget::main_menu::MainMenu;
 use super::widget::menu_item::MenuItemParsed;
 use super::widget::menu_item::parse_menu_item_constructor_string;
 use super::widget::splash::Splash;
@@ -50,6 +51,9 @@ progmem! {
     static progmem string ERRO_01 = "Erro de construcao de string";
 }
 
+
+
+
 pub fn development_entry_point() -> ! {
 
     // initialization
@@ -72,6 +76,17 @@ pub fn development_entry_point() -> ! {
         if splash.isRunningYet == false {
             break;
         }
+        canvas.render();
+    }
+
+    //main menu
+    let mut main_menu = MainMenu::new();
+    loop {
+        if let Some(key) = keyboard.get_key() {
+            main_menu.send_key(key);
+        }
+        main_menu.update();
+        main_menu.draw(&mut canvas);
         canvas.render();
     }
 
