@@ -103,37 +103,3 @@ pub fn parse_menu_item_constructor_string(declaration: FlashString) -> MenuItemP
     }
 }
 
-// new implementation from a more complex constructor
-
-
-
-trait Acessor<T> {
-    fn set(value: T);
-    fn get() -> T; 
-}
-
-pub struct ItemConstructor {
-    string_constructor: FlashString
-}
-
-impl ItemConstructor {
-     
-}
-
-
-pub struct MenuItem2 {
-
-}
-
-impl MenuItem2 {
-    pub fn new(constructor_string: FlashString)  {
-
-    }
-
-    pub fn send_key(key: KeyCode) {
-
-    }
-
-
-
-}
