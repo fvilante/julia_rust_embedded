@@ -1,3 +1,5 @@
+use heapless::String;
+
 use crate::board::lcd;
 use super::{point::Point, flash::FlashString};
 
@@ -92,6 +94,13 @@ impl Canvas  {
         self.screen_buffer_input = [' ' as u8; 80];
         self.cursor_position.set_point(Point::new(0,0));
         //lcd::clear();
+    }
+
+    // Attention: this function is designed to be used with 'String' from the 'heapless' library
+    pub fn print_string<const N: usize>(&mut self, string: String<N>) {
+        for char in string.chars() {
+            self.print_char(char);
+        }
     }
 
     // output part
