@@ -1,3 +1,5 @@
+use core::str::FromStr;
+
 use alloc::string::ToString;
 use heapless::String;
 use heapless::Vec;
@@ -10,15 +12,19 @@ use super::database::DataBase;
 use super::flash::FlashString;
 use super::keyboard::Keyboard;
 use super::canvas::Canvas;
+use super::point::Point;
 use super::widget::caption::Caption;
 use super::widget::execucao;
 use super::widget::execucao::Execucao;
 use super::widget::field::Field;
+use super::widget::field::FieldBuffer;
 use super::widget::main_menu;
 use super::widget::main_menu::MainMenu;
 use super::widget::main_menu::State;
 use super::widget::manual_mode::ManualMode;
 use super::widget::manual_mode::ManualModeState;
+use super::widget::menu_item;
+use super::widget::menu_item::MenuItem;
 use super::widget::menu_item::MenuItemParsed;
 use super::widget::menu_item::parse_menu_item_constructor_string;
 use super::widget::splash::Splash;
@@ -72,6 +78,24 @@ pub fn development_entry_point() -> ! {
     let mut keyboard = Keyboard::new(beep);
     let mut canvas = Canvas::new();
     canvas.render();  
+
+    let point1 = Point::new(0,0);
+    let point2 = Point::new(30,0);
+    let text: FlashString = FlashString::new(&S0);
+    let array: FieldBuffer = String::from_str("0000").unwrap();
+
+    let mut menu_item = MenuItem::new(point1, text, point2, array);
+    menu_item.set_edit_mode(true);
+    loop { 
+        if let Some(key) = keyboard.get_key() {
+            menu_item.send_key(key);
+        }
+        menu_item.update();
+        menu_item.draw(& mut canvas);
+        canvas.render();
+    }
+
+
     
     //splash
     let mut splash = Splash::new(4500);

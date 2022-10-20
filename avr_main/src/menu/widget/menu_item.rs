@@ -1,5 +1,5 @@
 use crate::{
-    board::keyboard::KeyCode,
+    board::{keyboard::KeyCode, lcd},
     menu::{canvas::Canvas, flash::FlashString, point::Point},
 };
 
@@ -27,28 +27,28 @@ impl MenuItem {
     }
 }
 
-impl Widget for MenuItem {
-    fn send_key(&mut self, key: KeyCode) {
+impl MenuItem {
+    pub fn send_key(&mut self, key: KeyCode) {
         self.field.send_key(key);
     }
 
-    fn update(&mut self) {
+    pub fn update(&mut self) {
         self.caption.update();
         self.field.update();
     }
 
-    fn draw(&self, canvas: &mut Canvas) {
+    pub fn draw(&self, canvas: &mut Canvas) {
         self.caption.draw(canvas);
         self.field.draw(canvas);
     }
 }
 
-impl Editable for MenuItem {
-    fn set_edit_mode(&mut self, value: bool) {
+impl MenuItem {
+    pub fn set_edit_mode(&mut self, value: bool) {
         self.field.set_edit_mode(value);
     }
 
-    fn is_in_edit_mode(&self) -> bool {
+    pub fn is_in_edit_mode(&self) -> bool {
         self.field.is_in_edit_mode()
     }
 }

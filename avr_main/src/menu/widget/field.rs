@@ -74,20 +74,24 @@ impl BufferedCursor {
 
 }
 
+//Make possible to edit a position of memory using Lcd display and keyboard
+//esc abort edition, and enter confirm edition
 pub struct Field {
-    buffer: BufferedCursor,
+    edition_buffer: BufferedCursor,
     blink: RectangularWave,
     start_point: Point,
     edit_mode: EditMode,
+    final_buffer: FieldBuffer,
 }
 
 impl Field {
     pub fn new(start_point: Point, array: FieldBuffer) -> Self {
         Self {
-            buffer: BufferedCursor::new(array),
+            edition_buffer: BufferedCursor::new(array.clone()),
             blink: RectangularWave::new(400,700),
             start_point,
             edit_mode: EditMode::new(false),
+            final_buffer: array,
         }
     }
 
@@ -99,7 +103,7 @@ impl Field {
     }
 
     pub fn get_value(&self) -> FieldBuffer {
-        self.buffer.buffer.clone()
+        self.final_buffer.clone()
     }
 }
 
@@ -110,22 +114,35 @@ impl Field {
         if self.is_in_edit_mode() {
 
             let effect = match key {
+                // save/cancel edition
+                KeyCode::KEY_ESC => {
+                    self.set_edit_mode(false); // terminate edition
+                    self.edition_buffer.buffer = self.final_buffer.clone(); // disconsider edited value
+                    Some(())
+                }
+                KeyCode::KEY_ENTER => {
+                    self.set_edit_mode(false); // terminate edition
+                    self.final_buffer = self.edition_buffer.buffer.clone(); // saves value
+                    Some(())
+                }
                 // navigation_key left and right
-                KeyCode::KEY_SETA_BRANCA_ESQUERDA => { self.buffer.move_cursor_left(); Some(()) }, 
-                KeyCode::KEY_SETA_BRANCA_DIREITA => { self.buffer.move_cursor_right(); Some(()) },
-                KeyCode::KEY_DIRECIONAL_PARA_DIREITA => { self.buffer.move_cursor_right(); Some(()) },
-                KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => { self.buffer.move_cursor_left(); Some(()) },
-                KeyCode::KEY_0 => { self.buffer.change_cursor_item_to('0').move_cursor_right(); Some(()) },
-                KeyCode::KEY_1 => { self.buffer.change_cursor_item_to('1').move_cursor_right(); Some(()) },
-                KeyCode::KEY_2 => { self.buffer.change_cursor_item_to('2').move_cursor_right(); Some(()) },
-                KeyCode::KEY_3 => { self.buffer.change_cursor_item_to('3').move_cursor_right(); Some(()) },
-                KeyCode::KEY_4 => { self.buffer.change_cursor_item_to('4').move_cursor_right(); Some(()) },
-                KeyCode::KEY_5 => { self.buffer.change_cursor_item_to('5').move_cursor_right(); Some(()) },
-                KeyCode::KEY_6 => { self.buffer.change_cursor_item_to('6').move_cursor_right(); Some(()) },
-                KeyCode::KEY_7 => { self.buffer.change_cursor_item_to('7').move_cursor_right(); Some(()) },
-                KeyCode::KEY_8 => { self.buffer.change_cursor_item_to('8').move_cursor_right(); Some(()) },
-                KeyCode::KEY_9 => { self.buffer.change_cursor_item_to('9').move_cursor_right(); Some(()) },
+                KeyCode::KEY_SETA_BRANCA_ESQUERDA => { self.edition_buffer.move_cursor_left(); Some(()) }, 
+                KeyCode::KEY_SETA_BRANCA_DIREITA => { self.edition_buffer.move_cursor_right(); Some(()) },
+                KeyCode::KEY_DIRECIONAL_PARA_DIREITA => { self.edition_buffer.move_cursor_right(); Some(()) },
+                KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => { self.edition_buffer.move_cursor_left(); Some(()) },
+                // edidtion key
+                KeyCode::KEY_0 => { self.edition_buffer.change_cursor_item_to('0').move_cursor_right(); Some(()) },
+                KeyCode::KEY_1 => { self.edition_buffer.change_cursor_item_to('1').move_cursor_right(); Some(()) },
+                KeyCode::KEY_2 => { self.edition_buffer.change_cursor_item_to('2').move_cursor_right(); Some(()) },
+                KeyCode::KEY_3 => { self.edition_buffer.change_cursor_item_to('3').move_cursor_right(); Some(()) },
+                KeyCode::KEY_4 => { self.edition_buffer.change_cursor_item_to('4').move_cursor_right(); Some(()) },
+                KeyCode::KEY_5 => { self.edition_buffer.change_cursor_item_to('5').move_cursor_right(); Some(()) },
+                KeyCode::KEY_6 => { self.edition_buffer.change_cursor_item_to('6').move_cursor_right(); Some(()) },
+                KeyCode::KEY_7 => { self.edition_buffer.change_cursor_item_to('7').move_cursor_right(); Some(()) },
+                KeyCode::KEY_8 => { self.edition_buffer.change_cursor_item_to('8').move_cursor_right(); Some(()) },
+                KeyCode::KEY_9 => { self.edition_buffer.change_cursor_item_to('9').move_cursor_right(); Some(()) },
                 KeyCode::KEY_ESC => { self.set_edit_mode(false); Some(()) },
+                //everything else
                 _ => { None },
             };
     
@@ -144,10 +161,10 @@ impl Field {
 
     pub fn draw(&self, canvas: &mut Canvas) {
         canvas.set_cursor(self.start_point);
-        for (position,digit) in self.buffer.buffer.char_indices() {
+        for (position,digit) in self.edition_buffer.buffer.char_indices() {
             let blink_char = '_';
             let mut current_char = digit.clone();
-            let is_current_char_over_cursor = position == self.buffer.cursor.get_current();
+            let is_current_char_over_cursor = position == self.edition_buffer.cursor.get_current();
             let is_time_to_blink = self.blink.read() && self.is_in_edit_mode(); // do not blink if it is not in edit mode
             if is_current_char_over_cursor && is_time_to_blink {
                 current_char = blink_char;
@@ -159,6 +176,7 @@ impl Field {
 
 impl Field {
     pub fn set_edit_mode(&mut self, value: bool) {
+
         self.edit_mode.set_edit_mode(value);
     }
 
