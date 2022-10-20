@@ -1,11 +1,14 @@
 
+use core::str::FromStr;
+
 use alloc::borrow::ToOwned;
 use heapless::{ 
     Vec,
     String,
 };
+use lib_1::utils::common::convert_u16_to_string_decimal;
 
-use crate::{menu::{point::Point, ratangular_wave::RectangularWave, canvas::Canvas}, board::keyboard::KeyCode};
+use crate::{menu::{point::Point, ratangular_wave::RectangularWave, canvas::Canvas, database::Accessor}, board::keyboard::KeyCode};
 
 use super::{edit_mode::EditMode, widget::Widget, widget::Editable, cursor::Cursor};
 
@@ -87,11 +90,22 @@ impl Field {
             edit_mode: EditMode::new(false),
         }
     }
+
+    pub fn from_acessor_u16(start_point: Point, accessor: Accessor<u16>) -> Self {
+        let current_value = accessor.get();
+        let as_string = convert_u16_to_string_decimal(current_value);
+        let array: FieldBuffer = String::from_iter(as_string.chars());
+        Field::new(start_point, array)
+    }
+
+    pub fn get_value(&self) -> FieldBuffer {
+        self.buffer.buffer.clone()
+    }
 }
 
-impl Widget for Field {
+impl Field {
 
-    fn send_key(&mut self, key: KeyCode) {     
+    pub fn send_key(&mut self, key: KeyCode) {     
         
         if self.is_in_edit_mode() {
 
@@ -124,11 +138,11 @@ impl Widget for Field {
         }
     }
 
-    fn update(&mut self) {
+    pub fn update(&mut self) {
         self.blink.update();
     }
 
-    fn draw(&self, canvas: &mut Canvas) {
+    pub fn draw(&self, canvas: &mut Canvas) {
         canvas.set_cursor(self.start_point);
         for (position,digit) in self.buffer.buffer.char_indices() {
             let blink_char = '_';
@@ -143,12 +157,12 @@ impl Widget for Field {
     }
 }
 
-impl Editable for Field {
-    fn set_edit_mode(&mut self, value: bool) {
+impl Field {
+    pub fn set_edit_mode(&mut self, value: bool) {
         self.edit_mode.set_edit_mode(value);
     }
 
-    fn is_in_edit_mode(&self) -> bool {
+    pub fn is_in_edit_mode(&self) -> bool {
         self.edit_mode.is_in_edit_mode()
     }
 }
