@@ -1,6 +1,7 @@
 use alloc::string::ToString;
 use heapless::String;
 use heapless::Vec;
+use lib_1::utils::common::convert_u16_to_string_decimal;
 use crate::board::output_expander::OutputExpander;
 use crate::board::{lcd, output_expander};
 use crate::board::keyboard::KeyCode;
@@ -141,13 +142,6 @@ pub fn development_entry_point() -> ! {
             }
 
             State::PROGRAMA => {
-                
-                lcd::clear();
-                let mut database = DataBase::new();
-                database.parameter_03().set(12);
-                let x = database.parameter_03().get();
-                lcd::print_u16_in_hex(x);
-                loop { }
 
                 if let Some(key) = keyboard.get_key() {
                     menu.send_key(key);

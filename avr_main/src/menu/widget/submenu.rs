@@ -34,14 +34,16 @@ impl SubMenu {
         let s2 = FlashString::new(&NOP2);
         let f1: String<10> = String::from("0000");
         let f2: String<10> = String::from("00000");
+        let menu_item1 = MenuItem::new(Point::new(2,0), s1, Point::new(35,0), f1);
+        let menu_item2 = MenuItem::new(Point::new(2,1), s2, Point::new(34,1), f2);
         Self {
             items: items.clone(),
             item_cursor: Cursor::new(0..items.len()), // number of items to show
             display_cursor: Cursor::new(0..2), // number of lines in the display 
             is_in_edit_mode: false,
             displayed_items: [
-                MenuItem::new(Point::new(2,0), s1, Point::new(35,0), f1),
-                MenuItem::new(Point::new(2,1), s2, Point::new(34,1), f2),
+                menu_item1,
+                menu_item2,
             ]
         }
     }
