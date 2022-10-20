@@ -1,3 +1,6 @@
+use core::str::FromStr;
+use heapless::String;
+
 
 
 // return (byteLow, byteHigh)
@@ -70,6 +73,14 @@ pub fn convert_u16_to_str_hex(data: u16) -> (char,char,char,char) {
     let (lowbyte_high, lowbyte_low) = convert_u8_to_str_hex(low);
     let (highbyte_high, highbyte_low) = convert_u8_to_str_hex(high);
 
-    (highbyte_high, highbyte_low, lowbyte_high, lowbyte_low)
-    
+    (highbyte_high, highbyte_low, lowbyte_high, lowbyte_low) 
+}
+
+//NOTE: value above 65535 are clamped
+pub fn convert_u16_to_string_decimal (value: u16) -> String<5> {
+
+    let mut buffer = itoa::Buffer::new();
+    let printed = buffer.format(value as u64);
+    let string: String<5> = String::from_str(printed).unwrap();
+    string
 }
