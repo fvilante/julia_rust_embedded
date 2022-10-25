@@ -1,4 +1,4 @@
-pub mod main;
+pub mod menu_entry_point;
 pub mod flash;
 pub mod keyboard;
 pub mod point;
