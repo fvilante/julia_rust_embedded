@@ -8,6 +8,7 @@ use crate::board::output_expander::OutputExpander;
 use crate::board::{lcd, output_expander};
 use crate::board::keyboard::KeyCode;
 use crate::enviroment::front_panel::FrontPanel;
+use crate::microcontroler::delay::delay_ms;
 use super::database::DataBase;
 use super::flash::FlashString;
 use super::keyboard::Keyboard;
@@ -100,20 +101,50 @@ pub fn development_entry_point() -> ! {
 
     canvas.render();  
 
-    let point1 = Point::new(0,0);
-    let point2 = Point::new(30,0);
-    let text: FlashString = FlashString::new(&S0);
-    let array: FieldBuffer = String::from_str("0000").unwrap();
+    let point0a = Point::new(1,0);
+    let point0b = Point::new(30,0);
+    let text0: FlashString = FlashString::new(&S0);
+    let array0: FieldBuffer = String::from_str("0000").unwrap();
 
-    let mut menu_item = MenuItem::new(point1, text, point2, array);
-    menu_item.set_edit_mode(true);
+    let point1a = Point::new(1,1);
+    let point1b = Point::new(30,1);
+    let text1: FlashString = FlashString::new(&S1);
+    let array1: FieldBuffer = String::from_str("0000").unwrap();
+
+    let mut menu_item_0 = MenuItem::new(point0a, text0, point0b, array0);
+    let mut menu_item_1 = MenuItem::new(point1a, text1, point1b, array1);
+    menu_item_0.set_edit_mode(true);
+    menu_item_1.set_edit_mode(false);
     loop { 
         if let Some(key) = keyboard.get_key() {
-            menu_item.send_key(key);
+            menu_item_0.send_key(key);
+            menu_item_1.send_key(key);
         }
-        menu_item.update();
-        menu_item.draw(& mut canvas);
+        menu_item_0.update();
+        menu_item_1.update();
+        menu_item_0.draw(& mut canvas);
+        menu_item_1.draw(& mut canvas);
         canvas.render();
+        if let Some(value) = menu_item_0.get_value_if_it_has_changed() {
+            canvas.set_cursor(Point::new(0,1));
+            canvas.print_string(String::from_str("Coletado=").unwrap() as FieldBuffer);
+            canvas.print_string(value);
+            canvas.render();
+            delay_ms(3000);
+            menu_item_0.set_edit_mode(true);
+            //canvas.render();
+            //loop { }
+        }
+        if let Some(value) = menu_item_1.get_value_if_it_has_changed() {
+            canvas.set_cursor(Point::new(0,0));
+            canvas.print_string(String::from_str("Coletado=").unwrap() as FieldBuffer);
+            canvas.print_string(value);
+            canvas.render();
+            delay_ms(3000);
+            menu_item_1.set_edit_mode(true);
+            //canvas.render();
+            //loop { }
+        }
     }
 
 

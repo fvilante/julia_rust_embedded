@@ -22,8 +22,26 @@ impl MenuItem {
         }
     }
 
+    //pub fn from_string_constructor(declaration: FlashString) -> Self {
+    //    match parse_menu_item_constructor_string(declaration) {
+    //        MenuItemParsed::PureCaption(value) => {
+    //            
+    //        } 
+    //        MenuItemParsed::CaptionWithOneField(c_first, c_field, c_first ) => {
+    //            let x = 1; // initial x
+    //            let point1 = Point(x,0);
+    //            let point2 = point1.x as usize + c_field.len();
+    //            Self::new(point1, text, point2, array)
+    //        }
+    //    }
+    //}
+
     pub fn set_caption(&mut self, text: FlashString) {
         self.caption.set_caption(text);
+    }
+
+    pub fn get_value_if_it_has_changed(&mut self) -> Option<FieldBuffer> {
+        self.field.get_value_if_it_has_changed()
     }
 }
 
@@ -57,10 +75,9 @@ impl MenuItem {
 //
 
 
-
 pub enum MenuItemParsed {
     PureCaption(String<40>), // [Caption]
-    CaptionWithOneField(String<40>, String<10>, String<10>), // [1st_caption, field_type, last_caption]
+    CaptionWithOneField(String<40>, FieldBuffer, String<10>), // [1st_caption, field_type, last_caption]
 }
 
 pub fn parse_menu_item_constructor_string(declaration: FlashString) -> MenuItemParsed {

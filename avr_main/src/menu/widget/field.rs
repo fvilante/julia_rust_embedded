@@ -82,6 +82,7 @@ pub struct Field {
     start_point: Point,
     edit_mode: EditMode,
     final_buffer: FieldBuffer,
+    last_saved_value_has_been_retrieved: bool,
 }
 
 impl Field {
@@ -92,6 +93,7 @@ impl Field {
             start_point,
             edit_mode: EditMode::new(false),
             final_buffer: array,
+            last_saved_value_has_been_retrieved: true,
         }
     }
 
@@ -102,8 +104,14 @@ impl Field {
         Field::new(start_point, array)
     }
 
-    pub fn get_value(&self) -> FieldBuffer {
-        self.final_buffer.clone()
+    pub fn get_value_if_it_has_changed(&mut self) -> Option<FieldBuffer> {
+        if self.last_saved_value_has_been_retrieved == false {
+            self.last_saved_value_has_been_retrieved = true;
+            Some(self.final_buffer.clone())
+        } else {
+            None
+        }
+        
     }
 }
 
@@ -123,6 +131,7 @@ impl Field {
                 KeyCode::KEY_ENTER => {
                     self.set_edit_mode(false); // terminate edition
                     self.final_buffer = self.edition_buffer.buffer.clone(); // saves value
+                    self.last_saved_value_has_been_retrieved = false; // reset flag
                     Some(())
                 }
                 // navigation_key left and right
