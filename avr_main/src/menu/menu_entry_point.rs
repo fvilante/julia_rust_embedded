@@ -66,17 +66,38 @@ progmem! {
 }
 
 
+struct SystemEnviroment {
+    pub output_expander: OutputExpander,
+    pub keyboard: Keyboard,
+    pub canvas: Canvas,
+}
+
+impl SystemEnviroment {
+    pub fn new() -> Self {
+        lcd::lcd_initialize();
+        let mut output_expander = OutputExpander::new();
+        let beep = |on:bool| { OutputExpander::new().BUZZER(on).commit(); };
+        let mut keyboard = Keyboard::new(beep);
+        let canvas = Canvas::new();
+        Self {
+            output_expander,
+            keyboard,
+            canvas,
+        }
+    }
+
+    pub fn get_front_panel<'a>(&'a mut self) -> FrontPanel<'a> {
+        let front_panel: FrontPanel<'a> = FrontPanel::new(&mut self.output_expander);
+        front_panel
+    }
+
+}
 
 
 pub fn development_entry_point() -> ! {
 
-    // initialization
-    lcd::lcd_initialize();
-    let mut output_expander = OutputExpander::new();
-    let _front_panel = FrontPanel::new(&mut output_expander).reset();
-    let beep = |on:bool| { OutputExpander::new().BUZZER(on).commit(); };
-    let mut keyboard = Keyboard::new(beep);
-    let mut canvas = Canvas::new();
+    let SystemEnviroment{mut canvas, mut keyboard, ..} = SystemEnviroment::new();
+
     canvas.render();  
 
     let point1 = Point::new(0,0);
