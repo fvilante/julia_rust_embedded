@@ -97,32 +97,31 @@ impl SystemEnviroment {
 
 }
 
+
+type MenuItemGetter = fn() -> MenuItem;
+
+type MenuList = Vec<MenuItemGetter,10>;
+
 struct SubMenu2 {
-    menu_item_0: MenuItem,
-    menu_item_1: MenuItem,
+    menu_list: MenuList,    // all itens of submenu
+    menu_item_0: MenuItem,  // first lcd line widget
+    menu_item_1: MenuItem,  // second lcd line widget
     current_selector: bool,  // false = line0, true = line1
+    first_line_to_render: u8, // line of the vector which must be the first line to render in lcd
 }
 
+
+
 impl SubMenu2 {
-    pub fn new() -> Self {
-        let point0a = Point::new(1,0);
-        let point0b = Point::new(30,0);
-        let text0: FlashString = FlashString::new(&S0);
-        let array0: FieldBuffer = String::from_str("0000").unwrap();
-
-        let point1a = Point::new(1,1);
-        let point1b = Point::new(30,1);
-        let text1: FlashString = FlashString::new(&S1);
-        let array1: FieldBuffer = String::from_str("0000").unwrap();
-
-        let mut menu_item_0 = MenuItem::new(point0a, text0, point0b, array0);
-        let mut menu_item_1 = MenuItem::new(point1a, text1, point1b, array1);
-        menu_item_0.set_edit_mode(false);
-        menu_item_1.set_edit_mode(false);
+    pub fn new(menu_list: MenuList) -> Self {
+        let menu_item_0 = menu_list[0]();
+        let menu_item_1 = menu_list[1]();
         Self {
+            menu_list,
             menu_item_0,
             menu_item_1,
             current_selector: LINE_0,
+            first_line_to_render: 0,
         }
     }
 
@@ -158,6 +157,14 @@ impl SubMenu2 {
                 Some(LINE_1)
             }
         }
+    }
+
+    pub fn scroll_down(&self) {
+        todo!()
+    }
+
+    pub fn scroll_up(&self) {
+        todo!()
     }
 
 }
@@ -252,7 +259,45 @@ pub fn development_entry_point() -> ! {
 
     canvas.render();  
 
-    let mut submenu = SubMenu2::new();
+
+    let mut menu_list = Vec::<MenuItemGetter,10>::new();
+    menu_list.push(|| {
+        let point0a = Point::new(1,0);
+        let point0b = Point::new(33,0);
+        let text0: FlashString = FlashString::new(&S0);
+        let array0: FieldBuffer = String::from_str("0000").unwrap();
+        let mut menu_item_0 = MenuItem::new(point0a, text0, point0b, array0);
+        menu_item_0
+    });
+
+    menu_list.push(|| {
+        let point1a = Point::new(1,1);
+        let point1b = Point::new(33,1);
+        let text1: FlashString = FlashString::new(&S1);
+        let array1: FieldBuffer = String::from_str("0000").unwrap();
+        let mut menu_item_1 = MenuItem::new(point1a, text1, point1b, array1); 
+        menu_item_1
+    });
+
+    menu_list.push(|| {
+        let point1a = Point::new(1,1);
+        let point1b = Point::new(33,1);
+        let text1: FlashString = FlashString::new(&S2);
+        let array1: FieldBuffer = String::from_str("0000").unwrap();
+        let mut menu_item_1 = MenuItem::new(point1a, text1, point1b, array1); 
+        menu_item_1
+    });
+
+    menu_list.push(|| {
+        let point1a = Point::new(1,1);
+        let point1b = Point::new(33,1);
+        let text1: FlashString = FlashString::new(&S3);
+        let array1: FieldBuffer = String::from_str("0000").unwrap();
+        let mut menu_item_1 = MenuItem::new(point1a, text1, point1b, array1); 
+        menu_item_1
+    });
+
+    let mut submenu = SubMenu2::new(menu_list);
 
     loop { 
 
