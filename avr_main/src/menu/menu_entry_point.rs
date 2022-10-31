@@ -73,6 +73,9 @@ struct SystemEnviroment {
     pub canvas: Canvas,
 }
 
+pub const LINE_0: bool = false;
+pub const LINE_1: bool = true;
+
 impl SystemEnviroment {
     pub fn new() -> Self {
         lcd::lcd_initialize();
@@ -94,6 +97,154 @@ impl SystemEnviroment {
 
 }
 
+struct SubMenu2 {
+    menu_item_0: MenuItem,
+    menu_item_1: MenuItem,
+    current_selector: bool,  // false = line0, true = line1
+}
+
+impl SubMenu2 {
+    pub fn new() -> Self {
+        let point0a = Point::new(1,0);
+        let point0b = Point::new(30,0);
+        let text0: FlashString = FlashString::new(&S0);
+        let array0: FieldBuffer = String::from_str("0000").unwrap();
+
+        let point1a = Point::new(1,1);
+        let point1b = Point::new(30,1);
+        let text1: FlashString = FlashString::new(&S1);
+        let array1: FieldBuffer = String::from_str("0000").unwrap();
+
+        let mut menu_item_0 = MenuItem::new(point0a, text0, point0b, array0);
+        let mut menu_item_1 = MenuItem::new(point1a, text1, point1b, array1);
+        menu_item_0.set_edit_mode(false);
+        menu_item_1.set_edit_mode(false);
+        Self {
+            menu_item_0,
+            menu_item_1,
+            current_selector: LINE_0,
+        }
+    }
+
+    // false = line0, true = line1
+    pub fn get_value_if_it_has_changed(&mut self, line: bool) -> Option<FieldBuffer> {
+        if line == LINE_0 {
+            self.menu_item_0.get_value_if_it_has_changed()
+        } else {
+            self.menu_item_1.get_value_if_it_has_changed()
+        }
+    }
+
+    // false = line0, true = line1
+    pub fn set_edit_mode(&mut self, line: bool, value: bool) {
+        if line == LINE_0 {
+            self.menu_item_0.set_edit_mode(value)
+        } else {
+            self.menu_item_1.set_edit_mode(value)
+        }
+    }
+
+    // if is in edit mode returns Some<Line>
+    pub fn is_in_edit_mode(&self) -> Option<bool> {
+        let is_in_edit_mode_0 = self.menu_item_0.is_in_edit_mode();
+        let is_in_edit_mode_1 = self.menu_item_1.is_in_edit_mode();
+        let is_not_in_edit_mode = !is_in_edit_mode_0 && !is_in_edit_mode_1;
+        if is_not_in_edit_mode {
+            None
+        } else {
+            if is_in_edit_mode_0 {
+                Some(LINE_0)
+            } else {
+                Some(LINE_1)
+            }
+        }
+    }
+
+}
+
+
+impl SubMenu2 {
+    pub fn send_key(&mut self, key: KeyCode) {
+        let is_in_edit_mode = self.is_in_edit_mode();
+
+        match is_in_edit_mode {
+            //is editing some line
+            Some(current_line) => {
+                // delegate keys 
+                if current_line == LINE_0 {
+                    self.menu_item_0.send_key(key);
+                } else { // LINE_1
+                    self.menu_item_1.send_key(key);
+                }
+            }
+
+            //not editing any line
+            None => {
+                // navigate menu
+                match key {
+                    KeyCode::KEY_DIRECIONAL_PARA_BAIXO => {
+                        if self.current_selector == LINE_0 {
+                            self.current_selector = LINE_1
+                        } else {
+                            // overflow
+                        }
+                     },
+                    KeyCode::KEY_DIRECIONAL_PARA_CIMA => {
+                        if self.current_selector == LINE_1 {
+                            self.current_selector = LINE_0
+                        } else {
+                            // overflow
+                        }
+                     },
+                    KeyCode::KEY_ENTER => {
+                        if self.current_selector == LINE_0 {
+                            self.menu_item_0.set_edit_mode(true);
+                        } else { // LINE_1
+                            self.menu_item_1.set_edit_mode(true);
+                        }
+                    }
+                    _ => { }
+                }
+            }
+        }
+        
+    }
+
+    pub fn update(&mut self) {
+        self.menu_item_0.update();
+        self.menu_item_1.update();
+    }
+
+    pub fn draw(&self, canvas: &mut Canvas) {
+        fn draw_selector(self_: &SubMenu2, line: bool, canvas: &mut Canvas) {
+            fn draw_char(self_: &SubMenu2, canvas: &mut Canvas) {
+                match self_.is_in_edit_mode() {
+                    Some(_) => canvas.print_char('*'),
+                    None => canvas.print_char('>')
+                }
+                
+            }
+            if line == LINE_0 {
+                canvas.set_cursor(Point::new(0,0));
+                draw_char(self_, canvas);
+                canvas.set_cursor(Point::new(0,1));
+                canvas.print_char(' ');
+            } else {
+                canvas.set_cursor(Point::new(0,0));
+                canvas.print_char(' ');
+                canvas.set_cursor(Point::new(0,1));
+                draw_char(self_, canvas);
+            }
+        }
+        if self.current_selector == LINE_0 {
+            draw_selector(self, LINE_0, canvas);
+        } else {
+            draw_selector(self, LINE_1, canvas);
+        }
+        self.menu_item_0.draw(canvas);
+        self.menu_item_1.draw(canvas);
+    }
+}
 
 pub fn development_entry_point() -> ! {
 
@@ -101,47 +252,34 @@ pub fn development_entry_point() -> ! {
 
     canvas.render();  
 
-    let point0a = Point::new(1,0);
-    let point0b = Point::new(30,0);
-    let text0: FlashString = FlashString::new(&S0);
-    let array0: FieldBuffer = String::from_str("0000").unwrap();
+    let mut submenu = SubMenu2::new();
 
-    let point1a = Point::new(1,1);
-    let point1b = Point::new(30,1);
-    let text1: FlashString = FlashString::new(&S1);
-    let array1: FieldBuffer = String::from_str("0000").unwrap();
-
-    let mut menu_item_0 = MenuItem::new(point0a, text0, point0b, array0);
-    let mut menu_item_1 = MenuItem::new(point1a, text1, point1b, array1);
-    menu_item_0.set_edit_mode(true);
-    menu_item_1.set_edit_mode(false);
     loop { 
+
         if let Some(key) = keyboard.get_key() {
-            menu_item_0.send_key(key);
-            menu_item_1.send_key(key);
+            submenu.send_key(key);
         }
-        menu_item_0.update();
-        menu_item_1.update();
-        menu_item_0.draw(& mut canvas);
-        menu_item_1.draw(& mut canvas);
+        
+        submenu.update();
+        submenu.draw(&mut canvas);
         canvas.render();
-        if let Some(value) = menu_item_0.get_value_if_it_has_changed() {
+        if let Some(value) = submenu.get_value_if_it_has_changed(false) {
             canvas.set_cursor(Point::new(0,1));
             canvas.print_string(String::from_str("Coletado=").unwrap() as FieldBuffer);
             canvas.print_string(value);
             canvas.render();
-            delay_ms(3000);
-            menu_item_0.set_edit_mode(true);
+            delay_ms(100);
+            //submenu.set_edit_mode(LINE_0, true);
             //canvas.render();
             //loop { }
         }
-        if let Some(value) = menu_item_1.get_value_if_it_has_changed() {
+        if let Some(value) = submenu.get_value_if_it_has_changed(true) {
             canvas.set_cursor(Point::new(0,0));
             canvas.print_string(String::from_str("Coletado=").unwrap() as FieldBuffer);
             canvas.print_string(value);
             canvas.render();
-            delay_ms(3000);
-            menu_item_1.set_edit_mode(true);
+            delay_ms(100);
+            //submenu.set_edit_mode(LINE_1, true);
             //canvas.render();
             //loop { }
         }

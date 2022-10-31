@@ -56,15 +56,15 @@ impl BufferedCursor {
         self
     }
 
-    //pub fn move_cursor_begin(&mut self) -> &mut Self {
-    //    self.cursor.begin();
-    //    self
-    //}
-    //
-    //pub fn move_cursor_end(&mut self) -> &mut Self {
-    //   self.cursor.end();
-    //    self
-    //}
+    pub fn move_cursor_begin(&mut self) -> &mut Self {
+        self.cursor.begin();
+        self
+    }
+    
+    pub fn move_cursor_end(&mut self) -> &mut Self {
+        self.cursor.end();
+        self
+    }
 
     pub fn addAndMoveRight(&mut self, item: char) -> &mut Self {
         self
@@ -125,11 +125,13 @@ impl Field {
                 // save/cancel edition
                 KeyCode::KEY_ESC => {
                     self.set_edit_mode(false); // terminate edition
+                    self.edition_buffer.cursor.begin(); // reset cursor position
                     self.edition_buffer.buffer = self.final_buffer.clone(); // disconsider edited value
                     Some(())
                 }
                 KeyCode::KEY_ENTER => {
                     self.set_edit_mode(false); // terminate edition
+                    self.edition_buffer.cursor.begin(); // reset cursor position
                     self.final_buffer = self.edition_buffer.buffer.clone(); // saves value
                     self.last_saved_value_has_been_retrieved = false; // reset flag
                     Some(())

@@ -39,11 +39,11 @@ impl Cursor {
         has_reached_lower_bound
     }
 
-    //fn end(&mut self) {
-    //    self.current = self.range.end;
-    //}
-    //
-    //fn begin(&mut self) {
-    //    self.current = self.range.start;
-    //}
+    pub fn end(&mut self) {
+        self.current = self.range.end;
+    }
+    
+    pub fn begin(&mut self) {
+        self.current = self.range.start;
+    }
 }
