@@ -13,3 +13,15 @@ impl Point {
         }
     }
 }
+
+pub struct Point1d {
+    pub pos: u8,
+}
+
+impl Point1d {
+    pub fn new(pos: u8) -> Self {
+        Self {
+            pos,
+        }
+    }
+}

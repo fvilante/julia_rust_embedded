@@ -1,6 +1,6 @@
 use crate::{
     board::{keyboard::KeyCode, lcd},
-    menu::{canvas::Canvas, flash::FlashString, point::Point},
+    menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}},
 };
 
 use super::{caption::Caption, field::{Field, FieldBuffer}, widget::Editable, widget::Widget};
@@ -9,16 +9,21 @@ use heapless::String;
 use core::str::FromStr;
 
 pub struct MenuItem {
+    point_a: Point1d,
     caption: Caption,
+    point_b: Point1d,
     field: Field,
 }
 
 impl MenuItem {
     /// NOTE: client should put point1 and point2 in the same line
-    pub fn new(point1: Point, text: FlashString, point2: Point, array: FieldBuffer) -> Self {
+    /// point1 = position of caption, point2 = position of field
+    pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, array: FieldBuffer) -> Self {
         Self {
-            caption: Caption::new(point1, text),
-            field: Field::new(point2, array),
+            point_a,
+            caption: Caption::new(text),
+            point_b,
+            field: Field::new(array),
         }
     }
 
@@ -55,9 +60,16 @@ impl MenuItem {
         self.field.update();
     }
 
-    pub fn draw(&self, canvas: &mut Canvas) {
-        self.caption.draw(canvas);
-        self.field.draw(canvas);
+    // lcd_line: false = line_0 ; true = line_1
+    pub fn draw(&self, canvas: &mut Canvas, lcd_line: bool) {
+        let mut line = 0;
+        if lcd_line {
+            line = 1;
+        }
+        let point1 = Point::new(self.point_a.pos, line);
+        let point2 = Point::new(self.point_b.pos, line);
+        self.caption.draw(canvas, point1);
+        self.field.draw(canvas, point2);
     }
 }
 

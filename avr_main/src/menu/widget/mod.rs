@@ -4,7 +4,6 @@ pub mod caption;
 pub mod field;
 pub mod cursor;
 pub mod menu_item;
-pub mod submenu;
 pub mod splash;
 pub mod main_menu;
 pub mod execucao;

@@ -5,14 +5,12 @@ use super::widget::Widget;
 
 pub struct Caption {
     text: FlashString,
-    start_point: Point,
 }
 
 impl Caption {
-    pub fn new(start_point: Point, text: FlashString) -> Self {
+    pub fn new(text: FlashString) -> Self {
         Self {
             text,
-            start_point,
         }
     }
 
@@ -30,8 +28,8 @@ impl Caption {
         // do nothing
     }
 
-    pub fn draw(&self, canvas: &mut Canvas) {
-        canvas.set_cursor(self.start_point);
+    pub fn draw(&self, canvas: &mut Canvas, start_point: Point) {
+        canvas.set_cursor(start_point);
         for byte in self.text.chars() {
             canvas.print_char(byte as char);
         }

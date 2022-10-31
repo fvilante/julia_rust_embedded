@@ -79,30 +79,28 @@ impl BufferedCursor {
 pub struct Field {
     edition_buffer: BufferedCursor,
     blink: RectangularWave,
-    start_point: Point,
     edit_mode: EditMode,
     final_buffer: FieldBuffer,
     last_saved_value_has_been_retrieved: bool,
 }
 
 impl Field {
-    pub fn new(start_point: Point, array: FieldBuffer) -> Self {
+    pub fn new(array: FieldBuffer) -> Self {
         Self {
             edition_buffer: BufferedCursor::new(array.clone()),
             blink: RectangularWave::new(400,700),
-            start_point,
             edit_mode: EditMode::new(false),
             final_buffer: array,
             last_saved_value_has_been_retrieved: true,
         }
     }
 
-    pub fn from_acessor_u16(start_point: Point, accessor: Accessor<u16>) -> Self {
-        let current_value = accessor.get();
-        let as_string = convert_u16_to_string_decimal(current_value);
-        let array: FieldBuffer = String::from_iter(as_string.chars());
-        Field::new(start_point, array)
-    }
+    //pub fn from_acessor_u16(start_point: Point, accessor: Accessor<u16>) -> Self {
+    //    let current_value = accessor.get();
+    //    let as_string = convert_u16_to_string_decimal(current_value);
+    //    let array: FieldBuffer = String::from_iter(as_string.chars());
+    //    Field::new(start_point)
+    //}
 
     pub fn get_value_if_it_has_changed(&mut self) -> Option<FieldBuffer> {
         if self.last_saved_value_has_been_retrieved == false {
@@ -170,8 +168,8 @@ impl Field {
         self.blink.update();
     }
 
-    pub fn draw(&self, canvas: &mut Canvas) {
-        canvas.set_cursor(self.start_point);
+    pub fn draw(&self, canvas: &mut Canvas, start_point: Point) {
+        canvas.set_cursor(start_point);
         for (position,digit) in self.edition_buffer.buffer.char_indices() {
             let blink_char = '_';
             let mut current_char = digit.clone();

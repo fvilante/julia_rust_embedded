@@ -14,6 +14,7 @@ use super::flash::FlashString;
 use super::keyboard::Keyboard;
 use super::canvas::Canvas;
 use super::point::Point;
+use super::point::Point1d;
 use super::widget::caption::Caption;
 use super::widget::execucao;
 use super::widget::execucao::Execucao;
@@ -29,8 +30,6 @@ use super::widget::menu_item::MenuItem;
 use super::widget::menu_item::MenuItemParsed;
 use super::widget::menu_item::parse_menu_item_constructor_string;
 use super::widget::splash::Splash;
-use super::widget::submenu::Items;
-use super::widget::submenu::SubMenu;
 use crate::menu::widget::widget::Widget;
 use crate::menu::widget::cursor::Cursor;
 
@@ -115,8 +114,8 @@ struct SubMenu2 {
 
 impl SubMenu2 {
     pub fn new(menu_list: MenuList) -> Self {
-        let menu_item_0 = menu_list[1]();
-        let menu_item_1 = menu_list[2]();
+        let menu_item_0 = menu_list[0]();
+        let menu_item_1 = menu_list[1]();
         let size = menu_list.len();
         Self {
             menu_list,
@@ -165,15 +164,21 @@ impl SubMenu2 {
     pub fn scroll_down(&mut self) {
         let has_finished = self.first_line_to_render.next();
         if !has_finished {
-            self.menu_item_0 = self.menu_list[1]();
-            self.menu_item_1 = self.menu_list[2]();
+            self.menu_item_0 = self.menu_list[self.first_line_to_render.get_current()+0]();
+            self.menu_item_1 = self.menu_list[self.first_line_to_render.get_current()+1]();
         } else {
-            // do nothing
+            // do nothing: already in the end of the menu list
         }
     }
 
     pub fn scroll_up(&mut self) {
-        todo!()
+        let has_finished = self.first_line_to_render.previous();
+        if !has_finished {
+            self.menu_item_0 = self.menu_list[self.first_line_to_render.get_current()+0]();
+            self.menu_item_1 = self.menu_list[self.first_line_to_render.get_current()+1]();
+        } else {
+            // do nothing: already in the begin of menu list
+        }
     }
 
 }
@@ -209,7 +214,7 @@ impl SubMenu2 {
                         if self.current_selector == LINE_1 {
                             self.current_selector = LINE_0
                         } else {
-                            // overflow
+                            self.scroll_up();
                         }
                      },
                     KeyCode::KEY_ENTER => {
@@ -252,13 +257,14 @@ impl SubMenu2 {
                 draw_char(self_, canvas);
             }
         }
+        canvas.clear();
         if self.current_selector == LINE_0 {
             draw_selector(self, LINE_0, canvas);
         } else {
             draw_selector(self, LINE_1, canvas);
         }
-        self.menu_item_0.draw(canvas);
-        self.menu_item_1.draw(canvas);
+        self.menu_item_0.draw(canvas, LINE_0);
+        self.menu_item_1.draw(canvas, LINE_1);
     }
 }
 
@@ -271,30 +277,39 @@ pub fn development_entry_point() -> ! {
 
     let mut menu_list = Vec::<MenuItemGetter,10>::new();
     menu_list.push(|| {
-        let point0a = Point::new(1,0);
-        let point0b = Point::new(33,0);
-        let text0: FlashString = FlashString::new(&S0);
-        let array0: FieldBuffer = String::from_str("0000").unwrap();
-        let mut menu_item_0 = MenuItem::new(point0a, text0, point0b, array0);
+        let point1 = Point1d::new(1);
+        let point2 = Point1d::new(33);
+        let text: FlashString = FlashString::new(&S0);
+        let array: FieldBuffer = String::from_str("0000").unwrap();
+        let mut menu_item_0 = MenuItem::new(point1, text, point2, array);
         menu_item_0
     });
 
     menu_list.push(|| {
-        let point1a = Point::new(1,0);
-        let point1b = Point::new(33,1);
-        let text1: FlashString = FlashString::new(&S1);
-        let array1: FieldBuffer = String::from_str("0000").unwrap();
-        let mut menu_item_1 = MenuItem::new(point1a, text1, point1b, array1); 
-        menu_item_1
+        let point1 = Point1d::new(1);
+        let point2 = Point1d::new(33);
+        let text: FlashString = FlashString::new(&S1);
+        let array: FieldBuffer = String::from_str("0000").unwrap();
+        let mut menu_item_0 = MenuItem::new(point1, text, point2, array);
+        menu_item_0
     });
 
     menu_list.push(|| {
-        let point1a = Point::new(1,1);
-        let point1b = Point::new(33,1);
-        let text1: FlashString = FlashString::new(&S2);
-        let array1: FieldBuffer = String::from_str("0000").unwrap();
-        let mut menu_item_1 = MenuItem::new(point1a, text1, point1b, array1); 
-        menu_item_1
+        let point1 = Point1d::new(1);
+        let point2 = Point1d::new(33);
+        let text: FlashString = FlashString::new(&S2);
+        let array: FieldBuffer = String::from_str("0000").unwrap();
+        let mut menu_item_0 = MenuItem::new(point1, text, point2, array);
+        menu_item_0
+    });
+
+    menu_list.push(|| {
+        let point1 = Point1d::new(1);
+        let point2 = Point1d::new(33);
+        let text: FlashString = FlashString::new(&S4);
+        let array: FieldBuffer = String::from_str("0000").unwrap();
+        let mut menu_item_0 = MenuItem::new(point1, text, point2, array);
+        menu_item_0
     });
 
     let mut submenu = SubMenu2::new(menu_list);
@@ -351,13 +366,7 @@ pub fn development_entry_point() -> ! {
     //main menu
     let mut manual_mode = ManualMode::new();
     let mut current_state: State = State::MAIN_MENU;
-    //submenu 'Programa'
-    let mut items: Items = Vec::new();
-    items.push(FlashString::new(&S0));
-    items.push(FlashString::new(&S1));
-    items.push(FlashString::new(&S2));
-    items.push(FlashString::new(&S3));
-    let mut menu = SubMenu::new(items);
+
     // main loop
     loop {
         match  current_state {
@@ -402,11 +411,7 @@ pub fn development_entry_point() -> ! {
 
             State::PROGRAMA => {
 
-                if let Some(key) = keyboard.get_key() {
-                    menu.send_key(key);
-                }
-                menu.update();
-                menu.draw(&mut canvas);
+                // todo: submenu programa
 
             }
         }
