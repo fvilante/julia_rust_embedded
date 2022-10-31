@@ -21,16 +21,16 @@ impl Caption {
     }
 }
 
-impl Widget for Caption {
-    fn send_key(&mut self, _key: KeyCode) { 
+impl Caption {
+    pub fn send_key(&mut self, _key: KeyCode) { 
         // ignore key
     }
 
-    fn update(&mut self) {
+    pub fn update(&mut self) {
         // do nothing
     }
 
-    fn draw(&self, canvas: &mut Canvas) {
+    pub fn draw(&self, canvas: &mut Canvas) {
         canvas.set_cursor(self.start_point);
         for byte in self.text.chars() {
             canvas.print_char(byte as char);
