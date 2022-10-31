@@ -2,7 +2,7 @@ pub mod widget;
 pub mod edit_mode;
 pub mod caption;
 pub mod field;
-mod cursor;
+pub mod cursor;
 pub mod menu_item;
 pub mod submenu;
 pub mod splash;

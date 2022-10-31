@@ -32,6 +32,7 @@ use super::widget::splash::Splash;
 use super::widget::submenu::Items;
 use super::widget::submenu::SubMenu;
 use crate::menu::widget::widget::Widget;
+use crate::menu::widget::cursor::Cursor;
 
 
 use avr_progmem::progmem;
@@ -107,21 +108,23 @@ struct SubMenu2 {
     menu_item_0: MenuItem,  // first lcd line widget
     menu_item_1: MenuItem,  // second lcd line widget
     current_selector: bool,  // false = line0, true = line1
-    first_line_to_render: u8, // line of the vector which must be the first line to render in lcd
+    first_line_to_render: Cursor, // line of the vector which must be the first line to render in lcd
 }
 
 
 
 impl SubMenu2 {
     pub fn new(menu_list: MenuList) -> Self {
-        let menu_item_0 = menu_list[0]();
-        let menu_item_1 = menu_list[1]();
+        let menu_item_0 = menu_list[1]();
+        let menu_item_1 = menu_list[2]();
+        let size = menu_list.len();
         Self {
             menu_list,
             menu_item_0,
             menu_item_1,
             current_selector: LINE_0,
-            first_line_to_render: 0,
+            first_line_to_render: Cursor::new(0..size-1),
+
         }
     }
 
@@ -159,11 +162,17 @@ impl SubMenu2 {
         }
     }
 
-    pub fn scroll_down(&self) {
-        todo!()
+    pub fn scroll_down(&mut self) {
+        let has_finished = self.first_line_to_render.next();
+        if !has_finished {
+            self.menu_item_0 = self.menu_list[1]();
+            self.menu_item_1 = self.menu_list[2]();
+        } else {
+            // do nothing
+        }
     }
 
-    pub fn scroll_up(&self) {
+    pub fn scroll_up(&mut self) {
         todo!()
     }
 
@@ -193,7 +202,7 @@ impl SubMenu2 {
                         if self.current_selector == LINE_0 {
                             self.current_selector = LINE_1
                         } else {
-                            // overflow
+                            self.scroll_down();
                         }
                      },
                     KeyCode::KEY_DIRECIONAL_PARA_CIMA => {
@@ -271,7 +280,7 @@ pub fn development_entry_point() -> ! {
     });
 
     menu_list.push(|| {
-        let point1a = Point::new(1,1);
+        let point1a = Point::new(1,0);
         let point1b = Point::new(33,1);
         let text1: FlashString = FlashString::new(&S1);
         let array1: FieldBuffer = String::from_str("0000").unwrap();
@@ -283,15 +292,6 @@ pub fn development_entry_point() -> ! {
         let point1a = Point::new(1,1);
         let point1b = Point::new(33,1);
         let text1: FlashString = FlashString::new(&S2);
-        let array1: FieldBuffer = String::from_str("0000").unwrap();
-        let mut menu_item_1 = MenuItem::new(point1a, text1, point1b, array1); 
-        menu_item_1
-    });
-
-    menu_list.push(|| {
-        let point1a = Point::new(1,1);
-        let point1b = Point::new(33,1);
-        let text1: FlashString = FlashString::new(&S3);
         let array1: FieldBuffer = String::from_str("0000").unwrap();
         let mut menu_item_1 = MenuItem::new(point1a, text1, point1b, array1); 
         menu_item_1
