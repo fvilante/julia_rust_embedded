@@ -237,27 +237,22 @@ impl SubMenu2 {
     }
 
     pub fn draw(&self, canvas: &mut Canvas) {
+        canvas.clear();
         fn draw_selector(self_: &SubMenu2, line: bool, canvas: &mut Canvas) {
             fn draw_char(self_: &SubMenu2, canvas: &mut Canvas) {
                 match self_.is_in_edit_mode() {
                     Some(_) => canvas.print_char('*'),
                     None => canvas.print_char('>')
                 }
-                
             }
             if line == LINE_0 {
                 canvas.set_cursor(Point::new(0,0));
                 draw_char(self_, canvas);
-                canvas.set_cursor(Point::new(0,1));
-                canvas.print_char(' ');
             } else {
-                canvas.set_cursor(Point::new(0,0));
-                canvas.print_char(' ');
                 canvas.set_cursor(Point::new(0,1));
                 draw_char(self_, canvas);
             }
         }
-        canvas.clear();
         if self.current_selector == LINE_0 {
             draw_selector(self, LINE_0, canvas);
         } else {
