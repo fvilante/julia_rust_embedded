@@ -16,12 +16,12 @@ const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 10;
 
 pub type FieldBuffer = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
 
-struct BufferedCursor {
+struct EditionBuffer {
     buffer: FieldBuffer,
     cursor: Cursor,
 }
 
-impl BufferedCursor {
+impl EditionBuffer {
     pub fn new(buffer: FieldBuffer) -> Self {
         Self {
             cursor: Cursor::new(0..buffer.len()),
@@ -32,7 +32,7 @@ impl BufferedCursor {
 
     pub fn change_cursor_item_to(&mut self, new_char: char) -> &mut Self {
         let current_cursor = self.cursor.get_current();
-        let mut s: String<10> = String::new();
+        let mut s: FieldBuffer = String::new();
         for (index, current_char) in self.buffer.char_indices() {
             if index == current_cursor {
                 s.push(new_char).unwrap();
@@ -77,8 +77,8 @@ impl BufferedCursor {
 //Make possible to edit a position of memory using Lcd display and keyboard
 //esc abort edition, and enter confirm edition
 pub struct Field {
-    edition_buffer: BufferedCursor,
-    blink: RectangularWave,
+    edition_buffer: EditionBuffer,
+    blink: RectangularWave<u32>,
     edit_mode: EditMode,
     final_buffer: FieldBuffer,
     last_saved_value_has_been_retrieved: bool,
@@ -87,7 +87,7 @@ pub struct Field {
 impl Field {
     pub fn new(array: FieldBuffer) -> Self {
         Self {
-            edition_buffer: BufferedCursor::new(array.clone()),
+            edition_buffer: EditionBuffer::new(array.clone()),
             blink: RectangularWave::new(400,700),
             edit_mode: EditMode::new(false),
             final_buffer: array,
