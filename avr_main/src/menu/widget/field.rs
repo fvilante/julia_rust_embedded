@@ -12,6 +12,9 @@ use crate::{menu::{point::Point, ratangular_wave::RectangularWave, canvas::Canva
 
 use super::{edit_mode::EditMode, widget::Widget, widget::Editable, cursor::Cursor};
 
+pub type Setter = fn(u16);
+pub type Getter = fn() -> u16;
+
 const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 10;
 
 pub type FieldBuffer = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;

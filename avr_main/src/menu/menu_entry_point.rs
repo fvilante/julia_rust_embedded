@@ -263,6 +263,11 @@ impl SubMenu2 {
     }
 }
 
+static mut FILE_01: u16 = 0x0001;
+static mut FILE_02: u16 = 0x0002;
+static mut FILE_03: u16 = 0x0003;
+static mut FILE_04: u16 = 0x0004;
+
 pub fn development_entry_point() -> ! {
 
     let SystemEnviroment{mut canvas, mut keyboard, ..} = SystemEnviroment::new();
@@ -275,37 +280,60 @@ pub fn development_entry_point() -> ! {
         let point1 = Point1d::new(1);
         let point2 = Point1d::new(33);
         let text: FlashString = FlashString::new(&S0);
-        let array: FieldBuffer = String::from_str("0000").unwrap();
-        let mut menu_item_0 = MenuItem::new(point1, text, point2, array);
-        menu_item_0
+        fn setter(value: u16) {
+            unsafe {
+                FILE_01 = value;
+            }
+        }
+        fn getter() -> u16 {
+            unsafe {
+                FILE_01
+            }
+        }
+        
+        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter);
+        menu_item
     });
 
     menu_list.push(|| {
         let point1 = Point1d::new(1);
         let point2 = Point1d::new(33);
         let text: FlashString = FlashString::new(&S1);
-        let array: FieldBuffer = String::from_str("0000").unwrap();
-        let mut menu_item_0 = MenuItem::new(point1, text, point2, array);
-        menu_item_0
+        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter);
+        fn setter(value: u16) {
+            unsafe {
+                FILE_02 = value;
+            }
+        }
+        
+        fn getter() -> u16 {
+            unsafe {
+                FILE_02
+            }
+        }
+        menu_item
     });
 
     menu_list.push(|| {
         let point1 = Point1d::new(1);
         let point2 = Point1d::new(33);
-        let text: FlashString = FlashString::new(&S2);
-        let array: FieldBuffer = String::from_str("0000").unwrap();
-        let mut menu_item_0 = MenuItem::new(point1, text, point2, array);
-        menu_item_0
+        let text: FlashString = FlashString::new(&S1);
+        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter);
+        fn setter(value: u16) {
+            unsafe {
+                FILE_03 = value;
+            }
+        }
+        
+        fn getter() -> u16 {
+            unsafe {
+                FILE_03
+            }
+        }
+        menu_item
     });
 
-    menu_list.push(|| {
-        let point1 = Point1d::new(1);
-        let point2 = Point1d::new(33);
-        let text: FlashString = FlashString::new(&S4);
-        let array: FieldBuffer = String::from_str("0000").unwrap();
-        let mut menu_item_0 = MenuItem::new(point1, text, point2, array);
-        menu_item_0
-    });
+
 
     let mut submenu = SubMenu2::new(menu_list);
 

@@ -3,9 +3,10 @@ use crate::{
     menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}},
 };
 
-use super::{caption::Caption, field::{Field, FieldBuffer}, widget::Editable, widget::Widget};
+use super::{caption::Caption, field::{Field, FieldBuffer, Getter, Setter}, widget::Editable, widget::Widget};
 
 use heapless::String;
+use lib_1::utils::common::convert_u16_to_string_decimal;
 use core::str::FromStr;
 
 pub struct MenuItem {
@@ -13,17 +14,25 @@ pub struct MenuItem {
     caption: Caption,
     point_b: Point1d,
     field: Field,
+    setter: Setter,
 }
 
 impl MenuItem {
     /// NOTE: client should put point1 and point2 in the same line
     /// point1 = position of caption, point2 = position of field
-    pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, array: FieldBuffer) -> Self {
+    pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, getter: Getter, setter: Setter) -> Self {
+        let v = getter();
+        fn convert(v: u16) -> FieldBuffer {
+            let x = convert_u16_to_string_decimal(v);
+            String::from_str(x.as_str()).unwrap()
+        }
+        let array = convert(v);
         Self {
             point_a,
             caption: Caption::new(text),
             point_b,
             field: Field::new(array),
+            setter,
         }
     }
 
@@ -58,6 +67,11 @@ impl MenuItem {
     pub fn update(&mut self) {
         self.caption.update();
         self.field.update();
+        // saves
+        if let Some(changedValue) = self.get_value_if_it_has_changed() {
+            let v: u16 = changedValue.parse().unwrap();
+            (self.setter)(v);
+        }
     }
 
     // lcd_line: false = line_0 ; true = line_1
