@@ -22,9 +22,21 @@ impl MenuItem {
     /// point1 = position of caption, point2 = position of field
     pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, getter: Getter, setter: Setter) -> Self {
         let v = getter();
-        fn convert(v: u16) -> FieldBuffer {
-            let x = convert_u16_to_string_decimal(v);
-            String::from_str(x.as_str()).unwrap()
+        fn convert(data: u16) -> FieldBuffer {
+            let number_of_chars = 5;
+            const blacket_char:char = '0';
+            let s = convert_u16_to_string_decimal(data);
+            let mut base: FieldBuffer = String::from_str(s.as_str()).unwrap();
+            let mut temp: FieldBuffer = String::new();
+            //leading zeros
+            for _ in base.len()..number_of_chars {
+                temp.push(blacket_char);
+            }
+            //actal number
+            for char in base.chars() {
+                temp.push(char);
+            }
+            temp
         }
         let array = convert(v);
         Self {
