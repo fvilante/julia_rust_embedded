@@ -317,7 +317,7 @@ pub fn development_entry_point() -> ! {
     menu_list.push(|| {
         let point1 = Point1d::new(1);
         let point2 = Point1d::new(33);
-        let text: FlashString = FlashString::new(&S1);
+        let text: FlashString = FlashString::new(&S3);
         let mut menu_item = MenuItem::new(point1, text, point2, getter, setter);
         fn setter(value: u16) {
             unsafe {
