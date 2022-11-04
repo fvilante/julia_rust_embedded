@@ -37,14 +37,14 @@ fn convert(data: u16) -> FieldBuffer {
 impl MenuItem {
     /// NOTE: client should put point1 and point2 in the same line
     /// point1 = position of caption, point2 = position of field
-    pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, getter: Getter, setter: Setter) -> Self {
+    pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, getter: Getter, setter: Setter, initial_cursor_position: usize) -> Self {
         let v = getter();
         let array = convert(v);
         Self {
             point_a,
             caption: Caption::new(text),
             point_b,
-            field: Field::new(array),
+            field: Field::new(array, initial_cursor_position),
             setter,
         }
     }

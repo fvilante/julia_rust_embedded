@@ -6,15 +6,30 @@ pub struct Cursor {
 }
 
 impl Cursor {
-    pub fn new(range: Range<usize>) -> Self {
+    pub fn new(range: Range<usize>, current: usize) -> Self {
+        let current_normalized = Self::__normalize(range.clone(), current);
         Self {
-            current: 0,
+            current: current_normalized,
             range,
         }
     }
 
+    /// normalize given cursor position to make sure it is inside valid range
+    fn __normalize(range: Range<usize>, unsafe_cursor: usize) -> usize {
+        let min = range.start;
+        let max = range.end-1;
+        unsafe_cursor.clamp(min, max)
+    }
+
     pub fn get_current(&self) -> usize {
-        self.current
+        self.current // value already normalized
+    }
+
+    // sets current cursor position
+    pub fn set_current(&mut self, current_cursor_position: usize) {
+        let current_normalized = Self::__normalize(self.range.clone(), current_cursor_position);
+        self.current = current_normalized;
+
     }
 
     /// returns true if has reached the upper bound

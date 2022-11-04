@@ -117,12 +117,13 @@ impl SubMenu2 {
         let menu_item_0 = menu_list[0]();
         let menu_item_1 = menu_list[1]();
         let size = menu_list.len();
+        let initial_item_index = 0;
         Self {
             menu_list,
             menu_item_0,
             menu_item_1,
             current_selector: LINE_0,
-            first_line_to_render: Cursor::new(0..size-1),
+            first_line_to_render: Cursor::new(0..size-1, initial_item_index),
 
         }
     }
@@ -263,10 +264,7 @@ impl SubMenu2 {
     }
 }
 
-static mut FILE_01: u16 = 0x0001;
-static mut FILE_02: u16 = 0x0002;
-static mut FILE_03: u16 = 0x0003;
-static mut FILE_04: u16 = 0x0004;
+static mut FILE: [u16; 4] = [0x00;4];
 
 pub fn development_entry_point() -> ! {
 
@@ -282,16 +280,16 @@ pub fn development_entry_point() -> ! {
         let text: FlashString = FlashString::new(&S0);
         fn setter(value: u16) {
             unsafe {
-                FILE_01 = value;
+                FILE[0] = value;
             }
         }
         fn getter() -> u16 {
             unsafe {
-                FILE_01
+                FILE[0]
             }
         }
         
-        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter);
+        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter, 1);
         menu_item
     });
 
@@ -299,16 +297,16 @@ pub fn development_entry_point() -> ! {
         let point1 = Point1d::new(1);
         let point2 = Point1d::new(33);
         let text: FlashString = FlashString::new(&S1);
-        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter);
+        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter, 1);
         fn setter(value: u16) {
             unsafe {
-                FILE_02 = value;
+                FILE[1] = value;
             }
         }
         
         fn getter() -> u16 {
             unsafe {
-                FILE_02
+                FILE[1]
             }
         }
         menu_item
@@ -318,16 +316,16 @@ pub fn development_entry_point() -> ! {
         let point1 = Point1d::new(1);
         let point2 = Point1d::new(33);
         let text: FlashString = FlashString::new(&S3);
-        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter);
+        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter, 1);
         fn setter(value: u16) {
             unsafe {
-                FILE_03 = value;
+                FILE[2] = value;
             }
         }
         
         fn getter() -> u16 {
             unsafe {
-                FILE_03
+                FILE[2]
             }
         }
         menu_item

@@ -25,9 +25,9 @@ struct EditionBuffer {
 }
 
 impl EditionBuffer {
-    pub fn new(buffer: FieldBuffer) -> Self {
+    pub fn new(buffer: FieldBuffer, cursor_position: usize) -> Self {
         Self {
-            cursor: Cursor::new(0..buffer.len()),
+            cursor: Cursor::new(0..buffer.len(), cursor_position),
             buffer,
         }
     }
@@ -85,25 +85,21 @@ pub struct Field {
     edit_mode: EditMode,
     final_buffer: FieldBuffer,
     last_saved_value_has_been_retrieved: bool,
+    initial_cursor_position: usize,
 }
 
 impl Field {
-    pub fn new(array: FieldBuffer) -> Self {
+    pub fn new(array: FieldBuffer, initial_cursor_position: usize) -> Self {
         Self {
-            edition_buffer: EditionBuffer::new(array.clone()),
+            edition_buffer: EditionBuffer::new(array.clone(), initial_cursor_position),
             blink: RectangularWave::new(400,700),
             edit_mode: EditMode::new(false),
             final_buffer: array,
             last_saved_value_has_been_retrieved: true,
+            initial_cursor_position,
         }
     }
 
-    //pub fn from_acessor_u16(start_point: Point, accessor: Accessor<u16>) -> Self {
-    //    let current_value = accessor.get();
-    //    let as_string = convert_u16_to_string_decimal(current_value);
-    //    let array: FieldBuffer = String::from_iter(as_string.chars());
-    //    Field::new(start_point)
-    //}
 
     pub fn get_value_if_it_has_changed(&mut self) -> Option<FieldBuffer> {
         if self.last_saved_value_has_been_retrieved == false {
@@ -126,13 +122,13 @@ impl Field {
                 // save/cancel edition
                 KeyCode::KEY_ESC => {
                     self.set_edit_mode(false); // terminate edition
-                    self.edition_buffer.cursor.begin(); // reset cursor position
+                    self.edition_buffer.cursor.set_current(self.initial_cursor_position); // reset cursor position
                     self.edition_buffer.buffer = self.final_buffer.clone(); // disconsider edited value
                     Some(())
                 }
                 KeyCode::KEY_ENTER => {
                     self.set_edit_mode(false); // terminate edition
-                    self.edition_buffer.cursor.begin(); // reset cursor position
+                    self.edition_buffer.cursor.set_current(self.initial_cursor_position); // reset cursor position
                     self.final_buffer = self.edition_buffer.buffer.clone(); // saves value
                     self.last_saved_value_has_been_retrieved = false; // reset flag
                     Some(())
