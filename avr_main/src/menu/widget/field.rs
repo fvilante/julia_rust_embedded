@@ -107,10 +107,9 @@ pub struct Field {
     edition_buffer: EditionBuffer,
     blink: RectangularWave<u32>,
     edit_mode: EditMode,
-    final_buffer: FieldBuffer,
-    last_saved_value_has_been_retrieved: bool,
     initial_cursor_position: usize,
     setter: Setter,
+    getter: Getter,
     valid_range: Range<u16>,
     number_of_digits: usize,
 }
@@ -120,27 +119,16 @@ impl Field {
         let array = convert_u16_to_FieldBuffer(getter(), number_of_digits);
         Self {
             setter,
+            getter,
             edition_buffer: EditionBuffer::new(array.clone(), initial_cursor_position),
             blink: RectangularWave::new(400,700),
             edit_mode: EditMode::new(false),
-            final_buffer: array,
-            last_saved_value_has_been_retrieved: true,
             initial_cursor_position,
             valid_range,
             number_of_digits,
         }
     }
 
-
-    pub fn get_value_if_it_has_changed(&mut self) -> Option<FieldBuffer> {
-        if self.last_saved_value_has_been_retrieved == false {
-            self.last_saved_value_has_been_retrieved = true;
-            Some(self.final_buffer.clone())
-        } else {
-            None
-        }
-        
-    }
 
     fn __saves_data(&mut self, data: FieldBuffer) {
         let value = convert_FieldBuffer_to_u16(data);
@@ -150,7 +138,13 @@ impl Field {
         (self.setter)(value_clamped);
         let field_buffer = convert_u16_to_FieldBuffer(value_clamped, self.number_of_digits);
         self.edition_buffer = EditionBuffer::new(field_buffer.clone(), self.initial_cursor_position);
-        self.final_buffer = field_buffer;
+    }
+
+    /// disconsider edited value and reset edition cursor
+    fn __abort_edition(&mut self) {
+        let previous_value = (self.getter)(); // original value
+        let field_buffer = convert_u16_to_FieldBuffer(previous_value, self.number_of_digits);
+        self.edition_buffer = EditionBuffer::new(field_buffer, self.initial_cursor_position);
     }
 }
 
@@ -164,15 +158,13 @@ impl Field {
                 // save/cancel edition
                 KeyCode::KEY_ESC => {
                     self.set_edit_mode(false); // terminate edition
-                    self.edition_buffer.cursor.set_current(self.initial_cursor_position); // reset cursor position
-                    self.edition_buffer.buffer = self.final_buffer.clone(); // disconsider edited value
+                    self.__abort_edition(); 
                     Some(())
                 }
                 KeyCode::KEY_ENTER => {
                     self.set_edit_mode(false); // terminate edition
-                    self.edition_buffer.cursor.set_current(self.initial_cursor_position); // reset cursor position
-                    self.final_buffer = self.edition_buffer.buffer.clone(); // saves value
-                    self.last_saved_value_has_been_retrieved = false; // reset flag
+                    let field_buffer: FieldBuffer = self.edition_buffer.buffer.clone();
+                    self.__saves_data(field_buffer);
                     Some(())
                 }
                 // navigation_key left and right
@@ -208,10 +200,6 @@ impl Field {
     pub fn update(&mut self) {
         // blinks cursor
         self.blink.update();
-        // saves data
-        if let Some(changedValue) = self.get_value_if_it_has_changed() {
-            self.__saves_data(changedValue);
-        }
     }
 
     pub fn draw(&self, canvas: &mut Canvas, start_point: Point) {
