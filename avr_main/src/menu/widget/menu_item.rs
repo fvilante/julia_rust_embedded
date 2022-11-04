@@ -7,69 +7,28 @@ use super::{caption::Caption, field::{Field, FieldBuffer, Getter, Setter}, widge
 
 use heapless::String;
 use lib_1::utils::common::convert_u16_to_string_decimal;
-use core::str::FromStr;
+use core::{str::FromStr, ops::Range};
 
 pub struct MenuItem {
     point_a: Point1d,
     caption: Caption,
     point_b: Point1d,
     field: Field,
-    setter: Setter,
 }
-//just a type convertion
-fn convert(data: u16) -> FieldBuffer {
-    let number_of_chars = 5;
-    const blacket_char:char = '0';
-    let s = convert_u16_to_string_decimal(data);
-    let mut base: FieldBuffer = String::from_str(s.as_str()).unwrap();
-    let mut temp: FieldBuffer = String::new();
-    //leading zeros
-    for _ in base.len()..number_of_chars {
-        temp.push(blacket_char);
-    }
-    //actal number
-    for char in base.chars() {
-        temp.push(char);
-    }
-    temp
-}
+
 
 impl MenuItem {
     /// NOTE: client should put point1 and point2 in the same line
     /// point1 = position of caption, point2 = position of field
-    pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, getter: Getter, setter: Setter, initial_cursor_position: usize) -> Self {
-        let v = getter();
-        let array = convert(v);
+    pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, getter: Getter, setter: Setter, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
         Self {
             point_a,
             caption: Caption::new(text),
             point_b,
-            field: Field::new(array, initial_cursor_position),
-            setter,
+            field: Field::new(setter, getter, initial_cursor_position, number_of_digits, valid_range),
         }
     }
 
-    //pub fn from_string_constructor(declaration: FlashString) -> Self {
-    //    match parse_menu_item_constructor_string(declaration) {
-    //        MenuItemParsed::PureCaption(value) => {
-    //            
-    //        } 
-    //        MenuItemParsed::CaptionWithOneField(c_first, c_field, c_first ) => {
-    //            let x = 1; // initial x
-    //            let point1 = Point(x,0);
-    //            let point2 = point1.x as usize + c_field.len();
-    //            Self::new(point1, text, point2, array)
-    //        }
-    //    }
-    //}
-
-    pub fn set_caption(&mut self, text: FlashString) {
-        self.caption.set_caption(text);
-    }
-
-    pub fn get_value_if_it_has_changed(&mut self) -> Option<FieldBuffer> {
-        self.field.get_value_if_it_has_changed()
-    }
 }
 
 impl MenuItem {
@@ -80,11 +39,6 @@ impl MenuItem {
     pub fn update(&mut self) {
         self.caption.update();
         self.field.update();
-        // saves
-        if let Some(changedValue) = self.get_value_if_it_has_changed() {
-            let v: u16 = changedValue.parse().unwrap();
-            (self.setter)(v);
-        }
     }
 
     // lcd_line: false = line_0 ; true = line_1

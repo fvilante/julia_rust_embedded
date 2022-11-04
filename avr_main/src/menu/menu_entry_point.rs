@@ -1,5 +1,5 @@
 use core::str::FromStr;
-
+use core::ops::Range;
 use alloc::string::ToString;
 use heapless::String;
 use heapless::Vec;
@@ -125,15 +125,6 @@ impl SubMenu2 {
             current_selector: LINE_0,
             first_line_to_render: Cursor::new(0..size-1, initial_item_index),
 
-        }
-    }
-
-    // false = line0, true = line1
-    pub fn get_value_if_it_has_changed(&mut self, line: bool) -> Option<FieldBuffer> {
-        if line == LINE_0 {
-            self.menu_item_0.get_value_if_it_has_changed()
-        } else {
-            self.menu_item_1.get_value_if_it_has_changed()
         }
     }
 
@@ -289,7 +280,7 @@ pub fn development_entry_point() -> ! {
             }
         }
         
-        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter, 1);
+        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter, 0, 4, 10..100);
         menu_item
     });
 
@@ -297,7 +288,7 @@ pub fn development_entry_point() -> ! {
         let point1 = Point1d::new(1);
         let point2 = Point1d::new(33);
         let text: FlashString = FlashString::new(&S1);
-        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter, 1);
+        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter, 0, 4, 0..0xFFFF);
         fn setter(value: u16) {
             unsafe {
                 FILE[1] = value;
@@ -316,7 +307,7 @@ pub fn development_entry_point() -> ! {
         let point1 = Point1d::new(1);
         let point2 = Point1d::new(33);
         let text: FlashString = FlashString::new(&S3);
-        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter, 1);
+        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter, 0, 4, 0..0xFFFF);
         fn setter(value: u16) {
             unsafe {
                 FILE[2] = value;
@@ -344,26 +335,7 @@ pub fn development_entry_point() -> ! {
         submenu.update();
         submenu.draw(&mut canvas);
         canvas.render();
-        if let Some(value) = submenu.get_value_if_it_has_changed(false) {
-            canvas.set_cursor(Point::new(0,1));
-            canvas.print_string(String::from_str("Coletado=").unwrap() as FieldBuffer);
-            canvas.print_string(value);
-            canvas.render();
-            delay_ms(100);
-            //submenu.set_edit_mode(LINE_0, true);
-            //canvas.render();
-            //loop { }
-        }
-        if let Some(value) = submenu.get_value_if_it_has_changed(true) {
-            canvas.set_cursor(Point::new(0,0));
-            canvas.print_string(String::from_str("Coletado=").unwrap() as FieldBuffer);
-            canvas.print_string(value);
-            canvas.render();
-            delay_ms(100);
-            //submenu.set_edit_mode(LINE_1, true);
-            //canvas.render();
-            //loop { }
-        }
+
     }
 
 

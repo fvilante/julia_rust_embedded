@@ -1,5 +1,6 @@
 
 use core::str::FromStr;
+use core::ops::Range;
 
 use alloc::borrow::ToOwned;
 use heapless::{ 
@@ -77,6 +78,29 @@ impl EditionBuffer {
 
 }
 
+//just a type convertion
+fn convert_u16_to_FieldBuffer(data: u16, number_of_digits: usize) -> FieldBuffer {
+    const blacket_char:char = '0';
+    let s = convert_u16_to_string_decimal(data);
+    let mut base: FieldBuffer = String::from_str(s.as_str()).unwrap();
+    let mut temp: FieldBuffer = String::new();
+    //leading zeros
+    for _ in base.len()..number_of_digits {
+        temp.push(blacket_char);
+    }
+    //actal number
+    for char in base.chars() {
+        temp.push(char);
+    }
+    temp
+}
+
+///NOTE: If error defaults to 0
+fn convert_FieldBuffer_to_u16(data: FieldBuffer) -> u16 {
+    let res = data.parse::<u16>().unwrap_or(0);
+    res
+}
+
 //Make possible to edit a position of memory using Lcd display and keyboard
 //esc abort edition, and enter confirm edition
 pub struct Field {
@@ -86,17 +110,24 @@ pub struct Field {
     final_buffer: FieldBuffer,
     last_saved_value_has_been_retrieved: bool,
     initial_cursor_position: usize,
+    setter: Setter,
+    valid_range: Range<u16>,
+    number_of_digits: usize,
 }
 
 impl Field {
-    pub fn new(array: FieldBuffer, initial_cursor_position: usize) -> Self {
+    pub fn new(setter: Setter, getter: Getter, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
+        let array = convert_u16_to_FieldBuffer(getter(), number_of_digits);
         Self {
+            setter,
             edition_buffer: EditionBuffer::new(array.clone(), initial_cursor_position),
             blink: RectangularWave::new(400,700),
             edit_mode: EditMode::new(false),
             final_buffer: array,
             last_saved_value_has_been_retrieved: true,
             initial_cursor_position,
+            valid_range,
+            number_of_digits,
         }
     }
 
@@ -109,6 +140,17 @@ impl Field {
             None
         }
         
+    }
+
+    fn __saves_data(&mut self, data: FieldBuffer) {
+        let value = convert_FieldBuffer_to_u16(data);
+        let min = self.valid_range.start;
+        let max = self.valid_range.end;
+        let value_clamped = value.clamp(min, max);
+        (self.setter)(value_clamped);
+        let field_buffer = convert_u16_to_FieldBuffer(value_clamped, self.number_of_digits);
+        self.edition_buffer = EditionBuffer::new(field_buffer.clone(), self.initial_cursor_position);
+        self.final_buffer = field_buffer;
     }
 }
 
@@ -164,7 +206,12 @@ impl Field {
     }
 
     pub fn update(&mut self) {
+        // blinks cursor
         self.blink.update();
+        // saves data
+        if let Some(changedValue) = self.get_value_if_it_has_changed() {
+            self.__saves_data(changedValue);
+        }
     }
 
     pub fn draw(&self, canvas: &mut Canvas, start_point: Point) {
