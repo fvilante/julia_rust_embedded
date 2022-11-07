@@ -29,6 +29,7 @@ use super::widget::menu_item;
 use super::widget::menu_item::MenuItem;
 use super::widget::menu_item::MenuItemParsed;
 use super::widget::menu_item::parse_menu_item_constructor_string;
+use super::widget::optional::Optional;
 use super::widget::splash::Splash;
 use crate::menu::widget::widget::Widget;
 use crate::menu::widget::cursor::Cursor;
@@ -60,6 +61,8 @@ progmem! {
     static progmem string S5 = "Aceleracao de Retorno";
     static progmem string S6 = "Start Automatico no Avanco";
     static progmem string S7 = "Start Automatico no Retorno";
+    static progmem string O1 = "Ligado";
+    static progmem string O2 = "Deslig";
 
     //NOTE: it is possible to load any type in progmem not only strings
     static progmem A0: [u8; 6] = [0,1,2,3,4,5];
@@ -257,13 +260,44 @@ impl SubMenu2 {
 
 static mut FILE: [u16; 4] = [0x00;4];
 
+static mut CURSOR: Cursor = Cursor::new(0..2, 0);
+
 pub fn development_entry_point() -> ! {
 
     let SystemEnviroment{mut canvas, mut keyboard, ..} = SystemEnviroment::new();
 
     canvas.render();  
 
+    //optional
 
+    let mut options = Vec::new();
+    options.push(FlashString::new(&O1));
+    options.push(FlashString::new(&O2));
+    fn setter(cursor: Cursor) {
+        unsafe {
+            CURSOR = cursor;
+        }
+    }
+
+    fn getter() -> Cursor {
+        unsafe {
+            CURSOR.clone()
+        }
+    }
+
+    let mut optional = Optional::new(options, setter, getter);
+    let point = Point::new(0,0);
+    optional.set_edit_mode(true);
+    loop {
+        if let Some(key) = keyboard.get_key() {
+            optional.send_key(key);
+        }
+        optional.update();
+        optional.draw(&mut canvas, point);
+        canvas.render();
+    }
+
+    // submenu
     let mut menu_list = Vec::<MenuItemGetter,10>::new();
     menu_list.push(|| {
         let point1 = Point1d::new(1);

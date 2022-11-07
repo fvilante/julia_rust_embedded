@@ -155,12 +155,14 @@ impl Field {
         if self.is_in_edit_mode() {
 
             let effect = match key {
-                // save/cancel edition
+                // cancel edition
                 KeyCode::KEY_ESC => {
                     self.set_edit_mode(false); // terminate edition
                     self.__abort_edition(); 
                     Some(())
                 }
+                
+                // saves edition
                 KeyCode::KEY_ENTER => {
                     self.set_edit_mode(false); // terminate edition
                     let field_buffer: FieldBuffer = self.edition_buffer.buffer.clone();

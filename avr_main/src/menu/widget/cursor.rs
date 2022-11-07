@@ -1,24 +1,40 @@
 use core::ops::Range;
 
+
 pub struct Cursor {
-    current: usize,
-    range: Range<usize>, //(inclusive-exclusive)
+    current: usize,     // oscilates between 'range' values
+    range: Range<usize>, //(inclusive-exclusive) 
 }
 
 impl Cursor {
-    pub fn new(range: Range<usize>, current: usize) -> Self {
-        let current_normalized = Self::__normalize(range.clone(), current);
+    pub const fn new(range: Range<usize>, current: usize) -> Self {
+        let range_copy = range.start..range.end;
+        let current_normalized = Self::__normalize(range_copy, current);
         Self {
             current: current_normalized,
             range,
         }
     }
 
+    pub fn clone(&self) -> Self {
+        //NOTE: By default 'Range' type is not copy. For more see: https://stackoverflow.com/questions/43416914/why-doesnt-opsranget-implement-copy-even-if-t-is-copy
+        let current = self.current;
+        let range = self.range.start..self.range.end;
+        let copied_cursor = Cursor::new(range, current);
+        copied_cursor
+    }
+
     /// normalize given cursor position to make sure it is inside valid range
-    fn __normalize(range: Range<usize>, unsafe_cursor: usize) -> usize {
+    const fn __normalize(range: Range<usize>, unsafe_cursor: usize) -> usize {
         let min = range.start;
         let max = range.end-1;
-        unsafe_cursor.clamp(min, max)
+        if unsafe_cursor < min {
+            min
+        } else if unsafe_cursor > max {
+            max
+        } else {
+            unsafe_cursor
+        }
     }
 
     pub fn get_current(&self) -> usize {
@@ -31,6 +47,8 @@ impl Cursor {
         self.current = current_normalized;
 
     }
+
+
 
     /// returns true if has reached the upper bound
     pub fn next(&mut self) -> bool {
@@ -54,8 +72,22 @@ impl Cursor {
         has_reached_lower_bound
     }
 
+    pub fn next_wrap_around(&mut self) {
+        let has_finished = self.next();
+        if has_finished {
+            self.begin();
+        } 
+    }
+    
+    pub fn previous_wrap_around(&mut self) {
+        let has_finished = self.previous();
+        if has_finished {
+            self.end();
+        }
+    }
+
     pub fn end(&mut self) {
-        self.current = self.range.end;
+        self.current = self.range.end-1;
     }
     
     pub fn begin(&mut self) {
