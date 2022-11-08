@@ -1,23 +1,28 @@
 //abstracts the access to a type in memory
 
-pub struct Accessor<'a, T: Clone> {
-    ref_mut: &'a mut T,
+type Setter<A> = fn(A);
+type Getter<A> = fn() -> A;
+
+pub struct Accessor<T> {
+    setter: Setter<T>,
+    getter: Getter<T>,
 }
 
-impl<'a, T: Clone> Accessor<'a, T> {
+impl<T> Accessor<T> {
 
-    pub fn new(ref_mut: &'a mut T) -> Self {
+    pub fn new(setter: Setter<T>, getter: Getter<T>) -> Self {
         Self {
-            ref_mut,
+            setter,
+            getter,
         }
     }
 
     pub fn set(&mut self, value: T) {
-        *self.ref_mut = value;
+        (self.setter)(value);
     }
 
     pub fn get(&self) -> T {
-        (*self.ref_mut).clone()
+        (self.getter)()
     }
 
 }

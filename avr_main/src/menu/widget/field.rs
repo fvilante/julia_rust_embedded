@@ -9,12 +9,10 @@ use heapless::{
 };
 use lib_1::utils::common::convert_u16_to_string_decimal;
 
-use crate::{menu::{point::Point, ratangular_wave::RectangularWave, canvas::Canvas}, board::keyboard::KeyCode};
+use crate::{menu::{point::Point, ratangular_wave::RectangularWave, canvas::Canvas, accessor::Accessor}, board::keyboard::KeyCode};
 
 use super::{edit_mode::EditMode, widget::Widget, widget::Editable, cursor::Cursor};
 
-pub type Setter = fn(u16);
-pub type Getter = fn() -> u16;
 
 const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 10;
 
@@ -108,24 +106,23 @@ pub struct Field {
     blink: RectangularWave<u32>,
     edit_mode: EditMode,
     initial_cursor_position: usize,
-    setter: Setter,
-    getter: Getter,
     valid_range: Range<u16>,
     number_of_digits: usize,
+    accessor: Accessor<u16>,
 }
 
 impl Field {
-    pub fn new(setter: Setter, getter: Getter, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
-        let array = convert_u16_to_FieldBuffer(getter(), number_of_digits);
+    pub fn new(accessor: Accessor<u16>, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
+        let value = accessor.get();
+        let array = convert_u16_to_FieldBuffer(value, number_of_digits);
         Self {
-            setter,
-            getter,
             edition_buffer: EditionBuffer::new(array.clone(), initial_cursor_position),
             blink: RectangularWave::new(400,700),
             edit_mode: EditMode::new(false),
             initial_cursor_position,
             valid_range,
             number_of_digits,
+            accessor,
         }
     }
 
@@ -135,14 +132,14 @@ impl Field {
         let min = self.valid_range.start;
         let max = self.valid_range.end;
         let value_clamped = value.clamp(min, max);
-        (self.setter)(value_clamped);
+        self.accessor.set(value_clamped);
         let field_buffer = convert_u16_to_FieldBuffer(value_clamped, self.number_of_digits);
         self.edition_buffer = EditionBuffer::new(field_buffer.clone(), self.initial_cursor_position);
     }
 
     /// disconsider edited value and reset edition cursor
     fn __abort_edition(&mut self) {
-        let previous_value = (self.getter)(); // original value
+        let previous_value = self.accessor.get(); // original value
         let field_buffer = convert_u16_to_FieldBuffer(previous_value, self.number_of_digits);
         self.edition_buffer = EditionBuffer::new(field_buffer, self.initial_cursor_position);
     }

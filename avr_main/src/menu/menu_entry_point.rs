@@ -8,6 +8,7 @@ use crate::board::output_expander::OutputExpander;
 use crate::board::{lcd, output_expander};
 use crate::board::keyboard::KeyCode;
 use crate::enviroment::front_panel::FrontPanel;
+use crate::menu::accessor::Accessor;
 use crate::menu::widget::sub_menu::MenuItemEnum;
 use crate::menu::widget::sub_menu::MenuItemEnumGetter;
 use crate::menu::widget::sub_menu::SubMenu;
@@ -104,8 +105,9 @@ pub fn development_entry_point() -> ! {
                 FILE[0]
             }
         }
+        let accessor = Accessor::new(setter, getter);
         
-        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter, 0, 4, 10..100);
+        let mut menu_item = MenuItem::new(point1, text, point2, accessor, 0, 4, 10..100);
         MenuItemEnum::MenuItem(menu_item)
     });
 
@@ -113,7 +115,6 @@ pub fn development_entry_point() -> ! {
         let point1 = Point1d::new(1);
         let point2 = Point1d::new(33);
         let text: FlashString = FlashString::new(&S1);
-        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter, 0, 4, 0..0xFFFF);
         fn setter(value: u16) {
             unsafe {
                 FILE[1] = value;
@@ -125,6 +126,8 @@ pub fn development_entry_point() -> ! {
                 FILE[1]
             }
         }
+        let accessor = Accessor::new(setter, getter);
+        let mut menu_item = MenuItem::new(point1, text, point2, accessor, 0, 4, 0..0xFFFF);
         MenuItemEnum::MenuItem(menu_item)
     });
 
@@ -132,7 +135,6 @@ pub fn development_entry_point() -> ! {
         let point1 = Point1d::new(1);
         let point2 = Point1d::new(33);
         let text: FlashString = FlashString::new(&S3);
-        let mut menu_item = MenuItem::new(point1, text, point2, getter, setter, 0, 4, 0..0xFFFF);
         fn setter(value: u16) {
             unsafe {
                 FILE[2] = value;
@@ -144,6 +146,8 @@ pub fn development_entry_point() -> ! {
                 FILE[2]
             }
         }
+        let accessor = Accessor::new(setter, getter);
+        let mut menu_item = MenuItem::new(point1, text, point2, accessor, 0, 4, 0..0xFFFF);
         MenuItemEnum::MenuItem(menu_item)
     });
 
