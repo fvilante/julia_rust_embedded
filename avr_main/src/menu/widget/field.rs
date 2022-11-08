@@ -120,22 +120,24 @@ impl EditionBuffer {
     }
 
 }
-
+ 
 struct Numerical {
     edition_buffer: EditionBuffer,
     valid_range: Range<u16>,
     number_of_digits: usize,
     // initial values
     initial_edition_buffer: EditionBuffer,
+    accessor: Accessor<u16>
 } 
 
 impl Numerical {
-    pub fn new(edition_buffer: EditionBuffer, valid_range: Range<u16>, number_of_digits: usize) -> Self {
+    pub fn new(edition_buffer: EditionBuffer, valid_range: Range<u16>, number_of_digits: usize, accessor: Accessor<u16>) -> Self {
         Self {
             edition_buffer: edition_buffer.clone(),
             valid_range,
             number_of_digits,
             initial_edition_buffer: edition_buffer,
+            accessor,
         }
     }
 
@@ -177,17 +179,17 @@ impl Numerical {
 }
 
 impl Numerical {
-    pub fn save_edition(&mut self, mut accessor: Accessor<u16>) {
+    pub fn save_edition(&mut self) {
         let normalized_value = self.to_u16_normalized();
-        accessor.set(normalized_value); // saves data to accessor
+        self.accessor.set(normalized_value); // saves data to accessor
         self.set_u16(normalized_value); // saves displayed data
+        self.reset_cursor();
     }
 
-    pub fn abort_edition(&mut self, accessor: Accessor<u16>) {
-        //reset Numerical
-        let original_value = accessor.get(); 
-        self.set_u16(original_value); // saves displayed data
-
+    pub fn abort_edition(&mut self) {
+        let original_value = self.accessor.get(); 
+        self.set_u16(original_value); // resets displayed data
+        self.reset_cursor();
     }
 
 
@@ -220,7 +222,7 @@ impl Numerical {
 
 
 
-//Make possible to edit a position of memory using Lcd display and keyboard
+//Makes possible to edit a position of memory using Lcd display and keyboard
 //esc abort edition, and enter confirm edition
 pub struct Field {
     //state (dynamic)
@@ -229,7 +231,6 @@ pub struct Field {
     edit_mode: EditMode,
     //initial condition (static):
     initial_cursor_position: usize,
-    accessor: Accessor<u16>,
 }
 
 impl Field {
@@ -238,25 +239,13 @@ impl Field {
         let array = convert_u16_to_FieldBuffer(value, number_of_digits);
         let edition_buffer = EditionBuffer::new(array.clone(), initial_cursor_position);
         Self {
-            numerical: Numerical::new(edition_buffer, valid_range, number_of_digits),
+            numerical: Numerical::new(edition_buffer, valid_range, number_of_digits, accessor),
             blink: RectangularWave::new(400,700),
             edit_mode: EditMode::new(false),
             initial_cursor_position,
-            accessor,
         }
     }
 
-
-    fn __saves_data(&mut self) {
-        self.numerical.save_edition(self.accessor.clone());
-        self.numerical.reset_cursor();
-    }
-
-    /// disconsider edited value and reset edition cursor
-    fn __abort_edition(&mut self) {
-        self.numerical.abort_edition(self.accessor.clone());
-        self.numerical.reset_cursor();
-    }
 }
 
 impl Field {
@@ -269,13 +258,13 @@ impl Field {
                 // cancel edition
                 KeyCode::KEY_ESC => {
                     self.set_edit_mode(false); // terminate edition
-                    self.__abort_edition(); 
+                    self.numerical.abort_edition(); 
                 }
                 
                 // saves edition
                 KeyCode::KEY_ENTER => {
                     self.set_edit_mode(false); // terminate edition
-                    self.__saves_data();
+                    self.numerical.save_edition(); 
                 }
 
                  //delegate everything else
@@ -308,7 +297,6 @@ impl Field {
 
 impl Field {
     pub fn set_edit_mode(&mut self, value: bool) {
-
         self.edit_mode.set_edit_mode(value);
     }
 
