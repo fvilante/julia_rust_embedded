@@ -8,7 +8,8 @@ use crate::board::output_expander::OutputExpander;
 use crate::board::{lcd, output_expander};
 use crate::board::keyboard::KeyCode;
 use crate::enviroment::front_panel::FrontPanel;
-use crate::menu::widget::sub_menu::MenuItemGetter;
+use crate::menu::widget::sub_menu::MenuItemEnum;
+use crate::menu::widget::sub_menu::MenuItemEnumGetter;
 use crate::menu::widget::sub_menu::SubMenu2;
 use crate::microcontroler::delay::delay_ms;
 use super::database::DataBase;
@@ -139,7 +140,7 @@ pub fn development_entry_point() -> ! {
     }
 
     // submenu
-    let mut menu_list = Vec::<MenuItemGetter,10>::new();
+    let mut menu_list = Vec::<MenuItemEnumGetter,10>::new();
     menu_list.push(|| {
         let point1 = Point1d::new(1);
         let point2 = Point1d::new(33);
@@ -156,7 +157,7 @@ pub fn development_entry_point() -> ! {
         }
         
         let mut menu_item = MenuItem::new(point1, text, point2, getter, setter, 0, 4, 10..100);
-        menu_item
+        MenuItemEnum::MenuItem(menu_item)
     });
 
     menu_list.push(|| {
@@ -175,7 +176,7 @@ pub fn development_entry_point() -> ! {
                 FILE[1]
             }
         }
-        menu_item
+        MenuItemEnum::MenuItem(menu_item)
     });
 
     menu_list.push(|| {
@@ -194,7 +195,7 @@ pub fn development_entry_point() -> ! {
                 FILE[2]
             }
         }
-        menu_item
+        MenuItemEnum::MenuItem(menu_item)
     });
 
 

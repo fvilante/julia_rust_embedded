@@ -8,15 +8,54 @@ use super::{menu_item::MenuItem, cursor::Cursor};
 pub const LINE_0: bool = false;
 pub const LINE_1: bool = true;
 
+pub enum MenuItemEnum {
+    MenuItem(MenuItem)
+}
 
-pub type MenuItemGetter = fn() -> MenuItem;
+impl MenuItemEnum {
+    pub fn set_edit_mode(&mut self, value: bool) {
+        match self {
+            MenuItemEnum::MenuItem(m_item) => m_item.set_edit_mode(value),
+        }
+    }
 
-pub type MenuList = Vec<MenuItemGetter,10>;
+    pub fn is_in_edit_mode(&self) -> bool {
+        match self {
+            MenuItemEnum::MenuItem(m_item) => m_item.is_in_edit_mode(),
+        }
+    }
+
+    pub fn send_key(&mut self, key: KeyCode) {
+        match self {
+            MenuItemEnum::MenuItem(m_item) => m_item.send_key(key),
+        }
+    }
+
+    pub fn update(&mut self) {
+        match self {
+            MenuItemEnum::MenuItem(m_item) => m_item.update(),
+        }
+    }
+
+    pub fn draw(&self, canvas: &mut Canvas, lcd_line: bool) {
+        match self {
+            MenuItemEnum::MenuItem(m_item) => m_item.draw(canvas, lcd_line),
+        }
+    }
+}
+
+
+
+
+
+pub type MenuItemEnumGetter = fn() -> MenuItemEnum;
+
+pub type MenuList = Vec<MenuItemEnumGetter,10>;
 
 pub struct SubMenu2 {
     menu_list: MenuList,    // all itens of submenu
-    menu_item_0: MenuItem,  // first lcd line widget
-    menu_item_1: MenuItem,  // second lcd line widget
+    menu_item_0: MenuItemEnum,  // first lcd line widget
+    menu_item_1: MenuItemEnum,  // second lcd line widget
     current_selector: bool,  // false = line0, true = line1
     first_line_to_render: Cursor, // line of the vector which must be the first line to render in lcd
 }
@@ -84,7 +123,6 @@ impl SubMenu2 {
     }
 
 }
-
 
 impl SubMenu2 {
     pub fn send_key(&mut self, key: KeyCode) {
