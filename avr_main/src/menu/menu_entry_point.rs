@@ -11,6 +11,7 @@ use crate::enviroment::front_panel::FrontPanel;
 use crate::menu::widget::sub_menu::MenuItemEnum;
 use crate::menu::widget::sub_menu::MenuItemEnumGetter;
 use crate::menu::widget::sub_menu::SubMenu2;
+use crate::menu::widget::widget_tests::SystemEnviroment;
 use crate::microcontroler::delay::delay_ms;
 use super::database::DataBase;
 use super::flash::FlashString;
@@ -34,6 +35,7 @@ use super::widget::menu_item::MenuItemParsed;
 use super::widget::menu_item::parse_menu_item_constructor_string;
 use super::widget::optional::Optional;
 use super::widget::splash::Splash;
+use super::widget::widget_tests::optional_widget_test;
 use crate::menu::widget::widget::Widget;
 use crate::menu::widget::cursor::Cursor;
 
@@ -64,8 +66,6 @@ progmem! {
     static progmem string S5 = "Aceleracao de Retorno";
     static progmem string S6 = "Start Automatico no Avanco";
     static progmem string S7 = "Start Automatico no Retorno";
-    static progmem string O1 = "Ligado";
-    static progmem string O2 = "Deslig";
 
     //NOTE: it is possible to load any type in progmem not only strings
     static progmem A0: [u8; 6] = [0,1,2,3,4,5];
@@ -73,71 +73,20 @@ progmem! {
 }
 
 
-struct SystemEnviroment {
-    pub output_expander: OutputExpander,
-    pub keyboard: Keyboard,
-    pub canvas: Canvas,
-}
 
-impl SystemEnviroment {
-    pub fn new() -> Self {
-        lcd::lcd_initialize();
-        let mut output_expander = OutputExpander::new();
-        let beep = |on:bool| { OutputExpander::new().BUZZER(on).commit(); };
-        let mut keyboard = Keyboard::new(beep);
-        let canvas = Canvas::new();
-        Self {
-            output_expander,
-            keyboard,
-            canvas,
-        }
-    }
-
-    pub fn get_front_panel<'a>(&'a mut self) -> FrontPanel<'a> {
-        let front_panel: FrontPanel<'a> = FrontPanel::new(&mut self.output_expander);
-        front_panel
-    }
-
-}
 
 static mut FILE: [u16; 4] = [0x00;4];
 
-static mut CURSOR: Cursor = Cursor::new(0..2, 0);
+
+
 
 pub fn development_entry_point() -> ! {
+
+    optional_widget_test();
 
     let SystemEnviroment{mut canvas, mut keyboard, ..} = SystemEnviroment::new();
 
     canvas.render();  
-
-    //optional
-
-    let mut options = Vec::new();
-    options.push(FlashString::new(&O1));
-    options.push(FlashString::new(&O2));
-    fn setter(cursor: Cursor) {
-        unsafe {
-            CURSOR = cursor;
-        }
-    }
-
-    fn getter() -> Cursor {
-        unsafe {
-            CURSOR.clone()
-        }
-    }
-
-    let mut optional = Optional::new(options, setter, getter);
-    let point = Point::new(0,0);
-    optional.set_edit_mode(true);
-    loop {
-        if let Some(key) = keyboard.get_key() {
-            optional.send_key(key);
-        }
-        optional.update();
-        optional.draw(&mut canvas, point);
-        canvas.render();
-    }
 
     // submenu
     let mut menu_list = Vec::<MenuItemEnumGetter,10>::new();

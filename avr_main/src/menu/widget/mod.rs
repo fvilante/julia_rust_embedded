@@ -10,6 +10,7 @@ pub mod execucao;
 pub mod manual_mode;
 pub mod optional;
 pub mod sub_menu;
+pub mod widget_tests;
 
 use crate::board::keyboard::KeyCode;
 use crate::alloc::borrow::ToOwned;

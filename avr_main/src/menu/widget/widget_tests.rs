@@ -1,0 +1,76 @@
+use avr_progmem::progmem;
+use heapless::Vec;
+use crate::{board::{output_expander::OutputExpander, lcd}, menu::{keyboard::Keyboard, canvas::Canvas, flash::FlashString, point::Point, widget::{optional::Optional, cursor::Cursor}}, enviroment::front_panel::FrontPanel};
+
+
+pub struct SystemEnviroment {
+    pub output_expander: OutputExpander,
+    pub keyboard: Keyboard,
+    pub canvas: Canvas,
+}
+
+impl SystemEnviroment {
+    pub fn new() -> Self {
+        lcd::lcd_initialize();
+        let mut output_expander = OutputExpander::new();
+        let beep = |on:bool| { OutputExpander::new().BUZZER(on).commit(); };
+        let mut keyboard = Keyboard::new(beep);
+        let canvas = Canvas::new();
+        Self {
+            output_expander,
+            keyboard,
+            canvas,
+        }
+    }
+
+    pub fn get_front_panel<'a>(&'a mut self) -> FrontPanel<'a> {
+        let front_panel: FrontPanel<'a> = FrontPanel::new(&mut self.output_expander);
+        front_panel
+    }
+
+}
+
+// ================= OPTIONAL WIDGET TEST ==========================================================
+
+progmem! {
+    static progmem string O1 = "Ligado";
+    static progmem string O2 = "Deslig";
+}
+
+static mut CURSOR: Cursor = Cursor::new(0..2, 0);
+
+pub fn optional_widget_test() -> ! {
+    let SystemEnviroment{mut canvas, mut keyboard, ..} = SystemEnviroment::new();
+
+    canvas.render();  
+
+    //optional
+
+    let mut options = Vec::new();
+    options.push(FlashString::new(&O1));
+    options.push(FlashString::new(&O2));
+    fn setter(cursor: Cursor) {
+        unsafe {
+            CURSOR = cursor;
+        }
+    }
+
+    fn getter() -> Cursor {
+        unsafe {
+            CURSOR.clone()
+        }
+    }
+
+    let mut optional = Optional::new(options, setter, getter);
+    let point = Point::new(0,0);
+    optional.set_edit_mode(true);
+    loop {
+        if let Some(key) = keyboard.get_key() {
+            optional.send_key(key);
+        }
+        optional.update();
+        optional.draw(&mut canvas, point);
+        canvas.render();
+    }
+
+}
