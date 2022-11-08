@@ -35,6 +35,7 @@ use super::widget::menu_item::MenuItemParsed;
 use super::widget::menu_item::parse_menu_item_constructor_string;
 use super::widget::optional::Optional;
 use super::widget::splash::Splash;
+use super::widget::sub_menu::MenuList;
 use super::widget::widget_tests::optional_widget_test;
 use crate::menu::widget::widget::Widget;
 use crate::menu::widget::cursor::Cursor;
@@ -82,14 +83,14 @@ static mut FILE: [u16; 4] = [0x00;4];
 
 pub fn development_entry_point() -> ! {
 
-    optional_widget_test();
+    //optional_widget_test();
 
     let SystemEnviroment{mut canvas, mut keyboard, ..} = SystemEnviroment::new();
 
     canvas.render();  
 
     // submenu
-    let mut menu_list = Vec::<MenuItemEnumGetter,10>::new();
+    let mut menu_list: MenuList = Vec::new();
     menu_list.push(|| {
         let point1 = Point1d::new(1);
         let point2 = Point1d::new(33);
