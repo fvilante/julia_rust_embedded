@@ -41,17 +41,32 @@ fn convert_FieldBuffer_to_u16(data: FieldBuffer) -> u16 {
     res
 }
 
+
+
 /// TODO: rename to NavigationString (?!)
 struct EditionBuffer {
     buffer: FieldBuffer,
     cursor: Cursor,
+    // initial condition
+    pub initial_cursor_position: usize,
 }
 
 impl EditionBuffer {
-    pub fn new(buffer: FieldBuffer, cursor_position: usize) -> Self {
+    pub fn new(buffer: FieldBuffer, initial_cursor_position: usize) -> Self {
         Self {
-            cursor: Cursor::new(0..buffer.len(), cursor_position),
+            cursor: Cursor::new(0..buffer.len(), initial_cursor_position),
             buffer,
+            initial_cursor_position,
+        }
+    }
+
+    pub fn clone(&self) -> Self {
+        let buffer: FieldBuffer = String::from_str(self.buffer.as_str()).unwrap();
+        let cursor = self.cursor.clone();
+        Self {
+            cursor,
+            buffer,
+            initial_cursor_position: self.initial_cursor_position,
         }
     }
 
@@ -68,6 +83,12 @@ impl EditionBuffer {
         }
         self.buffer = s.to_owned();
         self  
+    }
+
+    /// Reset cursor to its default initial position
+    /// NOTE: This method is not necessary the same as begin() method
+    pub fn reset_cursor(&mut self) {
+        self.cursor = Cursor::new(0..self.buffer.len(), self.initial_cursor_position);
     }
 
     /// increment_cursor_safe
@@ -101,14 +122,27 @@ impl EditionBuffer {
 }
 
 struct Numerical {
-    edition_buffer: EditionBuffer
+    edition_buffer: EditionBuffer,
+    valid_range: Range<u16>,
+    number_of_digits: usize,
+    // initial values
+    initial_edition_buffer: EditionBuffer,
 } 
 
 impl Numerical {
-    pub fn new(edition_buffer: EditionBuffer) -> Self {
+    pub fn new(edition_buffer: EditionBuffer, valid_range: Range<u16>, number_of_digits: usize) -> Self {
         Self {
-            edition_buffer,
+            edition_buffer: edition_buffer.clone(),
+            valid_range,
+            number_of_digits,
+            initial_edition_buffer: edition_buffer,
         }
+    }
+
+    pub fn set_u16(&mut self, value: u16) {
+        let initial_cursor_position = self.edition_buffer.initial_cursor_position;
+        let field_buffer = convert_u16_to_FieldBuffer(value, self.number_of_digits);
+        self.edition_buffer = EditionBuffer::new(field_buffer, initial_cursor_position);
     }
 
     pub fn to_u16(&self) -> u16 {
@@ -116,18 +150,44 @@ impl Numerical {
         value
     }
 
+    pub fn set_edition_buffer(&mut self, edition_buffer: EditionBuffer) {
+        self.edition_buffer = edition_buffer;
+
+    }
+
+    pub fn to_u16_normalized(&self) -> u16 {
+        let value = self.to_u16();
+        let min = self.valid_range.start;
+        let max = self.valid_range.end;
+        let value_clamped = value.clamp(min, max);
+        value_clamped
+    }
+
     pub fn get_current_cursor_index(&self) -> usize {
         self.edition_buffer.cursor.get_current()
+    }
+
+    pub fn reset_cursor(&mut self) {
+        self.edition_buffer.reset_cursor()
+    }
+
+    pub fn char_indices(&self) -> CharIndices {
+        self.edition_buffer.buffer.char_indices()
     }
 }
 
 impl Numerical {
     pub fn save_edition(&mut self, mut accessor: Accessor<u16>) {
-        accessor.set(self.to_u16())
+        let normalized_value = self.to_u16_normalized();
+        accessor.set(normalized_value); // saves data to accessor
+        self.set_u16(normalized_value); // saves displayed data
     }
 
-    pub fn char_indices(&self) -> CharIndices {
-        self.edition_buffer.buffer.char_indices()
+    pub fn abort_edition(&mut self, accessor: Accessor<u16>) {
+        //reset Numerical
+        let original_value = accessor.get(); 
+        self.set_u16(original_value); // saves displayed data
+
     }
 
 
@@ -163,12 +223,12 @@ impl Numerical {
 //Make possible to edit a position of memory using Lcd display and keyboard
 //esc abort edition, and enter confirm edition
 pub struct Field {
+    //state (dynamic)
     numerical: Numerical,
     blink: RectangularWave<u32>,
     edit_mode: EditMode,
+    //initial condition (static):
     initial_cursor_position: usize,
-    valid_range: Range<u16>,
-    number_of_digits: usize,
     accessor: Accessor<u16>,
 }
 
@@ -178,32 +238,24 @@ impl Field {
         let array = convert_u16_to_FieldBuffer(value, number_of_digits);
         let edition_buffer = EditionBuffer::new(array.clone(), initial_cursor_position);
         Self {
-            numerical: Numerical::new(edition_buffer),
+            numerical: Numerical::new(edition_buffer, valid_range, number_of_digits),
             blink: RectangularWave::new(400,700),
             edit_mode: EditMode::new(false),
             initial_cursor_position,
-            valid_range,
-            number_of_digits,
             accessor,
         }
     }
 
 
     fn __saves_data(&mut self) {
-        let value = self.numerical.to_u16();
-        let min = self.valid_range.start;
-        let max = self.valid_range.end;
-        let value_clamped = value.clamp(min, max);
-        self.accessor.set(value_clamped);
-        let field_buffer = convert_u16_to_FieldBuffer(value_clamped, self.number_of_digits);
-        self.numerical = Numerical::new(EditionBuffer::new(field_buffer.clone(), self.initial_cursor_position));
+        self.numerical.save_edition(self.accessor.clone());
+        self.numerical.reset_cursor();
     }
 
     /// disconsider edited value and reset edition cursor
     fn __abort_edition(&mut self) {
-        let previous_value = self.accessor.get(); // original value
-        let field_buffer = convert_u16_to_FieldBuffer(previous_value, self.number_of_digits);
-        self.numerical = Numerical::new(EditionBuffer::new(field_buffer, self.initial_cursor_position));
+        self.numerical.abort_edition(self.accessor.clone());
+        self.numerical.reset_cursor();
     }
 }
 
@@ -231,9 +283,7 @@ impl Field {
                 
             };
     
-        } else {
-            // ignore keys
-        }
+        } 
     }
 
     pub fn update(&mut self) {

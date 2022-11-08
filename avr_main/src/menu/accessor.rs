@@ -37,4 +37,10 @@ impl<T> Accessor<T> {
         (self.getter)()
     }
 
+    pub fn clone(&self) -> Self {
+        let setter = self.setter;
+        let getter = self.getter;
+        Self::new(setter, getter)
+    }
+
 }
