@@ -25,7 +25,7 @@ impl MenuItem {
             point_a,
             caption: Caption::new(text),
             point_b,
-            field: Field::new(accessor, initial_cursor_position, number_of_digits, valid_range),
+            field: Field::from_numerical(accessor, initial_cursor_position, number_of_digits, valid_range),
         }
     }
 

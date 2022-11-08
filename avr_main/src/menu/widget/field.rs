@@ -220,7 +220,7 @@ impl Numerical {
     }
 }
 
-struct NumericalField {
+pub struct NumericalField {
     numerical: Numerical,
     blink: RectangularWave<u32>,
 }
@@ -273,25 +273,64 @@ impl NumericalField {
 }
 
 
+pub enum FieldEnum {
+    Numerical(NumericalField),
+}
+
+impl FieldEnum {
+    pub fn save_edition(&mut self) {
+        match self {
+            Self::Numerical(x) => x.save_edition(), 
+        }
+    }
+
+    pub fn abort_edition(&mut self) {
+        match self {
+            Self::Numerical(x) => x.abort_edition(), 
+        }
+    }
+}
+
+impl FieldEnum {
+    pub fn send_key(&mut self, key: KeyCode) {
+        match self {
+            Self::Numerical(x) => x.send_key(key), 
+        }
+    }
+
+    pub fn update(&mut self) {
+        match self {
+            Self::Numerical(x) => x.update(), 
+        }
+    }
+
+    pub fn draw(&self, canvas: &mut Canvas, start_point: Point, is_in_editing_mode: bool) {
+        match self {
+            Self::Numerical(x) => x.draw(canvas, start_point, is_in_editing_mode), 
+        }
+    }
+}
 
 //Makes possible to edit a position of memory using Lcd display and keyboard
 //esc abort edition, and enter confirm edition
 pub struct Field {
-    numerical_field: NumericalField,
+    field_enum: FieldEnum,
     edit_mode: EditMode,
 }
 
 impl Field {
-    pub fn new(accessor: Accessor<u16>, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
-        let value = accessor.get();
-        let array = convert_u16_to_FieldBuffer(value, number_of_digits);
-        let edition_buffer = EditionBuffer::new(array.clone(), initial_cursor_position);
+    pub fn new(field_enum: FieldEnum) -> Self {
         Self {
-            numerical_field: NumericalField::new(accessor, initial_cursor_position, number_of_digits, valid_range),
+            field_enum,
             edit_mode: EditMode::new(false),
         }
     }
 
+    pub fn from_numerical(accessor: Accessor<u16>, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
+        let numerical_field = NumericalField::new(accessor, initial_cursor_position, number_of_digits, valid_range);
+        let field_enum = FieldEnum::Numerical(numerical_field);
+        Self::new(field_enum)
+    }
 }
 
 impl Field {
@@ -304,17 +343,17 @@ impl Field {
                 // cancel edition
                 KeyCode::KEY_ESC => {
                     self.set_edit_mode(false); // terminate edition
-                    self.numerical_field.abort_edition(); 
+                    self.field_enum.abort_edition(); 
                 }
                 
                 // saves edition
                 KeyCode::KEY_ENTER => {
                     self.set_edit_mode(false); // terminate edition
-                    self.numerical_field.save_edition(); 
+                    self.field_enum.save_edition(); 
                 }
 
                  //delegate everything else
-                _ => self.numerical_field.send_key(key),
+                _ => self.field_enum.send_key(key),
                 
             };
     
@@ -322,12 +361,12 @@ impl Field {
     }
 
     pub fn update(&mut self) {
-        self.numerical_field.update()
+        self.field_enum.update()
     }
 
     pub fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         let is_in_edit_mode = self.is_in_edit_mode();
-        self.numerical_field.draw(canvas, start_point, is_in_edit_mode)
+        self.field_enum.draw(canvas, start_point, is_in_edit_mode)
     }
 }
 
