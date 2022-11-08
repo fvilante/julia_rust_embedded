@@ -10,7 +10,7 @@ use crate::board::keyboard::KeyCode;
 use crate::enviroment::front_panel::FrontPanel;
 use crate::menu::widget::sub_menu::MenuItemEnum;
 use crate::menu::widget::sub_menu::MenuItemEnumGetter;
-use crate::menu::widget::sub_menu::SubMenu2;
+use crate::menu::widget::sub_menu::SubMenu;
 use crate::menu::widget::widget_tests::SystemEnviroment;
 use crate::microcontroler::delay::delay_ms;
 use super::database::DataBase;
@@ -150,7 +150,7 @@ pub fn development_entry_point() -> ! {
 
 
 
-    let mut submenu = SubMenu2::new(menu_list);
+    let mut submenu = SubMenu::new(menu_list);
 
     loop { 
 

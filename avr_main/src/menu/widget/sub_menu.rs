@@ -52,7 +52,7 @@ pub type MenuItemEnumGetter = fn() -> MenuItemEnum;
 
 pub type MenuList = Vec<MenuItemEnumGetter,10>;
 
-pub struct SubMenu2 {
+pub struct SubMenu {
     menu_list: MenuList,    // all itens of submenu
     menu_item_0: MenuItemEnum,  // first lcd line widget
     menu_item_1: MenuItemEnum,  // second lcd line widget
@@ -61,7 +61,7 @@ pub struct SubMenu2 {
 }
 
 
-impl SubMenu2 {
+impl SubMenu {
     pub fn new(menu_list: MenuList) -> Self {
         let menu_item_0 = menu_list[0]();
         let menu_item_1 = menu_list[1]();
@@ -124,7 +124,7 @@ impl SubMenu2 {
 
 }
 
-impl SubMenu2 {
+impl SubMenu {
     pub fn send_key(&mut self, key: KeyCode) {
         let is_in_edit_mode = self.is_in_edit_mode();
 
@@ -178,8 +178,8 @@ impl SubMenu2 {
 
     pub fn draw(&self, canvas: &mut Canvas) {
         canvas.clear();
-        fn draw_selector(self_: &SubMenu2, line: bool, canvas: &mut Canvas) {
-            fn draw_char(self_: &SubMenu2, canvas: &mut Canvas) {
+        fn draw_selector(self_: &SubMenu, line: bool, canvas: &mut Canvas) {
+            fn draw_char(self_: &SubMenu, canvas: &mut Canvas) {
                 match self_.is_in_edit_mode() {
                     Some(_) => canvas.print_char('*'),
                     None => canvas.print_char('>')
