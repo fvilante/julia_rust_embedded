@@ -1,5 +1,5 @@
 
-use core::str::FromStr;
+use core::str::{FromStr, CharIndices};
 use core::ops::Range;
 
 use alloc::borrow::ToOwned;
@@ -9,7 +9,7 @@ use heapless::{
 };
 use lib_1::utils::common::convert_u16_to_string_decimal;
 
-use crate::{menu::{point::Point, ratangular_wave::RectangularWave, canvas::Canvas, accessor::Accessor}, board::keyboard::KeyCode};
+use crate::{menu::{point::Point, ratangular_wave::RectangularWave, canvas::Canvas, accessor::{Accessor, AccessorEnum}}, board::keyboard::KeyCode};
 
 use super::{edit_mode::EditMode, widget::Widget, widget::Editable, cursor::Cursor};
 
@@ -18,6 +18,30 @@ const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 10;
 
 pub type FieldBuffer = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
 
+//just a type convertion
+fn convert_u16_to_FieldBuffer(data: u16, number_of_digits: usize) -> FieldBuffer {
+    const blacket_char:char = '0';
+    let s = convert_u16_to_string_decimal(data);
+    let mut base: FieldBuffer = String::from_str(s.as_str()).unwrap();
+    let mut temp: FieldBuffer = String::new();
+    //leading zeros
+    for _ in base.len()..number_of_digits {
+        temp.push(blacket_char);
+    }
+    //actal number
+    for char in base.chars() {
+        temp.push(char);
+    }
+    temp
+}
+
+///NOTE: If error defaults to 0
+fn convert_FieldBuffer_to_u16(data: FieldBuffer) -> u16 {
+    let res = data.parse::<u16>().unwrap_or(0);
+    res
+}
+
+/// TODO: rename to NavigationString (?!)
 struct EditionBuffer {
     buffer: FieldBuffer,
     cursor: Cursor,
@@ -31,7 +55,7 @@ impl EditionBuffer {
         }
     }
 
-
+    /// TODO: rename to change_cursor_char
     pub fn change_cursor_item_to(&mut self, new_char: char) -> &mut Self {
         let current_cursor = self.cursor.get_current();
         let mut s: FieldBuffer = String::new();
@@ -76,33 +100,70 @@ impl EditionBuffer {
 
 }
 
-//just a type convertion
-fn convert_u16_to_FieldBuffer(data: u16, number_of_digits: usize) -> FieldBuffer {
-    const blacket_char:char = '0';
-    let s = convert_u16_to_string_decimal(data);
-    let mut base: FieldBuffer = String::from_str(s.as_str()).unwrap();
-    let mut temp: FieldBuffer = String::new();
-    //leading zeros
-    for _ in base.len()..number_of_digits {
-        temp.push(blacket_char);
+struct Numerical {
+    edition_buffer: EditionBuffer
+} 
+
+impl Numerical {
+    pub fn new(edition_buffer: EditionBuffer) -> Self {
+        Self {
+            edition_buffer,
+        }
     }
-    //actal number
-    for char in base.chars() {
-        temp.push(char);
+
+    pub fn to_u16(&self) -> u16 {
+        let value = convert_FieldBuffer_to_u16(self.edition_buffer.buffer.clone());
+        value
     }
-    temp
+
+    pub fn get_current_cursor_index(&self) -> usize {
+        self.edition_buffer.cursor.get_current()
+    }
 }
 
-///NOTE: If error defaults to 0
-fn convert_FieldBuffer_to_u16(data: FieldBuffer) -> u16 {
-    let res = data.parse::<u16>().unwrap_or(0);
-    res
+impl Numerical {
+    pub fn save_edition(&mut self, mut accessor: Accessor<u16>) {
+        accessor.set(self.to_u16())
+    }
+
+    pub fn char_indices(&self) -> CharIndices {
+        self.edition_buffer.buffer.char_indices()
+    }
+
+
 }
+
+impl Numerical {
+    pub fn send_key(&mut self, key: KeyCode) {
+        match key {
+            // navigation_key left and right
+            KeyCode::KEY_SETA_BRANCA_ESQUERDA => { self.edition_buffer.move_cursor_left(); }, 
+            KeyCode::KEY_SETA_BRANCA_DIREITA => { self.edition_buffer.move_cursor_right(); },
+            KeyCode::KEY_DIRECIONAL_PARA_DIREITA => { self.edition_buffer.move_cursor_right(); },
+            KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => { self.edition_buffer.move_cursor_left(); },
+            // edition keys
+            KeyCode::KEY_0 => { self.edition_buffer.change_cursor_item_to('0').move_cursor_right(); },
+            KeyCode::KEY_1 => { self.edition_buffer.change_cursor_item_to('1').move_cursor_right(); },
+            KeyCode::KEY_2 => { self.edition_buffer.change_cursor_item_to('2').move_cursor_right(); },
+            KeyCode::KEY_3 => { self.edition_buffer.change_cursor_item_to('3').move_cursor_right(); },
+            KeyCode::KEY_4 => { self.edition_buffer.change_cursor_item_to('4').move_cursor_right(); },
+            KeyCode::KEY_5 => { self.edition_buffer.change_cursor_item_to('5').move_cursor_right(); },
+            KeyCode::KEY_6 => { self.edition_buffer.change_cursor_item_to('6').move_cursor_right(); },
+            KeyCode::KEY_7 => { self.edition_buffer.change_cursor_item_to('7').move_cursor_right(); },
+            KeyCode::KEY_8 => { self.edition_buffer.change_cursor_item_to('8').move_cursor_right(); },
+            KeyCode::KEY_9 => { self.edition_buffer.change_cursor_item_to('9').move_cursor_right(); },
+            //everything else -> do nothing
+            _ => { },
+        }
+    }
+}
+
+
 
 //Make possible to edit a position of memory using Lcd display and keyboard
 //esc abort edition, and enter confirm edition
 pub struct Field {
-    edition_buffer: EditionBuffer,
+    numerical: Numerical,
     blink: RectangularWave<u32>,
     edit_mode: EditMode,
     initial_cursor_position: usize,
@@ -115,8 +176,9 @@ impl Field {
     pub fn new(accessor: Accessor<u16>, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
         let value = accessor.get();
         let array = convert_u16_to_FieldBuffer(value, number_of_digits);
+        let edition_buffer = EditionBuffer::new(array.clone(), initial_cursor_position);
         Self {
-            edition_buffer: EditionBuffer::new(array.clone(), initial_cursor_position),
+            numerical: Numerical::new(edition_buffer),
             blink: RectangularWave::new(400,700),
             edit_mode: EditMode::new(false),
             initial_cursor_position,
@@ -128,21 +190,20 @@ impl Field {
 
 
     fn __saves_data(&mut self) {
-        let data: FieldBuffer = self.edition_buffer.buffer.clone();
-        let value = convert_FieldBuffer_to_u16(data);
+        let value = self.numerical.to_u16();
         let min = self.valid_range.start;
         let max = self.valid_range.end;
         let value_clamped = value.clamp(min, max);
         self.accessor.set(value_clamped);
         let field_buffer = convert_u16_to_FieldBuffer(value_clamped, self.number_of_digits);
-        self.edition_buffer = EditionBuffer::new(field_buffer.clone(), self.initial_cursor_position);
+        self.numerical = Numerical::new(EditionBuffer::new(field_buffer.clone(), self.initial_cursor_position));
     }
 
     /// disconsider edited value and reset edition cursor
     fn __abort_edition(&mut self) {
         let previous_value = self.accessor.get(); // original value
         let field_buffer = convert_u16_to_FieldBuffer(previous_value, self.number_of_digits);
-        self.edition_buffer = EditionBuffer::new(field_buffer, self.initial_cursor_position);
+        self.numerical = Numerical::new(EditionBuffer::new(field_buffer, self.initial_cursor_position));
     }
 }
 
@@ -152,45 +213,24 @@ impl Field {
         
         if self.is_in_edit_mode() {
 
-            let effect = match key {
+            match key {
                 // cancel edition
                 KeyCode::KEY_ESC => {
                     self.set_edit_mode(false); // terminate edition
                     self.__abort_edition(); 
-                    Some(())
                 }
                 
                 // saves edition
                 KeyCode::KEY_ENTER => {
                     self.set_edit_mode(false); // terminate edition
                     self.__saves_data();
-                    Some(())
                 }
-                // navigation_key left and right
-                KeyCode::KEY_SETA_BRANCA_ESQUERDA => { self.edition_buffer.move_cursor_left(); Some(()) }, 
-                KeyCode::KEY_SETA_BRANCA_DIREITA => { self.edition_buffer.move_cursor_right(); Some(()) },
-                KeyCode::KEY_DIRECIONAL_PARA_DIREITA => { self.edition_buffer.move_cursor_right(); Some(()) },
-                KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => { self.edition_buffer.move_cursor_left(); Some(()) },
-                // edidtion key
-                KeyCode::KEY_0 => { self.edition_buffer.change_cursor_item_to('0').move_cursor_right(); Some(()) },
-                KeyCode::KEY_1 => { self.edition_buffer.change_cursor_item_to('1').move_cursor_right(); Some(()) },
-                KeyCode::KEY_2 => { self.edition_buffer.change_cursor_item_to('2').move_cursor_right(); Some(()) },
-                KeyCode::KEY_3 => { self.edition_buffer.change_cursor_item_to('3').move_cursor_right(); Some(()) },
-                KeyCode::KEY_4 => { self.edition_buffer.change_cursor_item_to('4').move_cursor_right(); Some(()) },
-                KeyCode::KEY_5 => { self.edition_buffer.change_cursor_item_to('5').move_cursor_right(); Some(()) },
-                KeyCode::KEY_6 => { self.edition_buffer.change_cursor_item_to('6').move_cursor_right(); Some(()) },
-                KeyCode::KEY_7 => { self.edition_buffer.change_cursor_item_to('7').move_cursor_right(); Some(()) },
-                KeyCode::KEY_8 => { self.edition_buffer.change_cursor_item_to('8').move_cursor_right(); Some(()) },
-                KeyCode::KEY_9 => { self.edition_buffer.change_cursor_item_to('9').move_cursor_right(); Some(()) },
-                KeyCode::KEY_ESC => { self.set_edit_mode(false); Some(()) },
-                //everything else
-                _ => { None },
+
+                 //delegate everything else
+                _ => self.numerical.send_key(key),
+                
             };
     
-            // reset the blinker when some key is pressed makes a better visual effect
-            if let Some(_) = effect {
-                self.blink.reset();
-            }  
         } else {
             // ignore keys
         }
@@ -203,10 +243,10 @@ impl Field {
 
     pub fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         canvas.set_cursor(start_point);
-        for (position,digit) in self.edition_buffer.buffer.char_indices() {
+        for (position,digit) in self.numerical.char_indices() {
             let blink_char = '_';
             let mut current_char = digit.clone();
-            let is_current_char_over_cursor = position == self.edition_buffer.cursor.get_current();
+            let is_current_char_over_cursor = position == self.numerical.get_current_cursor_index();
             let is_time_to_blink = self.blink.read() && self.is_in_edit_mode(); // do not blink if it is not in edit mode
             if is_current_char_over_cursor && is_time_to_blink {
                 current_char = blink_char;
