@@ -65,13 +65,13 @@ pub fn optional_widget_test() -> ! {
 
     let mut optional = Optional::new(options, accessor);
     let point = Point::new(0,0);
-    optional.set_edit_mode(true);
+    let is_in_editing_mode = true;
     loop {
         if let Some(key) = keyboard.get_key() {
             optional.send_key(key);
         }
         optional.update();
-        optional.draw(&mut canvas, point);
+        optional.draw(&mut canvas, point, is_in_editing_mode);
         canvas.render();
     }
 

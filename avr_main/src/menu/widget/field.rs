@@ -11,6 +11,7 @@ use lib_1::utils::common::convert_u16_to_string_decimal;
 
 use crate::{menu::{point::Point, ratangular_wave::RectangularWave, canvas::Canvas, accessor::{Accessor, AccessorEnum}}, board::keyboard::KeyCode};
 
+use super::optional::{Optional, OptionsBuffer};
 use super::{edit_mode::EditMode, widget::Widget, widget::Editable, cursor::Cursor};
 
 
@@ -232,7 +233,7 @@ impl NumericalField {
         let edition_buffer = EditionBuffer::new(array.clone(), initial_cursor_position);
         Self {
             numerical: Numerical::new(edition_buffer, valid_range, number_of_digits, accessor),
-            blink: RectangularWave::new(400,700),
+            blink: RectangularWave::new(1000,1000),
         }
     }
 }
@@ -275,18 +276,21 @@ impl NumericalField {
 
 pub enum FieldEnum {
     Numerical(NumericalField),
+    Optional(Optional),
 }
 
 impl FieldEnum {
     pub fn save_edition(&mut self) {
         match self {
             Self::Numerical(x) => x.save_edition(), 
+            Self::Optional(x) => x.save_edition(),
         }
     }
 
     pub fn abort_edition(&mut self) {
         match self {
             Self::Numerical(x) => x.abort_edition(), 
+            Self::Optional(x) => x.abort_edition(),
         }
     }
 }
@@ -295,18 +299,21 @@ impl FieldEnum {
     pub fn send_key(&mut self, key: KeyCode) {
         match self {
             Self::Numerical(x) => x.send_key(key), 
+            Self::Optional(x) => x.send_key(key),
         }
     }
 
     pub fn update(&mut self) {
         match self {
             Self::Numerical(x) => x.update(), 
+            Self::Optional(x) => x.update(),
         }
     }
 
     pub fn draw(&self, canvas: &mut Canvas, start_point: Point, is_in_editing_mode: bool) {
         match self {
             Self::Numerical(x) => x.draw(canvas, start_point, is_in_editing_mode), 
+            Self::Optional(x) => x.draw(canvas, start_point, is_in_editing_mode), 
         }
     }
 }
@@ -329,6 +336,12 @@ impl Field {
     pub fn from_numerical(accessor: Accessor<u16>, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
         let numerical_field = NumericalField::new(accessor, initial_cursor_position, number_of_digits, valid_range);
         let field_enum = FieldEnum::Numerical(numerical_field);
+        Self::new(field_enum)
+    }
+
+    pub fn from_optional(options: OptionsBuffer, accessor: Accessor<Cursor>) -> Self {
+        let optional = Optional::new(options, accessor);
+        let field_enum = FieldEnum::Optional(optional);
         Self::new(field_enum)
     }
 }

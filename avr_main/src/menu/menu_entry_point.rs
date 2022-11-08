@@ -9,6 +9,7 @@ use crate::board::{lcd, output_expander};
 use crate::board::keyboard::KeyCode;
 use crate::enviroment::front_panel::FrontPanel;
 use crate::menu::accessor::Accessor;
+use crate::menu::widget::optional::OptionsBuffer;
 use crate::menu::widget::sub_menu::MenuItemEnum;
 use crate::menu::widget::sub_menu::MenuItemEnumGetter;
 use crate::menu::widget::sub_menu::SubMenu;
@@ -67,6 +68,8 @@ progmem! {
     static progmem string S5 = "Aceleracao de Retorno";
     static progmem string S6 = "Start Automatico no Avanco";
     static progmem string S7 = "Start Automatico no Retorno";
+    static progmem string O1 = "Ligado";
+    static progmem string O2 = "Deslig";
 
     //NOTE: it is possible to load any type in progmem not only strings
     static progmem A0: [u8; 6] = [0,1,2,3,4,5];
@@ -77,7 +80,7 @@ progmem! {
 
 
 static mut FILE: [u16; 4] = [0x00;4];
-
+static mut CURSOR: Cursor = Cursor::new(0..2, 0);
 
 
 
@@ -106,8 +109,8 @@ pub fn development_entry_point() -> ! {
             }
         }
         let accessor = Accessor::new(setter, getter);
-        
-        let mut menu_item = MenuItem::new(point1, text, point2, accessor, 0, 4, 10..100);
+        let field = Field::from_numerical(accessor, 0, 4, 10..100);
+        let mut menu_item = MenuItem::new(point1, text, point2, field);
         MenuItemEnum::MenuItem(menu_item)
     });
 
@@ -127,7 +130,35 @@ pub fn development_entry_point() -> ! {
             }
         }
         let accessor = Accessor::new(setter, getter);
-        let mut menu_item = MenuItem::new(point1, text, point2, accessor, 0, 4, 0..0xFFFF);
+        let field = Field::from_numerical(accessor, 0, 4, 0..0xFFFF);
+        let mut menu_item = MenuItem::new(point1, text, point2, field);
+        MenuItemEnum::MenuItem(menu_item)
+    });
+
+    //options
+    menu_list.push(|| {
+        let mut options: OptionsBuffer = Vec::new();
+        options.push(FlashString::new(&O1));
+        options.push(FlashString::new(&O2));
+
+        let point1 = Point1d::new(1);
+        let point2 = Point1d::new(30);
+        let text: FlashString = FlashString::new(&S7);
+        
+        fn setter(cursor: Cursor) {
+            unsafe {
+                CURSOR = cursor;
+            }
+        }
+    
+        fn getter() -> Cursor {
+            unsafe {
+                CURSOR.clone()
+            }
+        }
+        let accessor = Accessor::new(setter, getter);
+        let field = Field::from_optional(options, accessor);
+        let mut menu_item = MenuItem::new(point1, text, point2, field);
         MenuItemEnum::MenuItem(menu_item)
     });
 
@@ -147,7 +178,8 @@ pub fn development_entry_point() -> ! {
             }
         }
         let accessor = Accessor::new(setter, getter);
-        let mut menu_item = MenuItem::new(point1, text, point2, accessor, 0, 4, 0..0xFFFF);
+        let field = Field::from_numerical(accessor, 0, 4, 0..0xFFFF);
+        let mut menu_item = MenuItem::new(point1, text, point2, field);
         MenuItemEnum::MenuItem(menu_item)
     });
 

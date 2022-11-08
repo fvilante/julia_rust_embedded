@@ -3,7 +3,7 @@ use crate::{
     menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}, accessor::Accessor},
 };
 
-use super::{caption::Caption, field::{Field, FieldBuffer}, widget::Editable, widget::Widget};
+use super::{caption::Caption, field::{Field, FieldBuffer, FieldEnum}, widget::Editable, widget::Widget};
 
 use heapless::String;
 use lib_1::utils::common::convert_u16_to_string_decimal;
@@ -20,12 +20,12 @@ pub struct MenuItem {
 impl MenuItem {
     /// NOTE: client should put point1 and point2 in the same line
     /// point1 = position of caption, point2 = position of field
-    pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, accessor: Accessor<u16>, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
+    pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, field: Field) -> Self {
         Self {
             point_a,
             caption: Caption::new(text),
             point_b,
-            field: Field::from_numerical(accessor, initial_cursor_position, number_of_digits, valid_range),
+            field,
         }
     }
 
