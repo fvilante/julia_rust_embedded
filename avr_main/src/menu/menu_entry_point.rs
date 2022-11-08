@@ -13,7 +13,6 @@ use crate::menu::widget::sub_menu::MenuItemEnumGetter;
 use crate::menu::widget::sub_menu::SubMenu;
 use crate::menu::widget::widget_tests::SystemEnviroment;
 use crate::microcontroler::delay::delay_ms;
-use super::database::DataBase;
 use super::flash::FlashString;
 use super::keyboard::Keyboard;
 use super::canvas::Canvas;
