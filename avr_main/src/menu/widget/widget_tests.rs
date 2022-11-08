@@ -1,6 +1,6 @@
 use avr_progmem::progmem;
 use heapless::Vec;
-use crate::{board::{output_expander::OutputExpander, lcd}, menu::{keyboard::Keyboard, canvas::Canvas, flash::FlashString, point::Point, widget::{optional::Optional, cursor::Cursor}}, enviroment::front_panel::FrontPanel};
+use crate::{board::{output_expander::OutputExpander, lcd}, menu::{keyboard::Keyboard, canvas::Canvas, flash::FlashString, point::Point, widget::{optional::Optional, cursor::Cursor}, accessor::Accessor}, enviroment::front_panel::FrontPanel};
 
 
 pub struct SystemEnviroment {
@@ -61,7 +61,9 @@ pub fn optional_widget_test() -> ! {
         }
     }
 
-    let mut optional = Optional::new(options, setter, getter);
+    let accessor = Accessor::new(setter, getter);
+
+    let mut optional = Optional::new(options, accessor);
     let point = Point::new(0,0);
     optional.set_edit_mode(true);
     loop {

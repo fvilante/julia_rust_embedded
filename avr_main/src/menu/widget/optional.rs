@@ -1,6 +1,7 @@
 use heapless::Vec;
 
 use crate::board::keyboard::KeyCode;
+use crate::menu::accessor::Accessor;
 use crate::menu::canvas::Canvas;
 use crate::menu::flash::FlashString;
 use crate::menu::point::Point;
@@ -11,31 +12,26 @@ use super::edit_mode::EditMode;
 
 type OptionsBuffer = Vec<FlashString,5>;
 
-pub type Getter = fn() -> Cursor;
-pub type Setter = fn(Cursor);
-
 pub struct Optional {
     edit_mode: EditMode,
     options: OptionsBuffer,
     editing_cursor: Cursor,
     original_cursor: Cursor,
     blink: RectangularWave<u32>,
-    setter: Setter,
-    getter: Getter,
+    accessor: Accessor<Cursor>,
 }
 
 impl Optional {
 
-    pub fn new(options: OptionsBuffer, setter: Setter, getter: Getter) -> Self {
-        let cursor = getter();
+    pub fn new(options: OptionsBuffer, accessor: Accessor<Cursor>) -> Self {
+        let cursor = accessor.get();
         Self {
             edit_mode: EditMode::new(false),
             options: options.clone(),
             editing_cursor: cursor.clone(),
             original_cursor: cursor,
             blink: RectangularWave::new(1000,1000),
-            setter,
-            getter,
+            accessor,
         }
     }
 
@@ -68,7 +64,7 @@ impl Optional {
                     self.set_edit_mode(false);
                     let recupered_info = self.original_cursor.clone();
                     self.editing_cursor = recupered_info.clone();   // resets cursor
-                    (self.setter)(recupered_info);  // saves it
+                    self.accessor.set(recupered_info);  // saves it
                     Some(())
                 }
                 // saves edition
@@ -76,7 +72,7 @@ impl Optional {
                     self.set_edit_mode(false);
                     let info_to_save = self.editing_cursor.clone();
                     self.original_cursor = info_to_save.clone();  
-                    (self.setter)(info_to_save);
+                    self.accessor.set(info_to_save);
                     Some(())
                 }
 
