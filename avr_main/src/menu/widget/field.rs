@@ -127,7 +127,8 @@ impl Field {
     }
 
 
-    fn __saves_data(&mut self, data: FieldBuffer) {
+    fn __saves_data(&mut self) {
+        let data: FieldBuffer = self.edition_buffer.buffer.clone();
         let value = convert_FieldBuffer_to_u16(data);
         let min = self.valid_range.start;
         let max = self.valid_range.end;
@@ -162,8 +163,7 @@ impl Field {
                 // saves edition
                 KeyCode::KEY_ENTER => {
                     self.set_edit_mode(false); // terminate edition
-                    let field_buffer: FieldBuffer = self.edition_buffer.buffer.clone();
-                    self.__saves_data(field_buffer);
+                    self.__saves_data();
                     Some(())
                 }
                 // navigation_key left and right

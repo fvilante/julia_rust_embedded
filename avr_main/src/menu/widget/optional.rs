@@ -52,6 +52,18 @@ impl Optional {
         
     }
 
+    fn __abort_edition(&mut self) {
+        let recupered_info = self.original_cursor.clone();
+        self.editing_cursor = recupered_info.clone();   // resets cursor
+        self.accessor.set(recupered_info);  // saves it
+    }
+
+    fn __saves_data(&mut self) {
+        let info_to_save = self.editing_cursor.clone();
+        self.original_cursor = info_to_save.clone();  
+        self.accessor.set(info_to_save);
+    }
+
 }
 
 impl Optional {
@@ -62,17 +74,13 @@ impl Optional {
                 // cancel edition
                 KeyCode::KEY_ESC => {
                     self.set_edit_mode(false);
-                    let recupered_info = self.original_cursor.clone();
-                    self.editing_cursor = recupered_info.clone();   // resets cursor
-                    self.accessor.set(recupered_info);  // saves it
+                    self.__abort_edition();
                     Some(())
                 }
                 // saves edition
                 KeyCode::KEY_ENTER => {
                     self.set_edit_mode(false);
-                    let info_to_save = self.editing_cursor.clone();
-                    self.original_cursor = info_to_save.clone();  
-                    self.accessor.set(info_to_save);
+                    self.__saves_data();
                     Some(())
                 }
 
