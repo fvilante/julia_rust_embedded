@@ -220,17 +220,65 @@ impl Numerical {
     }
 }
 
+struct NumericalField {
+    numerical: Numerical,
+    blink: RectangularWave<u32>,
+}
+
+impl NumericalField {
+    pub fn new(accessor: Accessor<u16>, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
+        let value = accessor.get();
+        let array = convert_u16_to_FieldBuffer(value, number_of_digits);
+        let edition_buffer = EditionBuffer::new(array.clone(), initial_cursor_position);
+        Self {
+            numerical: Numerical::new(edition_buffer, valid_range, number_of_digits, accessor),
+            blink: RectangularWave::new(400,700),
+        }
+    }
+}
+
+impl NumericalField {
+    pub fn save_edition(&mut self) {
+        self.numerical.save_edition();
+    }
+
+    pub fn abort_edition(&mut self) {
+        self.numerical.abort_edition();
+    }
+
+}
+
+impl NumericalField {
+    pub fn send_key(&mut self, key: KeyCode) {
+        self.numerical.send_key(key)
+    }
+
+    pub fn update(&mut self) {
+        self.blink.update(); // blinks cursor
+    }
+
+    pub fn draw(&self, canvas: &mut Canvas, start_point: Point, is_in_edit_mode: bool) {
+        canvas.set_cursor(start_point);
+        for (position,digit) in self.numerical.char_indices() {
+            let blink_char = '_';
+            let mut current_char = digit.clone();
+            let is_current_char_over_cursor = position == self.numerical.get_current_cursor_index();
+            let is_time_to_blink = self.blink.read() && is_in_edit_mode; // do not blink if it is not in edit mode
+            if is_current_char_over_cursor && is_time_to_blink {
+                current_char = blink_char;
+            } 
+            canvas.print_char(current_char);
+        };
+    }
+}
+
 
 
 //Makes possible to edit a position of memory using Lcd display and keyboard
 //esc abort edition, and enter confirm edition
 pub struct Field {
-    //state (dynamic)
-    numerical: Numerical,
-    blink: RectangularWave<u32>,
+    numerical_field: NumericalField,
     edit_mode: EditMode,
-    //initial condition (static):
-    initial_cursor_position: usize,
 }
 
 impl Field {
@@ -239,10 +287,8 @@ impl Field {
         let array = convert_u16_to_FieldBuffer(value, number_of_digits);
         let edition_buffer = EditionBuffer::new(array.clone(), initial_cursor_position);
         Self {
-            numerical: Numerical::new(edition_buffer, valid_range, number_of_digits, accessor),
-            blink: RectangularWave::new(400,700),
+            numerical_field: NumericalField::new(accessor, initial_cursor_position, number_of_digits, valid_range),
             edit_mode: EditMode::new(false),
-            initial_cursor_position,
         }
     }
 
@@ -258,17 +304,17 @@ impl Field {
                 // cancel edition
                 KeyCode::KEY_ESC => {
                     self.set_edit_mode(false); // terminate edition
-                    self.numerical.abort_edition(); 
+                    self.numerical_field.abort_edition(); 
                 }
                 
                 // saves edition
                 KeyCode::KEY_ENTER => {
                     self.set_edit_mode(false); // terminate edition
-                    self.numerical.save_edition(); 
+                    self.numerical_field.save_edition(); 
                 }
 
                  //delegate everything else
-                _ => self.numerical.send_key(key),
+                _ => self.numerical_field.send_key(key),
                 
             };
     
@@ -276,22 +322,12 @@ impl Field {
     }
 
     pub fn update(&mut self) {
-        // blinks cursor
-        self.blink.update();
+        self.numerical_field.update()
     }
 
     pub fn draw(&self, canvas: &mut Canvas, start_point: Point) {
-        canvas.set_cursor(start_point);
-        for (position,digit) in self.numerical.char_indices() {
-            let blink_char = '_';
-            let mut current_char = digit.clone();
-            let is_current_char_over_cursor = position == self.numerical.get_current_cursor_index();
-            let is_time_to_blink = self.blink.read() && self.is_in_edit_mode(); // do not blink if it is not in edit mode
-            if is_current_char_over_cursor && is_time_to_blink {
-                current_char = blink_char;
-            } 
-            canvas.print_char(current_char);
-        };
+        let is_in_edit_mode = self.is_in_edit_mode();
+        self.numerical_field.draw(canvas, start_point, is_in_edit_mode)
     }
 }
 
