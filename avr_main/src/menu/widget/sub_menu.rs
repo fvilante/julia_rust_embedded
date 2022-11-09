@@ -77,6 +77,29 @@ impl SubMenu {
         }
     }
 
+    pub fn scroll_down(&mut self) {
+        let has_finished = self.first_line_to_render.next();
+        if !has_finished {
+            self.menu_item_0 = self.menu_list[self.first_line_to_render.get_current()+0]();
+            self.menu_item_1 = self.menu_list[self.first_line_to_render.get_current()+1]();
+        } else {
+            // do nothing: already in the end of the menu list
+        }
+    }
+
+    pub fn scroll_up(&mut self) {
+        let has_finished = self.first_line_to_render.previous();
+        if !has_finished {
+            self.menu_item_0 = self.menu_list[self.first_line_to_render.get_current()+0]();
+            self.menu_item_1 = self.menu_list[self.first_line_to_render.get_current()+1]();
+        } else {
+            // do nothing: already in the begin of menu list
+        }
+    }
+
+}
+
+impl SubMenu {
     // false = line0, true = line1
     pub fn set_edit_mode(&mut self, line: bool, value: bool) {
         if line == LINE_0 {
@@ -101,27 +124,6 @@ impl SubMenu {
             }
         }
     }
-
-    pub fn scroll_down(&mut self) {
-        let has_finished = self.first_line_to_render.next();
-        if !has_finished {
-            self.menu_item_0 = self.menu_list[self.first_line_to_render.get_current()+0]();
-            self.menu_item_1 = self.menu_list[self.first_line_to_render.get_current()+1]();
-        } else {
-            // do nothing: already in the end of the menu list
-        }
-    }
-
-    pub fn scroll_up(&mut self) {
-        let has_finished = self.first_line_to_render.previous();
-        if !has_finished {
-            self.menu_item_0 = self.menu_list[self.first_line_to_render.get_current()+0]();
-            self.menu_item_1 = self.menu_list[self.first_line_to_render.get_current()+1]();
-        } else {
-            // do nothing: already in the begin of menu list
-        }
-    }
-
 }
 
 impl SubMenu {
