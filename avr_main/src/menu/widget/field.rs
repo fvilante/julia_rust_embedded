@@ -9,6 +9,7 @@ use heapless::{
 };
 use lib_1::utils::common::convert_u16_to_string_decimal;
 
+use crate::board::lcd;
 use crate::{menu::{point::Point, ratangular_wave::RectangularWave, canvas::Canvas, accessor::{Accessor, AccessorEnum}}, board::keyboard::KeyCode};
 
 use super::optional::{Optional, OptionsBuffer};
@@ -223,7 +224,7 @@ impl Numerical {
 
 pub struct NumericalField {
     numerical: Numerical,
-    blink: RectangularWave<u32>,
+    blink: RectangularWave<u16>,
 }
 
 impl NumericalField {
@@ -233,7 +234,7 @@ impl NumericalField {
         let edition_buffer = EditionBuffer::new(array.clone(), initial_cursor_position);
         Self {
             numerical: Numerical::new(edition_buffer, valid_range, number_of_digits, accessor),
-            blink: RectangularWave::new(1000,1000),
+            blink: RectangularWave::new(600,300),
         }
     }
 }

@@ -16,7 +16,7 @@ pub struct Optional {
     options: OptionsBuffer,
     editing_cursor: Cursor,
     original_cursor: Cursor,
-    blink: RectangularWave<u32>,
+    blink: RectangularWave<u16>,
     accessor: Accessor<Cursor>,
 }
 
@@ -28,7 +28,7 @@ impl Optional {
             options: options.clone(),
             editing_cursor: cursor.clone(),
             original_cursor: cursor,
-            blink: RectangularWave::new(1000,1000),
+            blink: RectangularWave::new(600,300),
             accessor,
         }
     }

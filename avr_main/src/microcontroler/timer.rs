@@ -142,8 +142,9 @@ impl ClockCounter {
 // this implemantation is to be considered an initial version.
 pub fn now() -> u64 {
     let state = unsafe {
-        &mut *INTERRUPT_STATE.as_mut_ptr()
+        & *INTERRUPT_STATE.as_ptr()
     };
 
-    state.clock_counter.read()
+    let value = state.clock_counter.read();
+    value
 }
