@@ -1,12 +1,13 @@
 
+
 #[derive(Copy, Clone)]
-pub struct Point {
-    pub x: u8,
-    pub y: u8,
+pub struct Point<T = u8> {
+    pub x: T,
+    pub y: T,
 }
 
-impl Point {
-    pub fn new(x: u8, y: u8) -> Self {
+impl<T> Point<T> {
+    pub fn new(x: T, y: T) -> Self {
         Self {
             x,
             y,
@@ -14,12 +15,12 @@ impl Point {
     }
 }
 
-pub struct Point1d {
-    pub pos: u8,
+pub struct Point1d<T = u8> {
+    pub pos: T,
 }
 
-impl Point1d {
-    pub fn new(pos: u8) -> Self {
+impl<T> Point1d<T> {
+    pub fn new(pos: T) -> Self {
         Self {
             pos,
         }
