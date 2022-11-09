@@ -46,8 +46,8 @@ impl FlashString {
 }
 
 pub struct FlashStringIterator {
-    pub(crate) flash_string: FlashString,
-    pub(crate) counter: u8,
+    flash_string: FlashString,
+    counter: u8,
 }
 
 impl Iterator for FlashStringIterator {
