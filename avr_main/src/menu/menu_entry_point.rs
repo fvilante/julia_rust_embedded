@@ -15,6 +15,7 @@ use crate::menu::widget::sub_menu::MenuItemEnumGetter;
 use crate::menu::widget::sub_menu::SubMenu;
 use crate::menu::widget::widget_tests::SystemEnviroment;
 use crate::microcontroler::delay::delay_ms;
+use crate::microcontroler::timer::now;
 use super::flash::FlashString;
 use super::keyboard::Keyboard;
 use super::canvas::Canvas;
@@ -187,20 +188,25 @@ pub fn development_entry_point() -> ! {
 
     let mut submenu = SubMenu::new(menu_list);
 
+    let fps = 30; // frames_per_second
+    let mut next_frame: u64 = now() + (1000/fps);
+    
     loop { 
 
         if let Some(key) = keyboard.get_key() {
             submenu.send_key(key);
         }
         
-        submenu.update();
-        submenu.draw(&mut canvas);
-        canvas.render();
+        if now() > next_frame {
+            next_frame = now() + (1000/fps);
+            submenu.update();
+            submenu.draw(&mut canvas);
+            canvas.render();
+        }
+        
 
     }
 
-
-    
     //splash
     let mut splash = Splash::new(4500);
     loop {
