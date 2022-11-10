@@ -3,7 +3,7 @@ use crate::{
     menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}, accessor::Accessor},
 };
 
-use super::{caption::Caption, field::{Field, FieldBuffer, FieldEnum}, widget::Editable, widget::Widget};
+use super::{caption::Caption, field::{Field, FieldBuffer, FieldEnum}, widget::Editable, widget::Widget, sub_menu::LcdLine};
 
 use heapless::String;
 use lib_1::utils::common::convert_u16_to_string_decimal;
@@ -41,14 +41,10 @@ impl MenuItem {
         self.field.update();
     }
 
-    // lcd_line: false = line_0 ; true = line_1
-    pub fn draw(&self, canvas: &mut Canvas, lcd_line: bool) {
-        let mut line = 0;
-        if lcd_line {
-            line = 1;
-        }
-        let point1 = Point::new(self.point_a.pos, line);
-        let point2 = Point::new(self.point_b.pos, line);
+    pub fn draw(&self, canvas: &mut Canvas, lcd_line: LcdLine) {
+        let line = lcd_line.as_u8();
+        let point1: Point<u8> = Point::new(self.point_a.pos, line);
+        let point2: Point<u8> = Point::new(self.point_b.pos, line);
         self.caption.draw(canvas, point1);
         self.field.draw(canvas, point2);
     }

@@ -8,6 +8,24 @@ use super::{menu_item::MenuItem, cursor::Cursor};
 pub const LINE_0: bool = false;
 pub const LINE_1: bool = true;
 
+#[derive(PartialEq)]
+pub enum LcdLine {
+    Line0,
+    Line1,
+}
+
+impl LcdLine {
+    pub fn as_u8(&self) -> u8 {
+        match self {
+            Self::Line0 => 0,
+            Self::Line1 => 1,
+        }
+    }
+}
+
+use LcdLine::Line0;
+use LcdLine::Line1;
+
 
 pub enum MenuItemEnum {
     MenuItem(MenuItem)
@@ -38,7 +56,7 @@ impl MenuItemEnum {
         }
     }
 
-    pub fn draw(&self, canvas: &mut Canvas, lcd_line: bool) {
+    pub fn draw(&self, canvas: &mut Canvas, lcd_line: LcdLine) {
         match self {
             MenuItemEnum::MenuItem(m_item) => m_item.draw(canvas, lcd_line),
         }
@@ -56,7 +74,7 @@ pub type MenuList = Vec<MenuItemEnumGetter,10>;
 pub struct SubMenu {
     menu_list: MenuList,    // all itens of submenu
     menu_items: Vec<MenuItemEnum,2>, // first and second lcd lines
-    current_line_selected: bool,  // false = line0, true = line1
+    current_line_selected: LcdLine,  // lcd line reference
     first_line_to_render: Cursor, // line of the vector 'MenuList' which must be the first line to render in the first line of the lcd
 }
 
@@ -73,7 +91,7 @@ impl SubMenu {
         Self {
             menu_list,
             menu_items,
-            current_line_selected: LINE_0,
+            current_line_selected: Line0,
             first_line_to_render: Cursor::new(0..size-1, initial_item_index),
 
         }
@@ -88,20 +106,13 @@ impl SubMenu {
         self.menu_items.push(menu_item_1);
     }
 
-    fn get_line_index(&self, line: bool) -> usize {
-        match line {
-            LINE_0 => 0,
-            LINE_1 => 1,
-        }
-    }
-
-    fn get_menu_item_by_line_mut(&mut self, line: bool) -> &mut MenuItemEnum {
-        let index = self.get_line_index(line);
+    fn get_menu_item_by_line_mut(&mut self, line: LcdLine) -> &mut MenuItemEnum {
+        let index = line.as_u8() as usize;
         self.menu_items.get_mut(index).unwrap()
     }
 
-    fn get_menu_item_by_line(&self, line: bool) -> &MenuItemEnum {
-        let index = self.get_line_index(line);
+    fn get_menu_item_by_line(&self, line: LcdLine) -> &MenuItemEnum {
+        let index = line.as_u8() as usize;
         self.menu_items.get(index).unwrap()
     }
 
@@ -118,23 +129,23 @@ impl SubMenu {
     //
 
     // if is in edit mode returns Some<Line> else None
-    fn is_editing_some_line(&self) -> Option<bool> {
-        let is_in_edit_mode_0 = self.get_menu_item_by_line(LINE_0).is_in_edit_mode();
-        let is_in_edit_mode_1 = self.get_menu_item_by_line(LINE_1).is_in_edit_mode();
+    fn is_editing_some_line(&self) -> Option<LcdLine> {
+        let is_in_edit_mode_0 = self.get_menu_item_by_line(Line0).is_in_edit_mode();
+        let is_in_edit_mode_1 = self.get_menu_item_by_line(Line1).is_in_edit_mode();
         let is_not_in_edit_mode = !is_in_edit_mode_0 && !is_in_edit_mode_1;
         if is_not_in_edit_mode {
             None
         } else {
             if is_in_edit_mode_0 {
-                Some(LINE_0)
+                Some(Line0)
             } else {
-                Some(LINE_1)
+                Some(Line1)
             }
         }
     }
 
     // false = line0, true = line1
-    fn set_editing_mode_for_line(&mut self, line: bool, value: bool) {
+    fn set_editing_mode_for_line(&mut self, line: LcdLine, value: bool) {
         self.get_menu_item_by_line_mut(line).set_edit_mode(value)
     }
 
@@ -157,26 +168,26 @@ impl SubMenu {
                 // navigate menu
                 match key {
                     KeyCode::KEY_DIRECIONAL_PARA_BAIXO => {
-                        if self.current_line_selected == LINE_0 {
-                            self.current_line_selected = LINE_1
+                        if self.current_line_selected == Line0 {
+                            self.current_line_selected = Line1
                         } else {
                             self.scroll_down();
                         }
                      },
                     KeyCode::KEY_DIRECIONAL_PARA_CIMA => {
-                        if self.current_line_selected == LINE_1 {
-                            self.current_line_selected = LINE_0
+                        if self.current_line_selected == Line1 {
+                            self.current_line_selected = Line0
                         } else {
                             self.scroll_up();
                         }
                      },
                     KeyCode::KEY_ENTER => {
-                        if self.current_line_selected == LINE_0 {
-                            match self.get_menu_item_by_line_mut(LINE_0) {
+                        if self.current_line_selected == Line0 {
+                            match self.get_menu_item_by_line_mut(Line0) {
                                 MenuItemEnum::MenuItem(x) => x.set_edit_mode(true),
                             }
-                        } else { // LINE_1
-                            match self.get_menu_item_by_line_mut(LINE_1) {
+                        } else { // Line1
+                            match self.get_menu_item_by_line_mut(Line1) {
                                 MenuItemEnum::MenuItem(x) => x.set_edit_mode(true),
                             }
                         }
@@ -189,20 +200,20 @@ impl SubMenu {
     }
 
     pub fn update(&mut self) {
-        self.get_menu_item_by_line_mut(LINE_0).update();
-        self.get_menu_item_by_line_mut(LINE_1).update();
+        self.get_menu_item_by_line_mut(Line0).update();
+        self.get_menu_item_by_line_mut(Line1).update();
     }
 
     pub fn draw(&self, canvas: &mut Canvas) {
         canvas.clear();
-        fn draw_selector(self_: &SubMenu, line: bool, canvas: &mut Canvas) {
+        fn draw_selector(self_: &SubMenu, line: LcdLine, canvas: &mut Canvas) {
             fn draw_char(self_: &SubMenu, canvas: &mut Canvas) {
                 match self_.is_editing_some_line() {
                     Some(_) => canvas.print_char('*'),
                     None => canvas.print_char('>')
                 }
             }
-            if line == LINE_0 {
+            if line == Line0 {
                 canvas.set_cursor(Point::new(0,0));
                 draw_char(self_, canvas);
             } else {
@@ -210,12 +221,12 @@ impl SubMenu {
                 draw_char(self_, canvas);
             }
         }
-        if self.current_line_selected == LINE_0 {
-            draw_selector(self, LINE_0, canvas);
+        if self.current_line_selected == Line0 {
+            draw_selector(self, Line0, canvas);
         } else {
-            draw_selector(self, LINE_1, canvas);
+            draw_selector(self, Line1, canvas);
         }
-        self.get_menu_item_by_line(LINE_0).draw(canvas, LINE_0);
-        self.get_menu_item_by_line(LINE_1).draw(canvas, LINE_1);
+        self.get_menu_item_by_line(Line0).draw(canvas, Line0);
+        self.get_menu_item_by_line(Line1).draw(canvas, Line1);
     }
 }
