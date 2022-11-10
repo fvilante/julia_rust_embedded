@@ -55,8 +55,7 @@ pub type MenuList = Vec<MenuItemEnumGetter,10>;
 
 pub struct SubMenu {
     menu_list: MenuList,    // all itens of submenu
-    menu_item_0: MenuItemEnum,  // first lcd line widget
-    menu_item_1: MenuItemEnum,  // second lcd line widget
+    menu_items: Vec<MenuItemEnum,2>, // first and second lcd lines
     current_line_selected: bool,  // false = line0, true = line1
     first_line_to_render: Cursor, // line of the vector 'MenuList' which must be the first line to render in the first line of the lcd
 }
@@ -64,14 +63,16 @@ pub struct SubMenu {
 
 impl SubMenu {
     pub fn new(menu_list: MenuList) -> Self {
-        let menu_item_0 = menu_list[0]();
-        let menu_item_1 = menu_list[1]();
+        let mut menu_item_0 = menu_list[0]();
+        let mut menu_item_1 = menu_list[1]();
         let size = menu_list.len();
         let initial_item_index = 0;
+        let mut menu_items = Vec::new();
+        menu_items.push(menu_item_0);
+        menu_items.push(menu_item_1);
         Self {
             menu_list,
-            menu_item_0,
-            menu_item_1,
+            menu_items,
             current_line_selected: LINE_0,
             first_line_to_render: Cursor::new(0..size-1, initial_item_index),
 
@@ -80,8 +81,19 @@ impl SubMenu {
 
     fn update_menu_items(&mut self) {
         let index = self.first_line_to_render.get_current();
-        self.menu_item_0 = self.menu_list[index+0]();
-        self.menu_item_1 = self.menu_list[index+1]();
+        let mut menu_item_0 = self.menu_list[index+0]();
+        let mut menu_item_1 = self.menu_list[index+1]();
+        self.menu_items.clear();
+        self.menu_items.push(menu_item_0);
+        self.menu_items.push(menu_item_1);
+    }
+
+    fn get_menu_item_for_line(&mut self, line: bool) -> &mut MenuItemEnum {
+        if line==LINE_0 {
+            self.menu_items.get_mut(0).unwrap()
+        } else {
+            self.menu_items.get_mut(1).unwrap()
+        }
     }
 
     fn scroll_down(&mut self) {
@@ -97,9 +109,9 @@ impl SubMenu {
     //
 
     // if is in edit mode returns Some<Line> else None
-    fn is_editing_some_line(&self) -> Option<bool> {
-        let is_in_edit_mode_0 = self.menu_item_0.is_in_edit_mode();
-        let is_in_edit_mode_1 = self.menu_item_1.is_in_edit_mode();
+    fn is_editing_some_line(&mut self) -> Option<bool> {
+        let is_in_edit_mode_0 = self.get_menu_item_for_line(LINE_0).is_in_edit_mode();
+        let is_in_edit_mode_1 = self.get_menu_item_for_line(LINE_1).is_in_edit_mode();
         let is_not_in_edit_mode = !is_in_edit_mode_0 && !is_in_edit_mode_1;
         if is_not_in_edit_mode {
             None
@@ -115,9 +127,9 @@ impl SubMenu {
     // false = line0, true = line1
     fn set_editing_mode_for_line(&mut self, line: bool, value: bool) {
         if line == LINE_0 {
-            self.menu_item_0.set_edit_mode(value)
+            self.get_menu_item_for_line(LINE_0).set_edit_mode(value)
         } else {
-            self.menu_item_1.set_edit_mode(value)
+            self.get_menu_item_for_line(LINE_1).set_edit_mode(value)
         }
     }
 
@@ -133,9 +145,9 @@ impl SubMenu {
             Some(current_line) => {
                 // delegate keys 
                 if current_line == LINE_0 {
-                    self.menu_item_0.send_key(key);
+                    self.get_menu_item_for_line(LINE_0).send_key(key);
                 } else { // LINE_1
-                    self.menu_item_1.send_key(key);
+                    self.get_menu_item_for_line(LINE_1).send_key(key);
                 }
             }
 
@@ -159,11 +171,11 @@ impl SubMenu {
                      },
                     KeyCode::KEY_ENTER => {
                         if self.current_line_selected == LINE_0 {
-                            match &mut self.menu_item_0 {
+                            match &mut self.get_menu_item_for_line(LINE_0) {
                                 MenuItemEnum::MenuItem(x) => x.set_edit_mode(true),
                             }
                         } else { // LINE_1
-                            match &mut self.menu_item_1 {
+                            match &mut self.get_menu_item_for_line(LINE_1) {
                                 MenuItemEnum::MenuItem(x) => x.set_edit_mode(true),
                             }
                         }
@@ -176,14 +188,14 @@ impl SubMenu {
     }
 
     pub fn update(&mut self) {
-        self.menu_item_0.update();
-        self.menu_item_1.update();
+        self.get_menu_item_for_line(LINE_0).update();
+        self.get_menu_item_for_line(LINE_1).update();
     }
 
-    pub fn draw(&self, canvas: &mut Canvas) {
+    pub fn draw(&mut self, canvas: &mut Canvas) {
         canvas.clear();
-        fn draw_selector(self_: &SubMenu, line: bool, canvas: &mut Canvas) {
-            fn draw_char(self_: &SubMenu, canvas: &mut Canvas) {
+        fn draw_selector(self_: &mut SubMenu, line: bool, canvas: &mut Canvas) {
+            fn draw_char(self_: &mut SubMenu, canvas: &mut Canvas) {
                 match self_.is_editing_some_line() {
                     Some(_) => canvas.print_char('*'),
                     None => canvas.print_char('>')
@@ -202,7 +214,7 @@ impl SubMenu {
         } else {
             draw_selector(self, LINE_1, canvas);
         }
-        self.menu_item_0.draw(canvas, LINE_0);
-        self.menu_item_1.draw(canvas, LINE_1);
+        self.get_menu_item_for_line(LINE_0).draw(canvas, LINE_0);
+        self.get_menu_item_for_line(LINE_1).draw(canvas, LINE_1);
     }
 }
