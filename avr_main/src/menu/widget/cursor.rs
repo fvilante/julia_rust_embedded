@@ -1,9 +1,10 @@
 use core::ops::Range;
 
 
-pub struct Cursor {
+pub struct Cursor {     // size = 3 bytes
     current: usize,     // oscilates between 'range' values
     range: Range<usize>, //(inclusive-exclusive) 
+                         
 }
 
 impl Cursor {

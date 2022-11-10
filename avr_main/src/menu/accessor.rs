@@ -14,8 +14,8 @@ impl AccessorEnum {
     }
 }
 
-pub struct Accessor<T> {
-    setter: Setter<T>,
+pub struct Accessor<T> { // size = 4 bytes
+    setter: Setter<T>, 
     getter: Getter<T>,
 }
 

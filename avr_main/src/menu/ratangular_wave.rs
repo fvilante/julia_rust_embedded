@@ -2,11 +2,12 @@ use crate::microcontroler::timer::now;
 
 
 /// Generates a non-synchronous assymetric parametrizable retangular wave form
-pub struct RectangularWave<T> {
-    up_interval: T,
-    down_interval: T,
-    next_time_point: u64,
-    current_state: bool,
+pub struct RectangularWave<T = u16> {
+    up_interval: T,         // size = 2 bytes
+    down_interval: T,       // size = 2 bytes
+    next_time_point: u64,   // size = 8 bytes
+    current_state: bool,    // size = 1 bytes
+                            // TOTAL = 13 bytes
 }
 
 impl RectangularWave<u16>  {

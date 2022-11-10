@@ -9,11 +9,11 @@ use heapless::String;
 use lib_1::utils::common::convert_u16_to_string_decimal;
 use core::{str::FromStr, ops::Range};
 
-pub struct MenuItem {
-    point_a: Point1d,
-    caption: Caption,
-    point_b: Point1d,
-    field: Field,
+pub struct MenuItem { // size = 60 bytes (max)
+    point_a: Point1d, // size = 2 bytes
+    caption: Caption, // size = 3 bytes
+    point_b: Point1d, //        2 bytes
+    field: Field,   // size = 53 bytes (max)
 }
 
 
