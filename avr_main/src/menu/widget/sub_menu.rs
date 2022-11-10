@@ -145,7 +145,7 @@ impl SubMenu {
     }
 
     /// helper function to draw submenu cursor on screen
-    fn draw_selector(&self, line: LcdLine, canvas: &mut Canvas) {
+    fn draw_menu_item_selector(&self, line: LcdLine, canvas: &mut Canvas) {
         const EDITING_CURSOR: char = '*';
         const NAVIGATING_CURSOR: char = '>';
         // position cursor
@@ -212,9 +212,9 @@ impl SubMenu {
     pub fn draw(&self, canvas: &mut Canvas) {
         // clear screen
         canvas.clear();
-        // draw selector
-        let line = self.current_lcd_line_selected;
-        self.draw_selector(line, canvas);
+        // draw menu item selector
+        let current_line = self.current_lcd_line_selected;
+        self.draw_menu_item_selector(current_line, canvas);
         // draw menu items
         for line in LcdLine::iterator() {
             self.get_menu_item(line).draw(canvas, line);
