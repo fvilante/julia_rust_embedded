@@ -16,7 +16,7 @@ pub struct Optional {
     options: OptionsBuffer,
     editing_cursor: Cursor,
     original_cursor: Cursor,
-    blink: RectangularWave<u16>,
+    blink: RectangularWave,
     accessor: Accessor<Cursor>,
 }
 

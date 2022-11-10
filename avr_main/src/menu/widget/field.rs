@@ -224,7 +224,7 @@ impl Numerical {
 
 pub struct NumericalField { // size = 53 bytes
     numerical: Numerical,   // size = 40 bytes
-    blink: RectangularWave<u16>, // size = 13 bytes
+    blink: RectangularWave, // size = 13 bytes
 }
 
 impl NumericalField {
