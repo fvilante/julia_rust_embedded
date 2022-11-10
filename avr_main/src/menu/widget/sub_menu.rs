@@ -8,6 +8,7 @@ use super::{menu_item::MenuItem, cursor::Cursor};
 pub const LINE_0: bool = false;
 pub const LINE_1: bool = true;
 
+
 pub enum MenuItemEnum {
     MenuItem(MenuItem)
 }
@@ -56,8 +57,8 @@ pub struct SubMenu {
     menu_list: MenuList,    // all itens of submenu
     menu_item_0: MenuItemEnum,  // first lcd line widget
     menu_item_1: MenuItemEnum,  // second lcd line widget
-    current_selector: bool,  // false = line0, true = line1
-    first_line_to_render: Cursor, // line of the vector which must be the first line to render in lcd
+    current_line_selected: bool,  // false = line0, true = line1
+    first_line_to_render: Cursor, // line of the vector 'MenuList' which must be the first line to render in the first line of the lcd
 }
 
 
@@ -71,46 +72,32 @@ impl SubMenu {
             menu_list,
             menu_item_0,
             menu_item_1,
-            current_selector: LINE_0,
+            current_line_selected: LINE_0,
             first_line_to_render: Cursor::new(0..size-1, initial_item_index),
 
         }
     }
 
-    pub fn scroll_down(&mut self) {
-        let has_finished = self.first_line_to_render.next();
-        if !has_finished {
-            self.menu_item_0 = self.menu_list[self.first_line_to_render.get_current()+0]();
-            self.menu_item_1 = self.menu_list[self.first_line_to_render.get_current()+1]();
-        } else {
-            // do nothing: already in the end of the menu list
-        }
+    fn update_menu_items(&mut self) {
+        let index = self.first_line_to_render.get_current();
+        self.menu_item_0 = self.menu_list[index+0]();
+        self.menu_item_1 = self.menu_list[index+1]();
     }
 
-    pub fn scroll_up(&mut self) {
-        let has_finished = self.first_line_to_render.previous();
-        if !has_finished {
-            self.menu_item_0 = self.menu_list[self.first_line_to_render.get_current()+0]();
-            self.menu_item_1 = self.menu_list[self.first_line_to_render.get_current()+1]();
-        } else {
-            // do nothing: already in the begin of menu list
-        }
+    fn scroll_down(&mut self) {
+        self.first_line_to_render.next();
+        self.update_menu_items();
     }
 
-}
-
-impl SubMenu {
-    // false = line0, true = line1
-    pub fn set_edit_mode(&mut self, line: bool, value: bool) {
-        if line == LINE_0 {
-            self.menu_item_0.set_edit_mode(value)
-        } else {
-            self.menu_item_1.set_edit_mode(value)
-        }
+    fn scroll_up(&mut self) {
+        self.first_line_to_render.previous();
+        self.update_menu_items();
     }
 
-    // if is in edit mode returns Some<Line>
-    pub fn is_in_edit_mode(&self) -> Option<bool> {
+    //
+
+    // if is in edit mode returns Some<Line> else None
+    fn is_editing_some_line(&self) -> Option<bool> {
         let is_in_edit_mode_0 = self.menu_item_0.is_in_edit_mode();
         let is_in_edit_mode_1 = self.menu_item_1.is_in_edit_mode();
         let is_not_in_edit_mode = !is_in_edit_mode_0 && !is_in_edit_mode_1;
@@ -124,13 +111,24 @@ impl SubMenu {
             }
         }
     }
+
+    // false = line0, true = line1
+    fn set_editing_mode_for_line(&mut self, line: bool, value: bool) {
+        if line == LINE_0 {
+            self.menu_item_0.set_edit_mode(value)
+        } else {
+            self.menu_item_1.set_edit_mode(value)
+        }
+    }
+
 }
+
 
 impl SubMenu {
     pub fn send_key(&mut self, key: KeyCode) {
-        let is_in_edit_mode = self.is_in_edit_mode();
+        let is_editing_some_line = self.is_editing_some_line();
 
-        match is_in_edit_mode {
+        match is_editing_some_line {
             //is editing some line
             Some(current_line) => {
                 // delegate keys 
@@ -146,24 +144,28 @@ impl SubMenu {
                 // navigate menu
                 match key {
                     KeyCode::KEY_DIRECIONAL_PARA_BAIXO => {
-                        if self.current_selector == LINE_0 {
-                            self.current_selector = LINE_1
+                        if self.current_line_selected == LINE_0 {
+                            self.current_line_selected = LINE_1
                         } else {
                             self.scroll_down();
                         }
                      },
                     KeyCode::KEY_DIRECIONAL_PARA_CIMA => {
-                        if self.current_selector == LINE_1 {
-                            self.current_selector = LINE_0
+                        if self.current_line_selected == LINE_1 {
+                            self.current_line_selected = LINE_0
                         } else {
                             self.scroll_up();
                         }
                      },
                     KeyCode::KEY_ENTER => {
-                        if self.current_selector == LINE_0 {
-                            self.menu_item_0.set_edit_mode(true);
+                        if self.current_line_selected == LINE_0 {
+                            match &mut self.menu_item_0 {
+                                MenuItemEnum::MenuItem(x) => x.set_edit_mode(true),
+                            }
                         } else { // LINE_1
-                            self.menu_item_1.set_edit_mode(true);
+                            match &mut self.menu_item_1 {
+                                MenuItemEnum::MenuItem(x) => x.set_edit_mode(true),
+                            }
                         }
                     }
                     _ => { }
@@ -182,7 +184,7 @@ impl SubMenu {
         canvas.clear();
         fn draw_selector(self_: &SubMenu, line: bool, canvas: &mut Canvas) {
             fn draw_char(self_: &SubMenu, canvas: &mut Canvas) {
-                match self_.is_in_edit_mode() {
+                match self_.is_editing_some_line() {
                     Some(_) => canvas.print_char('*'),
                     None => canvas.print_char('>')
                 }
@@ -195,7 +197,7 @@ impl SubMenu {
                 draw_char(self_, canvas);
             }
         }
-        if self.current_selector == LINE_0 {
+        if self.current_line_selected == LINE_0 {
             draw_selector(self, LINE_0, canvas);
         } else {
             draw_selector(self, LINE_1, canvas);
