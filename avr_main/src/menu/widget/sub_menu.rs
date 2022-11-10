@@ -1,20 +1,24 @@
+use core::slice::Iter;
+
 use heapless::Vec;
 
 use crate::{board::keyboard::KeyCode, menu::{canvas::Canvas, point::Point}};
 
 use super::{menu_item::MenuItem, cursor::Cursor};
 
-//represents the lines of the 40x2 LCD  display
-pub const LINE_0: bool = false;
-pub const LINE_1: bool = true;
 
-#[derive(PartialEq)]
+//represents the lines of the 40x2 LCD  display
+#[derive(PartialEq, Copy, Clone)]
 pub enum LcdLine {
     Line0,
     Line1,
 }
 
 impl LcdLine {
+    pub fn iterator() -> impl Iterator<Item = LcdLine> {
+        [Self::Line0, Self::Line1].iter().copied()
+    }
+    
     pub fn as_u8(&self) -> u8 {
         match self {
             Self::Line0 => 0,
@@ -106,12 +110,12 @@ impl SubMenu {
         self.menu_items.push(menu_item_1);
     }
 
-    fn get_menu_item_by_line_mut(&mut self, line: LcdLine) -> &mut MenuItemEnum {
+    fn get_menu_item_mut(&mut self, line: LcdLine) -> &mut MenuItemEnum {
         let index = line.as_u8() as usize;
         self.menu_items.get_mut(index).unwrap()
     }
 
-    fn get_menu_item_by_line(&self, line: LcdLine) -> &MenuItemEnum {
+    fn get_menu_item(&self, line: LcdLine) -> &MenuItemEnum {
         let index = line.as_u8() as usize;
         self.menu_items.get(index).unwrap()
     }
@@ -130,8 +134,8 @@ impl SubMenu {
 
     // if is in edit mode returns Some<Line> else None
     fn is_editing_some_line(&self) -> Option<LcdLine> {
-        let is_in_edit_mode_0 = self.get_menu_item_by_line(Line0).is_in_edit_mode();
-        let is_in_edit_mode_1 = self.get_menu_item_by_line(Line1).is_in_edit_mode();
+        let is_in_edit_mode_0 = self.get_menu_item(Line0).is_in_edit_mode();
+        let is_in_edit_mode_1 = self.get_menu_item(Line1).is_in_edit_mode();
         let is_not_in_edit_mode = !is_in_edit_mode_0 && !is_in_edit_mode_1;
         if is_not_in_edit_mode {
             None
@@ -146,7 +150,24 @@ impl SubMenu {
 
     // false = line0, true = line1
     fn set_editing_mode_for_line(&mut self, line: LcdLine, value: bool) {
-        self.get_menu_item_by_line_mut(line).set_edit_mode(value)
+        self.get_menu_item_mut(line).set_edit_mode(value)
+    }
+
+    /// helper function to draw submenu cursor on screen
+    fn draw_selector(&self, line: LcdLine, canvas: &mut Canvas) {
+        const EDITING_CURSOR: char = '*';
+        const NAVIGATING_CURSOR: char = '>';
+        // position cursor
+        canvas.set_cursor(Point::new(0,line.as_u8()));
+        // draw selector char
+        match self.is_editing_some_line() {
+            Some(line) => {
+                canvas.print_char(EDITING_CURSOR);
+            }
+            None => {
+                canvas.print_char(NAVIGATING_CURSOR);
+            }
+        }
     }
 
 }
@@ -160,7 +181,7 @@ impl SubMenu {
             //is editing some line
             Some(current_line) => {
                 // delegate keys 
-                self.get_menu_item_by_line_mut(current_line).send_key(key);
+                self.get_menu_item_mut(current_line).send_key(key);
             }
 
             //not editing any line
@@ -183,11 +204,11 @@ impl SubMenu {
                      },
                     KeyCode::KEY_ENTER => {
                         if self.current_line_selected == Line0 {
-                            match self.get_menu_item_by_line_mut(Line0) {
+                            match self.get_menu_item_mut(Line0) {
                                 MenuItemEnum::MenuItem(x) => x.set_edit_mode(true),
                             }
                         } else { // Line1
-                            match self.get_menu_item_by_line_mut(Line1) {
+                            match self.get_menu_item_mut(Line1) {
                                 MenuItemEnum::MenuItem(x) => x.set_edit_mode(true),
                             }
                         }
@@ -200,33 +221,20 @@ impl SubMenu {
     }
 
     pub fn update(&mut self) {
-        self.get_menu_item_by_line_mut(Line0).update();
-        self.get_menu_item_by_line_mut(Line1).update();
+        for line in LcdLine::iterator() {
+            self.get_menu_item_mut(line).update();
+        }
     }
 
     pub fn draw(&self, canvas: &mut Canvas) {
+        // clear screen
         canvas.clear();
-        fn draw_selector(self_: &SubMenu, line: LcdLine, canvas: &mut Canvas) {
-            fn draw_char(self_: &SubMenu, canvas: &mut Canvas) {
-                match self_.is_editing_some_line() {
-                    Some(_) => canvas.print_char('*'),
-                    None => canvas.print_char('>')
-                }
-            }
-            if line == Line0 {
-                canvas.set_cursor(Point::new(0,0));
-                draw_char(self_, canvas);
-            } else {
-                canvas.set_cursor(Point::new(0,1));
-                draw_char(self_, canvas);
-            }
+        // draw selector
+        let line = self.current_line_selected;
+        self.draw_selector(line, canvas);
+        // draw menu items
+        for line in LcdLine::iterator() {
+            self.get_menu_item(line).draw(canvas, line);
         }
-        if self.current_line_selected == Line0 {
-            draw_selector(self, Line0, canvas);
-        } else {
-            draw_selector(self, Line1, canvas);
-        }
-        self.get_menu_item_by_line(Line0).draw(canvas, Line0);
-        self.get_menu_item_by_line(Line1).draw(canvas, Line1);
     }
 }
