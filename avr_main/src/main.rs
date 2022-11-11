@@ -17,6 +17,7 @@ mod cmpp;
 mod menu;
 mod custom_alloc;
 mod enviroment;
+mod utils;
 
 use board::lcd;
 use lib_1;

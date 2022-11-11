@@ -1,6 +1,6 @@
 use heapless::String;
 
-use crate::board::lcd;
+use crate::{board::lcd, utils::generic_string::GenericString};
 use super::{point::Point, flash::FlashString};
 
 
@@ -103,9 +103,15 @@ impl Canvas  {
         }
     }
 
-    pub fn print_xy(&mut self, point: Point, flash_string: FlashString) {
+    pub fn print_xy(&mut self, point: Point, generic_string: GenericString) {
         self.set_cursor(point);
-        self.print_flash_str(flash_string)
+        self.print_generic_string(generic_string)
+    }
+
+    pub fn print_generic_string(&mut self, string: GenericString) {
+        for byte in string.iter() {
+            self.print_char(byte as char)
+        }
     }
 
     // output part

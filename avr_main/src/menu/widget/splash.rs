@@ -1,6 +1,6 @@
 use avr_progmem::progmem;
 
-use crate::{microcontroler::timer::now, menu::{flash::FlashString, point::Point, canvas::Canvas}, board::keyboard::KeyCode};
+use crate::{microcontroler::timer::now, menu::{flash::FlashString, point::Point, canvas::Canvas}, board::keyboard::KeyCode, utils::generic_string::GenericString};
 
 use super::{widget::Widget, cursor::Cursor};
 
@@ -110,9 +110,9 @@ impl Widget for Splash {
         canvas.clear();
         match self.current_state {
             State::Initial => { },
-            State::BrandName => canvas.print_xy(Point::new(4, 0), FlashString::new(&TEXT0)),
-            State::LoadingX => canvas.print_xy(Point::new(0, 1), FlashString::new(&TEXT1)),
-            State::LoadingY => canvas.print_xy(Point::new(0, 0), FlashString::new(&TEXT2)),
+            State::BrandName => canvas.print_xy(Point::new(4, 0), GenericString::from_flash(&TEXT0)),
+            State::LoadingX => canvas.print_xy(Point::new(0, 1), GenericString::from_flash(&TEXT1)),
+            State::LoadingY => canvas.print_xy(Point::new(0, 0), GenericString::from_flash(&TEXT2)),
             State::End => {
                 //delegate / by-pass
             },
