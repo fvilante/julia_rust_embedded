@@ -45,13 +45,7 @@ impl State {
     }
 
     pub fn as_u8(&self) -> u8 {
-        match self {
-            Self::Initial => 0,
-            Self::BrandName => 1,
-            Self::LoadingX => 2,
-            Self::LoadingY => 3,
-            Self::End => 4,
-        }
+        *self as u8
     }
 
     pub fn next_state(&self) -> Self {
