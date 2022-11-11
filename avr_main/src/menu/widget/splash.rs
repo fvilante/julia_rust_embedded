@@ -58,7 +58,6 @@ impl State {
 pub struct Splash {
     current_state: State,
     next_state_time_point: u64,
-    //cursor: Cursor,
 }
 
 impl Splash {
@@ -67,11 +66,10 @@ impl Splash {
         Self { 
            current_state: initial_state,
            next_state_time_point: now() + Self::get_time_to_wait_in(initial_state), 
-           //cursor: Cursor::new(State::Initial..State::End, State::Initial),
         }
     }
 
-    /// gets interval time to wait until reach next state
+    /// gets time interval (in miliseconds) to wait until reach next state 
     fn get_time_to_wait_in(current_state: State) -> u64 {
         match current_state {
             State::Initial => 0,
