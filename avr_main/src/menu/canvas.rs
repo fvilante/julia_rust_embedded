@@ -103,6 +103,11 @@ impl Canvas  {
         }
     }
 
+    pub fn print_xy(&mut self, point: Point, flash_string: FlashString) {
+        self.set_cursor(point);
+        self.print_flash_str(flash_string)
+    }
+
     // output part
 
 

@@ -71,11 +71,6 @@ impl Splash {
         }
     }
 
-    fn print_xy(canvas: &mut Canvas, point: Point, flash_string: FlashString) {
-        canvas.set_cursor(point);
-        canvas.print_flash_str(flash_string)
-    }
-
     /// gets interval time to wait until reach next state
     fn get_time_to_wait_in(current_state: State) -> u64 {
         match current_state {
@@ -117,9 +112,9 @@ impl Widget for Splash {
         canvas.clear();
         match self.current_state {
             State::Initial => { },
-            State::BrandName => Self::print_xy(canvas, Point::new(4, 0), FlashString::new(&TEXT0)),
-            State::LoadingX => Self::print_xy(canvas, Point::new(0, 1), FlashString::new(&TEXT1)),
-            State::LoadingY => Self::print_xy(canvas, Point::new(0, 0), FlashString::new(&TEXT2)),
+            State::BrandName => canvas.print_xy(Point::new(4, 0), FlashString::new(&TEXT0)),
+            State::LoadingX => canvas.print_xy(Point::new(0, 1), FlashString::new(&TEXT1)),
+            State::LoadingY => canvas.print_xy(Point::new(0, 0), FlashString::new(&TEXT2)),
             State::End => {
                 //delegate / by-pass
             },
