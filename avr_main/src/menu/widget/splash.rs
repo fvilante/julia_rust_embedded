@@ -1,6 +1,6 @@
 use avr_progmem::progmem;
 
-use crate::{microcontroler::timer::now, menu::{flash::FlashString, point::Point}};
+use crate::{microcontroler::timer::now, menu::{flash::FlashString, point::Point, canvas::Canvas}, board::keyboard::KeyCode};
 
 use super::widget::Widget;
 
@@ -37,18 +37,18 @@ impl Splash {
     }
 }
 
-impl Widget for Splash {
-    fn send_key(&mut self, key: crate::board::keyboard::KeyCode) {
+impl Splash {
+    pub fn send_key(&mut self, key: KeyCode) {
         self.isRunningYet = false; 
     }
 
-    fn update(&mut self) {
+    pub fn update(&mut self) {
         if now() > self.when_to_hide {
             self.isRunningYet = false;
         }
     }
 
-    fn draw(&self, canvas: &mut crate::menu::canvas::Canvas) {
+    pub fn draw(&self, canvas: &mut Canvas) {
         canvas.clear();
         for line_number in 0..2 {
             let ( point, flash_string ) = Self::get_line_helper(line_number);

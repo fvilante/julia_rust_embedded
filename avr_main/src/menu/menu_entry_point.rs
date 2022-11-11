@@ -19,6 +19,8 @@ use crate::microcontroler::timer::now;
 use super::flash::FlashString;
 use super::keyboard::Keyboard;
 use super::canvas::Canvas;
+use super::menu_manager::MenuManager;
+use super::menu_manager::MenuViewEnum;
 use super::point::Point;
 use super::point::Point1d;
 use super::widget::caption::Caption;
@@ -85,6 +87,7 @@ static mut CURSOR: Cursor = Cursor::new(0..2, 0);
 
 
 
+
 pub fn development_entry_point() -> ! {
 
     //optional_widget_test();
@@ -92,6 +95,23 @@ pub fn development_entry_point() -> ! {
     let SystemEnviroment{mut canvas, mut keyboard, ..} = SystemEnviroment::new();
 
     canvas.render();  
+
+    // menu view
+    let interval_to_show_ms = 2000;
+    let mut splash = Splash::new(interval_to_show_ms);
+    let mut menu_view = MenuViewEnum::Splash(splash);
+    let mut menu_manager = MenuManager::new(menu_view);
+    loop {
+        if let Some(key) = keyboard.get_key() {
+            menu_manager.send_key(key);
+        }
+
+        menu_manager.update();
+        menu_manager.draw(&mut canvas);
+        canvas.render();
+    }
+
+
 
     // submenu
     let mut menu_list: MenuList = Vec::new();

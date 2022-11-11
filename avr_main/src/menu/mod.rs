@@ -6,3 +6,4 @@ pub mod canvas;
 pub mod ratangular_wave;
 pub mod widget;
 pub mod accessor;
+pub mod menu_manager;
