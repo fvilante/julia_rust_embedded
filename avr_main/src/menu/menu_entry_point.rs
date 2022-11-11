@@ -97,8 +97,7 @@ pub fn development_entry_point() -> ! {
     canvas.render();  
 
     // menu view
-    let interval_to_show_ms = 2000;
-    let mut splash = Splash::new(interval_to_show_ms);
+    let mut splash = Splash::new();
     let mut menu_view = MenuViewEnum::Splash(splash);
     let mut menu_manager = MenuManager::new(menu_view);
     loop {
@@ -110,6 +109,9 @@ pub fn development_entry_point() -> ! {
         menu_manager.draw(&mut canvas);
         canvas.render();
     }
+
+
+
 
 
 
@@ -226,22 +228,6 @@ pub fn development_entry_point() -> ! {
         
 
     }
-
-    //splash
-    let mut splash = Splash::new(4500);
-    loop {
-        if let Some(key) = keyboard.get_key() {
-            splash.send_key(key);
-        }
-        splash.update();
-        splash.draw(&mut canvas);
-        if splash.isRunningYet == false {
-            break;
-        }
-        canvas.render();
-    }
-
-    
 
     //main menu
     let mut manual_mode = ManualMode::new();
