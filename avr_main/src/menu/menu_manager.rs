@@ -1,54 +1,30 @@
 use crate::board::keyboard::KeyCode;
 use super::{widget::{splash::Splash, widget::Widget}, canvas::Canvas};
 
-pub enum MenuViewEnum {
-    Splash(Splash)
+
+
+pub struct MenuManager<'a> {
+    root_widget: &'a mut dyn Widget, 
 }
 
-impl MenuViewEnum {
-    pub fn send_key(&mut self, key: KeyCode) {
-        match self {
-            Self::Splash(x) => x.send_key(key),
-        }
-    }
-
-    pub fn update(&mut self) {
-        match self {
-            Self::Splash(x) => x.update(),
-        }
-    }
-
-    pub fn draw(&self, canvas: &mut Canvas) {
-        match self {
-            Self::Splash(x) => x.draw(canvas),
-        }
-    }
-}
-
-
-
-pub struct MenuManager {
-    menu_view: MenuViewEnum, 
-}
-
-impl MenuManager {
-    pub fn new(menu_view: MenuViewEnum) -> Self {
+impl<'a> MenuManager<'a> {
+    pub fn new(root_widget: &'a mut dyn Widget) -> Self {
         Self {
-            menu_view,
+            root_widget,
         }
     }
 }
 
-impl MenuManager {
-    pub fn send_key(&mut self, key: KeyCode) {
-        self.menu_view.send_key(key)
+impl Widget for MenuManager<'_> {
+    fn send_key(&mut self, key: KeyCode) {
+        self.root_widget.send_key(key)
     }
 
-    pub fn update(&mut self) {
-        self.menu_view.update()
+    fn update(&mut self) {
+        self.root_widget.update()
     }
 
-    pub fn draw(&self, canvas: &mut Canvas) {
-        self.menu_view.draw(canvas)
+    fn draw(&self, canvas: &mut Canvas) {
+        self.root_widget.draw(canvas)
     }
 }

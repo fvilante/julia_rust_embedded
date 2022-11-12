@@ -55,17 +55,46 @@ impl State {
     }
 }
 
-pub struct Splash {
-    current_state: State,
-    next_state_time_point: u64,
+pub struct EmptyWidget {
+
 }
 
-impl Splash {
+impl EmptyWidget {
     pub fn new() -> Self {
+        Self {
+
+        }
+    }
+}
+
+impl Widget for EmptyWidget {
+    fn send_key(&mut self, key: KeyCode) {
+        
+    }
+
+    fn update(&mut self) {
+        
+    }
+
+    fn draw(&self, canvas: &mut Canvas) {
+        
+    }
+}
+
+
+pub struct Splash<'a> {
+    current_state: State,
+    next_state_time_point: u64,
+    widget: &'a mut dyn Widget,
+}
+
+impl<'a> Splash<'a> {
+    pub fn new(widget: &'a mut dyn Widget) -> Self {
         let initial_state = State::Initial;
         Self { 
-           current_state: initial_state,
-           next_state_time_point: now() + Self::get_time_to_wait_in(initial_state), 
+            current_state: initial_state,
+            next_state_time_point: now() + Self::get_time_to_wait_in(initial_state), 
+            widget,
         }
     }
 
@@ -82,13 +111,14 @@ impl Splash {
 
 }
 
-impl Widget for Splash {
+impl<'a> Widget for Splash<'a> {
     fn send_key(&mut self, key: KeyCode) {
         let has_finished = self.current_state == State::End;
         if has_finished == false {
             // do nothing
         } else {
             // delegate / by-pass
+            self.widget.send_key(key)
         }
     }
 
@@ -102,6 +132,7 @@ impl Widget for Splash {
             }
         } else {
             // delegate
+            self.widget.update()
         }
         
     }
@@ -115,6 +146,7 @@ impl Widget for Splash {
             State::LoadingY => canvas.print_xy(Point::new(0, 0), GenericString::from_flash(&TEXT2)),
             State::End => {
                 //delegate / by-pass
+                self.widget.draw(canvas)
             },
         }
     }

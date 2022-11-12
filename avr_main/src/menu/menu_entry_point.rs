@@ -20,7 +20,6 @@ use super::flash::FlashString;
 use super::keyboard::Keyboard;
 use super::canvas::Canvas;
 use super::menu_manager::MenuManager;
-use super::menu_manager::MenuViewEnum;
 use super::point::Point;
 use super::point::Point1d;
 use super::widget::caption::Caption;
@@ -38,6 +37,7 @@ use super::widget::menu_item::MenuItem;
 use super::widget::menu_item::MenuItemParsed;
 use super::widget::menu_item::parse_menu_item_constructor_string;
 use super::widget::optional::Optional;
+use super::widget::splash::EmptyWidget;
 use super::widget::splash::Splash;
 use super::widget::sub_menu::MenuList;
 use super::widget::widget_tests::optional_widget_test;
@@ -97,9 +97,10 @@ pub fn development_entry_point() -> ! {
     canvas.render();  
 
     // menu view
-    let mut splash = Splash::new();
-    let mut menu_view = MenuViewEnum::Splash(splash);
-    let mut menu_manager = MenuManager::new(menu_view);
+    let empty = &mut EmptyWidget::new();
+    let splash1 = &mut Splash::new(empty);
+    let splash2 = &mut Splash::new(splash1);
+    let mut menu_manager = MenuManager::new(splash2);
     loop {
         if let Some(key) = keyboard.get_key() {
             menu_manager.send_key(key);
