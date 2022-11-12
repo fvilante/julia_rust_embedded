@@ -37,7 +37,6 @@ use super::widget::menu_item::MenuItem;
 use super::widget::menu_item::MenuItemParsed;
 use super::widget::menu_item::parse_menu_item_constructor_string;
 use super::widget::optional::Optional;
-use super::widget::splash::EmptyWidget;
 use super::widget::splash::Splash;
 use super::widget::sub_menu::MenuList;
 use super::widget::widget_tests::optional_widget_test;
@@ -97,10 +96,9 @@ pub fn development_entry_point() -> ! {
     canvas.render();  
 
     // menu view
-    let empty = &mut EmptyWidget::new();
-    let splash1 = &mut Splash::new(empty);
-    let splash2 = &mut Splash::new(splash1);
-    let mut menu_manager = MenuManager::new(splash2);
+    let splash1 = &mut Splash::new(None);
+    let splash2 = &mut Splash::new(Some(splash1));
+    let mut menu_manager = MenuManager::new(Some(splash2));
     loop {
         if let Some(key) = keyboard.get_key() {
             menu_manager.send_key(key);

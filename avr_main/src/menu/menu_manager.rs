@@ -2,13 +2,12 @@ use crate::board::keyboard::KeyCode;
 use super::{widget::{splash::Splash, widget::Widget}, canvas::Canvas};
 
 
-
 pub struct MenuManager<'a> {
-    root_widget: &'a mut dyn Widget, 
+    root_widget: Option<&'a mut dyn Widget>, 
 }
 
 impl<'a> MenuManager<'a> {
-    pub fn new(root_widget: &'a mut dyn Widget) -> Self {
+    pub fn new(root_widget: Option<&'a mut dyn Widget>) -> Self {
         Self {
             root_widget,
         }
@@ -17,14 +16,20 @@ impl<'a> MenuManager<'a> {
 
 impl Widget for MenuManager<'_> {
     fn send_key(&mut self, key: KeyCode) {
-        self.root_widget.send_key(key)
+        if let Some(widget) = &mut self.root_widget {
+            (*widget).send_key(key)
+        }
     }
 
     fn update(&mut self) {
-        self.root_widget.update()
-    }
+        if let Some(widget) = &mut self.root_widget {
+            (*widget).update()
+
+        }    }
 
     fn draw(&self, canvas: &mut Canvas) {
-        self.root_widget.draw(canvas)
+        if let Some(widget) = &self.root_widget {
+            (*widget).draw(canvas)
+        }
     }
 }
