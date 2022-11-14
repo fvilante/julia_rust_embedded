@@ -2,7 +2,7 @@ use avr_progmem::progmem;
 
 use crate::{microcontroler::timer::now, menu::{flash::FlashString, point::Point, canvas::Canvas}, board::keyboard::KeyCode, utils::generic_string::GenericString};
 
-use super::{widget::Widget, cursor::Cursor};
+use super::{widget::{Widget, IWidget}, cursor::Cursor};
 
 
 progmem! {
@@ -60,11 +60,11 @@ impl State {
 pub struct Splash<'a> {
     current_state: State,
     next_state_time_point: u64,
-    widget: Option<&'a mut dyn Widget>,
+    widget: Option<IWidget<'a>>,
 }
 
 impl<'a> Splash<'a> {
-    pub fn new(widget: Option<&'a mut dyn Widget>) -> Self {
+    pub fn new(widget: Option<IWidget<'a>>) -> Self {
         let initial_state = State::Initial;
         Self { 
             current_state: initial_state,

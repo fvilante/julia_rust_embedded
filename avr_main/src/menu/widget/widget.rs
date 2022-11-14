@@ -6,25 +6,26 @@ pub trait Widget {
     fn draw(&self, canvas: &mut Canvas);
 }
 
+pub type IWidget<'a> = &'a mut dyn Widget;
 
 /// helper to abstracts pointer manipulation
 pub struct WidgetHelper;
 
 impl WidgetHelper {
 
-    pub fn send_key(self_widget: &mut Option<&mut dyn Widget>, key: KeyCode) {
+    pub fn send_key(self_widget: &mut Option<IWidget>, key: KeyCode) {
         if let Some(widget) = &mut *self_widget {
             widget.send_key(key)
         }
     }
 
-    pub fn update(self_widget: &mut Option<&mut dyn Widget>) {
+    pub fn update(self_widget: &mut Option<IWidget>) {
         if let Some(widget) = &mut *self_widget {
             widget.update()
         }
     }
 
-    pub fn draw(self_widget: &Option<&mut dyn Widget>, canvas: &mut Canvas) {
+    pub fn draw(self_widget: &Option<IWidget>, canvas: &mut Canvas) {
         if let Some(widget) = &*self_widget {
             widget.draw(canvas)
         }
