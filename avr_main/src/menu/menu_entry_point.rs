@@ -95,192 +95,152 @@ pub fn development_entry_point() -> ! {
 
     canvas.render();  
 
-    // menu view
-    let splash1 = &mut Splash::new(None);
-    let splash2 = &mut Splash::new(Some(splash1));
-    let mut menu_manager = MenuManager::new(Some(splash2));
-    loop {
-        if let Some(key) = keyboard.get_key() {
-            menu_manager.send_key(key);
-        }
-
-        menu_manager.update();
-        menu_manager.draw(&mut canvas);
-        canvas.render();
-    }
-
-
-
-
-
-
-    // submenu
-    let mut menu_list: MenuList = Vec::new();
-    menu_list.push(|| {
-        let point1 = Point1d::new(1);
-        let point2 = Point1d::new(33);
-        let text: FlashString = FlashString::new(&S0);
-        fn setter(value: u16) {
-            unsafe {
-                FILE[0] = value;
-            }
-        }
-        fn getter() -> u16 {
-            unsafe {
-                FILE[0]
-            }
-        }
-        let accessor = Accessor::new(setter, getter);
-        let field = Field::from_numerical(accessor, 0, 4, 10..100);
-        let mut menu_item = MenuItem::new(point1, text, point2, field);
-        MenuItemEnum::MenuItem(menu_item)
-    });
-
-    menu_list.push(|| {
-        let point1 = Point1d::new(1);
-        let point2 = Point1d::new(33);
-        let text: FlashString = FlashString::new(&S1);
-        fn setter(value: u16) {
-            unsafe {
-                FILE[1] = value;
-            }
-        }
-        
-        fn getter() -> u16 {
-            unsafe {
-                FILE[1]
-            }
-        }
-        let accessor = Accessor::new(setter, getter);
-        let field = Field::from_numerical(accessor, 0, 4, 0..0xFFFF);
-        let mut menu_item = MenuItem::new(point1, text, point2, field);
-        MenuItemEnum::MenuItem(menu_item)
-    });
-
-    //options
-    menu_list.push(|| {
-        let mut options: OptionsBuffer = Vec::new();
-        options.push(FlashString::new(&O1));
-        options.push(FlashString::new(&O2));
-
-        let point1 = Point1d::new(1);
-        let point2 = Point1d::new(30);
-        let text: FlashString = FlashString::new(&S7);
-        
-        fn setter(cursor: Cursor) {
-            unsafe {
-                CURSOR = cursor;
-            }
-        }
-    
-        fn getter() -> Cursor {
-            unsafe {
-                CURSOR.clone()
-            }
-        }
-        let accessor = Accessor::new(setter, getter);
-        let field = Field::from_optional(options, accessor);
-        let mut menu_item = MenuItem::new(point1, text, point2, field);
-        MenuItemEnum::MenuItem(menu_item)
-    });
-
-    menu_list.push(|| {
-        let point1 = Point1d::new(1);
-        let point2 = Point1d::new(33);
-        let text: FlashString = FlashString::new(&S3);
-        fn setter(value: u16) {
-            unsafe {
-                FILE[2] = value;
-            }
-        }
-        
-        fn getter() -> u16 {
-            unsafe {
-                FILE[2]
-            }
-        }
-        let accessor = Accessor::new(setter, getter);
-        let field = Field::from_numerical(accessor, 0, 4, 0..0xFFFF);
-        let mut menu_item = MenuItem::new(point1, text, point2, field);
-        MenuItemEnum::MenuItem(menu_item)
-    });
-
-
-
-    let mut submenu = SubMenu::new(menu_list);
-
-    let fps = 30; // frames_per_second
-    let mut next_frame: u64 = now() + (1000/fps);
-    
-    loop { 
-
-        if let Some(key) = keyboard.get_key() {
-            submenu.send_key(key);
-        }
-        
-        if now() > next_frame {
-            next_frame = now() + (1000/fps);
-            submenu.update();
-            submenu.draw(&mut canvas);
-            canvas.render();
-        }
-        
-
-    }
+//    // menu view
+//    let splash1 = &mut Splash::new(None);
+//    let splash2 = &mut Splash::new(Some(splash1));
+//    let mut menu_manager = MenuManager::new(Some(splash2));
+//    loop {
+//        if let Some(key) = keyboard.get_key() {
+//            menu_manager.send_key(key);
+//        }
+//
+//        menu_manager.update();
+//        menu_manager.draw(&mut canvas);
+//        canvas.render();
+//    }
+//
+//
+//
+//
+//
+//
+//    // submenu
+//    let mut menu_list: MenuList = Vec::new();
+//    menu_list.push(|| {
+//        let point1 = Point1d::new(1);
+//        let point2 = Point1d::new(33);
+//        let text: FlashString = FlashString::new(&S0);
+//        fn setter(value: u16) {
+//            unsafe {
+//                FILE[0] = value;
+//            }
+//        }
+//        fn getter() -> u16 {
+//            unsafe {
+//                FILE[0]
+//            }
+//        }
+//        let accessor = Accessor::new(setter, getter);
+//        let field = Field::from_numerical(accessor, 0, 4, 10..100);
+//        let mut menu_item = MenuItem::new(point1, text, point2, field);
+//        MenuItemEnum::MenuItem(menu_item)
+//    });
+//
+//    menu_list.push(|| {
+//        let point1 = Point1d::new(1);
+//        let point2 = Point1d::new(33);
+//        let text: FlashString = FlashString::new(&S1);
+//        fn setter(value: u16) {
+//            unsafe {
+//                FILE[1] = value;
+//            }
+//        }
+//        
+//        fn getter() -> u16 {
+//            unsafe {
+//                FILE[1]
+//            }
+//        }
+//        let accessor = Accessor::new(setter, getter);
+//        let field = Field::from_numerical(accessor, 0, 4, 0..0xFFFF);
+//        let mut menu_item = MenuItem::new(point1, text, point2, field);
+//        MenuItemEnum::MenuItem(menu_item)
+//    });
+//
+//    //options
+//    menu_list.push(|| {
+//        let mut options: OptionsBuffer = Vec::new();
+//        options.push(FlashString::new(&O1));
+//        options.push(FlashString::new(&O2));
+//
+//        let point1 = Point1d::new(1);
+//        let point2 = Point1d::new(30);
+//        let text: FlashString = FlashString::new(&S7);
+//        
+//        fn setter(cursor: Cursor) {
+//            unsafe {
+//                CURSOR = cursor;
+//            }
+//        }
+//    
+//        fn getter() -> Cursor {
+//            unsafe {
+//                CURSOR.clone()
+//            }
+//        }
+//        let accessor = Accessor::new(setter, getter);
+//        let field = Field::from_optional(options, accessor);
+//        let mut menu_item = MenuItem::new(point1, text, point2, field);
+//        MenuItemEnum::MenuItem(menu_item)
+//    });
+//
+//    menu_list.push(|| {
+//        let point1 = Point1d::new(1);
+//        let point2 = Point1d::new(33);
+//        let text: FlashString = FlashString::new(&S3);
+//        fn setter(value: u16) {
+//            unsafe {
+//                FILE[2] = value;
+//            }
+//        }
+//        
+//        fn getter() -> u16 {
+//            unsafe {
+//                FILE[2]
+//            }
+//        }
+//        let accessor = Accessor::new(setter, getter);
+//        let field = Field::from_numerical(accessor, 0, 4, 0..0xFFFF);
+//        let mut menu_item = MenuItem::new(point1, text, point2, field);
+//        MenuItemEnum::MenuItem(menu_item)
+//    });
+//
+//
+//
+//    let mut submenu = SubMenu::new(menu_list);
+//
+//    let fps = 30; // frames_per_second
+//    let mut next_frame: u64 = now() + (1000/fps);
+//    
+//    loop { 
+//
+//        if let Some(key) = keyboard.get_key() {
+//            submenu.send_key(key);
+//        }
+//        
+//        if now() > next_frame {
+//            next_frame = now() + (1000/fps);
+//            submenu.update();
+//            submenu.draw(&mut canvas);
+//            canvas.render();
+//        }
+//        
+//
+//    }
 
     //main menu
     let mut manual_mode = ManualMode::new();
-    let mut current_state: State = State::MAIN_MENU;
+    let mut main_menu: MainMenu = MainMenu::new(&mut manual_mode);
 
     // main loop
     loop {
-        match  current_state {
-
-            State::MAIN_MENU => {
-
-                MainMenu::draw(&mut canvas);
-                if let Some(key) = keyboard.get_key() {
-                    match key {
-                        KeyCode::KEY_MANUAL => current_state = State::MANUAL,
-                        KeyCode::KEY_EXECUCAO => current_state = State::EXECUCAO,
-                        KeyCode::KEY_PROGRAMA => current_state = State::PROGRAMA,
-                        _ => { }
-                    }
-                }
-            }
-
-            State::EXECUCAO => {
-                
-                if let Some(key) = keyboard.get_key() {
-                    if key == KeyCode::KEY_ESC {
-                        current_state = State::MAIN_MENU;
-                    } else {
-                        // do nothing
-                    }
-                }
-                Execucao::draw(&mut canvas);               
-            }
-
-            State::MANUAL => {
-
-                if let Some(key) = keyboard.get_key() {
-                    manual_mode.send_key(key)
-                }
-                if manual_mode.current_state == ManualModeState::DISABLED {
-                    manual_mode.current_state = ManualModeState::FIRST_SCREEN;
-                    current_state = State::MAIN_MENU;
-                }
-                manual_mode.draw(&mut canvas); 
-
-            }
-
-            State::PROGRAMA => {
-
-                // todo: submenu programa
-
-            }
+        
+        if let Some(key) = keyboard.get_key() {
+            main_menu.send_key(key);
         }
 
+        main_menu.update();
+        main_menu.draw(&mut canvas);
         canvas.render();
     }
 

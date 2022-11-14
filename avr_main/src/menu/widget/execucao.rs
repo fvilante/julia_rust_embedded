@@ -15,6 +15,7 @@ progmem! {
 pub struct Execucao;
 
 impl Execucao {
+    
 
     fn get_line_helper(line_number: u8) -> (Point, FlashString) {
         let line0 = FlashString::new(&LINE0);

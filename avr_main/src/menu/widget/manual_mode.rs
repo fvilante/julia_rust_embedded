@@ -32,7 +32,11 @@ impl ManualMode {
         }
     }
 
-    pub fn send_key(&mut self, key: crate::board::keyboard::KeyCode) {
+}
+
+
+impl Widget for ManualMode {
+    fn send_key(&mut self, key: crate::board::keyboard::KeyCode) {
         if self.current_state == ManualModeState::FIRST_SCREEN {
             if key == KeyCode::KEY_ESC {
                 self.current_state = ManualModeState::DISABLED;
@@ -45,7 +49,11 @@ impl ManualMode {
         }
     }
 
-    pub fn draw(&self, canvas: &mut Canvas) {
+    fn update(&mut self) {
+
+    }
+
+    fn draw(&self, canvas: &mut Canvas) {
         fn helper_get_first_screen(line_number: u8) -> (Point, FlashString) {
             let line0 = FlashString::new(&LINE0);
             let line1 = FlashString::new(&LINE1);
@@ -57,7 +65,7 @@ impl ManualMode {
                 (Point::new(col1,1), line1)
             }
         }
-    
+
         fn helper_get_last_screen(line_number: u8) -> (Point, FlashString) {
             let line0 = FlashString::new(&LINE2);
             let line1 = FlashString::new(&LINE3);
@@ -93,8 +101,4 @@ impl ManualMode {
             draw2(canvas);
         }
     }
-
-    
-
 }
-
