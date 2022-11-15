@@ -2,7 +2,7 @@ use avr_progmem::progmem;
 
 use crate::{board::keyboard::KeyCode, menu::{point::Point, flash::FlashString, canvas::Canvas}};
 
-use super::{widget::{Widget, IWidget}, manual_mode::{ManualModeMenu, ManualModeState}};
+use super::{widget::{Widget, IWidget}, manual_mode::{ManualModeMenu, ManualModeState}, execucao::MenuExecucao};
 
 
 progmem! {
@@ -22,18 +22,18 @@ pub enum State {
 
 pub struct MainMenu {
     current_state: State,
-    manual_mode_menu: ManualModeMenu,
-    //execution_mode: IWidget,
+    menu_manual: ManualModeMenu,
+    menu_execucao: MenuExecucao,
     //program_mode: IWidget,
 }
 
 impl MainMenu {
 
-    pub fn new(manual_mode_menu: ManualModeMenu) -> Self {
+    pub fn new(menu_manual: ManualModeMenu, menu_execucao: MenuExecucao) -> Self {
         Self {
             current_state: State::MAIN_MENU,
-            manual_mode_menu,
-            
+            menu_manual,
+            menu_execucao,
         }
     }
 
@@ -75,8 +75,14 @@ impl Widget for MainMenu {
                     _ => { }
                 }
             },
-            State::MANUAL => self.manual_mode_menu.send_key(key),
-            State::EXECUCAO => todo!(),
+            State::MANUAL => self.menu_manual.send_key(key),
+            State::EXECUCAO => {
+                if key == KeyCode::KEY_ESC {
+                    self.current_state = State::MAIN_MENU
+                } else {
+                    // do nothing
+                }
+            },
             State::PROGRAMA => todo!(),
         }
     }
@@ -85,14 +91,16 @@ impl Widget for MainMenu {
         match self.current_state {
             State::MAIN_MENU => { },
             State::MANUAL => { 
-                if self.manual_mode_menu.current_state == ManualModeState::Resting {
-                    self.manual_mode_menu.current_state = ManualModeState::FirstScreen;
+                if self.menu_manual.current_state == ManualModeState::Resting {
+                    self.menu_manual.current_state = ManualModeState::FirstScreen;
                     self.current_state = State::MAIN_MENU
                 } else {
-                    self.manual_mode_menu.update()
+                    self.menu_manual.update()
                 }
             },
-            State::EXECUCAO => todo!(),
+            State::EXECUCAO => {
+                self.menu_execucao.update()
+            },
             State::PROGRAMA => todo!(),
         }
     }
@@ -100,8 +108,8 @@ impl Widget for MainMenu {
     fn draw(&self, canvas: &mut Canvas) {
         match self.current_state {
             State::MAIN_MENU => { self.draw_main_menu(canvas) },
-            State::MANUAL => { self.manual_mode_menu.draw(canvas)},
-            State::EXECUCAO => todo!(),
+            State::MANUAL => { self.menu_manual.draw(canvas)},
+            State::EXECUCAO => { self.menu_execucao.draw(canvas) },
             State::PROGRAMA => todo!(),
         }
     }

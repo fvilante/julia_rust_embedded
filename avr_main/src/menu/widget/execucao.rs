@@ -12,10 +12,15 @@ progmem! {
     static progmem string LINE1 = "X=${nnnn}    Y=${nnnn}";
 }
 
-pub struct Execucao;
+pub struct MenuExecucao;
 
-impl Execucao {
-    
+impl MenuExecucao {
+
+    pub fn new() -> Self {
+        Self { 
+
+        }
+    }
 
     fn get_line_helper(line_number: u8) -> (Point, FlashString) {
         let line0 = FlashString::new(&LINE0);
@@ -28,8 +33,19 @@ impl Execucao {
             (Point::new(col1,1), line1)
         }
     }
+}
 
-    pub fn draw(canvas: &mut Canvas) {
+impl Widget for MenuExecucao {
+
+    fn send_key(&mut self, key: KeyCode) {
+
+    }
+
+    fn update(&mut self) {
+
+    }
+    
+    fn draw(&self, canvas: &mut Canvas) {
         canvas.clear();
         for line_number in 0..2 {
             let ( point, flash_string ) = Self::get_line_helper(line_number);

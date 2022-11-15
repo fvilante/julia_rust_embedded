@@ -24,7 +24,7 @@ use super::point::Point;
 use super::point::Point1d;
 use super::widget::caption::Caption;
 use super::widget::execucao;
-use super::widget::execucao::Execucao;
+use super::widget::execucao::MenuExecucao;
 use super::widget::field::Field;
 use super::widget::field::FieldBuffer;
 use super::widget::main_menu;
@@ -229,8 +229,9 @@ pub fn development_entry_point() -> ! {
 //    }
 
     //main menu
-    let mut manual_mode = ManualModeMenu::new();
-    let mut main_menu: MainMenu = MainMenu::new(manual_mode);
+    let mut menu_execucao = MenuExecucao::new();
+    let mut menu_manual = ManualModeMenu::new();
+    let mut main_menu: MainMenu = MainMenu::new(menu_manual, menu_execucao);
 
     // main loop
     loop {
