@@ -2,7 +2,7 @@ use avr_progmem::progmem;
 
 use crate::{board::keyboard::KeyCode, menu::{point::Point, flash::FlashString, canvas::Canvas}};
 
-use super::{widget::{Widget, IWidget}, manual_mode::ManualMode};
+use super::{widget::{Widget, IWidget}, manual_mode::{ManualModeMenu, ManualModeState}};
 
 
 progmem! {
@@ -20,19 +20,19 @@ pub enum State {
 }
 
 
-pub struct MainMenu<'a> {
+pub struct MainMenu {
     current_state: State,
-    manual_mode_widget: IWidget<'a>,
+    manual_mode_menu: ManualModeMenu,
     //execution_mode: IWidget,
     //program_mode: IWidget,
 }
 
-impl<'a> MainMenu<'a> {
+impl MainMenu {
 
-    pub fn new(manual_mode: IWidget<'a>) -> Self {
+    pub fn new(manual_mode_menu: ManualModeMenu) -> Self {
         Self {
             current_state: State::MAIN_MENU,
-            manual_mode_widget: manual_mode,
+            manual_mode_menu,
             
         }
     }
@@ -62,7 +62,7 @@ impl<'a> MainMenu<'a> {
     
 }
 
-impl<'a> Widget for MainMenu<'a> {
+impl Widget for MainMenu {
     
     fn send_key(&mut self, key: KeyCode) {
 
@@ -75,7 +75,7 @@ impl<'a> Widget for MainMenu<'a> {
                     _ => { }
                 }
             },
-            State::MANUAL => self.manual_mode_widget.send_key(key),
+            State::MANUAL => self.manual_mode_menu.send_key(key),
             State::EXECUCAO => todo!(),
             State::PROGRAMA => todo!(),
         }
@@ -84,7 +84,14 @@ impl<'a> Widget for MainMenu<'a> {
     fn update(&mut self) {
         match self.current_state {
             State::MAIN_MENU => { },
-            State::MANUAL => { self.manual_mode_widget.update()},
+            State::MANUAL => { 
+                if self.manual_mode_menu.current_state == ManualModeState::Resting {
+                    self.manual_mode_menu.current_state = ManualModeState::FirstScreen;
+                    self.current_state = State::MAIN_MENU
+                } else {
+                    self.manual_mode_menu.update()
+                }
+            },
             State::EXECUCAO => todo!(),
             State::PROGRAMA => todo!(),
         }
@@ -93,7 +100,7 @@ impl<'a> Widget for MainMenu<'a> {
     fn draw(&self, canvas: &mut Canvas) {
         match self.current_state {
             State::MAIN_MENU => { self.draw_main_menu(canvas) },
-            State::MANUAL => { self.manual_mode_widget.draw(canvas)},
+            State::MANUAL => { self.manual_mode_menu.draw(canvas)},
             State::EXECUCAO => todo!(),
             State::PROGRAMA => todo!(),
         }

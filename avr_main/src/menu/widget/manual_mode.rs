@@ -16,37 +16,46 @@ progmem! {
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum ManualModeState {
-    DISABLED,
-    FIRST_SCREEN,
-    LAST_SCREEN,
+    Resting,       // Client is responsible to changes to FirstScreeen state
+    FirstScreen,
+    LastScreen,     // Server is responsible to changes to Resting state
 }
 
-pub struct ManualMode {
+pub struct ManualModeMenu {
     pub current_state: ManualModeState,
 }
 
-impl ManualMode {
+impl ManualModeMenu {
     pub fn new() -> Self {
         Self { 
-            current_state: ManualModeState::FIRST_SCREEN,
+            current_state: ManualModeState::FirstScreen,
         }
     }
 
 }
 
 
-impl Widget for ManualMode {
-    fn send_key(&mut self, key: crate::board::keyboard::KeyCode) {
-        if self.current_state == ManualModeState::FIRST_SCREEN {
-            if key == KeyCode::KEY_ESC {
-                self.current_state = ManualModeState::DISABLED;
-            } else {
-                //TODO: Put motor in manual mode
-                self.current_state = ManualModeState::LAST_SCREEN;
-            }
-        } else if self.current_state == ManualModeState::LAST_SCREEN {
-            self.current_state = ManualModeState::DISABLED;
+impl Widget for ManualModeMenu {
+    fn send_key(&mut self, key: KeyCode) {
+
+        match self.current_state {
+            ManualModeState::Resting => {
+                
+            },
+            ManualModeState::FirstScreen => {
+                if key == KeyCode::KEY_ESC {
+                    //back
+                    self.current_state = ManualModeState::Resting;
+                } else /* Non_ESC key */{ 
+                    //continue
+                    self.current_state = ManualModeState::LastScreen;
+                }
+            },
+            ManualModeState::LastScreen => {
+                self.current_state = ManualModeState::Resting;
+            },
         }
+    
     }
 
     fn update(&mut self) {
@@ -55,25 +64,25 @@ impl Widget for ManualMode {
 
     fn draw(&self, canvas: &mut Canvas) {
         fn helper_get_first_screen(line_number: u8) -> (Point, FlashString) {
-            let line0 = FlashString::new(&LINE0);
-            let line1 = FlashString::new(&LINE1);
-            let col0 = ((40 - line0.len()) / 2).try_into().unwrap_or(0);
-            let col1 = ((40 - line1.len()) / 2).try_into().unwrap_or(0);
             if line_number == 0 {
+                let line0 = FlashString::new(&LINE0);
+                let col0 = ((40 - line0.len()) / 2).try_into().unwrap_or(0);
                 (Point::new(col0,0), line0)
             } else {
+                let line1 = FlashString::new(&LINE1);
+                let col1 = ((40 - line1.len()) / 2).try_into().unwrap_or(0);
                 (Point::new(col1,1), line1)
             }
         }
 
         fn helper_get_last_screen(line_number: u8) -> (Point, FlashString) {
-            let line0 = FlashString::new(&LINE2);
-            let line1 = FlashString::new(&LINE3);
-            let col0 = ((40 - line0.len()) / 2).try_into().unwrap_or(0);
-            let col1 = ((40 - line1.len()) / 2).try_into().unwrap_or(0);
             if line_number == 0 {
+                let line0 = FlashString::new(&LINE2);
+                let col0 = ((40 - line0.len()) / 2).try_into().unwrap_or(0);
                 (Point::new(col0,0), line0)
             } else {
+                let line1 = FlashString::new(&LINE3);
+                let col1 = ((40 - line1.len()) / 2).try_into().unwrap_or(0);
                 (Point::new(col1,1), line1)
             }
         }
@@ -95,9 +104,9 @@ impl Widget for ManualMode {
             }
         }
 
-        if self.current_state == ManualModeState::FIRST_SCREEN {
+        if self.current_state == ManualModeState::FirstScreen {
             draw1(canvas);
-        } else if self.current_state == ManualModeState::LAST_SCREEN {
+        } else if self.current_state == ManualModeState::LastScreen {
             draw2(canvas);
         }
     }

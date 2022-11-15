@@ -30,7 +30,7 @@ use super::widget::field::FieldBuffer;
 use super::widget::main_menu;
 use super::widget::main_menu::MainMenu;
 use super::widget::main_menu::State;
-use super::widget::manual_mode::ManualMode;
+use super::widget::manual_mode::ManualModeMenu;
 use super::widget::manual_mode::ManualModeState;
 use super::widget::menu_item;
 use super::widget::menu_item::MenuItem;
@@ -229,8 +229,8 @@ pub fn development_entry_point() -> ! {
 //    }
 
     //main menu
-    let mut manual_mode = ManualMode::new();
-    let mut main_menu: MainMenu = MainMenu::new(&mut manual_mode);
+    let mut manual_mode = ManualModeMenu::new();
+    let mut main_menu: MainMenu = MainMenu::new(manual_mode);
 
     // main loop
     loop {
