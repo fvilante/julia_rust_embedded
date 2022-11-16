@@ -1,6 +1,6 @@
 use crate::{
     board::{keyboard::KeyCode, lcd},
-    menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}, accessor::Accessor},
+    menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}},
 };
 
 use super::{caption::Caption, field::{Field, FieldBuffer, FieldEnum}, widget::Editable, widget::Widget, sub_menu::{LcdLine, SubMenu}};

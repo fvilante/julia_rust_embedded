@@ -1,7 +1,7 @@
 use heapless::Vec;
 
 use crate::board::keyboard::KeyCode;
-use crate::menu::accessor::Accessor;
+use crate::menu::accessor::{Accessor, AccessorTrait};
 use crate::menu::canvas::Canvas;
 use crate::menu::flash::FlashString;
 use crate::menu::point::Point;

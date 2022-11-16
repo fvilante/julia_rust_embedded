@@ -3,9 +3,14 @@
 type Setter<A> = fn(A);
 type Getter<A> = fn() -> A;
 
-
 pub enum AccessorEnum {
     U16(Accessor<u16>),
+}
+
+
+pub trait AccessorTrait<T> {
+    fn get(&self) -> T;
+    fn set(&mut self, value: T);
 }
 
 impl AccessorEnum {
@@ -20,7 +25,6 @@ pub struct Accessor<T> { // size = 4 bytes
 }
 
 impl<T> Accessor<T> {
-
     pub fn new(setter: Setter<T>, getter: Getter<T>) -> Self {
         Self {
             setter,
@@ -28,19 +32,23 @@ impl<T> Accessor<T> {
         }
     }
 
-    ///TODO: this mutable self is really necessary?
-    pub fn set(&mut self, value: T) {
-        (self.setter)(value);
-    }
-
-    pub fn get(&self) -> T {
-        (self.getter)()
-    }
-
     pub fn clone(&self) -> Self {
         let setter = self.setter;
         let getter = self.getter;
         Self::new(setter, getter)
     }
+}
+
+impl<T> AccessorTrait<T> for Accessor<T> {
+
+    fn set(&mut self, value: T) {
+        (self.setter)(value);
+    }
+
+    fn get(&self) -> T {
+        (self.getter)()
+    }
 
 }
+
+
