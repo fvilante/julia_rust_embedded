@@ -3,20 +3,10 @@
 type Setter<A> = fn(A);
 type Getter<A> = fn() -> A;
 
-pub enum AccessorEnum {
-    U16(Accessor<u16>),
-}
-
 
 pub trait AccessorTrait<T> {
     fn get(&self) -> T;
     fn set(&mut self, value: T);
-}
-
-impl AccessorEnum {
-    pub fn from_u16(setter: Setter<u16>, getter: Getter<u16>) -> Accessor<u16> {
-        Accessor::new(setter, getter)
-    }
 }
 
 pub struct Accessor<T> { // size = 4 bytes

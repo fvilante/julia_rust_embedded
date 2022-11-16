@@ -11,7 +11,7 @@ use lib_1::utils::common::convert_u16_to_string_decimal;
 
 use crate::board::lcd;
 use crate::menu::accessor::AccessorTrait;
-use crate::{menu::{point::Point, ratangular_wave::RectangularWave, canvas::Canvas, accessor::{Accessor, AccessorEnum, }}, board::keyboard::KeyCode};
+use crate::{menu::{point::Point, ratangular_wave::RectangularWave, canvas::Canvas, accessor::{Accessor }}, board::keyboard::KeyCode};
 
 use super::optional::{Optional, OptionsBuffer};
 use super::{edit_mode::EditMode, widget::Widget, widget::Editable, cursor::Cursor};
