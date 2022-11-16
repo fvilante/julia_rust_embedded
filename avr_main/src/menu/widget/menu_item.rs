@@ -3,35 +3,37 @@ use crate::{
     menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}, accessor::Accessor},
 };
 
-use super::{caption::Caption, field::{Field, FieldBuffer, FieldEnum}, widget::Editable, widget::Widget, sub_menu::LcdLine};
+use super::{caption::Caption, field::{Field, FieldBuffer, FieldEnum}, widget::Editable, widget::Widget, sub_menu::{LcdLine, SubMenu}};
 
 use heapless::String;
 use lib_1::utils::common::convert_u16_to_string_decimal;
 use core::{str::FromStr, ops::Range};
 
-pub struct MenuItem { // size = 60 bytes (max)
+pub struct MenuItem<'a> { // size = 60 bytes (max)
     point_a: Point1d, // size = 2 bytes
     caption: Caption, // size = 3 bytes
     point_b: Point1d, //        2 bytes
     field: Field,   // size = 53 bytes (max)
+    sub_menu: Option<&'a mut SubMenu<'a>>,
 }
 
 
-impl MenuItem {
+impl<'a> MenuItem<'a> {
     /// NOTE: client should put point1 and point2 in the same line
     /// point1 = position of caption, point2 = position of field
-    pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, field: Field) -> Self {
+    pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, field: Field, sub_menu: Option<&'a mut SubMenu<'a>>) -> Self {
         Self {
             point_a,
             caption: Caption::new(text),
             point_b,
             field,
+            sub_menu,
         }
     }
 
 }
 
-impl MenuItem {
+impl MenuItem<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         self.field.send_key(key);
     }
@@ -50,7 +52,7 @@ impl MenuItem {
     }
 }
 
-impl MenuItem {
+impl MenuItem<'_> {
     pub fn set_edit_mode(&mut self, value: bool) {
         self.field.set_edit_mode(value);
     }

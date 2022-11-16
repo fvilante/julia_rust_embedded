@@ -26,20 +26,20 @@ impl LcdLine {
     }
 }
 
-pub type MenuItemGetter = fn() -> MenuItem;
+pub type MenuItemGetter<'a> = fn() -> MenuItem<'a>;
 
-pub type MenuList = Vec<MenuItemGetter,10>;
+pub type MenuList<'a> = Vec<MenuItemGetter<'a>,10>;
 
-pub struct SubMenu {
-    menu_list: MenuList,    // all itens of submenu
-    menu_items: Vec<MenuItem,2>, // first and second lcd lines
+pub struct SubMenu<'a> {
+    menu_list: MenuList<'a>,    // all itens of submenu
+    menu_items: Vec<MenuItem<'a>,2>, // first and second lcd lines
     current_lcd_line_selected: LcdLine,  // lcd line reference
     first_line_to_render: Cursor, // line of the vector 'MenuList' which must be the first line to render in the first line of the lcd
 }
 
 
-impl SubMenu {
-    pub fn new(menu_list: MenuList) -> Self {
+impl<'a> SubMenu<'a> {
+    pub fn new(menu_list: MenuList<'a>) -> Self {
         let mut menu_item_0 = menu_list[0]();
         let mut menu_item_1 = menu_list[1]();
         let size = menu_list.len();
@@ -65,12 +65,12 @@ impl SubMenu {
         self.menu_items.push(menu_item_1);
     }
 
-    fn get_menu_item_mut(&mut self, line: LcdLine) -> &mut MenuItem {
+    fn get_menu_item_mut(&mut self, line: LcdLine) -> &mut MenuItem<'a> {
         let index = line.as_u8() as usize;
         self.menu_items.get_mut(index).unwrap()
     }
 
-    fn get_menu_item(&self, line: LcdLine) -> &MenuItem {
+    fn get_menu_item(&self, line: LcdLine) -> &MenuItem<'a> {
         let index = line.as_u8() as usize;
         self.menu_items.get(index).unwrap()
     }
@@ -123,7 +123,7 @@ impl SubMenu {
 }
 
 
-impl SubMenu {
+impl<'a> SubMenu<'a> {
     pub fn send_key(&mut self, key: KeyCode) {
         let is_editing_some_line = self.get_line_being_edited();
 
