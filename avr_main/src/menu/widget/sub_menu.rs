@@ -26,63 +26,50 @@ impl LcdLine {
     }
 }
 
-pub type MenuItemGetter<'a> = fn() -> MenuItem<'a>;
-
-pub type MenuList<'a> = Vec<MenuItemGetter<'a>,10>;
+pub type MenuList<'a> = Vec<MenuItem<'a>,10>;
 
 pub struct SubMenu<'a> {
     menu_list: MenuList<'a>,    // all itens of submenu
-    menu_items: Vec<MenuItem<'a>,2>, // first and second lcd lines
     current_lcd_line_selected: LcdLine,  // lcd line reference
     first_line_to_render: Cursor, // line of the vector 'MenuList' which must be the first line to render in the first line of the lcd
 }
 
 
 impl<'a> SubMenu<'a> {
-    pub fn new(menu_list: MenuList<'a>) -> Self {
-        let mut menu_item_0 = menu_list[0]();
-        let mut menu_item_1 = menu_list[1]();
+    pub fn new(mut menu_list: MenuList<'a>) -> Self {
         let size = menu_list.len();
-        let initial_item_index = 0;
-        let mut menu_items = Vec::new();
-        menu_items.push(menu_item_0);
-        menu_items.push(menu_item_1);
+        let default_initial_menu_item = 0;
         Self {
             menu_list,
-            menu_items,
             current_lcd_line_selected: Line0,
-            first_line_to_render: Cursor::new(0..size-1, initial_item_index),
+            first_line_to_render: Cursor::new(0..size-1, default_initial_menu_item),
 
         }
     }
 
-    fn update_menu_items(&mut self) {
-        let index = self.first_line_to_render.get_current();
-        let mut menu_item_0 = self.menu_list[index+0]();
-        let mut menu_item_1 = self.menu_list[index+1]();
-        self.menu_items.clear();
-        self.menu_items.push(menu_item_0);
-        self.menu_items.push(menu_item_1);
+    fn get_current_index(&self, line: LcdLine) -> usize {
+        let lcd_index = line.as_u8() as usize;
+        let line_index = self.first_line_to_render.get_current();
+        let index = lcd_index + line_index;
+        index
     }
 
     fn get_menu_item_mut(&mut self, line: LcdLine) -> &mut MenuItem<'a> {
-        let index = line.as_u8() as usize;
-        self.menu_items.get_mut(index).unwrap()
+        let index = self.get_current_index(line);
+        self.menu_list.get_mut(index).unwrap()
     }
 
     fn get_menu_item(&self, line: LcdLine) -> &MenuItem<'a> {
-        let index = line.as_u8() as usize;
-        self.menu_items.get(index).unwrap()
+        let index = self.get_current_index(line);
+        self.menu_list.get(index).unwrap()
     }
 
     fn scroll_down(&mut self) {
         self.first_line_to_render.next();
-        self.update_menu_items();
     }
 
     fn scroll_up(&mut self) {
         self.first_line_to_render.previous();
-        self.update_menu_items();
     }
 
     //
