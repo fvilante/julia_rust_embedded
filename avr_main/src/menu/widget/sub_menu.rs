@@ -26,54 +26,13 @@ impl LcdLine {
     }
 }
 
+pub type MenuItemGetter = fn() -> MenuItem;
 
-pub enum MenuItemEnum {
-    MenuItem(MenuItem)
-}
-
-impl MenuItemEnum {
-    pub fn set_edit_mode(&mut self, value: bool) {
-        match self {
-            MenuItemEnum::MenuItem(m_item) => m_item.set_edit_mode(value),
-        }
-    }
-
-    pub fn is_in_edit_mode(&self) -> bool {
-        match self {
-            MenuItemEnum::MenuItem(m_item) => m_item.is_in_edit_mode(),
-        }
-    }
-
-    pub fn send_key(&mut self, key: KeyCode) {
-        match self {
-            MenuItemEnum::MenuItem(m_item) => m_item.send_key(key),
-        }
-    }
-
-    pub fn update(&mut self) {
-        match self {
-            MenuItemEnum::MenuItem(m_item) => m_item.update(),
-        }
-    }
-
-    pub fn draw(&self, canvas: &mut Canvas, lcd_line: LcdLine) {
-        match self {
-            MenuItemEnum::MenuItem(m_item) => m_item.draw(canvas, lcd_line),
-        }
-    }
-}
-
-
-
-
-
-pub type MenuItemEnumGetter = fn() -> MenuItemEnum;
-
-pub type MenuList = Vec<MenuItemEnumGetter,10>;
+pub type MenuList = Vec<MenuItemGetter,10>;
 
 pub struct SubMenu {
     menu_list: MenuList,    // all itens of submenu
-    menu_items: Vec<MenuItemEnum,2>, // first and second lcd lines
+    menu_items: Vec<MenuItem,2>, // first and second lcd lines
     current_lcd_line_selected: LcdLine,  // lcd line reference
     first_line_to_render: Cursor, // line of the vector 'MenuList' which must be the first line to render in the first line of the lcd
 }
@@ -106,12 +65,12 @@ impl SubMenu {
         self.menu_items.push(menu_item_1);
     }
 
-    fn get_menu_item_mut(&mut self, line: LcdLine) -> &mut MenuItemEnum {
+    fn get_menu_item_mut(&mut self, line: LcdLine) -> &mut MenuItem {
         let index = line.as_u8() as usize;
         self.menu_items.get_mut(index).unwrap()
     }
 
-    fn get_menu_item(&self, line: LcdLine) -> &MenuItemEnum {
+    fn get_menu_item(&self, line: LcdLine) -> &MenuItem {
         let index = line.as_u8() as usize;
         self.menu_items.get(index).unwrap()
     }
