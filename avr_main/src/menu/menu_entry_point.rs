@@ -130,23 +130,36 @@ pub fn development_entry_point() -> ! {
     let mut menu_list: MenuList = Vec::new();
 
     fn make_menu_item_helper<const N: usize>(point1_: u8, point2_: u8, pgm_text: &'static PmString<N>) -> (Point1d, Point1d, FlashString, ) {
-        let point1 = Point1d::new(1);
-        let point2 = Point1d::new(33);
+        let point1 = Point1d::new(point1_);
+        let point2 = Point1d::new(point2_);
         let text: FlashString = FlashString::new(pgm_text);
         (point1, point2, text)
     }
 
+    fn make_numerical_field(variable: &'static mut u16) -> Field {
+        let accessor = Accessor::new( unsafe{ variable });
+        let field = Field::from_numerical(accessor, 0, 4, 10..100);
+        field
+    }
+
+    fn make_optional_field_ligado_desligado(variable: &'static mut Cursor) -> Field {
+        let accessor = Accessor::new( unsafe{ variable });
+        let mut options: OptionsBuffer = Vec::new();
+        options.push(FlashString::new(&O1));
+        options.push(FlashString::new(&O2));
+        let field = Field::from_optional(options, accessor);
+        field
+    }
+
     // =========================================================
     let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_INICIAL);
-    let accessor = Accessor::new( unsafe{ &mut FILE[0] });
-    let field = Field::from_numerical(accessor, 0, 4, 10..100);
+    let field = make_numerical_field(unsafe{ &mut FILE[0] });
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
 
     // =========================================================
     let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_FINAL);
-    let accessor = Accessor::new( unsafe{ &mut FILE[1] });
-    let field = Field::from_numerical(accessor, 0, 4, 0..0xFFFF);
+    let field = make_numerical_field(unsafe{ &mut FILE[1] });
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
 
@@ -154,78 +167,9 @@ pub fn development_entry_point() -> ! {
     // =========================================================
     //options
     let (point1, point2, text) = make_menu_item_helper(1, 33, &START_AUTOMATICO_NO_RETORNO);
-    let accessor = Accessor::new( unsafe{ &mut CURSOR });
-    let mut options: OptionsBuffer = Vec::new();
-    options.push(FlashString::new(&O1));
-    options.push(FlashString::new(&O2));
-    let field = Field::from_optional(options, accessor);
+    let field = make_optional_field_ligado_desligado(unsafe{ &mut CURSOR });
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
-
-//    // =========================================================
-//    //options
-//    let mut options: OptionsBuffer = Vec::new();
-//    options.push(FlashString::new(&O1));
-//    options.push(FlashString::new(&O2));
-//    let point1 = Point1d::new(1);
-//    let point2 = Point1d::new(30);
-//    let text: FlashString = FlashString::new(&START_AUTOMATICO_NO_AVANCO);
-//    fn setter_d(cursor: Cursor) {
-//        unsafe {
-//            CURSOR = cursor;
-//        }
-//    }
-//    fn getter_d() -> Cursor {
-//        unsafe {
-//            CURSOR.clone()
-//        }
-//    }
-//    let accessor = Accessor::new(setter_d, getter_d);
-//    let field = Field::from_optional(options, accessor);
-//    let mut menu_item = MenuItem::new(point1, text, point2, field, None);
-//    menu_list.push(menu_item);
-
-
-//    // =========================================================
-//    let point1 = Point1d::new(1);
-//    let point2 = Point1d::new(33);
-//    let text: FlashString = FlashString::new(&VELOCIDADE_DE_RETORNO);
-//    fn setter_e(value: u16) {
-//        unsafe {
-//            FILE[2] = value;
-//        }
-//    }
-//    
-//    fn getter_e() -> u16 {
-//        unsafe {
-//            FILE[2]
-//        }
-//    }
-//    let accessor = Accessor::new(setter_e, getter_e);
-//    let field = Field::from_numerical(accessor, 0, 4, 0..0xFFFF);
-//    let mut menu_item = MenuItem::new(point1, text, point2, field, None);
-//    menu_list.push(menu_item);
-
-//    // =========================================================
-//    let point1 = Point1d::new(1);
-//    let point2 = Point1d::new(33);
-//    let text: FlashString = FlashString::new(&VELOCIDADE_DE_AVANCO);
-//    fn setter_f(value: u16) {
-//        unsafe {
-//            FILE[2] = value;
-//        }
-//    }
-//    
-//    fn getter_f() -> u16 {
-//        unsafe {
-//            FILE[2]
-//        }
-//    }
-//    let accessor = Accessor::new(setter_f, getter_f);
-//    let field = Field::from_numerical(accessor, 0, 4, 0..0xFFFF);
-//    let mut menu_item = MenuItem::new(point1, text, point2, field, None);
-//    menu_list.push(menu_item);
-
 
     // -----------------------------
     
