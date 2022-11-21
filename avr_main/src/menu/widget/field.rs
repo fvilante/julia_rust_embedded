@@ -46,11 +46,11 @@ fn convert_FieldBuffer_to_u16(data: FieldBuffer) -> u16 {
 
 
 /// TODO: rename to NavigationString (?!)
-struct EditionBuffer {      // size = 15 bytes
-    buffer: FieldBuffer,    // size = 10 bytes (may vary)
-    cursor: Cursor,         // size = 3 bytes 
+struct EditionBuffer {      
+    buffer: FieldBuffer,   
+    cursor: Cursor,         
     // initial condition
-    pub initial_cursor_position: usize, // size = 2 bytes
+    pub initial_cursor_position: usize, 
 }
 
 impl EditionBuffer {
@@ -123,13 +123,13 @@ impl EditionBuffer {
 
 }
  
-struct Numerical {                  // size = 40 bytes
-    edition_buffer: EditionBuffer, // size = 15 bytes
-    valid_range: Range<u16>,       // = 4 bytes
-    number_of_digits: usize,        // = 2 bytes
+struct Numerical {                  
+    edition_buffer: EditionBuffer, 
+    valid_range: Range<u16>,       
+    number_of_digits: usize,        
     // initial values
-    initial_edition_buffer: EditionBuffer, // size = 15 bytes
-    accessor: Accessor<u16>         // size = 4 bytes
+    initial_edition_buffer: EditionBuffer, 
+    accessor: Accessor<u16>         
 } 
 
 impl Numerical {
@@ -222,9 +222,9 @@ impl Numerical {
     }
 }
 
-pub struct NumericalField { // size = 53 bytes
-    numerical: Numerical,   // size = 40 bytes
-    blink: RectangularWave, // size = 13 bytes
+pub struct NumericalField { 
+    numerical: Numerical,   
+    blink: RectangularWave, 
 }
 
 impl NumericalField {
