@@ -153,20 +153,35 @@ pub fn development_entry_point() -> ! {
 
     // -----
 
-    let mut CURSOR: Cursor = Cursor::new(0..4, 0);
-    let mut FILE_01: u16 = 0x00;
-    let mut FILE_02: u16 = 0x00;
+    struct Database {
+        pub cursor: Cursor,
+        pub file_01: u16,
+        pub file_02: u16,
+    }
+
+    impl Database {
+
+        pub fn new() -> Self {
+            Self {
+                cursor: Cursor::new(0..4, 0),
+                file_01: 0x00,
+                file_02: 0x00,
+            }
+        }
+    }
+
+    let mut db = Database::new();
 
 
     // =========================================================
     let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_INICIAL);
-    let field = make_numerical_field(&mut FILE_01, 0, 4, 10..100);
+    let field = make_numerical_field(&mut db.file_01, 0, 4, 10..100);
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
 
     // =========================================================
     let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_FINAL);
-    let field = make_numerical_field(&mut FILE_02, 0, 4, 0..0xFFFF);
+    let field = make_numerical_field(&mut db.file_02, 0, 4, 0..0xFFFF);
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
 
@@ -174,7 +189,7 @@ pub fn development_entry_point() -> ! {
     // =========================================================
     //options
     let (point1, point2, text) = make_menu_item_helper(1, 33, &START_AUTOMATICO_NO_RETORNO);
-    let field = make_optional_field_ligado_desligado( &mut CURSOR, [&O1, &O2, &O3, &O4]);
+    let field = make_optional_field_ligado_desligado(&mut db.cursor, [&O1, &O2, &O3, &O4]);
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
 
