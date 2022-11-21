@@ -129,10 +129,16 @@ pub fn development_entry_point() -> ! {
     // submenu
     let mut menu_list: MenuList = Vec::new();
 
+    fn make_menu_item_helper<const N: usize>(point1_: u8, point2_: u8, pgm_text: &'static PmString<N>) -> (Point1d, Point1d, FlashString, ) {
+        let point1 = Point1d::new(1);
+        let point2 = Point1d::new(33);
+        let text: FlashString = FlashString::new(pgm_text);
+        (point1, point2, text)
+    }
+
     // =========================================================
-    let point1 = Point1d::new(1);
-    let point2 = Point1d::new(33);
-    let text: FlashString = FlashString::new(&POSICAO_INICIAL);
+
+    let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_INICIAL);
     fn setter_a(value: u16) {
         unsafe {
             FILE[0] = value;
@@ -149,9 +155,7 @@ pub fn development_entry_point() -> ! {
     menu_list.push(menu_item);
 
     // =========================================================
-    let point1 = Point1d::new(1);
-    let point2 = Point1d::new(33);
-    let text: FlashString = FlashString::new(&POSICAO_FINAL);
+    let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_FINAL);
     fn setter_b(value: u16) {
         unsafe {
             FILE[0] = value;
@@ -170,12 +174,10 @@ pub fn development_entry_point() -> ! {
     
     // =========================================================
     //options
+    let (point1, point2, text) = make_menu_item_helper(1, 33, &START_AUTOMATICO_NO_RETORNO);
     let mut options: OptionsBuffer = Vec::new();
     options.push(FlashString::new(&O1));
     options.push(FlashString::new(&O2));
-    let point1 = Point1d::new(1);
-    let point2 = Point1d::new(30);
-    let text: FlashString = FlashString::new(&START_AUTOMATICO_NO_RETORNO);
     fn setter_c(cursor: Cursor) {
         unsafe {
             CURSOR = cursor;
