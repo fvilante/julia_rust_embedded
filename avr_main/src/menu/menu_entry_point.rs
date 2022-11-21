@@ -136,9 +136,9 @@ pub fn development_entry_point() -> ! {
         (point1, point2, text)
     }
 
-    fn make_numerical_field(variable: &'static mut u16) -> Field {
+    fn make_numerical_field(variable: &'static mut u16, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Field {
         let accessor = Accessor::new( unsafe{ variable });
-        let field = Field::from_numerical(accessor, 0, 4, 10..100);
+        let field = Field::from_numerical(accessor, initial_cursor_position, number_of_digits, valid_range);
         field
     }
 
@@ -153,13 +153,13 @@ pub fn development_entry_point() -> ! {
 
     // =========================================================
     let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_INICIAL);
-    let field = make_numerical_field(unsafe{ &mut FILE[0] });
+    let field = make_numerical_field(unsafe{ &mut FILE[0] }, 0, 4, 10..100);
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
 
     // =========================================================
     let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_FINAL);
-    let field = make_numerical_field(unsafe{ &mut FILE[1] });
+    let field = make_numerical_field(unsafe{ &mut FILE[1] }, 0, 4, 0..0xFFFF);
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
 
