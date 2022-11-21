@@ -71,6 +71,8 @@ progmem! {
     static progmem string START_AUTOMATICO_NO_RETORNO = "Start Automatico no Retorno";
     static progmem string O1 = "Ligado";
     static progmem string O2 = "Deslig";
+    static progmem string O3 = "Juca  ";
+    static progmem string O4 = "Nego  ";
 
     //NOTE: it is possible to load any type in progmem not only strings
     static progmem A0: [u8; 6] = [0,1,2,3,4,5];
@@ -81,7 +83,7 @@ progmem! {
 
 
 static mut FILE: [u16; 4] = [0x00;4];
-static mut CURSOR: Cursor = Cursor::new(0..2, 0);
+static mut CURSOR: Cursor = Cursor::new(0..4, 0); //TODO: bring text alongside option number in this object ??!
 
 
 
@@ -142,14 +144,16 @@ pub fn development_entry_point() -> ! {
         field
     }
 
-    fn make_optional_field_ligado_desligado(variable: &'static mut Cursor) -> Field {
+    fn make_optional_field_ligado_desligado<const N: usize, const ArraySize: usize>(variable: &'static mut Cursor, options_list: [&PmString<N>; ArraySize]) -> Field {
         let accessor = Accessor::new( unsafe{ variable });
         let mut options: OptionsBuffer = Vec::new();
-        options.push(FlashString::new(&O1));
-        options.push(FlashString::new(&O2));
+        for item in options_list {
+            options.push(FlashString::new(item));
+        }
         let field = Field::from_optional(options, accessor);
         field
     }
+
 
     // =========================================================
     let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_INICIAL);
@@ -167,7 +171,7 @@ pub fn development_entry_point() -> ! {
     // =========================================================
     //options
     let (point1, point2, text) = make_menu_item_helper(1, 33, &START_AUTOMATICO_NO_RETORNO);
-    let field = make_optional_field_ligado_desligado(unsafe{ &mut CURSOR });
+    let field = make_optional_field_ligado_desligado(unsafe{ &mut CURSOR }, [&O1, &O2, &O3, &O4]);
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
 
