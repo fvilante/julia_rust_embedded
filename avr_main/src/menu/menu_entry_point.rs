@@ -138,14 +138,14 @@ pub fn development_entry_point() -> ! {
 
     // =========================================================
     let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_INICIAL);
-    let accessor = Accessor::from_variable( unsafe{ &mut FILE[0] });
+    let accessor = Accessor::new( unsafe{ &mut FILE[0] });
     let field = Field::from_numerical(accessor, 0, 4, 10..100);
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
 
     // =========================================================
     let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_FINAL);
-    let accessor = Accessor::from_variable( unsafe{ &mut FILE[1] });
+    let accessor = Accessor::new( unsafe{ &mut FILE[1] });
     let field = Field::from_numerical(accessor, 0, 4, 0..0xFFFF);
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
@@ -154,7 +154,7 @@ pub fn development_entry_point() -> ! {
     // =========================================================
     //options
     let (point1, point2, text) = make_menu_item_helper(1, 33, &START_AUTOMATICO_NO_RETORNO);
-    let accessor = Accessor::from_variable( unsafe{ &mut CURSOR });
+    let accessor = Accessor::new( unsafe{ &mut CURSOR });
     let mut options: OptionsBuffer = Vec::new();
     options.push(FlashString::new(&O1));
     options.push(FlashString::new(&O2));
