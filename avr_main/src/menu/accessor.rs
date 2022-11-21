@@ -3,40 +3,66 @@
 type Setter<A> = fn(A);
 type Getter<A> = fn() -> A;
 
+//
+// pub trait AccessorTrait<T> {
+//     fn get(&self) -> T;
+//     fn set(&mut self, value: T);
+// }
 
-pub trait AccessorTrait<T> {
-    fn get(&self) -> T;
-    fn set(&mut self, value: T);
+
+enum Kind<T: Copy + 'static> {
+    SetterGetter(Setter<T>, Getter<T>),
+    Variable(&'static mut T),
 }
 
-pub struct Accessor<T> { // size = 4 bytes
-    setter: Setter<T>, 
-    getter: Getter<T>,
+
+pub struct Accessor<T: Copy + 'static> { // size = 4 bytes
+    kind: Kind<T>
 }
 
-impl<T> Accessor<T> {
+impl<T: Copy + 'static> Accessor<T> {
     pub fn new(setter: Setter<T>, getter: Getter<T>) -> Self {
         Self {
-            setter,
-            getter,
+            kind: Kind::SetterGetter(setter, getter),
         }
     }
 
-    pub fn clone(&self) -> Self {
-        let setter = self.setter;
-        let getter = self.getter;
-        Self::new(setter, getter)
+    pub fn from_variable(variable: &'static mut T) -> Self {
+        Self {
+            kind: Kind::Variable(variable)
+        }
     }
+
+    //pub fn clone(&self) -> Self {
+    //    match self.kind {
+    //        Kind::SetterGetter(setter, getter) => Self::new(setter, getter),
+    //        Kind::Variable(variable) => Self::from_variable(variable),
+    //    }        
+    //}
 }
 
-impl<T> AccessorTrait<T> for Accessor<T> {
+impl<T: Copy + 'static> /*AccessorTrait<T> for*/ Accessor<T> {
 
-    fn set(&mut self, value: T) {
-        (self.setter)(value);
+    pub fn set(&mut self, value: T) {
+        match &mut self.kind {
+            Kind::SetterGetter(setter, _) => { setter(value); },
+            Kind::Variable(variable) => {
+                unsafe {
+                    **variable = value;
+                }
+            }
+        }
     }
 
-    fn get(&self) -> T {
-        (self.getter)()
+    pub fn get(&self) -> T {
+        match &self.kind {
+            Kind::SetterGetter(_, getter) => { getter() },
+            Kind::Variable(variable) => {
+                unsafe {
+                    **variable
+                }
+            }
+        }
     }
 
 }

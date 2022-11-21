@@ -137,36 +137,15 @@ pub fn development_entry_point() -> ! {
     }
 
     // =========================================================
-
     let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_INICIAL);
-    fn setter_a(value: u16) {
-        unsafe {
-            FILE[0] = value;
-        }
-    }
-    fn getter_a() -> u16 {
-        unsafe {
-            FILE[0]
-        }
-    }
-    let accessor = Accessor::new(setter_a, getter_a);
+    let accessor = Accessor::from_variable( unsafe{ &mut FILE[0] });
     let field = Field::from_numerical(accessor, 0, 4, 10..100);
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
 
     // =========================================================
     let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_FINAL);
-    fn setter_b(value: u16) {
-        unsafe {
-            FILE[0] = value;
-        }
-    }
-    fn getter_b() -> u16 {
-        unsafe {
-            FILE[0]
-        }
-    }
-    let accessor = Accessor::new(setter_b, getter_b);
+    let accessor = Accessor::from_variable( unsafe{ &mut FILE[1] });
     let field = Field::from_numerical(accessor, 0, 4, 0..0xFFFF);
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
@@ -175,20 +154,10 @@ pub fn development_entry_point() -> ! {
     // =========================================================
     //options
     let (point1, point2, text) = make_menu_item_helper(1, 33, &START_AUTOMATICO_NO_RETORNO);
+    let accessor = Accessor::from_variable( unsafe{ &mut CURSOR });
     let mut options: OptionsBuffer = Vec::new();
     options.push(FlashString::new(&O1));
     options.push(FlashString::new(&O2));
-    fn setter_c(cursor: Cursor) {
-        unsafe {
-            CURSOR = cursor;
-        }
-    }
-    fn getter_c() -> Cursor {
-        unsafe {
-            CURSOR.clone()
-        }
-    }
-    let accessor = Accessor::new(setter_c, getter_c);
     let field = Field::from_optional(options, accessor);
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);

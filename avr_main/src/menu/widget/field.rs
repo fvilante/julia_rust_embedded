@@ -10,7 +10,6 @@ use heapless::{
 use lib_1::utils::common::convert_u16_to_string_decimal;
 
 use crate::board::lcd;
-use crate::menu::accessor::AccessorTrait;
 use crate::{menu::{point::Point, ratangular_wave::RectangularWave, canvas::Canvas, accessor::{Accessor }}, board::keyboard::KeyCode};
 
 use super::optional::{Optional, OptionsBuffer};

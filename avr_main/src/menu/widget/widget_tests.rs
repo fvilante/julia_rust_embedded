@@ -49,19 +49,7 @@ pub fn optional_widget_test() -> ! {
     let mut options = Vec::new();
     options.push(FlashString::new(&O1));
     options.push(FlashString::new(&O2));
-    fn setter(cursor: Cursor) {
-        unsafe {
-            CURSOR = cursor;
-        }
-    }
-
-    fn getter() -> Cursor {
-        unsafe {
-            CURSOR.clone()
-        }
-    }
-
-    let accessor = Accessor::new(setter, getter);
+    let accessor = Accessor::from_variable(unsafe { &mut CURSOR });
 
     let mut optional = Optional::new(options, accessor);
     let point = Point::new(0,0);
