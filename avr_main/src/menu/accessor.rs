@@ -4,13 +4,13 @@ type Setter<A> = fn(A);
 type Getter<A> = fn() -> A;
 
 
-pub struct Accessor<T: Copy + 'static> { // size = 4 bytes
-    variable: &'static mut T
+pub struct Accessor<'a,T: Copy + 'a> { // size = 4 bytes
+    variable: &'a mut T
 }
 
-impl<T: Copy + 'static> Accessor<T> {
+impl<'a,T: Copy + 'a> Accessor<'a,T> {
 
-    pub fn new(variable: &'static mut T) -> Self {
+    pub fn new(variable: &'a mut T) -> Self {
         Self {
             variable,
         }
@@ -18,7 +18,7 @@ impl<T: Copy + 'static> Accessor<T> {
 
 }
 
-impl<T: Copy + 'static> /*AccessorTrait<T> for*/ Accessor<T> {
+impl<'a, T: Copy + 'a> /*AccessorTrait<T> for*/ Accessor<'a,T> {
 
     pub fn set(&mut self, value: T) {
         unsafe {

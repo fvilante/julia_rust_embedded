@@ -123,17 +123,17 @@ impl EditionBuffer {
 
 }
  
-struct Numerical {                  
+struct Numerical<'a> {                  
     edition_buffer: EditionBuffer, 
     valid_range: Range<u16>,       
     number_of_digits: usize,        
     // initial values
     initial_edition_buffer: EditionBuffer, 
-    accessor: Accessor<u16>         
+    accessor: Accessor<'a, u16>         
 } 
 
-impl Numerical {
-    pub fn new(edition_buffer: EditionBuffer, valid_range: Range<u16>, number_of_digits: usize, accessor: Accessor<u16>) -> Self {
+impl<'a> Numerical<'a> {
+    pub fn new(edition_buffer: EditionBuffer, valid_range: Range<u16>, number_of_digits: usize, accessor: Accessor<'a,u16>) -> Self {
         Self {
             edition_buffer: edition_buffer.clone(),
             valid_range,
@@ -180,7 +180,7 @@ impl Numerical {
     }
 }
 
-impl Numerical {
+impl Numerical<'_> {
     pub fn save_edition(&mut self) {
         let normalized_value = self.to_u16_normalized();
         self.accessor.set(normalized_value); // saves data to accessor
@@ -197,7 +197,7 @@ impl Numerical {
 
 }
 
-impl Numerical {
+impl Numerical<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         match key {
             // navigation_key left and right
@@ -222,13 +222,13 @@ impl Numerical {
     }
 }
 
-pub struct NumericalField { 
-    numerical: Numerical,   
+pub struct NumericalField<'a> { 
+    numerical: Numerical<'a>,   
     blink: RectangularWave, 
 }
 
-impl NumericalField {
-    pub fn new(accessor: Accessor<u16>, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
+impl<'a> NumericalField<'a> {
+    pub fn new(accessor: Accessor<'a,u16>, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
         let value = accessor.get();
         let array = convert_u16_to_FieldBuffer(value, number_of_digits);
         let edition_buffer = EditionBuffer::new(array.clone(), initial_cursor_position);
@@ -239,7 +239,7 @@ impl NumericalField {
     }
 }
 
-impl NumericalField {
+impl NumericalField<'_> {
     pub fn save_edition(&mut self) {
         self.numerical.save_edition();
     }
@@ -250,7 +250,7 @@ impl NumericalField {
 
 }
 
-impl NumericalField {
+impl NumericalField<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         self.numerical.send_key(key)
     }
@@ -275,12 +275,12 @@ impl NumericalField {
 }
 
 
-pub enum FieldEnum {
-    Numerical(NumericalField), // size = 53 bytes
-    Optional(Optional),
+pub enum FieldEnum<'a> {
+    Numerical(NumericalField<'a>), 
+    Optional(Optional<'a>),
 }
 
-impl FieldEnum {
+impl FieldEnum<'_> {
     pub fn save_edition(&mut self) {
         match self {
             Self::Numerical(x) => x.save_edition(), 
@@ -296,7 +296,7 @@ impl FieldEnum {
     }
 }
 
-impl FieldEnum {
+impl FieldEnum<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         match self {
             Self::Numerical(x) => x.send_key(key), 
@@ -321,33 +321,33 @@ impl FieldEnum {
 
 //Makes possible to edit a position of memory using Lcd display and keyboard
 //esc abort edition, and enter confirm edition
-pub struct Field {
-    field_enum: FieldEnum,
+pub struct Field<'a> {
+    field_enum: FieldEnum<'a>,
     edit_mode: EditMode,
 }
 
-impl Field {
-    pub fn new(field_enum: FieldEnum) -> Self {
+impl<'a> Field<'a> {
+    pub fn new(field_enum: FieldEnum<'a>) -> Self {
         Self {
             field_enum,
             edit_mode: EditMode::new(false),
         }
     }
 
-    pub fn from_numerical(accessor: Accessor<u16>, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
+    pub fn from_numerical(accessor: Accessor<'a,u16>, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
         let numerical_field = NumericalField::new(accessor, initial_cursor_position, number_of_digits, valid_range);
         let field_enum = FieldEnum::Numerical(numerical_field);
         Self::new(field_enum)
     }
 
-    pub fn from_optional(options: OptionsBuffer, accessor: Accessor<Cursor>) -> Self {
+    pub fn from_optional(options: OptionsBuffer, accessor: Accessor<'a,Cursor>) -> Self {
         let optional = Optional::new(options, accessor);
         let field_enum = FieldEnum::Optional(optional);
         Self::new(field_enum)
     }
 }
 
-impl Field {
+impl Field<'_> {
 
     pub fn send_key(&mut self, key: KeyCode) {     
         
@@ -384,7 +384,7 @@ impl Field {
     }
 }
 
-impl Field {
+impl<'a> Field<'a> {
     pub fn set_edit_mode(&mut self, value: bool) {
         self.edit_mode.set_edit_mode(value);
     }

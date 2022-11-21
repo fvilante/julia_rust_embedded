@@ -82,20 +82,6 @@ progmem! {
 
 
 
-
-
-fn get_cursor() -> &'static mut Cursor {
-    static mut CURSOR: Cursor = Cursor::new(0..4, 0); //TODO: bring text alongside option number in this object ??!
-    unsafe{ &mut CURSOR }
-}
-
-static mut FILE: [u16; 4] = [0x00;4];
-fn get_file(index: usize) -> &'static mut u16 {
-    unsafe { &mut FILE[index]}
-}
-
-
-
 pub fn development_entry_point() -> ! {
 
     //optional_widget_test();
@@ -136,24 +122,27 @@ pub fn development_entry_point() -> ! {
 //    }
 
 
+
+
+
     // submenu
     let mut menu_list: MenuList = Vec::new();
 
-    fn make_menu_item_helper<const N: usize>(point1_: u8, point2_: u8, pgm_text: &'static PmString<N>) -> (Point1d, Point1d, FlashString, ) {
+    fn make_menu_item_helper<'a, const N: usize>(point1_: u8, point2_: u8, pgm_text: &'a PmString<N>) -> (Point1d, Point1d, FlashString, ) {
         let point1 = Point1d::new(point1_);
         let point2 = Point1d::new(point2_);
         let text: FlashString = FlashString::new(pgm_text);
         (point1, point2, text)
     }
 
-    fn make_numerical_field(variable: &'static mut u16, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Field {
-        let accessor = Accessor::new( unsafe{ variable });
+    fn make_numerical_field<'a>(variable: &'a mut u16, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Field<'a> {
+        let accessor = Accessor::new( variable );
         let field = Field::from_numerical(accessor, initial_cursor_position, number_of_digits, valid_range);
         field
     }
 
-    fn make_optional_field_ligado_desligado<const N: usize, const ArraySize: usize>(variable: &'static mut Cursor, options_list: [&PmString<N>; ArraySize]) -> Field {
-        let accessor = Accessor::new( unsafe{ variable });
+    fn make_optional_field_ligado_desligado<'a,const N: usize, const ArraySize: usize>(variable: &'a mut Cursor, options_list: [&PmString<N>; ArraySize]) -> Field<'a> {
+        let accessor = Accessor::new( variable );
         let mut options: OptionsBuffer = Vec::new();
         for item in options_list {
             options.push(FlashString::new(item));
@@ -162,16 +151,22 @@ pub fn development_entry_point() -> ! {
         field
     }
 
+    // -----
+
+    let mut CURSOR: Cursor = Cursor::new(0..4, 0);
+    let mut FILE_01: u16 = 0x00;
+    let mut FILE_02: u16 = 0x00;
+
 
     // =========================================================
     let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_INICIAL);
-    let field = make_numerical_field(unsafe{ get_file(2) }, 0, 4, 10..100);
+    let field = make_numerical_field(&mut FILE_01, 0, 4, 10..100);
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
 
     // =========================================================
     let (point1, point2, text) = make_menu_item_helper(1, 33, &POSICAO_FINAL);
-    let field = make_numerical_field(unsafe{ get_file(1) }, 0, 4, 0..0xFFFF);
+    let field = make_numerical_field(&mut FILE_02, 0, 4, 0..0xFFFF);
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
 
@@ -179,7 +174,7 @@ pub fn development_entry_point() -> ! {
     // =========================================================
     //options
     let (point1, point2, text) = make_menu_item_helper(1, 33, &START_AUTOMATICO_NO_RETORNO);
-    let field = make_optional_field_ligado_desligado(unsafe{ get_cursor() }, [&O1, &O2, &O3, &O4]);
+    let field = make_optional_field_ligado_desligado( &mut CURSOR, [&O1, &O2, &O3, &O4]);
     let mut menu_item = MenuItem::new(point1, text, point2, field, None);
     menu_list.push(menu_item);
 

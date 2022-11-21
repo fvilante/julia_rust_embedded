@@ -13,7 +13,7 @@ pub struct MenuItem<'a> {
     point_a: Point1d, 
     caption: Caption, 
     point_b: Point1d, 
-    field: Field,   
+    field: Field<'a>,   
     sub_menu: Option<&'a mut SubMenu<'a>>,
 }
 
@@ -21,7 +21,7 @@ pub struct MenuItem<'a> {
 impl<'a> MenuItem<'a> {
     /// NOTE: client should put point1 and point2 in the same line
     /// point1 = position of caption, point2 = position of field
-    pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, field: Field, sub_menu: Option<&'a mut SubMenu<'a>>) -> Self {
+    pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, field: Field<'a>, sub_menu: Option<&'a mut SubMenu<'a>>) -> Self {
         Self {
             point_a,
             caption: Caption::new(text),

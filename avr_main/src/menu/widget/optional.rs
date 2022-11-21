@@ -12,17 +12,17 @@ use super::edit_mode::EditMode;
 
 pub type OptionsBuffer = Vec<FlashString,5>;
 
-pub struct Optional {
+pub struct Optional<'a> {
     options: OptionsBuffer,
     editing_cursor: Cursor,
     original_cursor: Cursor,
     blink: RectangularWave,
-    accessor: Accessor<Cursor>,
+    accessor: Accessor<'a,Cursor>,
 }
 
-impl Optional {
+impl<'a> Optional<'a> {
 
-    pub fn new(options: OptionsBuffer, accessor: Accessor<Cursor>) -> Self {
+    pub fn new(options: OptionsBuffer, accessor: Accessor<'a,Cursor>) -> Self {
         let cursor = accessor.get();
         Self {
             options: options.clone(),
@@ -51,7 +51,7 @@ impl Optional {
     }
 }
 
-impl Optional {
+impl Optional<'_> {
 
     pub fn abort_edition(&mut self) {
         let recupered_info = self.original_cursor.clone();
@@ -67,7 +67,7 @@ impl Optional {
 
 }
 
-impl Optional {
+impl Optional<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         match key {
             // navigation_key left and right
