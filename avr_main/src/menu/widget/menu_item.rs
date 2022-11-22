@@ -1,11 +1,12 @@
 use crate::{
     board::{keyboard::KeyCode, lcd},
-    menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}},
+    menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}, accessor::Accessor},
 };
 
-use super::{caption::Caption, field::{Field, FieldBuffer, FieldEnum}, widget::Editable, widget::Widget, sub_menu::{LcdLine, SubMenu}};
+use super::{caption::Caption, field::{Field, FieldBuffer, FieldEnum}, widget::Editable, widget::Widget, sub_menu::{LcdLine, SubMenu}, cursor::Cursor, optional::OptionsBuffer};
 
-use heapless::String;
+use avr_progmem::string::PmString;
+use heapless::{String,Vec};
 use lib_1::utils::common::convert_u16_to_string_decimal;
 use core::{str::FromStr, ops::Range};
 
@@ -63,7 +64,111 @@ impl MenuItem<'_> {
 }
 
 
-//
+// ===============================================================================
+
+fn make_menu_item_helper<'a, const N: usize>(
+    point1_: u8,
+    point2_: u8,
+    pgm_text: &'a PmString<N>,
+) -> (Point1d, Point1d, FlashString) {
+    let point1 = Point1d::new(point1_);
+    let point2 = Point1d::new(point2_);
+    let text: FlashString = FlashString::new(pgm_text);
+    (point1, point2, text)
+}
+
+fn make_numerical_field<'a>(
+    variable: &'a mut u16,
+    initial_cursor_position: usize,
+    number_of_digits: usize,
+    valid_range: Range<u16>,
+) -> Field<'a> {
+    let accessor = Accessor::new(variable);
+    let field = Field::from_numerical(
+        accessor,
+        initial_cursor_position,
+        number_of_digits,
+        valid_range,
+    );
+    field
+}
+
+fn make_optional_field_ligado_desligado<'a, const N: usize, const ArraySize: usize>(
+    variable: &'a mut Cursor,
+    options_list: [&PmString<N>; ArraySize],
+) -> Field<'a> {
+    let accessor = Accessor::new(variable);
+    let mut options: OptionsBuffer = Vec::new();
+    for item in options_list {
+        options.push(FlashString::new(item));
+    }
+    let field = Field::from_optional(options, accessor);
+    field
+}
+
+pub struct NumericalParameterArgs<'a, const N: usize> {
+    pub point1_: u8,
+    pub point2_: u8,
+    pub text: &'static PmString<N>,
+    pub variable: &'a mut u16,
+    pub initial_cursor_position: usize,
+    pub number_of_digits: usize,
+    pub valid_range: Range<u16>,
+}
+
+pub fn make_numerical_parameter<'a, const N: usize>(
+    args: NumericalParameterArgs<'a, N>,
+) -> MenuItem<'a> {
+    match args {
+        NumericalParameterArgs {
+            point1_,
+            point2_,
+            text,
+            variable,
+            initial_cursor_position,
+            number_of_digits,
+            valid_range,
+        } => {
+            let (point1, point2, text) = make_menu_item_helper(point1_, point2_, text);
+            let field = make_numerical_field(
+                variable,
+                initial_cursor_position,
+                number_of_digits,
+                valid_range,
+            );
+            let mut menu_item = MenuItem::new(point1, text, point2, field, None);
+            menu_item
+        }
+    }
+}
+
+pub struct OptionalParameterArgs<'a, const N: usize, const M: usize, const ArraySize: usize> {
+    pub point1_: u8,
+    pub point2_: u8,
+    pub text: &'static PmString<N>,
+    pub variable: &'a mut Cursor,
+    pub options_list: [&'static PmString<M>; ArraySize],
+}
+
+pub fn make_optional_parameter<'a, const N: usize, const M: usize, const ArraySize: usize>(
+    args: OptionalParameterArgs<'a, N, M, ArraySize>,
+) -> MenuItem<'a> {
+    match args {
+        OptionalParameterArgs {
+            point1_,
+            point2_,
+            text,
+            variable,
+            options_list,
+        } => {
+            let (point1, point2, text) = make_menu_item_helper(point1_, point2_, text);
+            let field = make_optional_field_ligado_desligado(variable, options_list);
+            let mut menu_item = MenuItem::new(point1, text, point2, field, None);
+            menu_item
+        }
+    }
+}
+// =========================================================================
 
 
 pub enum MenuItemParsed {
