@@ -159,7 +159,7 @@ pub fn development_entry_point() -> ! {
     let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
         point1_: 1,
         point2_: 33,
-        text: &POSICAO_INICIAL,
+        text: FlashString::new(&POSICAO_INICIAL),
         variable: &mut db.file_01,
         initial_cursor_position: 0,
         number_of_digits: 4,
@@ -171,7 +171,7 @@ pub fn development_entry_point() -> ! {
     let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
         point1_: 1,
         point2_: 33,
-        text: &POSICAO_FINAL,
+        text: FlashString::new(&POSICAO_FINAL),
         variable: &mut db.file_02,
         initial_cursor_position: 0,
         number_of_digits: 4,
@@ -184,23 +184,23 @@ pub fn development_entry_point() -> ! {
     let mut menu_item = MenuItem::from_optional(OptionalParameterArgs {
         point1_: 1,
         point2_: 33,
-        text: &START_AUTOMATICO_NO_AVANCO,
+        text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
         variable: &mut db.cursor,
-        options_list: [&O1, &O2, &O3, &O4],
+        options_list: [FlashString::new(&O1), FlashString::new(&O2), FlashString::new(&O3), FlashString::new(&O4)],
     });
     menu_list.push(menu_item);
 
     // =========================================================
-    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
-        point1_: 1,
-        point2_: 33,
-        text: &POSICAO_INICIAL,
-        variable: &mut db.file_03,
-        initial_cursor_position: 0,
-        number_of_digits: 4,
-        valid_range: 0..100,
-    });
-    menu_list.push(menu_item);
+//    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
+//        point1_: 1,
+//        point2_: 33,
+//        text: FlashString::new(&POSICAO_INICIAL),
+//        variable: &mut db.file_03,
+//        initial_cursor_position: 0,
+//        number_of_digits: 4,
+//        valid_range: 0..100,
+//    });
+//    menu_list.push(menu_item);//
 
 //    // =========================================================
 //    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {

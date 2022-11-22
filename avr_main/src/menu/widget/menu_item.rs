@@ -12,22 +12,22 @@ use core::{str::FromStr, ops::Range};
 
 // -----------------------------------
 
-pub struct NumericalParameterArgs<'a, const N: usize> {
+pub struct NumericalParameterArgs<'a> {
     pub point1_: u8,
     pub point2_: u8,
-    pub text: &'static PmString<N>,
+    pub text: FlashString,
     pub variable: &'a mut u16,
     pub initial_cursor_position: usize,
     pub number_of_digits: usize,
     pub valid_range: Range<u16>,
 }
 
-pub struct OptionalParameterArgs<'a, const N: usize, const M: usize, const ArraySize: usize> {
+pub struct OptionalParameterArgs<'a, const ArraySize: usize> {
     pub point1_: u8,
     pub point2_: u8,
-    pub text: &'static PmString<N>,
+    pub text: FlashString,
     pub variable: &'a mut Cursor,
-    pub options_list: [&'static PmString<M>; ArraySize],
+    pub options_list: [FlashString; ArraySize],
 }
 
 
@@ -55,8 +55,8 @@ impl<'a> MenuItem<'a> {
         }
     }
 
-    pub fn from_numerical<const N: usize>(
-        args: NumericalParameterArgs<'a, N>,
+    pub fn from_numerical(
+        args: NumericalParameterArgs<'a>,
     ) -> MenuItem<'a> {
         match args {
             NumericalParameterArgs {
@@ -68,7 +68,8 @@ impl<'a> MenuItem<'a> {
                 number_of_digits,
                 valid_range,
             } => {
-                let (point1, point2, text) = make_menu_item_position_helper(point1_, point2_, text);
+                let point1 = Point1d::new(point1_);
+                let point2 = Point1d::new(point2_);
                 let field = make_numerical_field_helper(
                     variable,
                     initial_cursor_position,
@@ -81,8 +82,8 @@ impl<'a> MenuItem<'a> {
         }
     }
 
-    pub fn from_optional<const N: usize, const M: usize, const ArraySize: usize>(
-        args: OptionalParameterArgs<'a, N, M, ArraySize>,
+    pub fn from_optional<const ArraySize: usize>(
+        args: OptionalParameterArgs<'a, ArraySize>,
     ) -> MenuItem<'a> {
         match args {
             OptionalParameterArgs {
@@ -92,7 +93,8 @@ impl<'a> MenuItem<'a> {
                 variable,
                 options_list,
             } => {
-                let (point1, point2, text) = make_menu_item_position_helper(point1_, point2_, text);
+                let point1 = Point1d::new(point1_);
+                let point2 = Point1d::new(point2_);
                 let field = make_optional_field_ligado_desligado_helper(variable, options_list);
                 let mut menu_item = Self::new(point1, text, point2, field, None);
                 menu_item
@@ -135,17 +137,6 @@ impl MenuItem<'_> {
 // ===============================================================================
 // HELPER FUNCTIONS
 
-fn make_menu_item_position_helper<'a, const N: usize>(
-    point1_: u8,
-    point2_: u8,
-    pgm_text: &'a PmString<N>,
-) -> (Point1d, Point1d, FlashString) {
-    let point1 = Point1d::new(point1_);
-    let point2 = Point1d::new(point2_);
-    let text: FlashString = FlashString::new(pgm_text);
-    (point1, point2, text)
-}
-
 fn make_numerical_field_helper<'a>(
     variable: &'a mut u16,
     initial_cursor_position: usize,
@@ -162,14 +153,14 @@ fn make_numerical_field_helper<'a>(
     field
 }
 
-fn make_optional_field_ligado_desligado_helper<'a, const N: usize, const ArraySize: usize>(
+fn make_optional_field_ligado_desligado_helper<'a, const ArraySize: usize>(
     variable: &'a mut Cursor,
-    options_list: [&PmString<N>; ArraySize],
+    options_list: [FlashString; ArraySize],
 ) -> Field<'a> {
     let accessor = Accessor::new(variable);
     let mut options: OptionsBuffer = Vec::new();
     for item in options_list {
-        options.push(FlashString::new(item));
+        options.push(item);
     }
     let field = Field::from_optional(options, accessor);
     field
