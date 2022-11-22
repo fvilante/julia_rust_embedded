@@ -121,7 +121,6 @@ pub fn development_entry_point() -> ! {
     //    }
 
     // submenu
-    let mut menu_list: MenuList = Vec::new();
 
     fn make_menu_item_helper<'a, const N: usize>(
         point1_: u8,
@@ -244,6 +243,7 @@ pub fn development_entry_point() -> ! {
         }
     }
 
+    let mut menu_list: MenuList = Vec::new();
     let mut db = Database::new();
 
     // =========================================================
