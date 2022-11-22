@@ -22,12 +22,12 @@ pub struct NumericalParameterArgs<'a> {
     pub valid_range: Range<u16>,
 }
 
-pub struct OptionalParameterArgs<'a, const ArraySize: usize> {
+pub struct OptionalParameterArgs<'a> {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
     pub variable: &'a mut Cursor,
-    pub options_list: [FlashString; ArraySize],
+    pub options_list: OptionsBuffer,
 }
 
 
@@ -82,8 +82,8 @@ impl<'a> MenuItem<'a> {
         }
     }
 
-    pub fn from_optional<const ArraySize: usize>(
-        args: OptionalParameterArgs<'a, ArraySize>,
+    pub fn from_optional(
+        args: OptionalParameterArgs<'a>,
     ) -> MenuItem<'a> {
         match args {
             OptionalParameterArgs {
@@ -95,7 +95,7 @@ impl<'a> MenuItem<'a> {
             } => {
                 let point1 = Point1d::new(point1_);
                 let point2 = Point1d::new(point2_);
-                let field = make_optional_field_ligado_desligado_helper(variable, options_list);
+                let field = make_optional_helper(variable, options_list);
                 let mut menu_item = Self::new(point1, text, point2, field, None);
                 menu_item
             }
@@ -153,15 +153,11 @@ fn make_numerical_field_helper<'a>(
     field
 }
 
-fn make_optional_field_ligado_desligado_helper<'a, const ArraySize: usize>(
+fn make_optional_helper<'a>(
     variable: &'a mut Cursor,
-    options_list: [FlashString; ArraySize],
+    options: OptionsBuffer,
 ) -> Field<'a> {
     let accessor = Accessor::new(variable);
-    let mut options: OptionsBuffer = Vec::new();
-    for item in options_list {
-        options.push(item);
-    }
     let field = Field::from_optional(options, accessor);
     field
 }

@@ -33,6 +33,7 @@ use crate::enviroment::front_panel::FrontPanel;
 use crate::menu::accessor::Accessor;
 use crate::menu::widget::cursor::Cursor;
 use crate::menu::widget::optional::OptionsBuffer;
+use crate::menu::widget::optional::make_options_buffer_from_array;
 use crate::menu::widget::sub_menu::SubMenu;
 use crate::menu::widget::widget::Widget;
 use crate::menu::widget::widget_tests::SystemEnviroment;
@@ -186,7 +187,7 @@ pub fn development_entry_point() -> ! {
         point2_: 33,
         text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
         variable: &mut db.cursor,
-        options_list: [FlashString::new(&O1), FlashString::new(&O2), FlashString::new(&O3), FlashString::new(&O4)],
+        options_list: make_options_buffer_from_array([FlashString::new(&O1), FlashString::new(&O2), FlashString::new(&O3), FlashString::new(&O4)]),
     });
     menu_list.push(menu_item);
 

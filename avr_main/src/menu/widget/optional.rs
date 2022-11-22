@@ -12,6 +12,14 @@ use super::edit_mode::EditMode;
 
 pub type OptionsBuffer = Vec<FlashString,5>;
 
+pub fn make_options_buffer_from_array<const ArraySize: usize>(options_list: [FlashString; ArraySize]) -> OptionsBuffer {
+    let mut options: OptionsBuffer = Vec::new();
+    for item in options_list {
+        options.push(item);
+    }
+    options
+}
+
 pub struct Optional<'a> {
     options: OptionsBuffer,
     editing_cursor: Cursor,
