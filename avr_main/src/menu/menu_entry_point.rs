@@ -132,6 +132,10 @@ pub fn development_entry_point() -> ! {
         pub cursor: Cursor,
         pub file_01: u16,
         pub file_02: u16,
+        pub file_03: u16,
+        pub file_04: u16,
+        pub file_05: u16,
+        pub file_06: u16,
     }
 
     impl Database {
@@ -140,6 +144,10 @@ pub fn development_entry_point() -> ! {
                 cursor: Cursor::new(0..4, 0),
                 file_01: 0x00,
                 file_02: 0x00,
+                file_03: 0x00,
+                file_04: 0x00,
+                file_05: 0x00,
+                file_06: 0x00,
             }
         }
     }
@@ -181,6 +189,54 @@ pub fn development_entry_point() -> ! {
         options_list: [&O1, &O2, &O3, &O4],
     });
     menu_list.push(menu_item);
+
+    // =========================================================
+    let mut menu_item = make_numerical_parameter(NumericalParameterArgs {
+        point1_: 1,
+        point2_: 33,
+        text: &POSICAO_INICIAL,
+        variable: &mut db.file_03,
+        initial_cursor_position: 0,
+        number_of_digits: 4,
+        valid_range: 0..100,
+    });
+    menu_list.push(menu_item);
+
+//    // =========================================================
+//    let mut menu_item = make_numerical_parameter(NumericalParameterArgs {
+//        point1_: 1,
+//        point2_: 33,
+//        text: &POSICAO_FINAL,
+//        variable: &mut db.file_04,
+//        initial_cursor_position: 0,
+//        number_of_digits: 4,
+//        valid_range: 0..0xFFFF,
+//    });
+//    menu_list.push(menu_item);
+//
+//    // =========================================================
+//    let mut menu_item = make_numerical_parameter(NumericalParameterArgs {
+//        point1_: 1,
+//        point2_: 33,
+//        text: &POSICAO_INICIAL,
+//        variable: &mut db.file_05,
+//        initial_cursor_position: 0,
+//        number_of_digits: 4,
+//        valid_range: 0..100,
+//    });
+//    menu_list.push(menu_item);
+//
+//    // =========================================================
+//    let mut menu_item = make_numerical_parameter(NumericalParameterArgs {
+//        point1_: 1,
+//        point2_: 33,
+//        text: &POSICAO_FINAL,
+//        variable: &mut db.file_06,
+//        initial_cursor_position: 0,
+//        number_of_digits: 4,
+//        valid_range: 0..0xFFFF,
+//    });
+//    menu_list.push(menu_item);
 
     // -----------------------------
 
