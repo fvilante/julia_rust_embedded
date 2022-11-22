@@ -19,7 +19,7 @@ use super::widget::menu_item::parse_menu_item_constructor_string;
 use super::widget::menu_item::MenuItem;
 use super::widget::menu_item::MenuItemParsed;
 use super::widget::menu_item::{
-    make_numerical_parameter, make_optional_parameter, NumericalParameterArgs,
+    NumericalParameterArgs,
     OptionalParameterArgs,
 };
 use super::widget::optional::Optional;
@@ -156,7 +156,7 @@ pub fn development_entry_point() -> ! {
     let mut db = Database::new();
 
     // =========================================================
-    let mut menu_item = make_numerical_parameter(NumericalParameterArgs {
+    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
         point1_: 1,
         point2_: 33,
         text: &POSICAO_INICIAL,
@@ -168,7 +168,7 @@ pub fn development_entry_point() -> ! {
     menu_list.push(menu_item);
 
     // =========================================================
-    let mut menu_item = make_numerical_parameter(NumericalParameterArgs {
+    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
         point1_: 1,
         point2_: 33,
         text: &POSICAO_FINAL,
@@ -181,7 +181,7 @@ pub fn development_entry_point() -> ! {
 
     // =========================================================
     //options
-    let mut menu_item = make_optional_parameter(OptionalParameterArgs {
+    let mut menu_item = MenuItem::from_optional(OptionalParameterArgs {
         point1_: 1,
         point2_: 33,
         text: &START_AUTOMATICO_NO_AVANCO,
@@ -191,7 +191,7 @@ pub fn development_entry_point() -> ! {
     menu_list.push(menu_item);
 
     // =========================================================
-    let mut menu_item = make_numerical_parameter(NumericalParameterArgs {
+    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
         point1_: 1,
         point2_: 33,
         text: &POSICAO_INICIAL,
@@ -203,7 +203,7 @@ pub fn development_entry_point() -> ! {
     menu_list.push(menu_item);
 
 //    // =========================================================
-//    let mut menu_item = make_numerical_parameter(NumericalParameterArgs {
+//    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
 //        point1_: 1,
 //        point2_: 33,
 //        text: &POSICAO_FINAL,
@@ -215,7 +215,7 @@ pub fn development_entry_point() -> ! {
 //    menu_list.push(menu_item);
 //
 //    // =========================================================
-//    let mut menu_item = make_numerical_parameter(NumericalParameterArgs {
+//    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
 //        point1_: 1,
 //        point2_: 33,
 //        text: &POSICAO_INICIAL,
@@ -227,7 +227,7 @@ pub fn development_entry_point() -> ! {
 //    menu_list.push(menu_item);
 //
 //    // =========================================================
-//    let mut menu_item = make_numerical_parameter(NumericalParameterArgs {
+//    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
 //        point1_: 1,
 //        point2_: 33,
 //        text: &POSICAO_FINAL,
