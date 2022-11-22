@@ -176,7 +176,10 @@ fn make_optional_field_ligado_desligado_helper<'a, const N: usize, const ArraySi
 }
 
 // =========================================================================
-
+// BELLOW CODE: EXAMPLE OF CODE FOR INSTANTIATE MENUITEMS FROM TEMPLATE STRINGS
+// example of template declaration content = "Posicao inicial     ${nnnnn} mm/s"
+// CODE BELOW IS NOT ACTIVE YET, IT IS HERE TO SUGGEST FUTURE IMPLEMENTATION (REMOVE IT IF CONSIDERED NOT NECESSARY)
+// NOTE: CODE BELOW WAS TESTED AND WORKS, BUT IS JUST A PROOF-OF-CONCEPT. 
 
 pub enum MenuItemParsed {
     PureCaption(String<40>), // [Caption]
