@@ -1,9 +1,5 @@
 //abstracts the access to a type in memory
 
-type Setter<A> = fn(A);
-type Getter<A> = fn() -> A;
-
-
 pub struct Accessor<'a,T: Copy + 'a> { // size = 4 bytes
     variable: &'a mut T
 }
