@@ -17,8 +17,8 @@ pub struct NumericalParameterArgs<'a> {
     pub point2_: u8,
     pub text: FlashString,
     pub variable: &'a mut u16,
-    pub initial_cursor_position: usize,
-    pub number_of_digits: usize,
+    pub initial_cursor_position: u8,
+    pub number_of_digits: u8,
     pub valid_range: Range<u16>,
 }
 
@@ -72,8 +72,8 @@ impl<'a> MenuItem<'a> {
                 let point2 = Point1d::new(point2_);
                 let field = make_numerical_field_helper(
                     variable,
-                    initial_cursor_position,
-                    number_of_digits,
+                    initial_cursor_position as usize,
+                    number_of_digits as usize,
                     valid_range,
                 );
                 let mut menu_item = Self::new(point1, text, point2, field, None);

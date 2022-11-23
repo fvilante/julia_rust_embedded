@@ -1,47 +1,54 @@
 use core::ops::Range;
 
-
+/// TODO: Make Cursor<T=u8>
 #[derive(Copy, Clone)]
 pub struct Cursor {     // size = 3 bytes
-    current: usize,     // oscilates between 'range' values
+    current: u8,     // oscilates between 'range' values
     //range: Range<usize>, //(inclusive-exclusive) 
-    start: usize, // min_included
-    end: usize, // max_excluded
+    start: u8, // min_included
+    end: u8, // max_excluded
                          
 }
 
 impl Cursor {
-    pub const fn new(range: Range<usize>, current: usize) -> Self {
+    pub fn new(range: Range<usize>, current: usize) -> Self {
         let range_copy = range.start..range.end;
-        let current_normalized = Self::__normalize(range_copy, current);
+        let current_normalized = Self::__normalize_current(range_copy, current);
         Self {
             current: current_normalized,
-            start: range.start,
-            end: range.end,
+            start: Self::__cast_usize_to_u8(range.start),
+            end: Self::__cast_usize_to_u8(range.end),
         }
     }
 
+    ///TODO: Improve safety by making this function unnecessary, using a generic type T over Cursor<T> type
+    fn __cast_usize_to_u8(value: usize) -> u8 {
+        value.clamp(u8::MIN as usize, u8::MAX as usize) as u8
+    }
 
-    /// normalize given cursor position to make sure it is inside valid range
-    const fn __normalize(range: Range<usize>, unsafe_cursor: usize) -> usize {
-        let min = range.start;
-        let max = range.end-1;
+    /// normalize given cursor position to make sure it is inside valid range, also converts it to u8 (compact) format
+    fn __normalize_current(range: Range<usize>, unsafe_cursor_: usize) -> u8 {
+        let min = Self::__cast_usize_to_u8(range.start);
+        let max = Self::__cast_usize_to_u8(range.end-1);
+        let unsafe_cursor = Self::__cast_usize_to_u8(unsafe_cursor_);
         if unsafe_cursor < min {
             min
         } else if unsafe_cursor > max {
             max
         } else {
-            unsafe_cursor
+            let safe_cursor = unsafe_cursor;
+            safe_cursor
         }
     }
 
     pub fn get_current(&self) -> usize {
-        self.current // value already normalized
+        self.current as usize// value already normalized
     }
 
     // sets current cursor position
     pub fn set_current(&mut self, current_cursor_position: usize) {
-        let current_normalized = Self::__normalize(self.start..self.end, current_cursor_position);
+        let range = self.start as usize..self.end as usize;
+        let current_normalized = Self::__normalize_current(range, current_cursor_position);
         self.current = current_normalized;
 
     }

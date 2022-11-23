@@ -16,7 +16,7 @@ use super::optional::{Optional, OptionsBuffer};
 use super::{edit_mode::EditMode, widget::Widget, widget::Editable, cursor::Cursor};
 
 
-const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 10;
+const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 6;
 
 pub type FieldBuffer = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
 
