@@ -30,6 +30,10 @@ pub struct OptionalParameterArgs<'a> {
     pub options_list: OptionsBuffer,
 }
 
+pub enum MenuItemArgs<'a> {
+    Numerical(NumericalParameterArgs<'a>),
+    Optional(OptionalParameterArgs<'a>)
+}
 
 // -----------------------------------
 
@@ -99,6 +103,13 @@ impl<'a> MenuItem<'a> {
                 let mut menu_item = Self::new(point1, text, point2, field, None);
                 menu_item
             }
+        }
+    }
+
+    pub fn from_menu_args(args: MenuItemArgs<'a>) -> Self {
+        match args {
+            MenuItemArgs::Numerical(args) => Self::from_numerical(args),
+            MenuItemArgs::Optional(args) => Self::from_optional(args),
         }
     }
 
