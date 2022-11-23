@@ -26,7 +26,7 @@ impl LcdLine {
     }
 }
 
-pub type MenuList<'a> = Vec<MenuItem<'a>,10>;
+pub type MenuList<'a> = Vec<MenuItem<'a>,6>;
 
 pub struct SubMenu<'a> {
     menu_list: MenuList<'a>,    // all itens of submenu
