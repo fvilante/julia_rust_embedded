@@ -74,8 +74,9 @@ impl<'a> MenuItem<'a> {
             } => {
                 let point1 = Point1d::new(point1_);
                 let point2 = Point1d::new(point2_);
-                let field = make_numerical_field_helper(
-                    variable,
+                let accessor = Accessor::new(variable);
+                let field = Field::from_numerical(
+                    accessor,
                     initial_cursor_position as usize,
                     number_of_digits as usize,
                     valid_range,
@@ -99,7 +100,8 @@ impl<'a> MenuItem<'a> {
             } => {
                 let point1 = Point1d::new(point1_);
                 let point2 = Point1d::new(point2_);
-                let field = make_optional_helper(variable, options_list);
+                let accessor = Accessor::new(variable);
+                let field = Field::from_optional(options_list, accessor);
                 let mut menu_item = Self::new(point1, text, point2, field, None);
                 menu_item
             }
@@ -145,33 +147,6 @@ impl MenuItem<'_> {
 }
 
 
-// ===============================================================================
-// HELPER FUNCTIONS
-
-fn make_numerical_field_helper<'a>(
-    variable: &'a mut u16,
-    initial_cursor_position: usize,
-    number_of_digits: usize,
-    valid_range: Range<u16>,
-) -> Field<'a> {
-    let accessor = Accessor::new(variable);
-    let field = Field::from_numerical(
-        accessor,
-        initial_cursor_position,
-        number_of_digits,
-        valid_range,
-    );
-    field
-}
-
-fn make_optional_helper<'a>(
-    variable: &'a mut Cursor,
-    options: OptionsBuffer,
-) -> Field<'a> {
-    let accessor = Accessor::new(variable);
-    let field = Field::from_optional(options, accessor);
-    field
-}
 
 // =========================================================================
 // BELLOW CODE: EXAMPLE OF CODE FOR INSTANTIATE MENUITEMS FROM TEMPLATE STRINGS
