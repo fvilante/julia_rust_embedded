@@ -1,5 +1,7 @@
 use core::ops::Range;
 
+use lib_1::utils::common::usize_to_u8_clamper;
+
 /// TODO: Make Cursor<T=u8>
 #[derive(Copy, Clone)]
 pub struct Cursor {     // size = 3 bytes
@@ -11,7 +13,7 @@ pub struct Cursor {     // size = 3 bytes
 }
 
 impl Cursor {
-    pub fn new(range: Range<usize>, current: usize) -> Self {
+    pub const fn new(range: Range<usize>, current: usize) -> Self {
         let range_copy = range.start..range.end;
         let current_normalized = Self::__normalize_current(range_copy, current);
         Self {
@@ -22,12 +24,12 @@ impl Cursor {
     }
 
     ///TODO: Improve safety by making this function unnecessary, using a generic type T over Cursor<T> type
-    fn __cast_usize_to_u8(value: usize) -> u8 {
-        value.clamp(u8::MIN as usize, u8::MAX as usize) as u8
+    const fn __cast_usize_to_u8(value: usize) -> u8 {
+        usize_to_u8_clamper(value)
     }
 
     /// normalize given cursor position to make sure it is inside valid range, also converts it to u8 (compact) format
-    fn __normalize_current(range: Range<usize>, unsafe_cursor_: usize) -> u8 {
+    const fn __normalize_current(range: Range<usize>, unsafe_cursor_: usize) -> u8 {
         let min = Self::__cast_usize_to_u8(range.start);
         let max = Self::__cast_usize_to_u8(range.end-1);
         let unsafe_cursor = Self::__cast_usize_to_u8(unsafe_cursor_);

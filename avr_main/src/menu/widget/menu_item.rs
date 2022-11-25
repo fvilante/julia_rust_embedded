@@ -1,6 +1,6 @@
 use crate::{
     board::{keyboard::KeyCode, lcd},
-    menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}, accessor::Accessor},
+    menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}, accessor::{Accessor, Accessor2Handler, Accessor2Controler}},
 };
 
 use super::{caption::Caption, field::{Field, FieldBuffer, FieldEnum}, widget::Editable, widget::Widget, sub_menu::{LcdLine, SubMenu}, cursor::Cursor, optional::OptionsBuffer};
@@ -12,27 +12,27 @@ use core::{str::FromStr, ops::Range};
 
 // -----------------------------------
 
-pub struct NumericalParameterArgs<'a> {
+pub struct NumericalParameterArgs {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
-    pub variable: &'a mut u16,
+    pub accessor_handler: Accessor2Handler<u16>,
     pub initial_cursor_position: u8,
     pub number_of_digits: u8,
     pub valid_range: Range<u16>,
 }
 
-pub struct OptionalParameterArgs<'a> {
+pub struct OptionalParameterArgs {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
-    pub variable: &'a mut Cursor,
+    pub accessor_handler: Accessor2Handler<Cursor>,
     pub options_list: OptionsBuffer,
 }
 
-pub enum MenuItemArgs<'a> {
-    Numerical(NumericalParameterArgs<'a>),
-    Optional(OptionalParameterArgs<'a>)
+pub enum MenuItemArgs {
+    Numerical(NumericalParameterArgs),
+    Optional(OptionalParameterArgs)
 }
 
 // -----------------------------------
@@ -59,22 +59,23 @@ impl<'a> MenuItem<'a> {
         }
     }
 
-    pub fn from_numerical(
-        args: NumericalParameterArgs<'a>,
+    pub fn from_numerical<const SIZE: usize>(
+        controler: &'static mut Accessor2Controler<u16, SIZE>, 
+        args: NumericalParameterArgs,
     ) -> MenuItem<'a> {
         match args {
             NumericalParameterArgs {
                 point1_,
                 point2_,
                 text,
-                variable,
+                accessor_handler,
                 initial_cursor_position,
                 number_of_digits,
                 valid_range,
             } => {
                 let point1 = Point1d::new(point1_);
                 let point2 = Point1d::new(point2_);
-                let accessor = Accessor::new(variable);
+                let accessor = Accessor::from_accessor_controler(controler, accessor_handler);
                 let field = Field::from_numerical(
                     accessor,
                     initial_cursor_position as usize,
@@ -87,20 +88,21 @@ impl<'a> MenuItem<'a> {
         }
     }
 
-    pub fn from_optional(
-        args: OptionalParameterArgs<'a>,
+    pub fn from_optional<const SIZE: usize>(
+        controler: &'static mut Accessor2Controler<Cursor, SIZE>, 
+        args: OptionalParameterArgs,
     ) -> MenuItem<'a> {
         match args {
             OptionalParameterArgs {
                 point1_,
                 point2_,
                 text,
-                variable,
+                accessor_handler,
                 options_list,
             } => {
                 let point1 = Point1d::new(point1_);
                 let point2 = Point1d::new(point2_);
-                let accessor = Accessor::new(variable);
+                let accessor = Accessor::from_accessor_controler(controler, accessor_handler);
                 let field = Field::from_optional(options_list, accessor);
                 let mut menu_item = Self::new(point1, text, point2, field, None);
                 menu_item
@@ -108,12 +110,12 @@ impl<'a> MenuItem<'a> {
         }
     }
 
-    pub fn from_menu_args(args: MenuItemArgs<'a>) -> Self {
-        match args {
-            MenuItemArgs::Numerical(args) => Self::from_numerical(args),
-            MenuItemArgs::Optional(args) => Self::from_optional(args),
-        }
-    }
+    //pub fn from_menu_args<T,const SIZE: usize>( controler: &mut Accessor2Controler<T, SIZE>, args: MenuItemArgs) -> Self {
+    //    match args {
+    //        MenuItemArgs::Numerical(args) => Self::from_numerical(controler, args),
+    //        MenuItemArgs::Optional(args) => Self::from_optional(controler, args),
+    //    }
+    //}
 
 }
 

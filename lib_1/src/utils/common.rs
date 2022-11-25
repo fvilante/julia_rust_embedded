@@ -1,4 +1,4 @@
-use core::str::FromStr;
+use core::{str::FromStr, marker::Destruct};
 use heapless::String;
 
 
@@ -85,7 +85,24 @@ pub fn convert_u16_to_string_decimal (value: u16) -> String<5> {
     string
 }
 
-pub fn usize_to_u8_clamper(data: usize) -> u8 {
-    let clamped_u8 = data.clamp(u8::MIN as usize, u8::MAX as usize) as u8;
+
+const fn const_clamp<T>(data: T, min: T, max: T) -> T
+where
+    T: Sized,
+    T: ~const Destruct,
+    T: ~const PartialOrd,
+{
+    assert!(min <= max);
+    if data < min {
+        min
+    } else if data > max {
+        max
+    } else {
+        data
+    }
+}
+
+pub const fn usize_to_u8_clamper(data: usize) -> u8 {
+    let clamped_u8 = const_clamp(data, u8::MIN as usize, u8::MAX as usize) as u8;
     clamped_u8
 }

@@ -18,6 +18,11 @@ impl<'a,T: Copy + 'a> Accessor<'a,T> {
         }
     }
 
+    pub fn from_accessor_controler<const SIZE: usize>(controler: &'static mut Accessor2Controler<T, SIZE>, handler: Accessor2Handler<T>) -> Self {
+        let accessor = (*controler).get_mut(handler);
+        Self::new(&mut accessor.variable)
+    }
+
 }
 
 impl<'a, T: Copy + 'a> /*AccessorTrait<T> for*/ Accessor<'a,T> {
@@ -68,7 +73,7 @@ pub struct Accessor2Controler<T, const CAPACITY: usize> {
 }
 
 impl<T, const SIZE: usize> Accessor2Controler<T, SIZE> {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             data_base: Vec::new(),
         }

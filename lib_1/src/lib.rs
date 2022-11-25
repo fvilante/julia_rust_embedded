@@ -1,6 +1,8 @@
 #![no_std]
 #![allow(dead_code)]
 #![feature(result_flattening)]
+#![feature(const_trait_impl)]
+#![feature(const_refs_to_cell)]
 
 
 //  Memory allocation for embbeded systems 

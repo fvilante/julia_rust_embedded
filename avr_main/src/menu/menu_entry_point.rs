@@ -31,6 +31,8 @@ use crate::board::output_expander::OutputExpander;
 use crate::board::{lcd, output_expander};
 use crate::enviroment::front_panel::FrontPanel;
 use crate::menu::accessor::Accessor;
+use crate::menu::accessor::Accessor2Controler;
+use crate::menu::accessor::Accessor2Handler;
 use crate::menu::widget::cursor::Cursor;
 use crate::menu::widget::optional::OptionsBuffer;
 use crate::menu::widget::optional::make_options_buffer_from_array;
@@ -83,6 +85,48 @@ progmem! {
     static progmem string ERRO_01 = "Erro de construcao de string";
 }
 
+struct Database {
+    pub cursor: Cursor,
+    pub file_01: u16,
+    pub file_02: u16,
+    pub file_03: u16,
+    pub file_04: u16,
+    pub file_05: u16,
+    pub file_06: u16,
+
+    pub cursors: Accessor2Controler<Cursor,1>,
+    pub u16s: Accessor2Controler<u16,10>,
+}
+
+impl Database {
+
+    pub const fn new() -> Self {
+        let cursors = Accessor2Controler::new();
+        let u16s = Accessor2Controler::new(); 
+        Self {
+            cursor: Cursor::new(0..4, 0),
+            file_01: 0x00,
+            file_02: 0x00,
+            file_03: 0x00,
+            file_04: 0x00,
+            file_05: 0x00,
+            file_06: 0x00,
+            cursors,
+            u16s,
+        }
+    }
+
+    pub fn create_u16(&mut self, initial_value: u16) -> Option<Accessor2Handler<u16>> {
+        self.u16s.new_accessor(initial_value)
+    }
+
+    pub fn create_cursor(&mut self, initial_value: Cursor) -> Option<Accessor2Handler<Cursor>> {
+        self.cursors.new_accessor(initial_value)
+    }
+}
+
+static mut db: Database = Database::new();
+
 pub fn development_entry_point() -> ! {
     //optional_widget_test();
 
@@ -129,39 +173,15 @@ pub fn development_entry_point() -> ! {
 
     // -----
 
-    struct Database {
-        pub cursor: Cursor,
-        pub file_01: u16,
-        pub file_02: u16,
-        pub file_03: u16,
-        pub file_04: u16,
-        pub file_05: u16,
-        pub file_06: u16,
-    }
-
-    impl Database {
-        pub fn new() -> Self {
-            Self {
-                cursor: Cursor::new(0..4, 0),
-                file_01: 0x00,
-                file_02: 0x00,
-                file_03: 0x00,
-                file_04: 0x00,
-                file_05: 0x00,
-                file_06: 0x00,
-            }
-        }
-    }
-
+   
     let mut menu_list: MenuList = Vec::new();
-    let mut db = Database::new();
 
     // =========================================================
-    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
+    let mut menu_item = MenuItem::from_numerical(unsafe { &mut db.u16s }, NumericalParameterArgs {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&POSICAO_INICIAL),
-        variable: &mut db.file_01,
+        accessor_handler: unsafe { db.create_u16(0).unwrap() },
         initial_cursor_position: 0,
         number_of_digits: 4,
         valid_range: 0..100,
@@ -169,11 +189,11 @@ pub fn development_entry_point() -> ! {
     menu_list.push(menu_item);
 
     // =========================================================
-    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
+    let mut menu_item = MenuItem::from_numerical(unsafe { &mut db.u16s }, NumericalParameterArgs {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&POSICAO_FINAL),
-        variable: &mut db.file_02,
+        accessor_handler: unsafe { db.create_u16(0).unwrap() },
         initial_cursor_position: 0,
         number_of_digits: 4,
         valid_range: 0..0xFFFF,
@@ -182,11 +202,11 @@ pub fn development_entry_point() -> ! {
 
     // =========================================================
     //options
-    let mut menu_item = MenuItem::from_optional(OptionalParameterArgs {
+    let mut menu_item = MenuItem::from_optional(unsafe { &mut db.cursors }, OptionalParameterArgs {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
-        variable: &mut db.cursor,
+        accessor_handler: unsafe { db.create_cursor(Cursor::new(0..4, 0)).unwrap() },
         options_list: make_options_buffer_from_array([FlashString::new(&O1), FlashString::new(&O2), FlashString::new(&O3), FlashString::new(&O4)]),
     });
     menu_list.push(menu_item);
