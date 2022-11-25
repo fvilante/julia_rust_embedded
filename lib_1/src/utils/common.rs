@@ -84,3 +84,8 @@ pub fn convert_u16_to_string_decimal (value: u16) -> String<5> {
     let string: String<5> = String::from_str(printed).unwrap();
     string
 }
+
+pub fn usize_to_u8_clamper(data: usize) -> u8 {
+    let clamped_u8 = data.clamp(u8::MIN as usize, u8::MAX as usize) as u8;
+    clamped_u8
+}
