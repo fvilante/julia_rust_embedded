@@ -86,17 +86,8 @@ progmem! {
 }
 
 struct Database {
-    pub cursor: Cursor,
-    pub file_01: u16,
-    pub file_02: u16,
-    pub file_03: u16,
-    pub file_04: u16,
-    pub file_05: u16,
-    pub file_06: u16,
-
     pub cursors: Accessor2Controler<Cursor,1>,
-    pub u16s: Accessor2Controler<u16,10>,
-}
+    pub u16s: Accessor2Controler<u16,10>,}
 
 impl Database {
 
@@ -104,13 +95,6 @@ impl Database {
         let cursors = Accessor2Controler::new();
         let u16s = Accessor2Controler::new(); 
         Self {
-            cursor: Cursor::new(0..4, 0),
-            file_01: 0x00,
-            file_02: 0x00,
-            file_03: 0x00,
-            file_04: 0x00,
-            file_05: 0x00,
-            file_06: 0x00,
             cursors,
             u16s,
         }
