@@ -1,6 +1,6 @@
 use crate::{
     board::{keyboard::KeyCode, lcd},
-    menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}, accessor::{Accessor, Accessor2Handler, Accessor2Controler}},
+    menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}, accessor::{Accessor, ArenaId, Arena}},
 };
 
 use super::{caption::Caption, field::{Field, FieldBuffer, FieldEnum}, widget::Editable, widget::Widget, sub_menu::{LcdLine, SubMenu}, cursor::Cursor, optional::OptionsBuffer};
@@ -16,7 +16,7 @@ pub struct NumericalParameterArgs {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
-    pub accessor_handler: Accessor2Handler<u16>,
+    pub arena_id: ArenaId<u16>,
     pub initial_cursor_position: u8,
     pub number_of_digits: u8,
     pub valid_range: Range<u16>,
@@ -26,7 +26,7 @@ pub struct OptionalParameterArgs {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
-    pub accessor_handler: Accessor2Handler<Cursor>,
+    pub accessor_handler: ArenaId<Cursor>,
     pub options_list: OptionsBuffer,
 }
 
@@ -60,7 +60,7 @@ impl<'a> MenuItem<'a> {
     }
 
     pub fn from_numerical<const SIZE: usize>(
-        controler: &'static mut Accessor2Controler<u16, SIZE>, 
+        controler: &'static mut Arena<u16, SIZE>, 
         args: NumericalParameterArgs,
     ) -> MenuItem<'a> {
         match args {
@@ -68,7 +68,7 @@ impl<'a> MenuItem<'a> {
                 point1_,
                 point2_,
                 text,
-                accessor_handler,
+                arena_id: accessor_handler,
                 initial_cursor_position,
                 number_of_digits,
                 valid_range,
@@ -89,7 +89,7 @@ impl<'a> MenuItem<'a> {
     }
 
     pub fn from_optional<const SIZE: usize>(
-        controler: &'static mut Accessor2Controler<Cursor, SIZE>, 
+        controler: &'static mut Arena<Cursor, SIZE>, 
         args: OptionalParameterArgs,
     ) -> MenuItem<'a> {
         match args {

@@ -31,8 +31,8 @@ use crate::board::output_expander::OutputExpander;
 use crate::board::{lcd, output_expander};
 use crate::enviroment::front_panel::FrontPanel;
 use crate::menu::accessor::Accessor;
-use crate::menu::accessor::Accessor2Controler;
-use crate::menu::accessor::Accessor2Handler;
+use crate::menu::accessor::Arena;
+use crate::menu::accessor::ArenaId;
 use crate::menu::widget::cursor::Cursor;
 use crate::menu::widget::optional::OptionsBuffer;
 use crate::menu::widget::optional::make_options_buffer_from_array;
@@ -86,26 +86,26 @@ progmem! {
 }
 
 struct Database {
-    pub cursors: Accessor2Controler<Cursor,1>,
-    pub u16s: Accessor2Controler<u16,10>,}
+    pub cursors: Arena<Cursor,1>,
+    pub u16s: Arena<u16,10>,}
 
 impl Database {
 
     pub const fn new() -> Self {
-        let cursors = Accessor2Controler::new();
-        let u16s = Accessor2Controler::new(); 
+        let cursors = Arena::new();
+        let u16s = Arena::new(); 
         Self {
             cursors,
             u16s,
         }
     }
 
-    pub fn create_u16(&mut self, initial_value: u16) -> Option<Accessor2Handler<u16>> {
-        self.u16s.new_accessor(initial_value)
+    pub fn alloc_u16(&mut self, initial_value: u16) -> Option<ArenaId<u16>> {
+        self.u16s.alloc(initial_value)
     }
 
-    pub fn create_cursor(&mut self, initial_value: Cursor) -> Option<Accessor2Handler<Cursor>> {
-        self.cursors.new_accessor(initial_value)
+    pub fn alloc_cursor(&mut self, initial_value: Cursor) -> Option<ArenaId<Cursor>> {
+        self.cursors.alloc(initial_value)
     }
 }
 
@@ -165,7 +165,7 @@ pub fn development_entry_point() -> ! {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&POSICAO_INICIAL),
-        accessor_handler: unsafe { db.create_u16(0).unwrap() },
+        arena_id: unsafe { db.alloc_u16(0).unwrap() },
         initial_cursor_position: 0,
         number_of_digits: 4,
         valid_range: 0..100,
@@ -177,7 +177,7 @@ pub fn development_entry_point() -> ! {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&POSICAO_FINAL),
-        accessor_handler: unsafe { db.create_u16(0).unwrap() },
+        arena_id: unsafe { db.alloc_u16(0).unwrap() },
         initial_cursor_position: 0,
         number_of_digits: 4,
         valid_range: 0..0xFFFF,
@@ -190,7 +190,7 @@ pub fn development_entry_point() -> ! {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
-        accessor_handler: unsafe { db.create_cursor(Cursor::new(0..4, 0)).unwrap() },
+        accessor_handler: unsafe { db.alloc_cursor(Cursor::new(0..4, 0)).unwrap() },
         options_list: make_options_buffer_from_array([FlashString::new(&O1), FlashString::new(&O2), FlashString::new(&O3), FlashString::new(&O4)]),
     });
     menu_list.push(menu_item);
