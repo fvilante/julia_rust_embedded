@@ -43,6 +43,7 @@ use crate::microcontroler::delay::delay_ms;
 use crate::microcontroler::timer::now;
 use alloc::string::ToString;
 use avr_progmem::string::PmString;
+use core::cell::Cell;
 use core::ops::Range;
 use core::str::FromStr;
 use heapless::String;
@@ -86,14 +87,15 @@ progmem! {
 }
 
 struct Database {
-    pub cursors: Arena<Cursor,1>,
-    pub u16s: Arena<u16,10>,}
+    pub cursors: Cell<Arena<Cursor,1>>,
+    pub u16s: Cell<Arena<u16,10>>,
+}
 
 impl Database {
 
     pub const fn new() -> Self {
-        let cursors = Arena::new();
-        let u16s = Arena::new(); 
+        let cursors = Cell::new(Arena::new());
+        let u16s = Cell::new(Arena::new()); 
         Self {
             cursors,
             u16s,
@@ -101,11 +103,13 @@ impl Database {
     }
 
     pub fn alloc_u16(&mut self, initial_value: u16) -> Option<ArenaId<u16>> {
-        self.u16s.alloc(initial_value)
+        let arena = self.u16s.get_mut();
+        arena.alloc(initial_value)
     }
 
     pub fn alloc_cursor(&mut self, initial_value: Cursor) -> Option<ArenaId<Cursor>> {
-        self.cursors.alloc(initial_value)
+        let arena = self.cursors.get_mut();
+        arena.alloc(initial_value)
     }
 }
 

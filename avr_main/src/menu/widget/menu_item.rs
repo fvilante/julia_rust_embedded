@@ -8,7 +8,7 @@ use super::{caption::Caption, field::{Field, FieldBuffer, FieldEnum}, widget::Ed
 use avr_progmem::string::PmString;
 use heapless::{String,Vec};
 use lib_1::utils::common::convert_u16_to_string_decimal;
-use core::{str::FromStr, ops::Range};
+use core::{str::FromStr, ops::Range, cell::Cell};
 
 // -----------------------------------
 
@@ -60,7 +60,7 @@ impl<'a> MenuItem<'a> {
     }
 
     pub fn from_numerical<'b: 'a,const SIZE: usize>(
-        controler: &'b mut Arena<u16, SIZE>, 
+        controler: &'b mut Cell<Arena<u16, SIZE>>, 
         args: NumericalParameterArgs,
     ) -> MenuItem<'a> {
         match args {
@@ -75,7 +75,7 @@ impl<'a> MenuItem<'a> {
             } => {
                 let point1 = Point1d::new(point1_);
                 let point2 = Point1d::new(point2_);
-                let accessor = Accessor::from_accessor_controler(controler, accessor_handler);
+                let accessor = Accessor::from_accessor_controler(controler.get_mut(), accessor_handler);
                 let field = Field::from_numerical(
                     accessor,
                     initial_cursor_position as usize,
@@ -89,7 +89,7 @@ impl<'a> MenuItem<'a> {
     }
 
     pub fn from_optional<'b: 'a,const SIZE: usize>(
-        controler: &'b mut Arena<Cursor, SIZE>, 
+        controler: &'b mut Cell<Arena<Cursor, SIZE>>, 
         args: OptionalParameterArgs,
     ) -> MenuItem<'a> {
         match args {
@@ -102,7 +102,7 @@ impl<'a> MenuItem<'a> {
             } => {
                 let point1 = Point1d::new(point1_);
                 let point2 = Point1d::new(point2_);
-                let accessor = Accessor::from_accessor_controler(controler, accessor_handler);
+                let accessor = Accessor::from_accessor_controler(controler.get_mut(), accessor_handler);
                 let field = Field::from_optional(options_list, accessor);
                 let mut menu_item = Self::new(point1, text, point2, field, None);
                 menu_item
