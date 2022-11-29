@@ -19,7 +19,7 @@ impl<'a,T: Copy + 'a> Accessor<'a,T> {
         }
     }
 
-    pub fn from_accessor_controler<const SIZE: usize>(controler: &'static mut Arena<T, SIZE>, handler: ArenaId<T>) -> Self {
+    pub fn from_accessor_controler<const SIZE: usize>(controler: &'a mut Arena<T, SIZE>, handler: ArenaId<T>) -> Self {
         let accessor = (*controler).get_mut(handler);
         Self::new(accessor.get_mut())
     }
