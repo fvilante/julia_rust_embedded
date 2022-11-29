@@ -43,7 +43,7 @@ impl<'a, T: Copy + 'a> /*AccessorTrait<T> for*/ Accessor<'a,T> {
 }
 
 /// Areana Element Refewrence
-pub struct ArenaId<T>{
+pub struct ArenaId<T> {
     index: u8,
     phantom: PhantomData<T>
 }
@@ -59,11 +59,15 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
         }
     }
 
+    fn make_hash(&self, index: usize) -> u8 {
+        usize_to_u8_clamper(index)
+    }
+
     /// Allocates a new arena_bucket of type T; returns None if data_base is out of capacity.
     pub fn alloc(&mut self, initial_value: T) -> Option<ArenaId<T>> {
         let new_cell = Cell::new(initial_value);
         let index = self.data_base.len();
-        let arena_index = usize_to_u8_clamper(index);
+        let arena_index = self.make_hash(index);
         let result = self.data_base.push(new_cell);
         match result {
             Ok(_) => Some(ArenaId{ index: arena_index, phantom: PhantomData }),
