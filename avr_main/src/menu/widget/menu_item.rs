@@ -59,8 +59,8 @@ impl<'a> MenuItem<'a> {
         }
     }
 
-    pub fn from_numerical<const SIZE: usize>(
-        controler: &'static mut Arena<u16, SIZE>, 
+    pub fn from_numerical<'b: 'a,const SIZE: usize>(
+        controler: &'b mut Arena<u16, SIZE>, 
         args: NumericalParameterArgs,
     ) -> MenuItem<'a> {
         match args {
@@ -88,8 +88,8 @@ impl<'a> MenuItem<'a> {
         }
     }
 
-    pub fn from_optional<const SIZE: usize>(
-        controler: &'static mut Arena<Cursor, SIZE>, 
+    pub fn from_optional<'b: 'a,const SIZE: usize>(
+        controler: &'b mut Arena<Cursor, SIZE>, 
         args: OptionalParameterArgs,
     ) -> MenuItem<'a> {
         match args {

@@ -157,7 +157,6 @@ pub fn development_entry_point() -> ! {
 
     // -----
 
-   
     let mut menu_list: MenuList = Vec::new();
 
     // =========================================================
