@@ -68,15 +68,14 @@ mod tests {
         let mut arena: Arena<u8, 1> = Arena::new();
         let probe = 0;
         let handler = arena.alloc(probe).unwrap();
-        let element_ref = arena.borrow(handler);
-        let actual = *element_ref;
+        let actual = *arena.borrow(handler);
         assert_eq!(actual, probe); 
     }
 
     #[test]
     fn can_allocate_once_and_mutate() {
-        let mut arena: Arena<u8, 1> = Arena::new();
         let probe = 0;
+        let mut arena: Arena<u8, 1> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
         *arena.borrow_mut(handler.clone()) += 1;
         let actual = *arena.borrow(handler);
