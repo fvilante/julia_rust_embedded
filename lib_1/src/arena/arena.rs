@@ -105,6 +105,17 @@ mod tests {
         assert_eq!(actual, probe); 
     }
 
+    fn produce_error_if_allocate_more_than_its_capacity() {
+        let arena: Arena<u8, 2> = Arena::new();
+        let _handler1 = arena.alloc(6).unwrap();
+        let _handler2 = arena.alloc(7).unwrap();
+        let should_be_error_handler = arena.alloc(8);
+        match should_be_error_handler {
+            Some(_) => assert!(false),
+            None => assert!(true), // happy path
+        }
+    }
+
     #[test]
     fn can_allocate_once_and_mutate() {
         let probe = 0;
@@ -133,7 +144,7 @@ mod tests {
     }
 
     #[test]
-    fn can_allocate_once_and_borrow_mut_once_at_a_time() {
+    fn can_allocate_once_and_borrow_mut_only_once_at_a_time() {
         let probe = 0;
         let arena: Arena<u8, 2> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
@@ -154,7 +165,7 @@ mod tests {
     }
 
     #[test]
-    fn can_allocate_once_and_borrow_immutable_many_at_a_time() {
+    fn can_allocate_once_and_borrow_immutable_many_at_same_time() {
         let probe = 7;
         let arena: Arena<u8, 2> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
