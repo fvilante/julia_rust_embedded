@@ -20,7 +20,7 @@ use crate::utils::common::usize_to_u8_clamper;
 // 
 
 /// Areana Element Refewrence
-#[derive(Clone)]
+#[derive(Copy,Clone)]
 pub struct ArenaId<T> {
     index: u8,
     phantom: PhantomData<T>
@@ -98,7 +98,7 @@ mod tests {
         let probe = 0;
         let mut arena: Arena<u8, 1> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
-        *arena.try_borrow_mut(handler.clone()).unwrap() += 1;
+        *arena.try_borrow_mut(handler).unwrap() += 1;
         let actual = *arena.try_borrow(handler).unwrap();
         let expected = 1;
         assert_eq!(actual, expected); 
@@ -110,8 +110,8 @@ mod tests {
         let mut arena: Arena<u8, 2> = Arena::new();
         let handler1 = arena.alloc(probe).unwrap();
         let handler2 = arena.alloc(probe).unwrap();
-        *arena.try_borrow_mut(handler1.clone()).unwrap() += 1;
-        *arena.try_borrow_mut(handler2.clone()).unwrap() += 2;
+        *arena.try_borrow_mut(handler1).unwrap() += 1;
+        *arena.try_borrow_mut(handler2).unwrap() += 2;
         let actual1 = *arena.try_borrow(handler1).unwrap();
         let actual2 = *arena.try_borrow(handler2).unwrap();
         let expected1 = 1;
@@ -126,15 +126,15 @@ mod tests {
         let mut arena: Arena<u8, 2> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
         {
-            let mut borrow_mut1 = arena.try_borrow_mut(handler.clone()).unwrap();
+            let mut borrow_mut1 = arena.try_borrow_mut(handler).unwrap();
             *borrow_mut1 += 1;
         }
         {
-            let mut borrow_mut2 = arena.try_borrow_mut(handler.clone()).unwrap(); 
+            let mut borrow_mut2 = arena.try_borrow_mut(handler).unwrap(); 
             *borrow_mut2 += 2;
         }
-        let actual1 = *arena.try_borrow(handler.clone()).unwrap();
-        let actual2 = *arena.try_borrow(handler.clone()).unwrap();
+        let actual1 = *arena.try_borrow(handler).unwrap();
+        let actual2 = *arena.try_borrow(handler).unwrap();
         let expected1 = 3;
         let expected2 = 3;
         assert_eq!(actual1, expected1); 
@@ -146,8 +146,8 @@ mod tests {
         let probe = 7;
         let mut arena: Arena<u8, 2> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
-        let borrow_1 = arena.try_borrow(handler.clone()).unwrap();
-        let borrow_2 = arena.try_borrow(handler.clone()).unwrap();
+        let borrow_1 = arena.try_borrow(handler).unwrap();
+        let borrow_2 = arena.try_borrow(handler).unwrap();
         let actual1 = *borrow_1;
         let actual2 = *borrow_2;
         let expected1 = probe;
@@ -161,7 +161,7 @@ mod tests {
         let probe = 0;
         let mut arena: Arena<u8, 2> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
-        let mut borrow_mut1 = arena.try_borrow_mut(handler.clone()).unwrap();
+        let mut borrow_mut1 = arena.try_borrow_mut(handler).unwrap();
         let mut should_be_error = arena.try_borrow_mut(handler.clone()); 
         match should_be_error {
             Ok(_) => assert!(false),
