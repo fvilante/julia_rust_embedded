@@ -11,7 +11,7 @@ pub struct ArenaId<T> {
 }
 
 pub struct Arena<T, const CAPACITY: usize> {
-    data_base: RefCell<Vec<Cell<T>, CAPACITY>>, //TODO: Maybe this be converted to an array and cell.as_slice_of_cells should be used. (?!)
+    data_base: RefCell<Vec<RefCell<T>, CAPACITY>>, //TODO: Maybe this be converted to an array and cell.as_slice_of_cells should be used. (?!)
 }
 
 impl<T, const SIZE: usize> Arena<T, SIZE> {
@@ -27,7 +27,7 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
 
     /// Allocates a new arena_bucket of type T; returns None if data_base is out of capacity.
     pub fn alloc(&mut self, initial_value: T) -> Option<ArenaId<T>> {
-        let new_cell = Cell::new(initial_value);
+        let new_cell = RefCell::new(initial_value);
         let data_base = self.data_base.get_mut();
         let index = data_base.len();
         let arena_index = Self::make_hash(index);
@@ -38,12 +38,12 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
         }
     }
 
-    pub fn get_mut(&mut self, arena_id: ArenaId<T>) -> &mut Cell<T> {
+    pub fn get_mut(&mut self, arena_id: ArenaId<T>) -> &mut RefCell<T> {
         let data_base = self.data_base.get_mut();
         data_base.get_mut(arena_id.index as usize).unwrap()
     }
 
-    pub fn get(&mut self, handler: ArenaId<T>) -> &Cell<T> {
+    pub fn get(&mut self, handler: ArenaId<T>) -> &RefCell<T> {
         let data_base = self.data_base.get_mut();
         data_base.get(handler.index as usize).unwrap()
     }
@@ -61,7 +61,7 @@ mod tests {
         let mut arena: Arena<u8, 1> = Arena::new();
         let probe = 0;
         let handler = arena.alloc(probe).unwrap();
-        let actual = arena.get(handler).get();
+        let actual = *arena.get(handler).borrow();
         assert_eq!(actual, probe); 
     }
 
@@ -69,7 +69,7 @@ mod tests {
         let mut arena: Arena<u8, 1> = Arena::new();
         let probe = 0;
         let handler = arena.alloc(probe).unwrap();
-        let actual = arena.get(handler).get();
+        let actual = *arena.get(handler).borrow();
         assert_eq!(actual, probe); 
     }
 
