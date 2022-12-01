@@ -1,4 +1,4 @@
-use core::{cell::{Cell, RefCell, RefMut, Ref, UnsafeCell, BorrowError, BorrowMutError}, marker::PhantomData, ops::{DerefMut, Deref}};
+use core::{cell::{RefCell, UnsafeCell, BorrowError, BorrowMutError}, marker::PhantomData, ops::{DerefMut, Deref}};
 use heapless::Vec;
 
 use crate::utils::common::usize_to_u8_clamper;
@@ -44,7 +44,7 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
     }
 
     /// Allocates a new arena_bucket of type T; returns None if data_base is out of capacity.
-    pub fn alloc(&mut self, initial_value: T) -> Option<ArenaId<T>> {
+    pub fn alloc(&self, initial_value: T) -> Option<ArenaId<T>> {
         let new_value = RefCell::new(initial_value);
         let data_base = unsafe { &mut *self.data_base.get() };
         let index = data_base.len();
@@ -98,7 +98,7 @@ mod tests {
 
     #[test]
     fn can_allocate_once_immutable() {
-        let mut arena: Arena<u8, 1> = Arena::new();
+        let arena: Arena<u8, 1> = Arena::new();
         let probe = 0;
         let handler = arena.alloc(probe).unwrap();
         let actual = *arena.borrow(handler);
@@ -108,7 +108,7 @@ mod tests {
     #[test]
     fn can_allocate_once_and_mutate() {
         let probe = 0;
-        let mut arena: Arena<u8, 1> = Arena::new();
+        let arena: Arena<u8, 1> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
         *arena.borrow_mut(handler) += 1;
         let actual = *arena.borrow(handler);
@@ -119,7 +119,7 @@ mod tests {
     #[test]
     fn can_allocate_twice_and_mutate() {
         let probe = 0;
-        let mut arena: Arena<u8, 2> = Arena::new();
+        let arena: Arena<u8, 2> = Arena::new();
         let handler1 = arena.alloc(probe).unwrap();
         let handler2 = arena.alloc(probe).unwrap();
         *arena.borrow_mut(handler1) += 1;
@@ -135,7 +135,7 @@ mod tests {
     #[test]
     fn can_allocate_once_and_borrow_mut_once_at_a_time() {
         let probe = 0;
-        let mut arena: Arena<u8, 2> = Arena::new();
+        let arena: Arena<u8, 2> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
         {
             let mut borrow_mut1 = arena.borrow_mut(handler);
@@ -156,7 +156,7 @@ mod tests {
     #[test]
     fn can_allocate_once_and_borrow_immutable_many_at_a_time() {
         let probe = 7;
-        let mut arena: Arena<u8, 2> = Arena::new();
+        let arena: Arena<u8, 2> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
         let borrow_1 = arena.borrow(handler);
         let borrow_2 = arena.borrow(handler);
@@ -171,7 +171,7 @@ mod tests {
     #[test]
     fn cannot_allocate_once_and_reborrow_twice_at_same_time() {
         let probe = 0;
-        let mut arena: Arena<u8, 2> = Arena::new();
+        let arena: Arena<u8, 2> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
         let borrow_mut1 = arena.borrow_mut(handler);
         let should_be_runtime_error = arena.try_borrow_mut(handler); 
