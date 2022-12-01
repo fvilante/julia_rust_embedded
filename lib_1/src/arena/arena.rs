@@ -1,10 +1,11 @@
-use core::{cell::{Cell, RefCell}, marker::PhantomData};
+use core::{cell::{Cell, RefCell, RefMut, Ref}, marker::PhantomData};
 use heapless::Vec;
 
 use crate::utils::common::usize_to_u8_clamper;
 
 
 /// Areana Element Refewrence
+#[derive(Clone)]
 pub struct ArenaId<T> {
     index: u8,
     phantom: PhantomData<T>
@@ -38,14 +39,20 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
         }
     }
 
-    pub fn get_mut(&mut self, arena_id: ArenaId<T>) -> &mut RefCell<T> {
-        let data_base = self.data_base.get_mut();
-        data_base.get_mut(arena_id.index as usize).unwrap()
+    pub fn borrow_mut(&self, arena_id: ArenaId<T>) -> RefMut<T> {
+        let index = arena_id.index as usize;
+        let data_base = unsafe { &mut *self.data_base.as_ptr() }; // TODO: Check if this unsafe block is correct, I made it by luck.
+        let element = data_base.get_mut(index).unwrap();
+        let ref_mut = (*element).borrow_mut();
+        ref_mut
     }
 
-    pub fn get(&mut self, handler: ArenaId<T>) -> &RefCell<T> {
-        let data_base = self.data_base.get_mut();
-        data_base.get(handler.index as usize).unwrap()
+    pub fn get(&self, handler: ArenaId<T>) -> Ref<T> {
+        let data_base = unsafe { self.data_base.try_borrow_unguarded().unwrap() }; //TODO: remove this unsafe block when/if possible/necessary
+        let ref_ref_element = data_base.get(handler.index as usize).unwrap();
+        let ref_element = ref_ref_element;
+        let borrow = ref_element.borrow();
+        borrow
     }
 
 }
@@ -57,24 +64,24 @@ mod tests {
     use super::*;
 
     #[test]
-    fn can_allocate_once_mutable() {
-        let mut arena: Arena<u8, 1> = Arena::new();
-        let probe = 0;
-        let handler = arena.alloc(probe).unwrap();
-        let actual = *arena.get(handler).borrow();
-        assert_eq!(actual, probe); 
-    }
-
     fn can_allocate_once_immutable() {
         let mut arena: Arena<u8, 1> = Arena::new();
         let probe = 0;
         let handler = arena.alloc(probe).unwrap();
-        let actual = *arena.get(handler).borrow();
+        let element_ref = arena.get(handler);
+        let actual = *element_ref;
         assert_eq!(actual, probe); 
     }
 
     #[test]
-    fn it_contra_maps() {
-        assert_eq!(1, 1); 
+    fn can_allocate_once_and_mutate() {
+        let mut arena: Arena<u8, 1> = Arena::new();
+        let probe = 0;
+        let handler = arena.alloc(probe).unwrap();
+        *arena.borrow_mut(handler.clone()) += 1;
+        let actual = *arena.get(handler);
+        let expected = 1;
+        assert_eq!(actual, expected); 
     }
+
 }
