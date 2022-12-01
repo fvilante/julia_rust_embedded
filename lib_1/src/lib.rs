@@ -21,6 +21,7 @@ pub mod types;
 pub mod mock;
 pub mod utils;
 pub mod adt;
+pub mod arena;
 //pub mod alloc;
 
 
