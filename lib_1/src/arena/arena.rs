@@ -57,6 +57,7 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
     }
 
     /// Returns error if aliasing rules violated at run-time otherwhise returns the mutable reference
+    /// Equivalent to RefCell::try_borrow_mut
     /// Note, see also: https://stackoverflow.com/a/51349578/8233039
     pub fn try_borrow_mut<'a>(&'a self, arena_id: ArenaId<T>) -> Result<impl DerefMut<Target = T> + 'a, BorrowMutError> {
         let index = arena_id.index as usize;
@@ -66,7 +67,8 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
         ref_mut
     }
 
-    /// Returns error if aliasing rules violated at run-time otherwhise returns the mutable reference
+    /// Returns error if aliasing rules violated at run-time otherwhise returns the imutable reference
+    /// Equivalent to RefCell::try_borrow
     /// Note, see also: https://stackoverflow.com/a/51349578/8233039
     pub fn try_borrow<'a>(&'a self, handler: ArenaId<T>) -> Result<impl Deref<Target = T> + 'a, BorrowError> {
         let data_base = unsafe { &mut *self.data_base.get() };
@@ -74,6 +76,16 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
         let ref_element = ref_ref_element;
         let borrow = ref_element.try_borrow();
         borrow
+    }
+
+    /// Attention may fail at run-time, prefer try_borrow to a infalible action
+    pub fn borrow<'a>(&'a self, handler: ArenaId<T>) -> impl Deref<Target = T> + 'a {
+        self.try_borrow(handler).unwrap()
+    }
+
+    /// Attention may fail at run-time, prefer try_borrow_mut to a infalible action
+    pub fn borrow_mut<'a>(&'a self, handler: ArenaId<T>) -> impl DerefMut<Target = T> + 'a {
+        self.try_borrow_mut(handler).unwrap()
     }
 
 }
@@ -89,7 +101,7 @@ mod tests {
         let mut arena: Arena<u8, 1> = Arena::new();
         let probe = 0;
         let handler = arena.alloc(probe).unwrap();
-        let actual = *arena.try_borrow(handler).unwrap();
+        let actual = *arena.borrow(handler);
         assert_eq!(actual, probe); 
     }
 
@@ -98,8 +110,8 @@ mod tests {
         let probe = 0;
         let mut arena: Arena<u8, 1> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
-        *arena.try_borrow_mut(handler).unwrap() += 1;
-        let actual = *arena.try_borrow(handler).unwrap();
+        *arena.borrow_mut(handler) += 1;
+        let actual = *arena.borrow(handler);
         let expected = 1;
         assert_eq!(actual, expected); 
     }
@@ -110,10 +122,10 @@ mod tests {
         let mut arena: Arena<u8, 2> = Arena::new();
         let handler1 = arena.alloc(probe).unwrap();
         let handler2 = arena.alloc(probe).unwrap();
-        *arena.try_borrow_mut(handler1).unwrap() += 1;
-        *arena.try_borrow_mut(handler2).unwrap() += 2;
-        let actual1 = *arena.try_borrow(handler1).unwrap();
-        let actual2 = *arena.try_borrow(handler2).unwrap();
+        *arena.borrow_mut(handler1) += 1;
+        *arena.borrow_mut(handler2) += 2;
+        let actual1 = *arena.borrow(handler1);
+        let actual2 = *arena.borrow(handler2);
         let expected1 = 1;
         let expected2 = 2;
         assert_eq!(actual1, expected1); 
@@ -126,15 +138,15 @@ mod tests {
         let mut arena: Arena<u8, 2> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
         {
-            let mut borrow_mut1 = arena.try_borrow_mut(handler).unwrap();
+            let mut borrow_mut1 = arena.borrow_mut(handler);
             *borrow_mut1 += 1;
         }
         {
-            let mut borrow_mut2 = arena.try_borrow_mut(handler).unwrap(); 
+            let mut borrow_mut2 = arena.borrow_mut(handler); 
             *borrow_mut2 += 2;
         }
-        let actual1 = *arena.try_borrow(handler).unwrap();
-        let actual2 = *arena.try_borrow(handler).unwrap();
+        let actual1 = *arena.borrow(handler);
+        let actual2 = *arena.borrow(handler);
         let expected1 = 3;
         let expected2 = 3;
         assert_eq!(actual1, expected1); 
@@ -146,8 +158,8 @@ mod tests {
         let probe = 7;
         let mut arena: Arena<u8, 2> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
-        let borrow_1 = arena.try_borrow(handler).unwrap();
-        let borrow_2 = arena.try_borrow(handler).unwrap();
+        let borrow_1 = arena.borrow(handler);
+        let borrow_2 = arena.borrow(handler);
         let actual1 = *borrow_1;
         let actual2 = *borrow_2;
         let expected1 = probe;
@@ -161,9 +173,9 @@ mod tests {
         let probe = 0;
         let mut arena: Arena<u8, 2> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
-        let mut borrow_mut1 = arena.try_borrow_mut(handler).unwrap();
-        let mut should_be_error = arena.try_borrow_mut(handler.clone()); 
-        match should_be_error {
+        let borrow_mut1 = arena.borrow_mut(handler);
+        let should_be_runtime_error = arena.try_borrow_mut(handler); 
+        match should_be_runtime_error {
             Ok(_) => assert!(false),
             Err(_) => assert!(true), // happy path
         } 
