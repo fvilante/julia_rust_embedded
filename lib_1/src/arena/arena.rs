@@ -1,4 +1,4 @@
-use core::{cell::{Cell, RefCell, RefMut, Ref}, marker::PhantomData};
+use core::{cell::{Cell, RefCell, RefMut, Ref, UnsafeCell}, marker::PhantomData};
 use heapless::Vec;
 
 use crate::utils::common::usize_to_u8_clamper;
@@ -12,13 +12,13 @@ pub struct ArenaId<T> {
 }
 
 pub struct Arena<T, const CAPACITY: usize> {
-    data_base: RefCell<Vec<RefCell<T>, CAPACITY>>, //TODO: Maybe this be converted to an array and cell.as_slice_of_cells should be used. (?!)
+    data_base: UnsafeCell<Vec<RefCell<T>, CAPACITY>>, //TODO: Maybe this be converted to an array and cell.as_slice_of_cells should be used. (?!)
 }
 
 impl<T, const SIZE: usize> Arena<T, SIZE> {
     pub const fn new() -> Self {
         Self {
-            data_base: RefCell::new(Vec::new()),
+            data_base: UnsafeCell::new(Vec::new()),
         }
     }
 
@@ -28,11 +28,11 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
 
     /// Allocates a new arena_bucket of type T; returns None if data_base is out of capacity.
     pub fn alloc(&mut self, initial_value: T) -> Option<ArenaId<T>> {
-        let new_cell = RefCell::new(initial_value);
-        let data_base = self.data_base.get_mut();
+        let new_value = RefCell::new(initial_value);
+        let data_base = unsafe { &mut *self.data_base.get() };
         let index = data_base.len();
         let arena_index = Self::make_hash(index);
-        let result = data_base.push(new_cell);
+        let result = data_base.push(new_value);
         match result {
             Ok(_) => Some(ArenaId{ index: arena_index, phantom: PhantomData }),
             Err(_) => None,
@@ -41,14 +41,14 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
 
     pub fn borrow_mut(&self, arena_id: ArenaId<T>) -> RefMut<T> {
         let index = arena_id.index as usize;
-        let data_base = unsafe { &mut *self.data_base.as_ptr() }; // TODO: Check if this unsafe block is correct, I made it by luck.
+        let data_base = unsafe { &mut *self.data_base.get() };
         let element = data_base.get_mut(index).unwrap();
         let ref_mut = (*element).borrow_mut();
         ref_mut
     }
 
-    pub fn get(&self, handler: ArenaId<T>) -> Ref<T> {
-        let data_base = unsafe { self.data_base.try_borrow_unguarded().unwrap() }; //TODO: remove this unsafe block when/if possible/necessary
+    pub fn borrow(&self, handler: ArenaId<T>) -> Ref<T> {
+        let data_base = unsafe { &mut *self.data_base.get() };
         let ref_ref_element = data_base.get(handler.index as usize).unwrap();
         let ref_element = ref_ref_element;
         let borrow = ref_element.borrow();
@@ -68,7 +68,7 @@ mod tests {
         let mut arena: Arena<u8, 1> = Arena::new();
         let probe = 0;
         let handler = arena.alloc(probe).unwrap();
-        let element_ref = arena.get(handler);
+        let element_ref = arena.borrow(handler);
         let actual = *element_ref;
         assert_eq!(actual, probe); 
     }
@@ -79,7 +79,7 @@ mod tests {
         let probe = 0;
         let handler = arena.alloc(probe).unwrap();
         *arena.borrow_mut(handler.clone()) += 1;
-        let actual = *arena.get(handler);
+        let actual = *arena.borrow(handler);
         let expected = 1;
         assert_eq!(actual, expected); 
     }
