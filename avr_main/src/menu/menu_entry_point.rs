@@ -139,9 +139,9 @@ pub fn development_entry_point() -> ! {
     let mut value2: u16 = 0;
     let mut value3 = Cursor::new(0..2, 0);
 
-    let pointer1: *mut u16 = &mut value1;
-    let pointer2: *mut u16 = &mut value2;
-    let pointer3: *mut Cursor = &mut value3;
+    fn to_pointer_mut<T>(ref_: &mut T) -> *mut T {
+        ref_ as *mut T
+    }
 
     let mut menu_list: MenuList = Vec::new();
 
@@ -150,7 +150,7 @@ pub fn development_entry_point() -> ! {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&POSICAO_INICIAL),
-        variable: pointer1,
+        variable: to_pointer_mut(&mut value1),
         initial_cursor_position: 0,
         number_of_digits: 4,
         valid_range: 0..100,
@@ -162,7 +162,7 @@ pub fn development_entry_point() -> ! {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&POSICAO_FINAL),
-        variable: pointer2,
+        variable: to_pointer_mut(&mut value2),
         initial_cursor_position: 0,
         number_of_digits: 4,
         valid_range: 0..0xFFFF,
@@ -175,7 +175,7 @@ pub fn development_entry_point() -> ! {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
-        variable: pointer3,
+        variable: to_pointer_mut(&mut value3),
         options_list: make_options_buffer_from_array([FlashString::new(&O1), FlashString::new(&O2), FlashString::new(&O3), FlashString::new(&O4)]),
     });
     menu_list.push(menu_item);

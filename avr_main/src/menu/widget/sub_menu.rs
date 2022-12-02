@@ -33,8 +33,7 @@ pub struct SubMenu<'a> {
     menu_list: MenuList,    // all itens of submenu
     current_lcd_line_selected: LcdLine,  // lcd line reference
     first_line_to_render: Cursor, // line of the vector 'MenuList' which must be the first line to render in the first line of the lcd
-    mounted_0: MenuItem<'a>,
-    //mounted_1: MenuItem<'a>,
+    mounted: [MenuItem<'a>;2],
 }
 
 
@@ -43,13 +42,12 @@ impl<'a> SubMenu<'a> {
         let size = menu_list.len();
         let default_initial_menu_item = 0;
         let mounted_0 = MenuItem::from_menu_args(&menu_list[0]);
-        //let mounted_1 = MenuItem::from_menu_args(arena_u16s, arena_cursors, menu_list[1].clone());
+        let mounted_1 = MenuItem::from_menu_args(&menu_list[1]);
         Self {
             menu_list,
             current_lcd_line_selected: Line0,
             first_line_to_render: Cursor::new(0..size-1, default_initial_menu_item),
-            mounted_0,
-            //mounted_1,
+            mounted: [mounted_0, mounted_1],
         }
     }
 
@@ -63,13 +61,13 @@ impl<'a> SubMenu<'a> {
     fn get_menu_item_mut(&mut self, line: LcdLine) -> &mut MenuItem<'a> {
         //let index = self.get_current_index(line);
         //self.menu_list.get_mut(index).unwrap()
-        &mut self.mounted_0
+        &mut self.mounted[0]
     }
 
     fn get_menu_item(&self, line: LcdLine) -> &MenuItem<'a> {
         //let index = self.get_current_index(line);
         //self.menu_list.get(index).unwrap()]
-        &self.mounted_0
+        &self.mounted[0]
     }
 
     fn scroll_down(&mut self) {
