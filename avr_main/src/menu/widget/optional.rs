@@ -25,19 +25,19 @@ pub struct Optional<'a> {
     editing_cursor: Cursor,
     original_cursor: Cursor,
     blink: RectangularWave,
-    accessor: Accessor<'a,Cursor>,
+    variable: &'a mut Cursor,
 }
 
 impl<'a> Optional<'a> {
 
-    pub fn new(options: OptionsBuffer, accessor: Accessor<'a,Cursor>) -> Self {
-        let cursor = accessor.get();
+    pub fn new(options: OptionsBuffer, variable: &'a mut Cursor) -> Self {
+        let cursor = (*variable).clone();
         Self {
             options: options.clone(),
             editing_cursor: cursor.clone(),
             original_cursor: cursor,
             blink: RectangularWave::new(600,300),
-            accessor,
+            variable,
         }
     }
 
@@ -64,13 +64,13 @@ impl Optional<'_> {
     pub fn abort_edition(&mut self) {
         let recupered_info = self.original_cursor.clone();
         self.editing_cursor = recupered_info.clone();   // resets cursor
-        self.accessor.set(recupered_info);  // saves it
+        *self.variable = recupered_info ;  // saves it
     }
 
     pub fn save_edition(&mut self) {
         let info_to_save = self.editing_cursor.clone();
         self.original_cursor = info_to_save.clone();  
-        self.accessor.set(info_to_save);
+        *self.variable = info_to_save;
     }
 
 }

@@ -12,27 +12,27 @@ use core::{str::FromStr, ops::Range, cell::Cell};
 
 // -----------------------------------
 
-#[derive(Clone)]
+
 pub struct NumericalParameterArgs {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
-    pub arena_id: ArenaId<u16>,
+    pub variable: *mut u16, // unsafe
     pub initial_cursor_position: u8,
     pub number_of_digits: u8,
     pub valid_range: Range<u16>,
 }
 
-#[derive(Clone)]
+
 pub struct OptionalParameterArgs {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
-    pub accessor_handler: ArenaId<Cursor>,
+    pub variable: *mut Cursor, //unsafe
     pub options_list: OptionsBuffer,
 }
 
-#[derive(Clone)]
+
 pub enum MenuItemArgs {
     Numerical(NumericalParameterArgs),
     Optional(OptionalParameterArgs)
@@ -62,61 +62,59 @@ impl<'a> MenuItem<'a> {
         }
     }
 
-    pub fn from_numerical<'b: 'a,const SIZE: usize>(
-        controler: &'b mut Cell<Arena<u16, SIZE>>, 
-        args: NumericalParameterArgs,
+    pub fn from_numerical( 
+        args: &NumericalParameterArgs,
     ) -> MenuItem<'a> {
         match args {
             NumericalParameterArgs {
                 point1_,
                 point2_,
                 text,
-                arena_id: accessor_handler,
+                mut variable,
                 initial_cursor_position,
                 number_of_digits,
                 valid_range,
             } => {
-                let point1 = Point1d::new(point1_);
-                let point2 = Point1d::new(point2_);
-                let accessor = Accessor::from_accessor_controler(controler.get_mut(), accessor_handler);
+                let point1 = Point1d::new(*point1_);
+                let point2 = Point1d::new(*point2_);
                 let field = Field::from_numerical(
-                    accessor,
-                    initial_cursor_position as usize,
-                    number_of_digits as usize,
-                    valid_range,
+                    unsafe { &mut *variable },
+                    *initial_cursor_position as usize,
+                    *number_of_digits as usize,
+                    (*valid_range).clone(),
                 );
-                let mut menu_item = Self::new(point1, text, point2, field, None);
+                let mut menu_item = Self::new(point1, *text, point2, field, None);
                 menu_item
             }
         }
     }
 
-    pub fn from_optional<'b: 'a,const SIZE: usize>(
-        controler: &'b mut Cell<Arena<Cursor, SIZE>>, 
-        args: OptionalParameterArgs,
+    pub fn from_optional(
+        args: &OptionalParameterArgs,
     ) -> MenuItem<'a> {
         match args {
             OptionalParameterArgs {
                 point1_,
                 point2_,
                 text,
-                accessor_handler,
+                mut variable,
                 options_list,
             } => {
-                let point1 = Point1d::new(point1_);
-                let point2 = Point1d::new(point2_);
-                let accessor = Accessor::from_accessor_controler(controler.get_mut(), accessor_handler);
-                let field = Field::from_optional(options_list, accessor);
-                let mut menu_item = Self::new(point1, text, point2, field, None);
+                let mut options_list_cloned = Vec::new();
+                options_list_cloned.clone_from(options_list);
+                let point1 = Point1d::new(*point1_);
+                let point2 = Point1d::new(*point2_);
+                let field = Field::from_optional(options_list_cloned, unsafe { &mut *variable } );
+                let mut menu_item = Self::new(point1, *text, point2, field, None);
                 menu_item
             }
         }
     }
 
-    pub fn from_menu_args<const SIZE1: usize, const SIZE2: usize>( arena_u16s: &'a mut Cell<Arena<u16, SIZE1>>, arena_cursors: &'a mut Cell<Arena<Cursor, SIZE2>>,args: MenuItemArgs) -> Self {
+    pub fn from_menu_args(args: &MenuItemArgs) -> Self {
         match args {
-            MenuItemArgs::Numerical(args) => Self::from_numerical(arena_u16s, args),
-            MenuItemArgs::Optional(args) => Self::from_optional(arena_cursors, args),
+            MenuItemArgs::Numerical(args) => Self::from_numerical(args),
+            MenuItemArgs::Optional(args) => Self::from_optional(args),
         }
     }
 

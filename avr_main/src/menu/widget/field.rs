@@ -129,17 +129,17 @@ struct Numerical<'a> {
     number_of_digits: usize,        
     // initial values
     initial_edition_buffer: EditionBuffer, 
-    accessor: Accessor<'a, u16>         
+    variable: &'a mut u16         
 } 
 
 impl<'a> Numerical<'a> {
-    pub fn new(edition_buffer: EditionBuffer, valid_range: Range<u16>, number_of_digits: usize, accessor: Accessor<'a,u16>) -> Self {
+    pub fn new(edition_buffer: EditionBuffer, valid_range: Range<u16>, number_of_digits: usize, variable: &'a mut u16) -> Self {
         Self {
             edition_buffer: edition_buffer.clone(),
             valid_range,
             number_of_digits,
             initial_edition_buffer: edition_buffer,
-            accessor,
+            variable,
         }
     }
 
@@ -183,13 +183,13 @@ impl<'a> Numerical<'a> {
 impl Numerical<'_> {
     pub fn save_edition(&mut self) {
         let normalized_value = self.to_u16_normalized();
-        self.accessor.set(normalized_value); // saves data to accessor
+        *self.variable = normalized_value; // saves data
         self.set_u16(normalized_value); // saves displayed data
         self.reset_cursor();
     }
 
     pub fn abort_edition(&mut self) {
-        let original_value = self.accessor.get(); 
+        let original_value = (*self.variable).clone(); 
         self.set_u16(original_value); // resets displayed data
         self.reset_cursor();
     }
@@ -228,12 +228,12 @@ pub struct NumericalField<'a> {
 }
 
 impl<'a> NumericalField<'a> {
-    pub fn new(accessor: Accessor<'a,u16>, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
-        let value = accessor.get();
+    pub fn new(variable: &'a mut u16, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
+        let value = (*variable).clone();
         let array = convert_u16_to_FieldBuffer(value, number_of_digits);
         let edition_buffer = EditionBuffer::new(array.clone(), initial_cursor_position);
         Self {
-            numerical: Numerical::new(edition_buffer, valid_range, number_of_digits, accessor),
+            numerical: Numerical::new(edition_buffer, valid_range, number_of_digits, variable),
             blink: RectangularWave::new(600,300),
         }
     }
@@ -334,14 +334,14 @@ impl<'a> Field<'a> {
         }
     }
 
-    pub fn from_numerical(accessor: Accessor<'a,u16>, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
-        let numerical_field = NumericalField::new(accessor, initial_cursor_position, number_of_digits, valid_range);
+    pub fn from_numerical(variable: &'a mut u16, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
+        let numerical_field = NumericalField::new(variable, initial_cursor_position, number_of_digits, valid_range);
         let field_enum = FieldEnum::Numerical(numerical_field);
         Self::new(field_enum)
     }
 
-    pub fn from_optional(options: OptionsBuffer, accessor: Accessor<'a,Cursor>) -> Self {
-        let optional = Optional::new(options, accessor);
+    pub fn from_optional(options: OptionsBuffer, variable: &'a mut Cursor) -> Self {
+        let optional = Optional::new(options, variable);
         let field_enum = FieldEnum::Optional(optional);
         Self::new(field_enum)
     }

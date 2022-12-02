@@ -87,34 +87,7 @@ progmem! {
     static progmem string ERRO_01 = "Erro de construcao de string";
 }
 
-pub struct MenuArena {
-    pub cursors: Cell<Arena<Cursor,1>>,
-    pub u16s: Cell<Arena<u16,10>>,
-}
 
-impl MenuArena {
-
-    pub const fn new() -> Self {
-        let cursors = Cell::new(Arena::new());
-        let u16s = Cell::new(Arena::new()); 
-        Self {
-            cursors,
-            u16s,
-        }
-    }
-
-    pub fn alloc_u16(&mut self, initial_value: u16) -> Option<ArenaId<u16>> {
-        let arena = self.u16s.get_mut();
-        arena.alloc(initial_value)
-    }
-
-    pub fn alloc_cursor(&mut self, initial_value: Cursor) -> Option<ArenaId<Cursor>> {
-        let arena = self.cursors.get_mut();
-        arena.alloc(initial_value)
-    }
-}
-
-pub static mut MENU_ARENA: MenuArena = MenuArena::new();
 
 pub fn development_entry_point() -> ! {
     //optional_widget_test();
@@ -162,6 +135,14 @@ pub fn development_entry_point() -> ! {
 
     // -----
 
+    let mut value1: u16 = 0;
+    let mut value2: u16 = 0;
+    let mut value3 = Cursor::new(0..2, 0);
+
+    let pointer1: *mut u16 = &mut value1;
+    let pointer2: *mut u16 = &mut value2;
+    let pointer3: *mut Cursor = &mut value3;
+
     let mut menu_list: MenuList = Vec::new();
 
     // =========================================================
@@ -169,7 +150,7 @@ pub fn development_entry_point() -> ! {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&POSICAO_INICIAL),
-        arena_id: unsafe { MENU_ARENA.alloc_u16(0).unwrap() },
+        variable: pointer1,
         initial_cursor_position: 0,
         number_of_digits: 4,
         valid_range: 0..100,
@@ -181,7 +162,7 @@ pub fn development_entry_point() -> ! {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&POSICAO_FINAL),
-        arena_id: unsafe { MENU_ARENA.alloc_u16(0).unwrap() },
+        variable: pointer2,
         initial_cursor_position: 0,
         number_of_digits: 4,
         valid_range: 0..0xFFFF,
@@ -194,7 +175,7 @@ pub fn development_entry_point() -> ! {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
-        accessor_handler: unsafe { MENU_ARENA.alloc_cursor(Cursor::new(0..4, 0)).unwrap() },
+        variable: pointer3,
         options_list: make_options_buffer_from_array([FlashString::new(&O1), FlashString::new(&O2), FlashString::new(&O3), FlashString::new(&O4)]),
     });
     menu_list.push(menu_item);
@@ -250,9 +231,8 @@ pub fn development_entry_point() -> ! {
 
     // -----------------------------
 
-    let arena_u16s_ref = unsafe { &mut MENU_ARENA.u16s };
-    let arena_cursors_ref = unsafe { &mut MENU_ARENA.cursors };
-    let mut submenu = SubMenu::new(arena_u16s_ref, arena_cursors_ref, menu_list);
+
+    let mut submenu = SubMenu::new(menu_list);
 
     let fps = 30; // frames_per_second
     let mut next_frame: u64 = now() + (1000 / fps);
