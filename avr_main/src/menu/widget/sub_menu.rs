@@ -61,13 +61,13 @@ impl<'a> SubMenu<'a> {
     fn get_menu_item_mut(&mut self, line: LcdLine) -> &mut MenuItem<'a> {
         //let index = self.get_current_index(line);
         //self.menu_list.get_mut(index).unwrap()
-        &mut self.mounted[0]
+        &mut self.mounted[line.as_u8() as usize]
     }
 
     fn get_menu_item(&self, line: LcdLine) -> &MenuItem<'a> {
         //let index = self.get_current_index(line);
         //self.menu_list.get(index).unwrap()]
-        &self.mounted[0]
+        &self.mounted[line.as_u8() as usize]
     }
 
     fn scroll_down(&mut self) {
