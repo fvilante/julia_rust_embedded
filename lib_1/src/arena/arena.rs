@@ -1,4 +1,4 @@
-use core::{cell::{RefCell, UnsafeCell, BorrowError, BorrowMutError}, marker::PhantomData, ops::{DerefMut, Deref}};
+use core::{cell::{RefCell, UnsafeCell, BorrowError, BorrowMutError, RefMut, Ref}, marker::PhantomData, ops::{DerefMut, Deref}};
 use heapless::Vec;
 
 use crate::utils::common::usize_to_u8_clamper;
@@ -59,7 +59,7 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
     /// Returns error if aliasing rules violated at run-time otherwhise returns the mutable reference
     /// Equivalent to RefCell::try_borrow_mut
     /// Note, see also: https://stackoverflow.com/a/51349578/8233039
-    pub fn try_borrow_mut<'a>(&'a self, arena_id: ArenaId<T>) -> Result<impl DerefMut<Target = T> + 'a, BorrowMutError> {
+    pub fn try_borrow_mut<'a>(&'a self, arena_id: ArenaId<T>) -> Result<RefMut<'a,T>, BorrowMutError> {
         let index = arena_id.index as usize;
         let data_base = unsafe { &mut *self.data_base.get() };
         let element = data_base.get_mut(index).unwrap();
@@ -70,7 +70,7 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
     /// Returns error if aliasing rules violated at run-time otherwhise returns the imutable reference
     /// Equivalent to RefCell::try_borrow
     /// Note, see also: https://stackoverflow.com/a/51349578/8233039
-    pub fn try_borrow<'a>(&'a self, handler: ArenaId<T>) -> Result<impl Deref<Target = T> + 'a, BorrowError> {
+    pub fn try_borrow<'a>(&'a self, handler: ArenaId<T>) -> Result<Ref<'a,T>, BorrowError> {
         let data_base = unsafe { &mut *self.data_base.get() };
         let ref_ref_element = data_base.get(handler.index as usize).unwrap();
         let ref_element = ref_ref_element;
@@ -79,12 +79,12 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
     }
 
     /// Attention may fail at run-time, prefer try_borrow to a infalible action
-    pub fn borrow<'a>(&'a self, handler: ArenaId<T>) -> impl Deref<Target = T> + 'a {
+    pub fn borrow<'a>(&'a self, handler: ArenaId<T>) -> Ref<'a, T> {
         self.try_borrow(handler).unwrap()
     }
 
     /// Attention may fail at run-time, prefer try_borrow_mut to a infalible action
-    pub fn borrow_mut<'a>(&'a self, handler: ArenaId<T>) -> impl DerefMut<Target = T> + 'a {
+    pub fn borrow_mut<'a>(&'a self, handler: ArenaId<T>) -> RefMut<'a,T> {
         self.try_borrow_mut(handler).unwrap()
     }
 
