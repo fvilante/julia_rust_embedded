@@ -15,6 +15,7 @@ use super::widget::main_menu::State;
 use super::widget::manual_mode::ManualModeMenu;
 use super::widget::manual_mode::ManualModeState;
 use super::widget::menu_item;
+use super::widget::menu_item::MenuItemArgs;
 use super::widget::menu_item::parse_menu_item_constructor_string;
 use super::widget::menu_item::MenuItem;
 use super::widget::menu_item::MenuItemParsed;
@@ -86,12 +87,12 @@ progmem! {
     static progmem string ERRO_01 = "Erro de construcao de string";
 }
 
-struct Database {
+pub struct MenuArena {
     pub cursors: Cell<Arena<Cursor,1>>,
     pub u16s: Cell<Arena<u16,10>>,
 }
 
-impl Database {
+impl MenuArena {
 
     pub const fn new() -> Self {
         let cursors = Cell::new(Arena::new());
@@ -113,7 +114,7 @@ impl Database {
     }
 }
 
-static mut db: Database = Database::new();
+pub static mut MENU_ARENA: MenuArena = MenuArena::new();
 
 pub fn development_entry_point() -> ! {
     //optional_widget_test();
@@ -164,11 +165,11 @@ pub fn development_entry_point() -> ! {
     let mut menu_list: MenuList = Vec::new();
 
     // =========================================================
-    let mut menu_item = MenuItem::from_numerical(unsafe { &mut db.u16s }, NumericalParameterArgs {
+    let mut menu_item = MenuItemArgs::Numerical(NumericalParameterArgs {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&POSICAO_INICIAL),
-        arena_id: unsafe { db.alloc_u16(0).unwrap() },
+        arena_id: unsafe { MENU_ARENA.alloc_u16(0).unwrap() },
         initial_cursor_position: 0,
         number_of_digits: 4,
         valid_range: 0..100,
@@ -176,11 +177,11 @@ pub fn development_entry_point() -> ! {
     menu_list.push(menu_item);
 
     // =========================================================
-    let mut menu_item = MenuItem::from_numerical(unsafe { &mut db.u16s }, NumericalParameterArgs {
+    let mut menu_item = MenuItemArgs::Numerical(NumericalParameterArgs {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&POSICAO_FINAL),
-        arena_id: unsafe { db.alloc_u16(0).unwrap() },
+        arena_id: unsafe { MENU_ARENA.alloc_u16(0).unwrap() },
         initial_cursor_position: 0,
         number_of_digits: 4,
         valid_range: 0..0xFFFF,
@@ -189,11 +190,11 @@ pub fn development_entry_point() -> ! {
 
     // =========================================================
     //options
-    let mut menu_item = MenuItem::from_optional(unsafe { &mut db.cursors }, OptionalParameterArgs {
+    let mut menu_item = MenuItemArgs::Optional(OptionalParameterArgs {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
-        accessor_handler: unsafe { db.alloc_cursor(Cursor::new(0..4, 0)).unwrap() },
+        accessor_handler: unsafe { MENU_ARENA.alloc_cursor(Cursor::new(0..4, 0)).unwrap() },
         options_list: make_options_buffer_from_array([FlashString::new(&O1), FlashString::new(&O2), FlashString::new(&O3), FlashString::new(&O4)]),
     });
     menu_list.push(menu_item);
@@ -249,7 +250,9 @@ pub fn development_entry_point() -> ! {
 
     // -----------------------------
 
-    let mut submenu = SubMenu::new(menu_list);
+    let arena_u16s_ref = unsafe { &mut MENU_ARENA.u16s };
+    let arena_cursors_ref = unsafe { &mut MENU_ARENA.cursors };
+    let mut submenu = SubMenu::new(arena_u16s_ref, arena_cursors_ref, menu_list);
 
     let fps = 30; // frames_per_second
     let mut next_frame: u64 = now() + (1000 / fps);

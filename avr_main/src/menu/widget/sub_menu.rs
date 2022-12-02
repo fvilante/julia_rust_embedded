@@ -1,7 +1,8 @@
-use core::slice::Iter;
+use core::{slice::Iter, cell::Cell};
 use heapless::Vec;
+use lib_1::arena::arena::Arena;
 use crate::{board::keyboard::KeyCode, menu::{canvas::Canvas, point::Point}};
-use super::{menu_item::MenuItem, cursor::Cursor};
+use super::{menu_item::{MenuItem, MenuItemArgs}, cursor::Cursor};
 
 //represents the lines of the 40x2 LCD display
 #[derive(PartialEq, Copy, Clone)]
@@ -26,24 +27,29 @@ impl LcdLine {
     }
 }
 
-pub type MenuList<'a> = Vec<MenuItem<'a>,6>;
+pub type MenuList<'a> = Vec<MenuItemArgs,6>;
 
 pub struct SubMenu<'a> {
     menu_list: MenuList<'a>,    // all itens of submenu
     current_lcd_line_selected: LcdLine,  // lcd line reference
     first_line_to_render: Cursor, // line of the vector 'MenuList' which must be the first line to render in the first line of the lcd
+    mounted_0: MenuItem<'a>,
+    //mounted_1: MenuItem<'a>,
 }
 
 
 impl<'a> SubMenu<'a> {
-    pub fn new(mut menu_list: MenuList<'a>) -> Self {
+    pub fn new<const SIZE1: usize, const SIZE2: usize>(arena_u16s: &'a mut Cell<Arena<u16, SIZE1>>, arena_cursors: &'a mut Cell<Arena<Cursor, SIZE2>>, mut menu_list: MenuList<'a>) -> Self {
         let size = menu_list.len();
         let default_initial_menu_item = 0;
+        let mounted_0 = MenuItem::from_menu_args(arena_u16s, arena_cursors, menu_list[0].clone());
+        //let mounted_1 = MenuItem::from_menu_args(arena_u16s, arena_cursors, menu_list[1].clone());
         Self {
             menu_list,
             current_lcd_line_selected: Line0,
             first_line_to_render: Cursor::new(0..size-1, default_initial_menu_item),
-
+            mounted_0,
+            //mounted_1,
         }
     }
 
@@ -55,13 +61,15 @@ impl<'a> SubMenu<'a> {
     }
 
     fn get_menu_item_mut(&mut self, line: LcdLine) -> &mut MenuItem<'a> {
-        let index = self.get_current_index(line);
-        self.menu_list.get_mut(index).unwrap()
+        //let index = self.get_current_index(line);
+        //self.menu_list.get_mut(index).unwrap()
+        &mut self.mounted_0
     }
 
     fn get_menu_item(&self, line: LcdLine) -> &MenuItem<'a> {
-        let index = self.get_current_index(line);
-        self.menu_list.get(index).unwrap()
+        //let index = self.get_current_index(line);
+        //self.menu_list.get(index).unwrap()]
+        &self.mounted_0
     }
 
     fn scroll_down(&mut self) {

@@ -12,6 +12,7 @@ use core::{str::FromStr, ops::Range, cell::Cell};
 
 // -----------------------------------
 
+#[derive(Clone)]
 pub struct NumericalParameterArgs {
     pub point1_: u8,
     pub point2_: u8,
@@ -22,6 +23,7 @@ pub struct NumericalParameterArgs {
     pub valid_range: Range<u16>,
 }
 
+#[derive(Clone)]
 pub struct OptionalParameterArgs {
     pub point1_: u8,
     pub point2_: u8,
@@ -30,6 +32,7 @@ pub struct OptionalParameterArgs {
     pub options_list: OptionsBuffer,
 }
 
+#[derive(Clone)]
 pub enum MenuItemArgs {
     Numerical(NumericalParameterArgs),
     Optional(OptionalParameterArgs)
@@ -110,12 +113,12 @@ impl<'a> MenuItem<'a> {
         }
     }
 
-    //pub fn from_menu_args<T,const SIZE: usize>( controler: &mut Accessor2Controler<T, SIZE>, args: MenuItemArgs) -> Self {
-    //    match args {
-    //        MenuItemArgs::Numerical(args) => Self::from_numerical(controler, args),
-    //        MenuItemArgs::Optional(args) => Self::from_optional(controler, args),
-    //    }
-    //}
+    pub fn from_menu_args<const SIZE1: usize, const SIZE2: usize>( arena_u16s: &'a mut Cell<Arena<u16, SIZE1>>, arena_cursors: &'a mut Cell<Arena<Cursor, SIZE2>>,args: MenuItemArgs) -> Self {
+        match args {
+            MenuItemArgs::Numerical(args) => Self::from_numerical(arena_u16s, args),
+            MenuItemArgs::Optional(args) => Self::from_optional(arena_cursors, args),
+        }
+    }
 
 }
 
