@@ -20,14 +20,14 @@ impl<'a,T: Copy + 'a> Accessor<'a,T> {
         }
     }
 
-    pub fn from_accessor_controler<'b: 'a,const SIZE: usize>(controler: &'b mut Arena<T, SIZE>, handler: ArenaId<T>) -> Accessor<'a,T> {
+    pub fn from_accessor_controler<const SIZE: usize>(controler: &'a mut Arena<T, SIZE>, handler: ArenaId<T>) -> Accessor<'a,T> {
         let accessor = (*controler).borrow_mut(handler);
         Self::new(accessor)
     }
 
 }
 
-impl<'a, T: Copy + 'a> /*AccessorTrait<T> for*/ Accessor<'a,T> {
+impl<'a, T: Copy + 'a> Accessor<'a,T> {
 
     pub fn set(&mut self, value: T) {
         unsafe {
