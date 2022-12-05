@@ -70,7 +70,7 @@ impl<'a> MenuItem<'a> {
                 point1_,
                 point2_,
                 text,
-                mut variable,
+                variable,
                 initial_cursor_position,
                 number_of_digits,
                 valid_range,
@@ -78,7 +78,7 @@ impl<'a> MenuItem<'a> {
                 let point1 = Point1d::new(*point1_);
                 let point2 = Point1d::new(*point2_);
                 let field = Field::from_numerical(
-                    unsafe { &mut *variable },
+                    unsafe { &mut **variable },
                     *initial_cursor_position as usize,
                     *number_of_digits as usize,
                     (*valid_range).clone(),
@@ -97,14 +97,14 @@ impl<'a> MenuItem<'a> {
                 point1_,
                 point2_,
                 text,
-                mut variable,
+                variable,
                 options_list,
             } => {
                 let mut options_list_cloned = Vec::new();
                 options_list_cloned.clone_from(options_list);
                 let point1 = Point1d::new(*point1_);
                 let point2 = Point1d::new(*point2_);
-                let field = Field::from_optional(options_list_cloned, unsafe { &mut *variable } );
+                let field = Field::from_optional(options_list_cloned, unsafe { &mut **variable } );
                 let mut menu_item = Self::new(point1, *text, point2, field, None);
                 menu_item
             }
