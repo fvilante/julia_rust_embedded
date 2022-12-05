@@ -106,3 +106,8 @@ pub const fn usize_to_u8_clamper(data: usize) -> u8 {
     let clamped_u8 = const_clamp(data, u8::MIN as usize, u8::MAX as usize) as u8;
     clamped_u8
 }
+
+pub const fn u32_to_u16_clamper(data: u32) -> u16 {
+    let clamped_u8 = const_clamp(data, u16::MIN as u32, u16::MAX as u32) as u16;
+    clamped_u8
+}
