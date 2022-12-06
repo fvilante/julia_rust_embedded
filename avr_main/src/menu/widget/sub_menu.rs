@@ -1,7 +1,7 @@
 use core::{slice::Iter, cell::Cell};
 use heapless::Vec;
 use lib_1::arena::arena::Arena;
-use crate::{board::keyboard::KeyCode, menu::{canvas::Canvas, point::Point}};
+use crate::{board::keyboard::KeyCode, menu::{canvas::Canvas, point::Point}, unwrap_option};
 use super::{menu_item::{MenuItem, MenuItemArgs}, cursor::Cursor};
 
 //represents the lines of the 40x2 LCD display
@@ -33,7 +33,7 @@ pub struct SubMenu<'a> {
     menu_list: MenuList,    // all itens of submenu
     current_lcd_line_selected: LcdLine,  // lcd line reference
     first_line_to_render: Cursor, // line of the vector 'MenuList' which must be the first line to render in the first line of the lcd
-    mounted: [MenuItem<'a>;2],
+    mounted: [MenuItem<'a>;1],
 }
 
 
@@ -42,12 +42,12 @@ impl<'a> SubMenu<'a> {
         let size = menu_list.len();
         let default_initial_menu_item = 0;
         let mounted_0 = MenuItem::from_menu_args(&menu_list[0]);
-        let mounted_1 = MenuItem::from_menu_args(&menu_list[1]);
+        //let mounted_1 = MenuItem::from_menu_args(&menu_list[1]);
         Self {
             menu_list,
             current_lcd_line_selected: Line0,
             first_line_to_render: Cursor::new(0..size-1, default_initial_menu_item),
-            mounted: [mounted_0, mounted_1],
+            mounted: [mounted_0], //, mounted_1],
         }
     }
 
