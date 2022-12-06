@@ -105,12 +105,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "avr-std-stub"
-version = "1.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "839920177137ff472f3c35abf5b8166f331c6cf7f2dfa7ffd69f9aa7dc70b526"
-
-[[package]]
 name = "avr_delay"
 version = "0.4.2"
 source = "git+https://github.com/avr-rust/delay?rev=849918a8dfb2#849918a8dfb2f6211787bd8ff69c4083d685cf54"
@@ -125,11 +119,9 @@ dependencies = [
  "arduino-hal",
  "avr-device",
  "avr-progmem",
- "avr-std-stub",
  "embedded-hal",
  "heapless",
  "lib_1",
- "panic-halt",
  "ruduino",
 ]
 
@@ -268,12 +260,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "546c37ac5d9e56f55e73b677106873d9d9f5190605e41a856503623648488cae"
 
 [[package]]
-name = "panic-halt"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "de96540e0ebde571dc55c73d60ef407c653844e6f9a1e2fdbd40c07b9252d812"
-
-[[package]]
 name = "paste"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -310,7 +296,6 @@ source = "git+https://github.com/avr-rust/ruduino?rev=c057499#c0574999752c6bfc2c
 dependencies = [
  "avr-config",
  "avr-mcu",
- "avr-std-stub",
  "avr_delay",
  "const_env--value",
  "target-cpu-macro",
