@@ -1,32 +1,27 @@
 
 use core::panic::PanicInfo;
-use alloc::string::ToString;
-
 use crate::board::lcd;
-
 
 // PANIC HANDLER {{{
 // =============
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-
-    //TODO: Disable interrupts (?!) Not for now because there are no much interruptions running under the hood
-    
     lcd::lcd_initialize();
     lcd::clear();
+    
+    let NO_MESSAGE1 = "NO_MESSAGE_1";
+    let NO_MESSAGE2 = "NO_MESSAGE_2";
 
-    //TODO: I didn't explored the `info` object and do not know yet how to take the `.expect` message
-    if let Some(s) = info.message() {
-        let s = *s;
-        lcd::print("ERROR: ");
-        lcd::print(s.as_str().unwrap());
+    let error_message = if let Some(arguments) = info.message() {
+        if let Some(error_message) = arguments.as_str() {
+            error_message
+        } else {
+            NO_MESSAGE2
+        }
     } else {
-        lcd::print("FATAL ERROR: NO MESSAGE");
-    }
-
-
-    loop {
-        // HALT
-    }
-
+        NO_MESSAGE1
+    };
+    lcd::print("ERROR: ");
+    lcd::print(error_message);
+    loop { }
 }
