@@ -3,7 +3,7 @@
 #![feature(result_flattening)]
 #![feature(const_trait_impl)]
 #![feature(const_refs_to_cell)]
-
+#![allow(warnings)] // TODO: remove this on future
 
 //  Memory allocation for embbeded systems 
 //  For more see: 

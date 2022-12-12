@@ -4,6 +4,7 @@
 #![feature(abi_avr_interrupt)]
 #![feature(alloc_error_handler)] // necessary to execute file ./custom_alloc/alloc_error_handler.rs
 #![feature(panic_info_message)] // necessary to send error messages to the panic_handler
+#![allow(warnings)] // TODO: remove this on future
 
 #![allow(unused_imports)]
 #![allow(dead_code)]
