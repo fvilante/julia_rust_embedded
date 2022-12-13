@@ -9,7 +9,7 @@ BUILD_DIR=target/avr-atmega328p/release
 all: fast
 
 # just a division marker
-div:
+div: format
 	@echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 	@echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 	@echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
@@ -17,6 +17,9 @@ div:
 # watch platform-dependent (avr-side) and platform-independent (x86-side)
 watch_all:
 	cargo watch -c --why -s "make div x86_test check"
+
+format:
+	cargo fmt
 
 # watch executes the tests if any file on the project change (note: ignore files in target and .git folder)
 # if you do not have cargo-watch instaled type "cargo install cargo-watch" to install from source.

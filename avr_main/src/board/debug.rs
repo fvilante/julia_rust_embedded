@@ -37,11 +37,9 @@ pub fn blink_led3(on_interval_ms: u64, off_interval_ms: u64, repeat: Option<u64>
                 blink_once(on_interval_ms, off_interval_ms);
             }
         }
-        None => {
-            loop {
-                blink_once(on_interval_ms, off_interval_ms);
-            }
-        }
+        None => loop {
+            blink_once(on_interval_ms, off_interval_ms);
+        },
     }
 }
 
