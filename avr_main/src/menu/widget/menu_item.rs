@@ -3,8 +3,8 @@ use crate::{
     menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}, accessor::{Accessor}},
 };
 
-use super::{caption::Caption, field::{Field, FieldBuffer, FieldEnum}, widget::Editable, widget::Widget, sub_menu::{LcdLine, SubMenu}, cursor::Cursor, optional::OptionsBuffer};
-
+use super::{caption::Caption, field::{Field, FieldBuffer, FieldEnum}, widget::Editable, widget::Widget, sub_menu::{LcdLine, SubMenu}, optional::OptionsBuffer};
+use lib_1::utils::cursor::Cursor;
 use avr_progmem::string::PmString;
 use heapless::{String,Vec};
 use lib_1::{utils::common::convert_u16_to_string_decimal, arena::arena::{Arena, ArenaId}};

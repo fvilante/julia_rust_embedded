@@ -7,7 +7,7 @@ use crate::menu::flash::FlashString;
 use crate::menu::point::Point;
 use crate::menu::ratangular_wave::RectangularWave;
 use crate::menu::widget::widget::Editable;
-use super::cursor::Cursor;
+use lib_1::utils::cursor::Cursor;
 use super::edit_mode::EditMode;
 
 pub type OptionsBuffer = Vec<FlashString,5>;

@@ -2,7 +2,8 @@ use avr_progmem::progmem;
 
 use crate::{microcontroler::timer::now, menu::{flash::FlashString, point::Point, canvas::Canvas}, board::keyboard::KeyCode, utils::generic_string::GenericString};
 
-use super::{widget::{Widget, IWidget}, cursor::Cursor};
+use super::{widget::{Widget, IWidget}};
+use lib_1::utils::cursor::Cursor;
 
 
 progmem! {

@@ -32,7 +32,7 @@ use crate::board::output_expander::OutputExpander;
 use crate::board::{lcd, output_expander};
 use crate::enviroment::front_panel::FrontPanel;
 use crate::menu::accessor::Accessor;
-use crate::menu::widget::cursor::Cursor;
+use lib_1::utils::cursor::Cursor;
 use crate::menu::widget::optional::OptionsBuffer;
 use crate::menu::widget::optional::make_options_buffer_from_array;
 use crate::menu::widget::sub_menu::SubMenu;

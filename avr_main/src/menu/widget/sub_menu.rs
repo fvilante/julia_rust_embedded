@@ -2,7 +2,8 @@ use core::{slice::Iter, cell::Cell};
 use heapless::Vec;
 use lib_1::arena::arena::Arena;
 use crate::{board::keyboard::KeyCode, menu::{canvas::Canvas, point::Point}, unwrap_option};
-use super::{menu_item::{MenuItem, MenuItemArgs}, cursor::Cursor};
+use super::{menu_item::{MenuItem, MenuItemArgs}};
+use lib_1::utils::cursor::Cursor;
 
 //represents the lines of the 40x2 LCD display
 #[derive(PartialEq, Copy, Clone)]

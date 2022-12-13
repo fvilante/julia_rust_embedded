@@ -13,7 +13,8 @@ use crate::board::lcd;
 use crate::{menu::{point::Point, ratangular_wave::RectangularWave, canvas::Canvas, accessor::{Accessor }}, board::keyboard::KeyCode};
 
 use super::optional::{Optional, OptionsBuffer};
-use super::{edit_mode::EditMode, widget::Widget, widget::Editable, cursor::Cursor};
+use super::{edit_mode::EditMode, widget::Widget, widget::Editable};
+use lib_1::utils::cursor::Cursor;
 
 
 const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 6;
