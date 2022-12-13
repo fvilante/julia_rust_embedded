@@ -1,7 +1,9 @@
-use crate::{menu::{flash::FlashString, point::Point, canvas::Canvas}, board::keyboard::KeyCode};
+use crate::{
+    board::keyboard::KeyCode,
+    menu::{canvas::Canvas, flash::FlashString, point::Point},
+};
 
 use super::widget::Widget;
-
 
 pub struct Caption {
     text: FlashString,
@@ -9,9 +11,7 @@ pub struct Caption {
 
 impl Caption {
     pub fn new(text: FlashString) -> Self {
-        Self {
-            text,
-        }
+        Self { text }
     }
 
     pub fn set_caption(&mut self, text: FlashString) {
@@ -20,7 +20,7 @@ impl Caption {
 }
 
 impl Caption {
-    pub fn send_key(&mut self, _key: KeyCode) { 
+    pub fn send_key(&mut self, _key: KeyCode) {
         // ignore key
     }
 

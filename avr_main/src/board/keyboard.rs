@@ -2,16 +2,21 @@
 
 use arduino_hal::pac::AC;
 
-use crate::{board::lcd};
+use crate::board::lcd;
 
-use super::{shiftout::{write_shiftout, ShiftOutData}, shiftin::readShiftIn, output_expander::OutputExpander, input_expander::InputExpander};
+use super::{
+    input_expander::InputExpander,
+    output_expander::OutputExpander,
+    shiftin::readShiftIn,
+    shiftout::{write_shiftout, ShiftOutData},
+};
 
 use crate::microcontroler::delay::delay_ms;
 
 const ACTIVATED: bool = false; //low level
 const DEACTIVATE: bool = true; //true level
 
-// 
+//
 
 #[allow(non_camel_case_types)]
 #[derive(Copy, Clone, PartialEq)]
@@ -28,7 +33,7 @@ pub enum KeyCode {
     KEY_ESC = 0x1B,
 
     //edition keys
-    KEY_SETA_BRANCA_ESQUERDA = 0x20, 
+    KEY_SETA_BRANCA_ESQUERDA = 0x20,
     KEY_SETA_BRANCA_DIREITA = 0x21,
     KEY_MAIS_OU_MENOS = 0x2D,
 
@@ -71,10 +76,10 @@ pub enum KeyCode {
     KEY_DEL = 0x8E,
 
     //control key
-    KEY_CTRL = 0x8F,        //NOTE: Before use KEY_CTRL verify if it is implemented in hardware.
+    KEY_CTRL = 0x8F, //NOTE: Before use KEY_CTRL verify if it is implemented in hardware.
 
     //secret key
-    KEY_HIDDEN_KEY = 0x90,    
+    KEY_HIDDEN_KEY = 0x90,
 }
 
 impl KeyCode {
@@ -96,7 +101,7 @@ impl KeyCode {
 
     pub fn is_navigation(&self) -> bool {
         match self {
-            KeyCode::KEY_SETA_BRANCA_ESQUERDA => true, 
+            KeyCode::KEY_SETA_BRANCA_ESQUERDA => true,
             KeyCode::KEY_SETA_BRANCA_DIREITA => true,
             KeyCode::KEY_DIRECIONAL_PARA_CIMA => true,
             KeyCode::KEY_DIRECIONAL_PARA_BAIXO => true,
@@ -105,7 +110,6 @@ impl KeyCode {
             _ => false,
         }
     }
-    
 
     // if key is a numerical digit, return its numeric char
     pub fn as_numerical_char(&self) -> Option<char> {
@@ -124,12 +128,12 @@ impl KeyCode {
         }
     }
 
-    pub fn to_string(&self) -> &'static str{
+    pub fn to_string(&self) -> &'static str {
         match self {
             KeyCode::NO_KEY => "NO_KEY",
             KeyCode::KEY_ENTER => "KEY_ENTER",
             KeyCode::KEY_ESC => "KEY_ESC",
-            KeyCode::KEY_SETA_BRANCA_ESQUERDA => "KEY_SETA_BRANCA_ESQUERDA", 
+            KeyCode::KEY_SETA_BRANCA_ESQUERDA => "KEY_SETA_BRANCA_ESQUERDA",
             KeyCode::KEY_SETA_BRANCA_DIREITA => "KEY_SETA_BRANCA_DIREITA",
             KeyCode::KEY_MAIS_OU_MENOS => "KEY_MAIS_OU_MENOS",
             KeyCode::KEY_PONTO => "KEY_PONTO",
@@ -159,36 +163,67 @@ impl KeyCode {
             KeyCode::KEY_INS => "KEY_INS",
             KeyCode::KEY_DEL => "KEY_DEL",
             KeyCode::KEY_CTRL => "KEY_CTRL",
-            KeyCode::KEY_HIDDEN_KEY => "KEY_HIDDEN_KEY",    
+            KeyCode::KEY_HIDDEN_KEY => "KEY_HIDDEN_KEY",
         }
     }
 }
 
 //constants
 
-pub struct Keypad { 
+pub struct Keypad {
     output: OutputExpander,
     input: InputExpander,
     //last_keycode_read: KeyCode,
 }
 
-const KEYMAP: [[KeyCode;8];4] = [
-    [KeyCode::KEY_F1,  KeyCode::KEY_7,  KeyCode::KEY_8,  KeyCode::KEY_9,       KeyCode::KEY_EXECUCAO,               KeyCode::KEY_INS,                       KeyCode::KEY_ESC,                        KeyCode::KEY_HIDDEN_KEY],
-    [KeyCode::KEY_F2,  KeyCode::KEY_4,  KeyCode::KEY_5,  KeyCode::KEY_6,       KeyCode::KEY_MAIS_OU_MENOS,          KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA,  KeyCode::KEY_DIRECIONAL_PARA_CIMA,       KeyCode::KEY_START],
-    [KeyCode::KEY_F3,  KeyCode::KEY_1,  KeyCode::KEY_2,  KeyCode::KEY_3,       KeyCode::KEY_SETA_BRANCA_DIREITA,    KeyCode::KEY_DIRECIONAL_PARA_BAIXO,     KeyCode::KEY_DIRECIONAL_PARA_DIREITA,    KeyCode::KEY_MANUAL],
-    [KeyCode::KEY_F4,  KeyCode::KEY_0,  KeyCode::KEY_0,  KeyCode::KEY_ENTER,   KeyCode::KEY_SETA_BRANCA_ESQUERDA,   KeyCode::KEY_DEL,                       KeyCode::KEY_STOP,                       KeyCode::KEY_PROGRAMA],
+const KEYMAP: [[KeyCode; 8]; 4] = [
+    [
+        KeyCode::KEY_F1,
+        KeyCode::KEY_7,
+        KeyCode::KEY_8,
+        KeyCode::KEY_9,
+        KeyCode::KEY_EXECUCAO,
+        KeyCode::KEY_INS,
+        KeyCode::KEY_ESC,
+        KeyCode::KEY_HIDDEN_KEY,
+    ],
+    [
+        KeyCode::KEY_F2,
+        KeyCode::KEY_4,
+        KeyCode::KEY_5,
+        KeyCode::KEY_6,
+        KeyCode::KEY_MAIS_OU_MENOS,
+        KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA,
+        KeyCode::KEY_DIRECIONAL_PARA_CIMA,
+        KeyCode::KEY_START,
+    ],
+    [
+        KeyCode::KEY_F3,
+        KeyCode::KEY_1,
+        KeyCode::KEY_2,
+        KeyCode::KEY_3,
+        KeyCode::KEY_SETA_BRANCA_DIREITA,
+        KeyCode::KEY_DIRECIONAL_PARA_BAIXO,
+        KeyCode::KEY_DIRECIONAL_PARA_DIREITA,
+        KeyCode::KEY_MANUAL,
+    ],
+    [
+        KeyCode::KEY_F4,
+        KeyCode::KEY_0,
+        KeyCode::KEY_0,
+        KeyCode::KEY_ENTER,
+        KeyCode::KEY_SETA_BRANCA_ESQUERDA,
+        KeyCode::KEY_DEL,
+        KeyCode::KEY_STOP,
+        KeyCode::KEY_PROGRAMA,
+    ],
 ];
 
-
 impl Keypad {
-
     pub fn new() -> Self {
         let output = OutputExpander::new();
         let input = InputExpander::new();
-        Keypad { 
-            output,
-            input,
-        }
+        Keypad { output, input }
     }
 
     fn set_output(&mut self, n: u8, value: bool) -> () {
@@ -217,12 +252,12 @@ impl Keypad {
             5 => self.input.fetch().KBD_E6(),
             6 => self.input.fetch().KBD_E7(),
             7 => self.input.fetch().KBD_E8(),
-            _ => unreachable!(),            
+            _ => unreachable!(),
         }
     }
 
     pub fn scan(&mut self) -> KeyCode {
-        let mut key_code: KeyCode = KeyCode::NO_KEY;       
+        let mut key_code: KeyCode = KeyCode::NO_KEY;
         for collumn in 0..=7 {
             self.set_output(collumn, ACTIVATED);
             for row in 0..=3 {
@@ -232,18 +267,12 @@ impl Keypad {
                 }
             }
             self.set_output(collumn, DEACTIVATE);
-        };
+        }
         key_code
-  
     }
-
-
 }
 
-
-
 pub fn development_entry_point() -> ! {
-
     lcd::lcd_initialize();
     lcd::clear();
     lcd::print("Pressione qualquer tecla");
@@ -256,11 +285,4 @@ pub fn development_entry_point() -> ! {
         lcd::print_u8_in_hex(keycode as u8);
         delay_ms(100);
     }
-
 }
-
-
-
-
-
-

@@ -1,10 +1,14 @@
 use avr_progmem::progmem;
 
-use crate::{microcontroler::timer::now, menu::{flash::FlashString, point::Point, canvas::Canvas}, board::keyboard::KeyCode, utils::generic_string::GenericString};
+use crate::{
+    board::keyboard::KeyCode,
+    menu::{canvas::Canvas, flash::FlashString, point::Point},
+    microcontroler::timer::now,
+    utils::generic_string::GenericString,
+};
 
-use super::{widget::{Widget, IWidget}};
+use super::widget::{IWidget, Widget};
 use lib_1::utils::cursor::Cursor;
-
 
 progmem! {
     static progmem string TEXT0 = "Posijet Industria e Comercio Ltda.";
@@ -56,8 +60,6 @@ impl State {
     }
 }
 
-
-
 pub struct Splash<'a> {
     current_state: State,
     next_state_time_point: u64,
@@ -67,24 +69,23 @@ pub struct Splash<'a> {
 impl<'a> Splash<'a> {
     pub fn new(widget: Option<IWidget<'a>>) -> Self {
         let initial_state = State::Initial;
-        Self { 
+        Self {
             current_state: initial_state,
-            next_state_time_point: now() + Self::get_time_to_wait_in(initial_state), 
+            next_state_time_point: now() + Self::get_time_to_wait_in(initial_state),
             widget,
         }
     }
 
-    /// gets time interval (in miliseconds) to wait until reach next state 
+    /// gets time interval (in miliseconds) to wait until reach next state
     fn get_time_to_wait_in(current_state: State) -> u64 {
         match current_state {
             State::Initial => 0,
             State::BrandName => 2000,
             State::LoadingX => 2000,
             State::LoadingY => 2000,
-            State::End => 0, 
+            State::End => 0,
         }
     }
-
 }
 
 impl<'a> Widget for Splash<'a> {
@@ -112,17 +113,17 @@ impl<'a> Widget for Splash<'a> {
             // delegate
             if let Some(widget) = &mut self.widget {
                 (*widget).update()
-
-            }        
+            }
         }
-        
     }
 
     fn draw(&self, canvas: &mut Canvas) {
         canvas.clear();
         match self.current_state {
-            State::Initial => { },
-            State::BrandName => canvas.print_xy(Point::new(4, 0), GenericString::from_flash(&TEXT0)),
+            State::Initial => {}
+            State::BrandName => {
+                canvas.print_xy(Point::new(4, 0), GenericString::from_flash(&TEXT0))
+            }
             State::LoadingX => canvas.print_xy(Point::new(0, 1), GenericString::from_flash(&TEXT1)),
             State::LoadingY => canvas.print_xy(Point::new(0, 0), GenericString::from_flash(&TEXT2)),
             State::End => {
@@ -130,7 +131,7 @@ impl<'a> Widget for Splash<'a> {
                 if let Some(widget) = &self.widget {
                     (*widget).draw(canvas)
                 }
-            },
+            }
         }
     }
 }

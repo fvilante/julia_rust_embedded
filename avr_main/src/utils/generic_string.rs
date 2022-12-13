@@ -5,12 +5,10 @@ use heapless::String;
 
 use crate::menu::flash::{FlashString, FlashStringIterator};
 
-
 pub enum GenericString<'a> {
     FlashString(FlashString),
-    RamString(&'a str)
+    RamString(&'a str),
 }
-
 
 impl<'a> GenericString<'a> {
     pub fn from_flash<const N: usize>(string_flash_pointer: &'a PmString<N>) -> Self {
@@ -24,25 +22,18 @@ impl<'a> GenericString<'a> {
 
     pub fn iter(&self) -> WrapperIterator<'a> {
         match self {
-            Self::FlashString(flash) => {
-                WrapperIterator{
-                    flash: Some(flash.chars()),
-                    ram: None,
-                }
-                 
-            }
+            Self::FlashString(flash) => WrapperIterator {
+                flash: Some(flash.chars()),
+                ram: None,
+            },
 
-            Self::RamString(str) => {
-                WrapperIterator{
-                    flash: None,
-                    ram: Some(str.chars()),
-                }
-                
-            }
+            Self::RamString(str) => WrapperIterator {
+                flash: None,
+                ram: Some(str.chars()),
+            },
         }
     }
 }
-
 
 //Abstract different kind of generic string iterators
 pub struct WrapperIterator<'a> {
@@ -74,6 +65,3 @@ impl<'a> Iterator for WrapperIterator<'a> {
         }
     }
 }
-
-
-

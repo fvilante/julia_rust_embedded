@@ -1,12 +1,11 @@
-use crate::protocol::{frame::Frame, common::StartByte};
+use crate::protocol::{common::StartByte, frame::Frame};
 
 use super::transport_error::TransportError;
-use super::word_16::{Word16, BitMask16};
+use super::word_16::{BitMask16, Word16};
 
 use crate::protocol::transport::channel::Channel;
 
 type WordAddress = u8;
-
 
 #[repr(u8)]
 enum Direction {
@@ -16,64 +15,67 @@ enum Direction {
     ResetBitmask = 0x40,
 }
 
-
 pub enum CmppMessage {
-    GetWord{
-        waddr: WordAddress
+    GetWord {
+        waddr: WordAddress,
     },
-    SetWord{
+    SetWord {
         waddr: WordAddress,
         data: Word16,
     },
-    SetBitmask{
+    SetBitmask {
         waddr: WordAddress,
         bitmask: BitMask16,
     },
-    ResetBitmask{
+    ResetBitmask {
         waddr: WordAddress,
         bitmask: BitMask16,
     },
 }
 
-
-fn make_payload(channel: Channel, message: CmppMessage) -> Result<[u8; 4],TransportError> {
-
+fn make_payload(channel: Channel, message: CmppMessage) -> Result<[u8; 4], TransportError> {
     let [direction, waddr, byte_low, byte_high] = match message {
-        CmppMessage::GetWord { waddr } => {
-            [Direction::GetWord as u8, waddr, 0x00, 0x00]
-        }
+        CmppMessage::GetWord { waddr } => [Direction::GetWord as u8, waddr, 0x00, 0x00],
 
         CmppMessage::SetWord { waddr, data } => {
-            let Word16 { data_high, data_low } = data;
+            let Word16 {
+                data_high,
+                data_low,
+            } = data;
             [Direction::SetWord as u8, waddr, data_low, data_high]
         }
 
         CmppMessage::ResetBitmask { waddr, bitmask } => {
-            let Word16 { data_high, data_low } = Word16::from_bitmask(bitmask);
-            [Direction::ResetBitmask as u8,waddr, data_low, data_high]
+            let Word16 {
+                data_high,
+                data_low,
+            } = Word16::from_bitmask(bitmask);
+            [Direction::ResetBitmask as u8, waddr, data_low, data_high]
         }
 
         CmppMessage::SetBitmask { waddr, bitmask } => {
-            let Word16 { data_high, data_low } = Word16::from_bitmask(bitmask);
-            [Direction::SetBitmask as u8,waddr, data_low, data_high]
+            let Word16 {
+                data_high,
+                data_low,
+            } = Word16::from_bitmask(bitmask);
+            [Direction::SetBitmask as u8, waddr, data_low, data_high]
         }
     };
 
     channel
         .as_u8()
-        .map(|channel| [channel+direction, waddr, byte_low, byte_high])
+        .map(|channel| [channel + direction, waddr, byte_low, byte_high])
         .ok_or_else(|| TransportError::InvalidChannel(channel))
-
-
 }
 
 pub fn make_frame(channel: Channel, message: CmppMessage) -> Result<Frame<4>, TransportError> {
     let start_byte = StartByte::STX;
-    let payload = make_payload(channel,message);
-    payload.map(|payload| Frame{start_byte, payload} )
+    let payload = make_payload(channel, message);
+    payload.map(|payload| Frame {
+        start_byte,
+        payload,
+    })
 }
-
-
 
 #[cfg(test)]
 mod tests {
@@ -84,11 +86,16 @@ mod tests {
     fn it_create_get_word_frame() {
         let channel = Channel::new(0x01);
         let waddr = 0x50;
-        let expected = Frame{
+        let expected = Frame {
             start_byte: StartByte::STX,
-            payload: [channel.as_u8().unwrap()+Direction::GetWord as u8, waddr, 0x00, 0x00],
+            payload: [
+                channel.as_u8().unwrap() + Direction::GetWord as u8,
+                waddr,
+                0x00,
+                0x00,
+            ],
         };
-        let frame = make_frame(channel, CmppMessage::GetWord {waddr});
+        let frame = make_frame(channel, CmppMessage::GetWord { waddr });
         assert_eq!(expected, frame.unwrap());
     }
 }

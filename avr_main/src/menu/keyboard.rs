@@ -1,8 +1,7 @@
-use crate::microcontroler::delay::delay_ms;
-use crate::board::keyboard::Keypad;
-use crate::microcontroler::timer::now;
 use crate::board::keyboard::KeyCode;
-
+use crate::board::keyboard::Keypad;
+use crate::microcontroler::delay::delay_ms;
+use crate::microcontroler::timer::now;
 
 pub struct Debounce {
     pub debounce_time: u64,
@@ -35,7 +34,7 @@ impl Debounce {
                 return None;
             }
         } else {
-            // last key was some 
+            // last key was some
             let current_and_last_key_are_equal = self.last_key == current_key;
             let current_key_is_none = current_key == KeyCode::NO_KEY;
             if current_key_is_none {
@@ -47,7 +46,8 @@ impl Debounce {
             } else {
                 // last and current key are some
                 if current_and_last_key_are_equal {
-                    let has_debounce_time_been_passed = now() > (self.last_key_time + self.debounce_time);
+                    let has_debounce_time_been_passed =
+                        now() > (self.last_key_time + self.debounce_time);
                     if has_debounce_time_been_passed {
                         //TODO: PERFORM repetition code
                         self.last_key = current_key;
@@ -63,10 +63,8 @@ impl Debounce {
                     return None;
                 }
             }
-        
         }
     }
-
 }
 
 pub struct Keyboard {
@@ -94,10 +92,8 @@ impl Keyboard {
             (self.beep)(false);
             key
         };
-    
+
         let current_key = self.keypad.scan();
-        self.debouncer
-            .debounce_key(current_key)
-            .map(beep)
+        self.debouncer.debounce_key(current_key).map(beep)
     }
 }

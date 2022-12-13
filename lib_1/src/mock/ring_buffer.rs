@@ -1,4 +1,3 @@
-
 #[derive(Debug, PartialEq)]
 pub enum RingBufferError {
     BufferFull,
@@ -12,7 +11,7 @@ pub struct RingBuffer<T: Copy, const SIZE: usize> {
     is_full: bool,
 }
 
-impl<T: Copy,const SIZE: usize> RingBuffer<T,SIZE> {
+impl<T: Copy, const SIZE: usize> RingBuffer<T, SIZE> {
     pub const fn new(buffer: [T; SIZE]) -> Self {
         Self {
             buffer,
@@ -43,7 +42,7 @@ impl<T: Copy,const SIZE: usize> RingBuffer<T,SIZE> {
         self.is_full
     }
 
-    pub fn write(&mut self, data: T) -> Result<(),RingBufferError> {
+    pub fn write(&mut self, data: T) -> Result<(), RingBufferError> {
         // check if it is full
         if self.is_full() {
             return Err(RingBufferError::BufferFull);
@@ -58,10 +57,9 @@ impl<T: Copy,const SIZE: usize> RingBuffer<T,SIZE> {
             };
             return Ok(());
         }
-        
     }
 
-    pub fn read(&mut self) -> Result<T,RingBufferError>  {
+    pub fn read(&mut self) -> Result<T, RingBufferError> {
         // if buffer empty emit error
         if self.is_empty() {
             return Err(RingBufferError::BufferEmpty);
@@ -74,20 +72,15 @@ impl<T: Copy,const SIZE: usize> RingBuffer<T,SIZE> {
             return Ok(data);
         }
     }
-
-   
-   
-
 }
-
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn it_write_read_one_byte() {
-        let mut ring = RingBuffer::new([0x00;3]);
+        let mut ring = RingBuffer::new([0x00; 3]);
         // can write and read one byte
         let probe = 0x77;
         let expected = probe;
@@ -98,14 +91,14 @@ mod tests {
 
     #[test]
     fn it_signals_buffer_empty() {
-        let mut ring = RingBuffer::new([0x00;3]);
+        let mut ring = RingBuffer::new([0x00; 3]);
         let actual = ring.read().unwrap_err();
         assert_eq!(RingBufferError::BufferEmpty, actual)
     }
 
     #[test]
     fn it_signals_buffer_full() {
-        let mut ring = RingBuffer::new([0x00;3]);
+        let mut ring = RingBuffer::new([0x00; 3]);
         ring.write(0x01).unwrap();
         ring.write(0x02).unwrap();
         ring.write(0x03).unwrap();
@@ -115,7 +108,7 @@ mod tests {
 
     #[test]
     fn it_not_signals_buffer_full() {
-        let mut ring = RingBuffer::new([0x00;3]);
+        let mut ring = RingBuffer::new([0x00; 3]);
         ring.write(0x01).unwrap();
         ring.read().unwrap();
         ring.write(0x02).unwrap();
@@ -126,7 +119,7 @@ mod tests {
 
     #[test]
     fn it_clears_buffer_full_signal() {
-        let mut ring = RingBuffer::new([0x00;3]);
+        let mut ring = RingBuffer::new([0x00; 3]);
         ring.write(0x01).unwrap();
         ring.write(0x02).unwrap();
         ring.write(0x03).unwrap();
@@ -134,14 +127,14 @@ mod tests {
         ring.read().unwrap();
         let is_not_full = ring.write(0x05).unwrap();
         assert_eq!(RingBufferError::BufferFull, is_full);
-        assert_eq!((), is_not_full);      
+        assert_eq!((), is_not_full);
     }
 
     #[test]
     fn it_write_and_ready_dynamically() {
         // prepare
-        let mut ring = RingBuffer::new([0x00;3]);
-        let probe = [0,1,2,3,4,5,6];
+        let mut ring = RingBuffer::new([0x00; 3]);
+        let probe = [0, 1, 2, 3, 4, 5, 6];
         // act
         ring.write(probe[0]).unwrap();
         let a0 = ring.read().unwrap();
@@ -171,8 +164,5 @@ mod tests {
         assert_eq!(probe[5], a5);
         assert_eq!(RingBufferError::BufferEmpty, empty_again);
         assert_eq!(probe[6], a6);
-        
     }
-
-   
 }

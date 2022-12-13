@@ -1,6 +1,5 @@
-
-use core::panic::PanicInfo;
 use arduino_hal::delay_ms;
+use core::panic::PanicInfo;
 
 use crate::board::lcd;
 
@@ -10,7 +9,7 @@ use crate::board::lcd;
 fn panic(info: &PanicInfo) -> ! {
     lcd::lcd_initialize();
     lcd::clear();
-    
+
     let NO_MESSAGE1 = "NO_MESSAGE_1";
     let NO_MESSAGE2 = "NO_MESSAGE_2";
 
@@ -26,7 +25,7 @@ fn panic(info: &PanicInfo) -> ! {
     lcd::print("ERROR: ");
     lcd::print(error_message);
     delay_ms(2000); // Just a delay for the case of recurssive calls to `panic` (for example, inside panic function, try to unwrap a None value).
-    loop { }
+    loop {}
 }
 
 #[macro_export]

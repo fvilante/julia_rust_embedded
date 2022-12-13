@@ -1,7 +1,7 @@
-use crate::{types::serial_connection::SerialConnection};
-use super::ring_buffer::{RingBuffer};
+use super::ring_buffer::RingBuffer;
+use crate::types::serial_connection::SerialConnection;
 
-const BUFFER_SIZE: usize = 128 ;
+const BUFFER_SIZE: usize = 128;
 
 static mut BUFFER: RingBuffer<u8, BUFFER_SIZE> = RingBuffer::new([0x00 as u8; BUFFER_SIZE]);
 
@@ -11,23 +11,22 @@ pub struct MockedSerialConnection {
 
 impl SerialConnection for MockedSerialConnection {
     fn new(baud_rate: u32) -> Self {
-        Self {
-            baud_rate,
-        }
+        Self { baud_rate }
     }
 
     fn transmit(&self, byte: u8) {
-        unsafe { BUFFER.write(byte).unwrap(); };
+        unsafe {
+            BUFFER.write(byte).unwrap();
+        };
     }
 
-    fn ready_to_receive(&self ) -> bool {
+    fn ready_to_receive(&self) -> bool {
         unsafe { BUFFER.is_empty() == false }
     }
 
-    fn receive(&self ) -> u8 {
+    fn receive(&self) -> u8 {
         unsafe { BUFFER.read().unwrap() }
     }
-
 }
 
 pub fn add(left: u8, right: u8) -> u8 {
@@ -49,11 +48,11 @@ mod tests {
 
     fn it_writes_and_reads_a_bunch_of_bytes() {
         let serial = MockedSerialConnection::new(9600);
-        for i in 0..BUFFER_SIZE*2 {
+        for i in 0..BUFFER_SIZE * 2 {
             let probe: u8 = i.try_into().unwrap();
             serial.transmit(probe);
             let read = serial.receive();
             assert_eq!(read, probe);
-        };
+        }
     }
 }

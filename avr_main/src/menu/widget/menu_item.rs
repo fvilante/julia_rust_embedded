@@ -1,17 +1,31 @@
 use crate::{
     board::{keyboard::KeyCode, lcd},
-    menu::{canvas::Canvas, flash::FlashString, point::{Point, Point1d}, accessor::{Accessor}},
+    menu::{
+        accessor::Accessor,
+        canvas::Canvas,
+        flash::FlashString,
+        point::{Point, Point1d},
+    },
 };
 
-use super::{caption::Caption, field::{Field, FieldBuffer, FieldEnum}, widget::Editable, widget::Widget, sub_menu::{LcdLine, SubMenu}, optional::OptionsBuffer};
-use lib_1::utils::cursor::Cursor;
+use super::{
+    caption::Caption,
+    field::{Field, FieldBuffer, FieldEnum},
+    optional::OptionsBuffer,
+    sub_menu::{LcdLine, SubMenu},
+    widget::Editable,
+    widget::Widget,
+};
 use avr_progmem::string::PmString;
-use heapless::{String,Vec};
-use lib_1::{utils::common::convert_u16_to_string_decimal, arena::arena::{Arena, ArenaId}};
-use core::{str::FromStr, ops::Range, cell::Cell};
+use core::{cell::Cell, ops::Range, str::FromStr};
+use heapless::{String, Vec};
+use lib_1::utils::cursor::Cursor;
+use lib_1::{
+    arena::arena::{Arena, ArenaId},
+    utils::common::convert_u16_to_string_decimal,
+};
 
 // -----------------------------------
-
 
 pub struct NumericalParameterArgs {
     pub point1_: u8,
@@ -23,7 +37,6 @@ pub struct NumericalParameterArgs {
     pub valid_range: Range<u16>,
 }
 
-
 pub struct OptionalParameterArgs {
     pub point1_: u8,
     pub point2_: u8,
@@ -32,27 +45,31 @@ pub struct OptionalParameterArgs {
     pub options_list: OptionsBuffer,
 }
 
-
 pub enum MenuItemArgs {
     Numerical(NumericalParameterArgs),
-    Optional(OptionalParameterArgs)
+    Optional(OptionalParameterArgs),
 }
 
 // -----------------------------------
 
-pub struct MenuItem<'a> { 
-    point_a: Point1d, 
-    caption: Caption, 
-    point_b: Point1d, 
-    field: Field<'a>,   
+pub struct MenuItem<'a> {
+    point_a: Point1d,
+    caption: Caption,
+    point_b: Point1d,
+    field: Field<'a>,
     sub_menu: Option<&'a mut SubMenu<'a>>,
 }
-
 
 impl<'a> MenuItem<'a> {
     /// NOTE: client should put point1 and point2 in the same line
     /// point1 = position of caption, point2 = position of field
-    pub fn new(point_a: Point1d, text: FlashString, point_b: Point1d, field: Field<'a>, sub_menu: Option<&'a mut SubMenu<'a>>) -> Self {
+    pub fn new(
+        point_a: Point1d,
+        text: FlashString,
+        point_b: Point1d,
+        field: Field<'a>,
+        sub_menu: Option<&'a mut SubMenu<'a>>,
+    ) -> Self {
         Self {
             point_a,
             caption: Caption::new(text),
@@ -62,9 +79,7 @@ impl<'a> MenuItem<'a> {
         }
     }
 
-    pub fn from_numerical( 
-        args: &NumericalParameterArgs,
-    ) -> MenuItem<'a> {
+    pub fn from_numerical(args: &NumericalParameterArgs) -> MenuItem<'a> {
         match args {
             NumericalParameterArgs {
                 point1_,
@@ -89,9 +104,7 @@ impl<'a> MenuItem<'a> {
         }
     }
 
-    pub fn from_optional(
-        args: &OptionalParameterArgs,
-    ) -> MenuItem<'a> {
+    pub fn from_optional(args: &OptionalParameterArgs) -> MenuItem<'a> {
         match args {
             OptionalParameterArgs {
                 point1_,
@@ -104,7 +117,7 @@ impl<'a> MenuItem<'a> {
                 options_list_cloned.clone_from(options_list);
                 let point1 = Point1d::new(*point1_);
                 let point2 = Point1d::new(*point2_);
-                let field = Field::from_optional(options_list_cloned, unsafe { &mut *variable } );
+                let field = Field::from_optional(options_list_cloned, unsafe { &mut *variable });
                 let mut menu_item = Self::new(point1, *text, point2, field, None);
                 menu_item
             }
@@ -117,7 +130,6 @@ impl<'a> MenuItem<'a> {
             MenuItemArgs::Optional(args) => Self::from_optional(args),
         }
     }
-
 }
 
 impl MenuItem<'_> {
@@ -149,30 +161,30 @@ impl MenuItem<'_> {
     }
 }
 
-
-
 // =========================================================================
 // BELLOW CODE: EXAMPLE OF CODE FOR INSTANTIATE MENUITEMS FROM TEMPLATE STRINGS
 // example of template declaration content = "Posicao inicial     ${nnnnn} mm/s"
 // CODE BELOW IS NOT ACTIVE YET, IT IS HERE TO SUGGEST FUTURE IMPLEMENTATION (REMOVE IT IF CONSIDERED NOT NECESSARY)
-// NOTE: CODE BELOW WAS TESTED AND WORKS, BUT IS JUST A PROOF-OF-CONCEPT. 
+// NOTE: CODE BELOW WAS TESTED AND WORKS, BUT IS JUST A PROOF-OF-CONCEPT.
 
 pub enum MenuItemParsed {
-    PureCaption(String<40>), // [Caption]
+    PureCaption(String<40>),                                  // [Caption]
     CaptionWithOneField(String<40>, FieldBuffer, String<10>), // [1st_caption, field_type, last_caption]
 }
 
 pub fn parse_menu_item_constructor_string(declaration: FlashString) -> MenuItemParsed {
     // example of declaration content = "Posicao inicial     ${nnnnn} mm/s"
-    let s: String<40>  = declaration.to_string().unwrap_or(String::from_str("Error: Small container").unwrap());
+    let s: String<40> = declaration
+        .to_string()
+        .unwrap_or(String::from_str("Error: Small container").unwrap());
     let begin_token: &[_] = &['$', '{'];
     let end_token: &[_] = &['}'];
     match s.find(begin_token) {
-        Some(begin_index) =>  {
+        Some(begin_index) => {
             //1st caption ends in begin_index
-            let x = s.split_at(begin_index+begin_token.len());
+            let x = s.split_at(begin_index + begin_token.len());
             let first_caption_ = x.0;
-            let first_caption = &first_caption_[0..first_caption_.len()-begin_token.len()];
+            let first_caption = &first_caption_[0..first_caption_.len() - begin_token.len()];
             let remain = x.1;
             match remain.find(end_token) {
                 Some(end_index) => {
@@ -181,8 +193,8 @@ pub fn parse_menu_item_constructor_string(declaration: FlashString) -> MenuItemP
                     let last_caption_ = y.1;
                     let last_caption = &last_caption_[end_token.len()..last_caption_.len()];
                     MenuItemParsed::CaptionWithOneField(
-                        String::from_str(first_caption).unwrap(), 
-                        String::from_str(field_type).unwrap(), 
+                        String::from_str(first_caption).unwrap(),
+                        String::from_str(field_type).unwrap(),
                         String::from_str(last_caption).unwrap(),
                     )
                 }
@@ -201,4 +213,3 @@ pub fn parse_menu_item_constructor_string(declaration: FlashString) -> MenuItemP
         }
     }
 }
-

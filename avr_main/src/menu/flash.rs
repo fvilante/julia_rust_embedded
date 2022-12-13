@@ -1,5 +1,3 @@
-
-
 use core::str::FromStr;
 
 use alloc::borrow::ToOwned;
@@ -8,7 +6,7 @@ use avr_progmem::wrapper::ProgMem;
 use avr_progmem::string::PmString;
 use heapless::String;
 
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct FlashString {
     flash_ptr: *const u8,
     size_N: u8, // size in quantity of u8's
@@ -24,7 +22,10 @@ impl FlashString {
     }
 
     pub fn chars(self) -> FlashStringIterator {
-        FlashStringIterator { flash_string: (self), counter: (0) }
+        FlashStringIterator {
+            flash_string: (self),
+            counter: (0),
+        }
     }
 
     pub fn len(&self) -> usize {
@@ -41,8 +42,7 @@ impl FlashString {
             }
             return Some(s.to_owned());
         };
-        
-    } 
+    }
 }
 
 pub struct FlashStringIterator {
@@ -56,7 +56,9 @@ impl Iterator for FlashStringIterator {
     fn next(&mut self) -> Option<Self::Item> {
         let is_running = self.counter < self.flash_string.size_N;
         if is_running {
-            let byte = unsafe { ProgMem::new(self.flash_string.flash_ptr.add(self.counter as usize)).load() };
+            let byte = unsafe {
+                ProgMem::new(self.flash_string.flash_ptr.add(self.counter as usize)).load()
+            };
             self.counter += 1;
             Some(byte)
         } else {

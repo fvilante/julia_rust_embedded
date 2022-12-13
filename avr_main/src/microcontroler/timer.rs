@@ -16,7 +16,7 @@ use core::mem;
 //use panic_halt as _;
 
 struct InterruptState {
-    clock_counter: ClockCounter,       // increments on each tick of the clock
+    clock_counter: ClockCounter, // increments on each tick of the clock
 }
 
 static mut INTERRUPT_STATE: mem::MaybeUninit<InterruptState> = mem::MaybeUninit::uninit();
@@ -44,9 +44,7 @@ fn rig_timer(tmr1: &TC1) {
         CS1_A::PRESCALE_64 => 64,
         CS1_A::PRESCALE_256 => 256,
         CS1_A::PRESCALE_1024 => 1024,
-        CS1_A::NO_CLOCK | CS1_A::EXT_FALLING | CS1_A::EXT_RISING => {
-            1
-        }
+        CS1_A::NO_CLOCK | CS1_A::EXT_FALLING | CS1_A::EXT_RISING => 1,
     };
 
     let ticks = calc_overflow(ARDUINO_UNO_CLOCK_FREQUENCY_HZ, 1000, clock_divisor) as u16;
@@ -64,7 +62,6 @@ fn rig_timer(tmr1: &TC1) {
 }
 
 pub fn init_timer() -> () {
-
     fn set_initial_state(initial_state: InterruptState) -> () {
         unsafe {
             // SAFETY: Interrupts are not enabled at this point so we can safely write the global
@@ -73,7 +70,7 @@ pub fn init_timer() -> () {
             INTERRUPT_STATE = mem::MaybeUninit::new(initial_state);
             core::sync::atomic::compiler_fence(core::sync::atomic::Ordering::SeqCst);
         }
-    }   
+    }
 
     fn configure_timer() -> () {
         let dp = arduino_hal::Peripherals::take().unwrap();
@@ -93,9 +90,7 @@ pub fn init_timer() -> () {
     let clock_counter = ClockCounter::new();
 
     //Do all
-    set_initial_state(InterruptState {
-        clock_counter,
-    });
+    set_initial_state(InterruptState { clock_counter });
     configure_timer();
     enable_interrupts_globally();
 }
@@ -108,25 +103,22 @@ fn TIMER1_COMPA() {
         // initialized so this ISR will never run when LED is uninitialized.
         &mut *INTERRUPT_STATE.as_mut_ptr()
     };
-    
+
     state.clock_counter.increment();
 
     //lcd::clear();
     //lcd::print_u16_in_hex(state.clock_counter.read().try_into().unwrap());
-
 }
 
 //
 
 struct ClockCounter {
-    count: u64
+    count: u64,
 }
 
 impl ClockCounter {
     fn new() -> Self {
-        Self {
-            count: 0x00,
-        }
+        Self { count: 0x00 }
     }
 
     fn increment(&mut self) {
@@ -141,9 +133,7 @@ impl ClockCounter {
 // expected one tick every 1 milisec. NOTE: Period may change in future implementations.
 // this implemantation is to be considered an initial version.
 pub fn now() -> u64 {
-    let state = unsafe {
-        & *INTERRUPT_STATE.as_ptr()
-    };
+    let state = unsafe { &*INTERRUPT_STATE.as_ptr() };
 
     let value = state.clock_counter.read();
     value

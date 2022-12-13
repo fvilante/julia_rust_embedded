@@ -1,4 +1,3 @@
-
 pub enum AddressMask {
     ByteLow,
     ByteHigh,
@@ -18,7 +17,7 @@ pub enum AddressMask {
     Bit12,
     Bit13,
     Bit14,
-    Bit15, 
+    Bit15,
 }
 
 pub struct Address {
@@ -26,11 +25,10 @@ pub struct Address {
     address_mask: AddressMask,
 }
 
-
 pub enum Choice {
     OpenedClosed,
     OnOff,
-    ContinumPassToPass
+    ContinumPassToPass,
 }
 
 pub enum DataType {
@@ -41,17 +39,14 @@ pub enum DataType {
     Quantity,
     Choice(Choice),
     //
-    Pulses  // exemple: "Janela de protecao do giro"
+    Pulses, // exemple: "Janela de protecao do giro"
 }
 
-
-
-
-// represents a single cmpp parameter 
+// represents a single cmpp parameter
 pub struct Parameter {
     index: Index,
     address: Address,
-    data_type: DataType, 
+    data_type: DataType,
 }
 
 // Programa de Eixo
@@ -101,357 +96,313 @@ pub enum Index {
 
 const MAX_SIZE: usize = Index::LastElement as usize;
 
-pub const CASTING: [Parameter; MAX_SIZE ] = [
-    Parameter { 
-        index: Index::PosicaoInicial, 
+pub const CASTING: [Parameter; MAX_SIZE] = [
+    Parameter {
+        index: Index::PosicaoInicial,
         address: Address {
             word_address: 0x50,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Displacement,
     },
-
-    Parameter { 
-        index: Index::PosicaoFinal, 
+    Parameter {
+        index: Index::PosicaoFinal,
         address: Address {
             word_address: 0x51,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Displacement,
     },
-
-    Parameter { 
-        index: Index::AceleracaoDeAvanco, 
+    Parameter {
+        index: Index::AceleracaoDeAvanco,
         address: Address {
             word_address: 0x52,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Acceleration,
     },
-
-    Parameter { 
-        index: Index::AceleracaoDeRetorno, 
+    Parameter {
+        index: Index::AceleracaoDeRetorno,
         address: Address {
             word_address: 0x53,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Acceleration,
     },
-
-    Parameter { 
-        index: Index::VelocidadeDeAvanco, 
+    Parameter {
+        index: Index::VelocidadeDeAvanco,
         address: Address {
             word_address: 0x54,
             address_mask: AddressMask::Word,
         },
-        data_type:  DataType::Velocity,
+        data_type: DataType::Velocity,
     },
-
-    Parameter { 
-        index: Index::VelocidadeDeRetorno, 
+    Parameter {
+        index: Index::VelocidadeDeRetorno,
         address: Address {
             word_address: 0x55,
             address_mask: AddressMask::Word,
         },
-        data_type:  DataType::Velocity,
+        data_type: DataType::Velocity,
     },
-    
     //PARAMETROS DE IMPRESSAO
-
-    Parameter { 
-        index: Index::NumeroDeMensagensNoAvanco, 
+    Parameter {
+        index: Index::NumeroDeMensagensNoAvanco,
         address: Address {
             word_address: 0x56,
             address_mask: AddressMask::ByteHigh,
         },
         data_type: DataType::Quantity,
     },
-
-    Parameter { 
-        index: Index::NumeroDeMensagensNoRetorno, 
+    Parameter {
+        index: Index::NumeroDeMensagensNoRetorno,
         address: Address {
             word_address: 0x56,
             address_mask: AddressMask::ByteLow,
         },
         data_type: DataType::Quantity,
     },
-
-    Parameter { 
-        index: Index::PosicaoDaPrimeiraImpressaoNoAvanco, 
+    Parameter {
+        index: Index::PosicaoDaPrimeiraImpressaoNoAvanco,
         address: Address {
             word_address: 0x57,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Displacement,
     },
-
-    Parameter { 
-        index: Index::PosicaoDaPrimeiraImpressaoNoRetorno, 
+    Parameter {
+        index: Index::PosicaoDaPrimeiraImpressaoNoRetorno,
         address: Address {
             word_address: 0x58,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Displacement,
     },
-
-    Parameter { 
-        index: Index::PosicaoDaUltimaImpressaoNoAvanco, 
+    Parameter {
+        index: Index::PosicaoDaUltimaImpressaoNoAvanco,
         address: Address {
             word_address: 0x59,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Displacement,
     },
-
-    Parameter { 
-        index: Index::PosicaoDaUltimaImpressaoNoRetorno, 
+    Parameter {
+        index: Index::PosicaoDaUltimaImpressaoNoRetorno,
         address: Address {
             word_address: 0x5A,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Displacement,
     },
-
-    Parameter { 
-        index: Index::LogicaDeSinalDeReversao, 
+    Parameter {
+        index: Index::LogicaDeSinalDeReversao,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit9,
         },
         data_type: DataType::Quantity,
     },
-
     //PARAMETROS DA IMPRESSORA
-
-    Parameter { 
-        index: Index::LogicaDeSinalDeImpressao, 
+    Parameter {
+        index: Index::LogicaDeSinalDeImpressao,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit8,
         },
         data_type: DataType::Choice(Choice::OpenedClosed),
     },
-
-    Parameter { 
-        index: Index::LarguraDoSinalDeImpressao, 
+    Parameter {
+        index: Index::LarguraDoSinalDeImpressao,
         address: Address {
             word_address: 0x5B,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Duration,
     },
-
-    Parameter { 
-        index: Index::ReversaoDeMensagemViaSerial, 
+    Parameter {
+        index: Index::ReversaoDeMensagemViaSerial,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit11,
         },
         data_type: DataType::Choice(Choice::OnOff),
     },
-
-    Parameter { 
-        index: Index::SelecaoDeMensagemViaSerial, 
+    Parameter {
+        index: Index::SelecaoDeMensagemViaSerial,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit10,
         },
         data_type: DataType::Choice(Choice::OnOff),
     },
-
     //PARAMETROS DE CICLO
-
-    Parameter { 
-        index: Index::TempoParaStartAutomatico, 
+    Parameter {
+        index: Index::TempoParaStartAutomatico,
         address: Address {
             word_address: 0x5C,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Duration,
     },
-
-    Parameter { 
-        index: Index::TempoParaStartExterno, 
+    Parameter {
+        index: Index::TempoParaStartExterno,
         address: Address {
             word_address: 0x5D,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Duration,
     },
-
-    Parameter { 
-        index: Index::StartAutomaticoNoAvanco, 
+    Parameter {
+        index: Index::StartAutomaticoNoAvanco,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit0,
         },
         data_type: DataType::Choice(Choice::OnOff),
     },
-
-    Parameter { 
-        index: Index::StartAutomaticoNoRetorno, 
+    Parameter {
+        index: Index::StartAutomaticoNoRetorno,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit1,
         },
         data_type: DataType::Choice(Choice::OnOff),
     },
-
-    Parameter { 
-        index: Index::ModoContinuoPassoAPasso, 
+    Parameter {
+        index: Index::ModoContinuoPassoAPasso,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit15,
         },
         data_type: DataType::Choice(Choice::ContinumPassToPass),
     },
-
     //INTERTRAVAMENTO PARA DOIS EIXOS
-
-    Parameter { 
-        index: Index::AntecipacaoDaSaidaDeStart, 
+    Parameter {
+        index: Index::AntecipacaoDaSaidaDeStart,
         address: Address {
             word_address: 0x5E,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Displacement,
     },
-
-    Parameter { 
-        index: Index::SaidaDeStartNoAvanco, 
+    Parameter {
+        index: Index::SaidaDeStartNoAvanco,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit2,
         },
         data_type: DataType::Choice(Choice::OnOff),
     },
-
-    Parameter { 
-        index: Index::SaidaDeStartNoRetorno, 
+    Parameter {
+        index: Index::SaidaDeStartNoRetorno,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit3,
         },
         data_type: DataType::Choice(Choice::OnOff),
     },
-
-    Parameter { 
-        index: Index::EntradaDeStartEntreEixos, 
+    Parameter {
+        index: Index::EntradaDeStartEntreEixos,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit6,
         },
         data_type: DataType::Choice(Choice::OnOff),
     },
-
-    Parameter { 
-        index: Index::ReferenciaPeloStartExterno, 
+    Parameter {
+        index: Index::ReferenciaPeloStartExterno,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit7,
         },
         data_type: DataType::Choice(Choice::OnOff),
     },
-
     // CONFIGURACAO DE EIXO
 
     //
     //Numero do Canal
     //
-
-    Parameter { 
-        index: Index::NumeroDePulsosPorGiroDoMotor, 
+    Parameter {
+        index: Index::NumeroDePulsosPorGiroDoMotor,
         address: Address {
             word_address: 0x62,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Displacement, // better than Quantity?
     },
-
-    Parameter { 
-        index: Index::JanelaDeProtecaoParaOGiro, 
+    Parameter {
+        index: Index::JanelaDeProtecaoParaOGiro,
         address: Address {
             word_address: 0x61,
             address_mask: AddressMask::Word,
         },
-        data_type:  DataType::Pulses, // better than Quantity?
+        data_type: DataType::Pulses, // better than Quantity?
     },
-
     //
-    //Deslocamento/Giro do Motor 
+    //Deslocamento/Giro do Motor
     //
-
-    Parameter { 
-        index: Index::GiroComFuncaoDeProtecao, 
+    Parameter {
+        index: Index::GiroComFuncaoDeProtecao,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit2,
         },
         data_type: DataType::Choice(Choice::OnOff),
     },
-
-    Parameter { 
-        index: Index::GiroComFuncaoDeCorrecao, 
+    Parameter {
+        index: Index::GiroComFuncaoDeCorrecao,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit13,
         },
         data_type: DataType::Choice(Choice::OnOff),
     },
-
-    Parameter { 
-        index: Index::LogicaDeStartExterno, 
+    Parameter {
+        index: Index::LogicaDeStartExterno,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit5,
         },
         data_type: DataType::Choice(Choice::OpenedClosed),
     },
-
-    Parameter { 
-        index: Index::ValorDaPosicaoDeReferencia, 
+    Parameter {
+        index: Index::ValorDaPosicaoDeReferencia,
         address: Address {
             word_address: 0x63,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Displacement, // better than Quantity?
     },
-
-    Parameter { 
-        index: Index::VelocidadeDeReferencia, 
+    Parameter {
+        index: Index::VelocidadeDeReferencia,
         address: Address {
             word_address: 0x65,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Velocity, // better than Quantity?
     },
-
-    Parameter { 
-        index: Index::AceleracaoDeReferencia, 
+    Parameter {
+        index: Index::AceleracaoDeReferencia,
         address: Address {
             word_address: 0x64,
             address_mask: AddressMask::Word,
         },
         data_type: DataType::Acceleration, // better than Quantity?
     },
-
-    Parameter { 
-        index: Index::ReducaoDaCorrenteDeRepouso, 
+    Parameter {
+        index: Index::ReducaoDaCorrenteDeRepouso,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit14,
         },
         data_type: DataType::Choice(Choice::OnOff),
     },
-
-    Parameter { 
-        index: Index::EntradaDeStartExterno, 
+    Parameter {
+        index: Index::EntradaDeStartExterno,
         address: Address {
             word_address: 0x60,
             address_mask: AddressMask::Bit4,
         },
         data_type: DataType::Choice(Choice::OnOff),
     },
-
 ];
-

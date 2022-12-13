@@ -1,34 +1,40 @@
-
-use crate::types::serial_connection::SerialConnection;
-use super::{encoder::Encoder, decoder::{Decoder, SegmentError}};
 use super::frame::Frame;
+use super::{
+    decoder::{Decoder, SegmentError},
+    encoder::Encoder,
+};
+use crate::types::serial_connection::SerialConnection;
 
-pub type DelayFn = fn(u64) -> () ;
+pub type DelayFn = fn(u64) -> ();
 
 #[derive(Debug)]
 pub enum DatalinkError {
     SegmentError(SegmentError),
-    ReceptionTimeout{elapsed_time: u64},
+    ReceptionTimeout { elapsed_time: u64 },
 }
 
 #[derive(Debug, PartialEq)]
 pub struct DatalinkResult {
     pub frame: Frame<4>,
-    pub response_time_us: u64 // microseconds (aprox)
+    pub response_time_us: u64, // microseconds (aprox)
 }
 
-fn send(frame: Frame<4>, connection: &impl SerialConnection)  {
+fn send(frame: Frame<4>, connection: &impl SerialConnection) {
     let encoder = Encoder::new(frame);
     // transmit
     for byte in encoder {
         connection.transmit(byte);
-    } 
+    }
 }
 
-fn receive(connection: impl SerialConnection, timeout_us: u64, delay_us: DelayFn) -> Result<DatalinkResult, DatalinkError> {
+fn receive(
+    connection: impl SerialConnection,
+    timeout_us: u64,
+    delay_us: DelayFn,
+) -> Result<DatalinkResult, DatalinkError> {
     let mut decoder = Decoder::new();
     let mut elapsed_time: u64 = 0x00; // microseconds counter
-    
+
     //receive
     loop {
         if connection.ready_to_receive() {
@@ -38,7 +44,10 @@ fn receive(connection: impl SerialConnection, timeout_us: u64, delay_us: DelayFn
                 Ok(data) => {
                     match data {
                         Some(frame) => {
-                            return Ok(DatalinkResult{frame, response_time_us: elapsed_time});
+                            return Ok(DatalinkResult {
+                                frame,
+                                response_time_us: elapsed_time,
+                            });
                         }
 
                         None => {
@@ -51,7 +60,6 @@ fn receive(connection: impl SerialConnection, timeout_us: u64, delay_us: DelayFn
                     return Err(DatalinkError::SegmentError(e));
                 }
             }
-            
         }
         // check for timeout
         delay_us(1);
@@ -59,21 +67,25 @@ fn receive(connection: impl SerialConnection, timeout_us: u64, delay_us: DelayFn
         if elapsed_time > timeout_us {
             return Err(DatalinkError::ReceptionTimeout { elapsed_time });
         }
-
     }
 }
 
-
-pub fn transact(frame: Frame<4>, connection: impl SerialConnection, timeout_us: u64, delay_us: DelayFn) -> Result<DatalinkResult, DatalinkError> {
+pub fn transact(
+    frame: Frame<4>,
+    connection: impl SerialConnection,
+    timeout_us: u64,
+    delay_us: DelayFn,
+) -> Result<DatalinkResult, DatalinkError> {
     send(frame, &connection);
     receive(connection, timeout_us, delay_us)
 }
 
-
-
 #[cfg(test)]
 mod tests {
-    use crate::{mock::serial_connection_mock::MockedSerialConnection, protocol::common::StartByte, types::delay::delay_us};
+    use crate::{
+        mock::serial_connection_mock::MockedSerialConnection, protocol::common::StartByte,
+        types::delay::delay_us,
+    };
 
     use super::*;
 
@@ -81,17 +93,21 @@ mod tests {
     fn it_transact_one_frame() {
         // prepare
         let start_byte = StartByte::STX;
-        let payload = [1,2,3,4];
+        let payload = [1, 2, 3, 4];
         let timeout_us: u64 = 500;
-        let frame = Frame { start_byte, payload };
+        let frame = Frame {
+            start_byte,
+            payload,
+        };
         let connection = MockedSerialConnection::new(9600);
-        let expected = DatalinkResult{frame, response_time_us: 0x00};
+        let expected = DatalinkResult {
+            frame,
+            response_time_us: 0x00,
+        };
         // act
         let actual = transact(frame, connection, timeout_us, delay_us).unwrap();
         // check
         assert_eq!(expected.frame, actual.frame);
         assert_eq!(true, actual.response_time_us < timeout_us)
     }
-
 }
-

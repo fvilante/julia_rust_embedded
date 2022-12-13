@@ -1,9 +1,15 @@
 use avr_progmem::progmem;
 
-use crate::{board::keyboard::KeyCode, menu::{point::Point, flash::FlashString, canvas::Canvas}};
+use crate::{
+    board::keyboard::KeyCode,
+    menu::{canvas::Canvas, flash::FlashString, point::Point},
+};
 
-use super::{widget::{Widget, IWidget}, manual_mode::{ManualModeMenu, ManualModeState}, execucao::MenuExecucao};
-
+use super::{
+    execucao::MenuExecucao,
+    manual_mode::{ManualModeMenu, ManualModeState},
+    widget::{IWidget, Widget},
+};
 
 progmem! {
     //                             1234567890123456789012345678901234567890
@@ -19,7 +25,6 @@ pub enum State {
     PROGRAMA,
 }
 
-
 pub struct MainMenu {
     current_state: State,
     menu_manual: ManualModeMenu,
@@ -28,7 +33,6 @@ pub struct MainMenu {
 }
 
 impl MainMenu {
-
     pub fn new(menu_manual: ManualModeMenu, menu_execucao: MenuExecucao) -> Self {
         Self {
             current_state: State::MAIN_MENU,
@@ -44,36 +48,29 @@ impl MainMenu {
             let col0 = ((40 - line0.len()) / 2).try_into().unwrap_or(0);
             let col1 = ((40 - line1.len()) / 2).try_into().unwrap_or(0);
             if line_number == 0 {
-                (Point::new(col0,0), line0)
+                (Point::new(col0, 0), line0)
             } else {
-                (Point::new(col1,1), line1)
+                (Point::new(col1, 1), line1)
             }
         }
 
-
         canvas.clear();
         for line_number in 0..2 {
-            let ( point, flash_string ) = get_line_helper(line_number);
+            let (point, flash_string) = get_line_helper(line_number);
             canvas.set_cursor(point);
             canvas.print_flash_str(flash_string);
         }
     }
-
-    
 }
 
 impl Widget for MainMenu {
-    
     fn send_key(&mut self, key: KeyCode) {
-
         match self.current_state {
-            State::MAIN_MENU => {
-                match key {
-                    KeyCode::KEY_MANUAL => self.current_state = State::MANUAL,
-                    KeyCode::KEY_EXECUCAO => self.current_state = State::EXECUCAO,
-                    KeyCode::KEY_PROGRAMA => self.current_state = State::PROGRAMA,
-                    _ => { }
-                }
+            State::MAIN_MENU => match key {
+                KeyCode::KEY_MANUAL => self.current_state = State::MANUAL,
+                KeyCode::KEY_EXECUCAO => self.current_state = State::EXECUCAO,
+                KeyCode::KEY_PROGRAMA => self.current_state = State::PROGRAMA,
+                _ => {}
             },
             State::MANUAL => self.menu_manual.send_key(key),
             State::EXECUCAO => {
@@ -82,34 +79,32 @@ impl Widget for MainMenu {
                 } else {
                     // do nothing
                 }
-            },
+            }
             State::PROGRAMA => todo!(),
         }
     }
 
     fn update(&mut self) {
         match self.current_state {
-            State::MAIN_MENU => { },
-            State::MANUAL => { 
+            State::MAIN_MENU => {}
+            State::MANUAL => {
                 if self.menu_manual.current_state == ManualModeState::Resting {
                     self.menu_manual.current_state = ManualModeState::FirstScreen;
                     self.current_state = State::MAIN_MENU
                 } else {
                     self.menu_manual.update()
                 }
-            },
-            State::EXECUCAO => {
-                self.menu_execucao.update()
-            },
+            }
+            State::EXECUCAO => self.menu_execucao.update(),
             State::PROGRAMA => todo!(),
         }
     }
 
     fn draw(&self, canvas: &mut Canvas) {
         match self.current_state {
-            State::MAIN_MENU => { self.draw_main_menu(canvas) },
-            State::MANUAL => { self.menu_manual.draw(canvas)},
-            State::EXECUCAO => { self.menu_execucao.draw(canvas) },
+            State::MAIN_MENU => self.draw_main_menu(canvas),
+            State::MANUAL => self.menu_manual.draw(canvas),
+            State::EXECUCAO => self.menu_execucao.draw(canvas),
             State::PROGRAMA => todo!(),
         }
     }

@@ -1,22 +1,20 @@
 extern crate alloc;
 use alloc::boxed::Box;
 
-pub struct Reader<'a,A> {
-    f: Box<dyn FnMut(A) -> () + 'a>
+pub struct Reader<'a, A> {
+    f: Box<dyn FnMut(A) -> () + 'a>,
 }
 
-impl<'a,A> Reader<'a, A> {
+impl<'a, A> Reader<'a, A> {
     pub fn new(f: impl FnMut(A) -> () + 'a) -> Self {
-        Self {
-            f: Box::new(f),
-        }
+        Self { f: Box::new(f) }
     }
 
     pub fn unwrap(&mut self, data: A) -> () {
         (self.f)(data)
     }
 
-    pub fn contra_map<A0>(&mut self, mut f: impl FnMut(A0) -> A + 'a ) -> Reader<A0> {
+    pub fn contra_map<A0>(&mut self, mut f: impl FnMut(A0) -> A + 'a) -> Reader<A0> {
         let g = move |a0: A0| {
             let a = f(a0);
             self.unwrap(a);
@@ -24,9 +22,6 @@ impl<'a,A> Reader<'a, A> {
         Reader::new(g)
     }
 }
-
-
-        
 
 #[cfg(test)]
 mod tests {
@@ -42,8 +37,7 @@ mod tests {
         let mut r1 = r0.contra_map(|u: i32| u.try_into().unwrap_or(66_u8));
         r1.unwrap(10);
         unsafe {
-            assert_eq!(STATE, 22_u8); 
+            assert_eq!(STATE, 22_u8);
         }
-        
     }
 }

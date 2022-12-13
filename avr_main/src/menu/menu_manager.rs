@@ -1,18 +1,19 @@
+use super::{
+    canvas::Canvas,
+    widget::{
+        splash::Splash,
+        widget::{IWidget, Widget, WidgetHelper},
+    },
+};
 use crate::board::keyboard::KeyCode;
-use super::{widget::{splash::Splash, widget::{Widget, WidgetHelper, IWidget}}, canvas::Canvas};
 
 pub struct MenuManager<'a> {
-    root_widget: Option<IWidget<'a>>, 
+    root_widget: Option<IWidget<'a>>,
 }
-
-
-
 
 impl<'a> MenuManager<'a> {
     pub fn new(root_widget: Option<IWidget<'a>>) -> Self {
-        Self {
-            root_widget,
-        }
+        Self { root_widget }
     }
 }
 

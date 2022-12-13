@@ -5,8 +5,8 @@
 #![feature(const_refs_to_cell)]
 #![allow(warnings)] // TODO: remove this on future
 
-//  Memory allocation for embbeded systems 
-//  For more see: 
+//  Memory allocation for embbeded systems
+//  For more see:
 //      https://docs.rust-embedded.org/book/collections/
 //      https://docs.rs/alloc-shim/latest/alloc/
 #[cfg(all(feature = "alloc", not(feature = "std")))]
@@ -15,22 +15,18 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std as alloc;
 
-
-pub mod protocol;
-pub mod types;
-pub mod mock;
-pub mod utils;
 pub mod adt;
 pub mod arena;
+pub mod mock;
+pub mod protocol;
+pub mod types;
+pub mod utils;
 //pub mod alloc;
 
-
 #[allow(unused_imports)]
-
 #[cfg(test)]
 mod tests {
 
-   
     use super::*;
 
     #[test]

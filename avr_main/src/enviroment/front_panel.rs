@@ -1,15 +1,15 @@
-use crate::{board::output_expander::{OutputExpander, self}, microcontroler::delay::delay_ms};
+use crate::{
+    board::output_expander::{self, OutputExpander},
+    microcontroler::delay::delay_ms,
+};
 
 pub struct FrontPanel<'a> {
-    output_expander: &'a mut OutputExpander
+    output_expander: &'a mut OutputExpander,
 }
 
 impl<'a> FrontPanel<'a> {
-
     pub fn new(output_expander: &'a mut OutputExpander) -> Self {
-        Self {
-            output_expander,
-        }
+        Self { output_expander }
     }
 
     pub fn all(&mut self, on: bool) -> &mut Self {
@@ -18,7 +18,7 @@ impl<'a> FrontPanel<'a> {
         self.LED_MANUAL(on);
         self.LED_EXECUCAO(on);
         self.LED_PROGRAMA(on);
-        self.BUZZER(on);        
+        self.BUZZER(on);
         self
     }
 
@@ -74,21 +74,12 @@ impl<'a> FrontPanel<'a> {
         self.output_expander.BUZZER(false).commit();
         self
     }
-
 }
 
-
 pub fn development_entry_point() -> ! {
-
     let mut output_expander = OutputExpander::new();
-    
-    FrontPanel
-        ::new(&mut output_expander)
-        .reset()
-        .auto_test();
-        
 
-    loop { }
+    FrontPanel::new(&mut output_expander).reset().auto_test();
 
-
+    loop {}
 }

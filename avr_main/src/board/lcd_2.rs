@@ -2,13 +2,12 @@
 
 use crate::board::lcd;
 
-
-pub struct Lcd { }
+pub struct Lcd {}
 
 impl Lcd {
     pub fn new() -> Self {
         lcd::lcd_initialize();
-        Lcd{ }
+        Lcd {}
     }
 
     pub fn setCursor(&self, col: u8, row: u8) -> &Self {
@@ -30,32 +29,20 @@ impl Lcd {
         lcd::print_char(c);
         self
     }
-
-
-    
 }
-
 
 // ------------------------------------------
 // Examples
 
-
 pub fn development_entry_point() -> ! {
-
     let lcd = Lcd::new();
     let mut i = 0;
-    lcd
-        .print("Contando")
-        .print(" de 0 ate -")
-        .print_char('>');
+    lcd.print("Contando").print(" de 0 ate -").print_char('>');
 
     lcd.print(" ");
-       
+
     loop {
-        lcd
-            .setCursor(2,1)
-            .print_u8_in_hex(i);
+        lcd.setCursor(2, 1).print_u8_in_hex(i);
         i = i + 1;
     }
-
 }

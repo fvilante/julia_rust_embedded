@@ -1,18 +1,14 @@
 // Julia printed circuit board
 
+use ruduino::cores::atmega328p::port;
 use ruduino::Pin;
-use ruduino::cores::atmega328p::{port};
 
-use crate::microcontroler:: {
-    eeprom::read_eeprom,
-    eeprom::write_eeprom,
-    delay::delay_ms,
-};
+use crate::microcontroler::{delay::delay_ms, eeprom::read_eeprom, eeprom::write_eeprom};
 
 // -------------------------------------------------------------------------------------------------------
 
-const LED_ON:bool = true;
-const LED_OFF:bool = false;
+const LED_ON: bool = true;
+const LED_OFF: bool = false;
 
 //static mut led3_state: bool = true; //current led state
 
@@ -28,7 +24,6 @@ pub fn set_led3(state: bool) -> () {
 }
 
 pub fn blink_led3(on_interval_ms: u64, off_interval_ms: u64, repeat: Option<u64>) -> () {
-    
     let blink_once = |on_interval_ms: u64, off_interval_ms: u64| {
         set_led3(LED_ON);
         delay_ms(on_interval_ms);
@@ -40,22 +35,22 @@ pub fn blink_led3(on_interval_ms: u64, off_interval_ms: u64, repeat: Option<u64>
         Some(n) => {
             for _ in 0..n {
                 blink_once(on_interval_ms, off_interval_ms);
-            };
+            }
         }
         None => {
             loop {
                 blink_once(on_interval_ms, off_interval_ms);
-            };
+            }
         }
-    }   
+    }
 }
 
 //FUNCTION NOT WORKING! PROBLEM A PROBLEM IN THE ITS GLOBAL STATE
 /*
 pub fn toogle_led3() -> () {
     let mut new_value:bool;
-    unsafe{ 
-        led3_state = !led3_state; 
+    unsafe{
+        led3_state = !led3_state;
         new_value = led3_state;
     };
     set_led3(new_value)
@@ -88,15 +83,17 @@ fn test_eeprom() -> bool {
 
 // ATTENTION: This routine erases EEPROM data
 pub fn hard_test_eeprom() -> () {
-    fn blink_led_fast() -> () { blink_led3(100, 100, None) }
-    fn blink_led_slow() -> () { blink_led3(1000, 1000, None) }
+    fn blink_led_fast() -> () {
+        blink_led3(100, 100, None)
+    }
+    fn blink_led_slow() -> () {
+        blink_led3(1000, 1000, None)
+    }
     if test_eeprom() {
         blink_led_fast()
     } else {
         blink_led_slow()
     }
 }
-
-
 
 // -------------------------------------------------------------------------------------------------------

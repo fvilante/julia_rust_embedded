@@ -5,25 +5,21 @@
 
 use lib_1::utils::common::get_bit_at_as_bool;
 
-use super::shiftin::{ShiftInData, self, readShiftIn};
+use super::shiftin::{self, readShiftIn, ShiftInData};
 
-use crate::board::lcd::{
-    lcd_initialize,
-    print_u8_in_hex,
-};
+use crate::board::lcd::{lcd_initialize, print_u8_in_hex};
 
 // Represents each of the three CD4021 Integrated Circuit present on the board
 enum ShiftRegister {
-    IC0,  // Board descriptor: U109 
-    IC1,  // Board descriptor: U102
-    IC2   // Board descriptor: U106
+    IC0, // Board descriptor: U109
+    IC1, // Board descriptor: U102
+    IC2, // Board descriptor: U106
 }
 
-
 enum Bit {
-    D0,     // bit 0 of a byte
-    D1,     // bit 1 of a byte
-    D2,     // etc...
+    D0, // bit 0 of a byte
+    D1, // bit 1 of a byte
+    D2, // etc...
     D3,
     D4,
     D5,
@@ -64,34 +60,32 @@ enum InputExpanderSignalRequest {
 
 fn get_adddress(signal: InputExpanderSignalRequest) -> Address {
     match signal {
-        InputExpanderSignalRequest::START                   => Address(ShiftRegister::IC0, Bit::D0),
-        InputExpanderSignalRequest::FC_MAIS_1               => Address(ShiftRegister::IC0, Bit::D1),
-        InputExpanderSignalRequest::FC_MAIS_2               => Address(ShiftRegister::IC0, Bit::D2),
-        InputExpanderSignalRequest::ENTRADA_START_OUTRO     => Address(ShiftRegister::IC0, Bit::D3),
-        InputExpanderSignalRequest::EMERG                   => Address(ShiftRegister::IC0, Bit::D4),
-        InputExpanderSignalRequest::BUSY                    => Address(ShiftRegister::IC0, Bit::D5),
-        InputExpanderSignalRequest::FC_MENOS_2              => Address(ShiftRegister::IC0, Bit::D6),
-        InputExpanderSignalRequest::FC_MENOS_1              => Address(ShiftRegister::IC0, Bit::D7),
-        InputExpanderSignalRequest::KBD_E1                  => Address(ShiftRegister::IC1, Bit::D0),
-        InputExpanderSignalRequest::KBD_E2                  => Address(ShiftRegister::IC1, Bit::D1),
-        InputExpanderSignalRequest::KBD_E3                  => Address(ShiftRegister::IC1, Bit::D2),
-        InputExpanderSignalRequest::KBD_E4                  => Address(ShiftRegister::IC1, Bit::D3),
-        InputExpanderSignalRequest::KBD_E5                  => Address(ShiftRegister::IC1, Bit::D4),
-        InputExpanderSignalRequest::KBD_E6                  => Address(ShiftRegister::IC1, Bit::D5),
-        InputExpanderSignalRequest::KBD_E7                  => Address(ShiftRegister::IC1, Bit::D6),
-        InputExpanderSignalRequest::KBD_E8                  => Address(ShiftRegister::IC1, Bit::D7),
-        InputExpanderSignalRequest::REF_1                   => Address(ShiftRegister::IC2, Bit::D0),
-        InputExpanderSignalRequest::REF_2                   => Address(ShiftRegister::IC2, Bit::D1),
-        InputExpanderSignalRequest::ENTRADA_VAGO1           => Address(ShiftRegister::IC2, Bit::D2),
-        InputExpanderSignalRequest::ENTRADA_VAGO2           => Address(ShiftRegister::IC2, Bit::D3),
-        InputExpanderSignalRequest::INPUT_BUS20             => Address(ShiftRegister::IC2, Bit::D4),
-        InputExpanderSignalRequest::INPUT_BUS21             => Address(ShiftRegister::IC2, Bit::D5),
-        InputExpanderSignalRequest::INPUT_BUS22             => Address(ShiftRegister::IC2, Bit::D6),
-        InputExpanderSignalRequest::INPUT_BUS23             => Address(ShiftRegister::IC2, Bit::D7),
+        InputExpanderSignalRequest::START => Address(ShiftRegister::IC0, Bit::D0),
+        InputExpanderSignalRequest::FC_MAIS_1 => Address(ShiftRegister::IC0, Bit::D1),
+        InputExpanderSignalRequest::FC_MAIS_2 => Address(ShiftRegister::IC0, Bit::D2),
+        InputExpanderSignalRequest::ENTRADA_START_OUTRO => Address(ShiftRegister::IC0, Bit::D3),
+        InputExpanderSignalRequest::EMERG => Address(ShiftRegister::IC0, Bit::D4),
+        InputExpanderSignalRequest::BUSY => Address(ShiftRegister::IC0, Bit::D5),
+        InputExpanderSignalRequest::FC_MENOS_2 => Address(ShiftRegister::IC0, Bit::D6),
+        InputExpanderSignalRequest::FC_MENOS_1 => Address(ShiftRegister::IC0, Bit::D7),
+        InputExpanderSignalRequest::KBD_E1 => Address(ShiftRegister::IC1, Bit::D0),
+        InputExpanderSignalRequest::KBD_E2 => Address(ShiftRegister::IC1, Bit::D1),
+        InputExpanderSignalRequest::KBD_E3 => Address(ShiftRegister::IC1, Bit::D2),
+        InputExpanderSignalRequest::KBD_E4 => Address(ShiftRegister::IC1, Bit::D3),
+        InputExpanderSignalRequest::KBD_E5 => Address(ShiftRegister::IC1, Bit::D4),
+        InputExpanderSignalRequest::KBD_E6 => Address(ShiftRegister::IC1, Bit::D5),
+        InputExpanderSignalRequest::KBD_E7 => Address(ShiftRegister::IC1, Bit::D6),
+        InputExpanderSignalRequest::KBD_E8 => Address(ShiftRegister::IC1, Bit::D7),
+        InputExpanderSignalRequest::REF_1 => Address(ShiftRegister::IC2, Bit::D0),
+        InputExpanderSignalRequest::REF_2 => Address(ShiftRegister::IC2, Bit::D1),
+        InputExpanderSignalRequest::ENTRADA_VAGO1 => Address(ShiftRegister::IC2, Bit::D2),
+        InputExpanderSignalRequest::ENTRADA_VAGO2 => Address(ShiftRegister::IC2, Bit::D3),
+        InputExpanderSignalRequest::INPUT_BUS20 => Address(ShiftRegister::IC2, Bit::D4),
+        InputExpanderSignalRequest::INPUT_BUS21 => Address(ShiftRegister::IC2, Bit::D5),
+        InputExpanderSignalRequest::INPUT_BUS22 => Address(ShiftRegister::IC2, Bit::D6),
+        InputExpanderSignalRequest::INPUT_BUS23 => Address(ShiftRegister::IC2, Bit::D7),
     }
 }
-
-
 
 pub struct InputExpander {
     cache: ShiftInData,
@@ -99,7 +93,6 @@ pub struct InputExpander {
 }
 
 impl InputExpander {
-
     pub fn new() -> Self {
         Self {
             cache: ShiftInData {
@@ -139,8 +132,7 @@ impl InputExpander {
         bit
     }
 
-
-    // Public api 
+    // Public api
 
     pub fn START(&mut self) -> bool {
         self.get_signal__(InputExpanderSignalRequest::START)
@@ -214,21 +206,19 @@ impl InputExpander {
     pub fn INPUT_BUS23(&mut self) -> bool {
         self.get_signal__(InputExpanderSignalRequest::INPUT_BUS23)
     }
-} 
-
+}
 
 //
 
 pub fn development_entry_point() -> ! {
-
     let mut input = InputExpander::new();
 
     // retrieve data from hardware to cache
     input.fetch();
 
     // read from cache
-    let (d0,d1,d2,d3,d4,d5,d6,d7) = (
-        input.KBD_E1(), 
+    let (d0, d1, d2, d3, d4, d5, d6, d7) = (
+        input.KBD_E1(),
         input.KBD_E2(),
         input.KBD_E3(),
         input.KBD_E4(),
@@ -238,21 +228,17 @@ pub fn development_entry_point() -> ! {
         input.KBD_E8(),
     );
 
-    let value:u8 = 
-        (d0 as u8) * (1 << 0) +
-        (d1 as u8) * (1 << 1) +
-        (d2 as u8) * (1 << 2) +
-        (d3 as u8) * (1 << 3) +
-        (d4 as u8) * (1 << 4) +
-        (d5 as u8) * (1 << 5) +
-        (d6 as u8) * (1 << 6) +
-        (d7 as u8) * (1 << 7);
-    
+    let value: u8 = (d0 as u8) * (1 << 0)
+        + (d1 as u8) * (1 << 1)
+        + (d2 as u8) * (1 << 2)
+        + (d3 as u8) * (1 << 3)
+        + (d4 as u8) * (1 << 4)
+        + (d5 as u8) * (1 << 5)
+        + (d6 as u8) * (1 << 6)
+        + (d7 as u8) * (1 << 7);
 
     lcd_initialize();
     print_u8_in_hex(value);
 
-
-    loop { }
-
+    loop {}
 }

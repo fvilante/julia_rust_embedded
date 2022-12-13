@@ -4,14 +4,12 @@ pub const ACK: u8 = 0x06;
 pub const NACK: u8 = 0x15;
 pub const ETX: u8 = 0x03;
 
-
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum StartByte {
     STX = 0x02,
     ACK = 0x06,
     NACK = 0x15,
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -33,6 +31,3 @@ mod tests {
         assert_eq!(ETX, 0x03);
     }
 }
-
-
-

@@ -1,8 +1,12 @@
-use core::{slice::Iter, cell::Cell};
+use super::menu_item::{MenuItem, MenuItemArgs};
+use crate::{
+    board::keyboard::KeyCode,
+    menu::{canvas::Canvas, point::Point},
+    unwrap_option,
+};
+use core::{cell::Cell, slice::Iter};
 use heapless::Vec;
 use lib_1::arena::arena::Arena;
-use crate::{board::keyboard::KeyCode, menu::{canvas::Canvas, point::Point}, unwrap_option};
-use super::{menu_item::{MenuItem, MenuItemArgs}};
 use lib_1::utils::cursor::Cursor;
 
 //represents the lines of the 40x2 LCD display
@@ -22,15 +26,14 @@ impl LcdLine {
     }
 }
 
-pub type MenuList = Vec<MenuItemArgs,6>;
+pub type MenuList = Vec<MenuItemArgs, 6>;
 
 pub struct SubMenu<'a> {
-    menu_list: MenuList,    // all itens of submenu
-    current_lcd_line_selected: LcdLine,  // lcd line reference
+    menu_list: MenuList,                // all itens of submenu
+    current_lcd_line_selected: LcdLine, // lcd line reference
     first_line_to_render: Cursor, // line of the vector 'MenuList' which must be the first line to render in the first line of the lcd
-    mounted: [MenuItem<'a>;1],
+    mounted: [MenuItem<'a>; 1],
 }
-
 
 impl<'a> SubMenu<'a> {
     pub fn new(mut menu_list: MenuList) -> Self {
@@ -41,7 +44,7 @@ impl<'a> SubMenu<'a> {
         Self {
             menu_list,
             current_lcd_line_selected: Line0,
-            first_line_to_render: Cursor::from_range(0..size-1, default_initial_menu_item),
+            first_line_to_render: Cursor::from_range(0..size - 1, default_initial_menu_item),
             mounted: [mounted_0], //, mounted_1],
         }
     }
@@ -96,7 +99,7 @@ impl<'a> SubMenu<'a> {
         const EDITING_CURSOR: char = '*';
         const NAVIGATING_CURSOR: char = '>';
         // position cursor
-        canvas.set_cursor(Point::new(0,line as u8));
+        canvas.set_cursor(Point::new(0, line as u8));
         // draw selector char
         match self.get_line_being_edited() {
             Some(line) => {
@@ -107,9 +110,7 @@ impl<'a> SubMenu<'a> {
             }
         }
     }
-
 }
-
 
 impl<'a> SubMenu<'a> {
     pub fn send_key(&mut self, key: KeyCode) {
@@ -118,7 +119,7 @@ impl<'a> SubMenu<'a> {
         match is_editing_some_line {
             //is editing some line
             Some(current_line) => {
-                // delegate keys 
+                // delegate keys
                 self.get_menu_item_mut(current_line).send_key(key);
             }
 
@@ -126,28 +127,30 @@ impl<'a> SubMenu<'a> {
             None => {
                 // navigate menu
                 match key {
-                    KeyCode::KEY_DIRECIONAL_PARA_BAIXO => {
-                        match self.current_lcd_line_selected {
-                            LcdLine::Line0 => { self.current_lcd_line_selected = Line1;},
-                            LcdLine::Line1 => { self.scroll_down(); },
+                    KeyCode::KEY_DIRECIONAL_PARA_BAIXO => match self.current_lcd_line_selected {
+                        LcdLine::Line0 => {
+                            self.current_lcd_line_selected = Line1;
+                        }
+                        LcdLine::Line1 => {
+                            self.scroll_down();
                         }
                     },
-                    KeyCode::KEY_DIRECIONAL_PARA_CIMA => {
-                        match self.current_lcd_line_selected {
-                            LcdLine::Line0 => { self.scroll_up(); },
-                            LcdLine::Line1 => { self.current_lcd_line_selected = Line0;},
-                            
+                    KeyCode::KEY_DIRECIONAL_PARA_CIMA => match self.current_lcd_line_selected {
+                        LcdLine::Line0 => {
+                            self.scroll_up();
+                        }
+                        LcdLine::Line1 => {
+                            self.current_lcd_line_selected = Line0;
                         }
                     },
                     KeyCode::KEY_ENTER => {
                         let line = self.current_lcd_line_selected;
                         self.get_menu_item_mut(line).set_edit_mode(true);
                     }
-                    _ => { }
+                    _ => {}
                 }
             }
         }
-        
     }
 
     pub fn update(&mut self) {

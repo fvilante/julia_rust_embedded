@@ -1,17 +1,11 @@
 // Driver for output expander made of 4 serially connected shift registers
 
+use ruduino::cores::atmega328p::port;
 use ruduino::Pin;
-use ruduino::cores::atmega328p::{port};
 
-use crate::microcontroler::delay::{ 
-    delay_ms,
-    delay_us,
-};
+use crate::microcontroler::delay::{delay_ms, delay_us};
 
-use super::debug::{
-    set_led3,
-    blink_led3,
-};
+use super::debug::{blink_led3, set_led3};
 
 const HIGH: bool = true;
 const LOW: bool = false;
@@ -29,7 +23,7 @@ fn init_shiftout_pins() -> () {
     serial_out(LOW);
 }
 
-fn serial_out(value: bool) -> () {  
+fn serial_out(value: bool) -> () {
     if value == HIGH {
         port::B0::set_high();
     } else {
@@ -37,7 +31,7 @@ fn serial_out(value: bool) -> () {
     };
 }
 
-fn srclk_out(value: bool) -> () {    
+fn srclk_out(value: bool) -> () {
     if value == HIGH {
         port::B2::set_high();
     } else {
@@ -45,7 +39,7 @@ fn srclk_out(value: bool) -> () {
     };
 }
 
-fn srclr_out(value: bool) -> () {    
+fn srclr_out(value: bool) -> () {
     if value == HIGH {
         port::D6::set_high();
     } else {
@@ -53,7 +47,7 @@ fn srclr_out(value: bool) -> () {
     };
 }
 
-fn rclk_out(value: bool) -> () {    
+fn rclk_out(value: bool) -> () {
     if value == HIGH {
         port::C5::set_high();
     } else {
@@ -61,7 +55,7 @@ fn rclk_out(value: bool) -> () {
     };
 }
 
-fn srenab_out(value: bool) -> () {  
+fn srenab_out(value: bool) -> () {
     if value == HIGH {
         port::C4::set_high();
     } else {
@@ -69,7 +63,7 @@ fn srenab_out(value: bool) -> () {
     };
 }
 
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct ShiftOutData {
     pub byte0: u8,
     pub byte1: u8,
@@ -77,8 +71,8 @@ pub struct ShiftOutData {
     pub byte3: u8,
 }
 
-fn shiftout__(data_out: u8 ) {
-    // This shifts 8 bits out MSB first, 
+fn shiftout__(data_out: u8) {
+    // This shifts 8 bits out MSB first,
     // on the rising edge of the clock,
     // clock idles low
 
@@ -88,12 +82,11 @@ fn shiftout__(data_out: u8 ) {
     srclk_out(LOW);
 
     let mut pin_state: bool;
-    
-    for i in 0..8 {
 
+    for i in 0..8 {
         srclk_out(LOW);
 
-        if (data_out & (1<<(7-i)))>=1 {
+        if (data_out & (1 << (7 - i))) >= 1 {
             pin_state = HIGH;
         } else {
             pin_state = LOW;
@@ -101,7 +94,7 @@ fn shiftout__(data_out: u8 ) {
 
         //Sets the pin to HIGH or LOW depending on pin_state
         serial_out(pin_state);
-        //register shifts bits on upstroke of clock pin  
+        //register shifts bits on upstroke of clock pin
         srclk_out(HIGH);
         //zero the data pin after shift to prevent bleed through
         serial_out(LOW);
@@ -109,7 +102,6 @@ fn shiftout__(data_out: u8 ) {
 }
 
 pub fn write_shiftout(data: ShiftOutData) -> () {
-
     //FIX: When possible make this initialization execute once on first execution.
     init_shiftout_pins();
 
@@ -119,7 +111,7 @@ pub fn write_shiftout(data: ShiftOutData) -> () {
     //clear register
     srclr_out(LOW);
     srclr_out(HIGH);
-    
+
     //latch
     rclk_out(LOW);
 
@@ -128,10 +120,9 @@ pub fn write_shiftout(data: ShiftOutData) -> () {
     shiftout__(data.byte2);
     shiftout__(data.byte1);
     shiftout__(data.byte0);
-    
+
     //latch
     rclk_out(HIGH);
-
 }
 
 // eletrical test result:
@@ -155,7 +146,7 @@ pub fn test_signal() -> ! {
 }
 
 // OUTPUT_BUS0     KBD-SA                   BIT0 - SHIFT-REGISTER 1 BEGIN
-// OUTPUT_BUS1     KBD-SB                   BIT1             
+// OUTPUT_BUS1     KBD-SB                   BIT1
 // OUTPUT_BUS2     KBD-S1                   BIT2
 // OUTPUT_BUS3     KBD-S2                   BIT3
 // OUTPUT_BUS4     KBD-S3                   BIT4
@@ -187,35 +178,28 @@ pub fn test_signal() -> ! {
 // OUTPUT_BUS30    LED_EXECUCAO             BIT6
 // OUTPUT_BUS31    LED_MANUAL               BIT7
 
-
 // Speed Test Measurement Results:
 // 32bits I/O Expander (using 4 output shift-registers in the board) has max output frequency about => 5kHz
 // perid = 200usec / f = 5khz
 // high pulse width = 4usec
-// note: the focus was just to take a first measurement, no conclusions have beeing derived from that. 
+// note: the focus was just to take a first measurement, no conclusions have beeing derived from that.
 pub fn example_1() -> ! {
-
     loop {
-    
-        let mut data: ShiftOutData = ShiftOutData { 
-            byte0: (0x00), 
-            byte1: (0x00), 
-            byte2: (0x00), 
-            byte3: (0x00), 
-        };
-        write_shiftout(data); 
-        //delay_ms(100);
-        data = ShiftOutData { 
-            byte0: (0x00), 
-            byte1: (0x00), 
-            byte2: (0x00), 
-            byte3: (1<<6), // this pulse has 230 usec of period and
+        let mut data: ShiftOutData = ShiftOutData {
+            byte0: (0x00),
+            byte1: (0x00),
+            byte2: (0x00),
+            byte3: (0x00),
         };
         write_shiftout(data);
-        //delay_ms(100);    
+        //delay_ms(100);
+        data = ShiftOutData {
+            byte0: (0x00),
+            byte1: (0x00),
+            byte2: (0x00),
+            byte3: (1 << 6), // this pulse has 230 usec of period and
+        };
+        write_shiftout(data);
+        //delay_ms(100);
     }
 }
-
-
-
-

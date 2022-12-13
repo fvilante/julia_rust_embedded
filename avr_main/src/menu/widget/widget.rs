@@ -1,4 +1,4 @@
-use crate::{menu::canvas::Canvas, board::keyboard::KeyCode};
+use crate::{board::keyboard::KeyCode, menu::canvas::Canvas};
 
 pub trait Widget {
     fn send_key(&mut self, key: KeyCode);
@@ -12,7 +12,6 @@ pub type IWidget<'a> = &'a mut dyn Widget;
 pub struct WidgetHelper;
 
 impl WidgetHelper {
-
     pub fn send_key(self_widget: &mut Option<IWidget>, key: KeyCode) {
         if let Some(widget) = &mut *self_widget {
             widget.send_key(key)
@@ -30,10 +29,7 @@ impl WidgetHelper {
             widget.draw(canvas)
         }
     }
-    
 }
-
-
 
 pub trait Editable {
     fn set_edit_mode(&mut self, value: bool);

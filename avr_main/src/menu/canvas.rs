@@ -1,15 +1,13 @@
 use heapless::String;
 
+use super::{flash::FlashString, point::Point};
 use crate::{board::lcd, utils::generic_string::GenericString};
-use super::{point::Point, flash::FlashString};
 
-
-struct CursorPosition { 
+struct CursorPosition {
     point: Point,
 }
 
 impl CursorPosition {
-
     fn new() -> Self {
         Self {
             point: Point::new(0, 0),
@@ -17,23 +15,19 @@ impl CursorPosition {
     }
 
     fn new_from_point(point: Point) -> Self {
-        Self {
-            point,
-        }
+        Self { point }
     }
 
     fn from_index(index: usize) -> Self {
         let col: u8 = (index % 40).try_into()./*clamp(0,79).*/unwrap_or(0);
         let row: u8 = (index / 40).try_into()./*clamp(0,1).*/unwrap_or(0);
         let point = Point::new(col, row);
-        Self {
-            point,
-        }
+        Self { point }
     }
-    
-    fn get_index(&self ) -> usize {
-        let Point{x:col, y:row} = self.point;
-        let index = col + (40*row);
+
+    fn get_index(&self) -> usize {
+        let Point { x: col, y: row } = self.point;
+        let index = col + (40 * row);
         index.into()
     }
 
@@ -45,7 +39,7 @@ impl CursorPosition {
     fn increment(&mut self) -> &mut Self {
         let mut index = self.get_index();
         index += 1;
-        let new_point = Self::from_index(index.clamp(0, 79)).point ;
+        let new_point = Self::from_index(index.clamp(0, 79)).point;
         self.point = new_point;
         self
     }
@@ -58,13 +52,12 @@ pub struct Canvas {
     screen_buffer_output: [u8; 80],
 }
 
-impl Canvas  {
-
+impl Canvas {
     pub fn new() -> Self {
         lcd::lcd_initialize();
         Self {
             is_initialized: true,
-            cursor_position: CursorPosition::new_from_point(Point::new(0,0)),
+            cursor_position: CursorPosition::new_from_point(Point::new(0, 0)),
             screen_buffer_input: [' ' as u8; 80],
             screen_buffer_output: ['x' as u8; 80],
         }
@@ -92,7 +85,7 @@ impl Canvas  {
 
     pub fn clear(&mut self) {
         self.screen_buffer_input = [' ' as u8; 80];
-        self.cursor_position.set_point(Point::new(0,0));
+        self.cursor_position.set_point(Point::new(0, 0));
         //lcd::clear();
     }
 
@@ -116,7 +109,6 @@ impl Canvas  {
 
     // output part
 
-
     /// The purpose of this routine is to avoid unecessary writings to LCD.
     /// It swaps two lcd buffers: The output_buffer represents current state of lcd and
     /// input_buffer represent the desired state of lcd
@@ -127,5 +119,4 @@ impl Canvas  {
             lcd::print_u8(byte);
         }
     }
-
 }

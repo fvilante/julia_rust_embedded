@@ -1,6 +1,4 @@
-
 static mut SOME_VAR: u64 = 0x00;
-
 
 pub fn delay_us(us: u64) {
     fn delay_one_us() {

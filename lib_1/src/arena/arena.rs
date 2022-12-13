@@ -1,13 +1,16 @@
-use core::{cell::{RefCell, UnsafeCell, BorrowError, BorrowMutError, RefMut, Ref}, marker::PhantomData, ops::{DerefMut, Deref}};
+use core::{
+    cell::{BorrowError, BorrowMutError, Ref, RefCell, RefMut, UnsafeCell},
+    marker::PhantomData,
+    ops::{Deref, DerefMut},
+};
 use heapless::Vec;
 
 use crate::utils::common::usize_to_u8_clamper;
 
-
 // Arena
-// 
+//
 // Concepts used to understand the design of this module:
-//     
+//
 //     - External concepts
 //         - Typed Arenas (to avoid propagating lifetimes and make code simplier)
 //     - Internal concepts
@@ -17,13 +20,13 @@ use crate::utils::common::usize_to_u8_clamper;
 //             - RefCell
 //                 - Ref
 //                 - RefMut
-// 
+//
 
 /// Areana Element Refewrence
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct ArenaId<T> {
     index: u8,
-    phantom: PhantomData<T>
+    phantom: PhantomData<T>,
 }
 
 pub struct Arena<T, const CAPACITY: usize> {
@@ -51,7 +54,10 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
         let arena_index = Self::make_hash(index);
         let result = data_base.push(new_value);
         match result {
-            Ok(_) => Some(ArenaId{ index: arena_index, phantom: PhantomData }),
+            Ok(_) => Some(ArenaId {
+                index: arena_index,
+                phantom: PhantomData,
+            }),
             Err(_) => None,
         }
     }
@@ -59,7 +65,10 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
     /// Returns error if aliasing rules violated at run-time otherwhise returns the mutable reference
     /// Equivalent to RefCell::try_borrow_mut
     /// Note, see also: https://stackoverflow.com/a/51349578/8233039
-    pub fn try_borrow_mut<'a>(&'a self, arena_id: ArenaId<T>) -> Result<RefMut<'a,T>, BorrowMutError> {
+    pub fn try_borrow_mut<'a>(
+        &'a self,
+        arena_id: ArenaId<T>,
+    ) -> Result<RefMut<'a, T>, BorrowMutError> {
         let index = arena_id.index as usize;
         let data_base = unsafe { &mut *self.data_base.get() };
         let element = data_base.get_mut(index).unwrap();
@@ -70,7 +79,7 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
     /// Returns error if aliasing rules violated at run-time otherwhise returns the imutable reference
     /// Equivalent to RefCell::try_borrow
     /// Note, see also: https://stackoverflow.com/a/51349578/8233039
-    pub fn try_borrow<'a>(&'a self, handler: ArenaId<T>) -> Result<Ref<'a,T>, BorrowError> {
+    pub fn try_borrow<'a>(&'a self, handler: ArenaId<T>) -> Result<Ref<'a, T>, BorrowError> {
         let data_base = unsafe { &mut *self.data_base.get() };
         let ref_ref_element = data_base.get(handler.index as usize).unwrap();
         let ref_element = ref_ref_element;
@@ -84,12 +93,10 @@ impl<T, const SIZE: usize> Arena<T, SIZE> {
     }
 
     /// Attention may fail at run-time, prefer try_borrow_mut to a infalible action
-    pub fn borrow_mut<'a>(&'a self, handler: ArenaId<T>) -> RefMut<'a,T> {
+    pub fn borrow_mut<'a>(&'a self, handler: ArenaId<T>) -> RefMut<'a, T> {
         self.try_borrow_mut(handler).unwrap()
     }
-
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -102,7 +109,7 @@ mod tests {
         let probe = 0;
         let handler = arena.alloc(probe).unwrap();
         let actual = *arena.borrow(handler);
-        assert_eq!(actual, probe); 
+        assert_eq!(actual, probe);
     }
 
     fn produce_error_if_allocate_more_than_its_capacity() {
@@ -124,7 +131,7 @@ mod tests {
         *arena.borrow_mut(handler) += 1;
         let actual = *arena.borrow(handler);
         let expected = 1;
-        assert_eq!(actual, expected); 
+        assert_eq!(actual, expected);
     }
 
     #[test]
@@ -139,8 +146,8 @@ mod tests {
         let actual2 = *arena.borrow(handler2);
         let expected1 = 1;
         let expected2 = 2;
-        assert_eq!(actual1, expected1); 
-        assert_eq!(actual2, expected2); 
+        assert_eq!(actual1, expected1);
+        assert_eq!(actual2, expected2);
     }
 
     #[test]
@@ -153,15 +160,15 @@ mod tests {
             *borrow_mut1 += 1;
         }
         {
-            let mut borrow_mut2 = arena.borrow_mut(handler); 
+            let mut borrow_mut2 = arena.borrow_mut(handler);
             *borrow_mut2 += 2;
         }
         let actual1 = *arena.borrow(handler);
         let actual2 = *arena.borrow(handler);
         let expected1 = 3;
         let expected2 = 3;
-        assert_eq!(actual1, expected1); 
-        assert_eq!(actual2, expected2); 
+        assert_eq!(actual1, expected1);
+        assert_eq!(actual2, expected2);
     }
 
     #[test]
@@ -175,8 +182,8 @@ mod tests {
         let actual2 = *borrow_2;
         let expected1 = probe;
         let expected2 = probe;
-        assert_eq!(actual1, expected1); 
-        assert_eq!(actual2, expected2); 
+        assert_eq!(actual1, expected1);
+        assert_eq!(actual2, expected2);
     }
 
     #[test]
@@ -185,11 +192,10 @@ mod tests {
         let arena: Arena<u8, 2> = Arena::new();
         let handler = arena.alloc(probe).unwrap();
         let borrow_mut1 = arena.borrow_mut(handler);
-        let should_be_runtime_error = arena.try_borrow_mut(handler); 
+        let should_be_runtime_error = arena.try_borrow_mut(handler);
         match should_be_runtime_error {
             Ok(_) => assert!(false),
             Err(_) => assert!(true), // happy path
-        } 
+        }
     }
-
 }

@@ -1,22 +1,17 @@
 // ==============================================================================
-// For more see: 
+// For more see:
 //
 //          https://os.phil-opp.com/heap-allocation/#a-dummyallocator
 //
 // ==============================================================================
 
-
 //use crate::board::lcd;
 
-use alloc::alloc::{
-    GlobalAlloc,
-    Layout,
-};
+use alloc::alloc::{GlobalAlloc, Layout};
 
 use core::ptr::null_mut;
 
 use crate::board::lcd;
-
 
 pub struct Dummy {
     val: u8,
@@ -28,11 +23,11 @@ struct Reservation {
 }
 
 //static mut INDEX: Option<[Reservation; 5]> = None;
-static mut HEAP_MEMORY: [u8;200] = [0x00;200]; //heap memory
+static mut HEAP_MEMORY: [u8; 200] = [0x00; 200]; //heap memory
 
 unsafe impl GlobalAlloc for Dummy {
     unsafe fn alloc(&self, _layout: Layout) -> *mut u8 {
-        //lcd::lcd_initialize(); 
+        //lcd::lcd_initialize();
         //lcd::print("Inside Allocator. Size/Alignment");
         //lcd::print_u16_in_hex(layout.size().try_into().unwrap());
         //lcd::print("/");
@@ -42,8 +37,6 @@ unsafe impl GlobalAlloc for Dummy {
         //null_mut()
         let a = HEAP_MEMORY.as_mut_ptr();
         a
-
-
     }
 
     unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {
@@ -52,4 +45,4 @@ unsafe impl GlobalAlloc for Dummy {
 }
 
 #[global_allocator]
-static ALLOCATOR: Dummy = Dummy{val: 0x00};
+static ALLOCATOR: Dummy = Dummy { val: 0x00 };

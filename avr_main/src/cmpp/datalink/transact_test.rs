@@ -1,23 +1,20 @@
+use super::concrete_serial::ConcreteSerialPort;
+use crate::board::lcd;
+use crate::microcontroler::delay::delay_us;
 use lib_1::protocol::common::StartByte;
 use lib_1::protocol::frame::Frame;
 use lib_1::protocol::transact::{transact, DatalinkError};
-use crate::microcontroler::delay::delay_us;
-use crate::board::lcd;
-use super::concrete_serial::ConcreteSerialPort;
 use lib_1::types::serial_connection::SerialConnection;
-
-
-
 
 pub fn development_entry_point() -> ! {
     lcd::lcd_initialize();
-    let frame = Frame{
+    let frame = Frame {
         start_byte: StartByte::STX,
-        payload: [0,0x50,0,0],
+        payload: [0, 0x50, 0, 0],
     };
     let baud_rate = 2400;
     let connection = ConcreteSerialPort::new(baud_rate);
-    let timeout_us = 200*1000;
+    let timeout_us = 200 * 1000;
     let response = transact(frame, connection, timeout_us, delay_us);
     match response {
         Err(e) => {
@@ -33,9 +30,7 @@ pub fn development_entry_point() -> ! {
                 }
             }
         }
-        Ok(_frame) => {
-            lcd::print("Successful datalink transaction!")
-        }
+        Ok(_frame) => lcd::print("Successful datalink transaction!"),
     }
 
     loop {}

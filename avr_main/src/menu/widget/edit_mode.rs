@@ -1,15 +1,12 @@
 use super::widget::Editable;
 
-
 pub struct EditMode {
     is_in_edit_mode: bool,
 }
 
 impl EditMode {
     pub fn new(is_in_edit_mode: bool) -> Self {
-        Self {
-            is_in_edit_mode,
-        }
+        Self { is_in_edit_mode }
     }
 }
 
