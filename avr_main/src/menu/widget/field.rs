@@ -135,27 +135,42 @@ impl ContentEditor {
     }
 }
 
-struct Numerical<'a> {
+struct Unsigned16ContentEditor {
     content_editor: ContentEditor,
     valid_range: Range<u16>,
     number_of_digits: usize,
-    // initial values
+}
+
+/// An `unsigned integer` cursor navigated editor
+///
+/// This type does supose that the edition is being performed in memory and does not include the `view` mechanism
+struct Unsigned16Editor<'a> {
+    content_editor: ContentEditor,
+    valid_range: Range<u16>,
+    /// Number of digits you want your editor have.
+    ///
+    /// Must be a number between 0 and 5.
+    /// TODO: otherwise it will be clamped to the nearest edge of that range.
+    number_of_digits: usize,
+    /// The initial content is being saved for make possible to `reset` it
+    ///
+    /// TODO: Remove the necessity of this property by avoiding make the Self alive when no edition is hapenning by the user (for example when the info is just being show in screen without any edition mode)
     initial_edition_buffer: ContentEditor,
     variable: &'a mut u16,
 }
 
-impl<'a> Numerical<'a> {
+impl<'a> Unsigned16Editor<'a> {
     pub fn new(
-        edition_buffer: ContentEditor,
+        contentEditor: ContentEditor,
         valid_range: Range<u16>,
         number_of_digits: usize,
         variable: &'a mut u16,
     ) -> Self {
         Self {
-            content_editor: edition_buffer.clone(),
+            content_editor: contentEditor.clone(),
             valid_range,
             number_of_digits,
-            initial_edition_buffer: edition_buffer,
+            initial_edition_buffer: contentEditor,
             variable,
         }
     }
@@ -196,7 +211,7 @@ impl<'a> Numerical<'a> {
     }
 }
 
-impl Numerical<'_> {
+impl Unsigned16Editor<'_> {
     pub fn save_edition(&mut self) {
         let normalized_value = self.to_u16_normalized();
         *self.variable = normalized_value; // saves data
@@ -211,7 +226,7 @@ impl Numerical<'_> {
     }
 }
 
-impl Numerical<'_> {
+impl Unsigned16Editor<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         match key {
             // navigation_key left and right
@@ -285,7 +300,7 @@ impl Numerical<'_> {
 }
 
 pub struct NumericalField<'a> {
-    numerical: Numerical<'a>,
+    numerical: Unsigned16Editor<'a>,
     blink: RectangularWave,
 }
 
@@ -300,7 +315,12 @@ impl<'a> NumericalField<'a> {
         let array = convert_u16_to_FieldBuffer(value, number_of_digits);
         let edition_buffer = ContentEditor::new(array.clone(), initial_cursor_position);
         Self {
-            numerical: Numerical::new(edition_buffer, valid_range, number_of_digits, variable),
+            numerical: Unsigned16Editor::new(
+                edition_buffer,
+                valid_range,
+                number_of_digits,
+                variable,
+            ),
             blink: RectangularWave::new(600, 300),
         }
     }
