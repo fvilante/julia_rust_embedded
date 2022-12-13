@@ -47,18 +47,21 @@ fn convert_FieldBuffer_to_u16(data: Content) -> u16 {
     data.parse::<u16>().unwrap_or(0)
 }
 
-/// A string that represents some data being edited by a navigating cursor.
+/// A string that represents some data content being edited by a navigation cursor.
+///
+/// This type is agnostic to the type of data being edited, that means you can use this type to edit numbers and even text
 struct ContentEditor {
-    /// String content being edited
+    /// String content being edited.
     content: Content,
-    /// Current cursor position
+    /// Tracks current cursor position.
     cursor: Cursor,
-    /// The place where the cursor starts
+    /// The place where the cursor starts.
+    ///
+    /// TODO: Remove the necessity of this method being avoiding make the Self alive when no edition is hapenning by the user (for example when the info is just being show in screen without any edition mode)
     pub initial_cursor_position: u8,
 }
 
 impl ContentEditor {
-    /// Constructs a new edition buffer
     pub fn new(initial_content: Content, initial_cursor_position: u8) -> Self {
         let start = 0;
         let end = usize_to_u8_clamper(initial_content.len());
@@ -79,7 +82,7 @@ impl ContentEditor {
         }
     }
 
-    /// TODO: rename to change_cursor_char
+    /// Changes the character in place of the current cursor position to given `new_char`
     pub fn change_cursor_item_to(&mut self, new_char: char) -> &mut Self {
         let current_cursor = self.cursor.get_current();
         let mut s: Content = String::new();
@@ -96,39 +99,44 @@ impl ContentEditor {
 
     /// Reset cursor to its default initial position
     /// NOTE: This method is not necessary the same as begin() method
+    ///
+    /// TODO: Remove the necessity of this method being avoiding make the Self alive when no edition is hapenning by the user (for example when the info is just being show in screen without any edition mode)
     pub fn reset_cursor(&mut self) {
         self.cursor = Cursor::from_range(0..self.content.len(), self.initial_cursor_position);
     }
 
-    /// increment_cursor_safe
+    /// Move cursor to a single character to the right
     pub fn move_cursor_right(&mut self) -> &mut Self {
         self.cursor.next();
         self
     }
 
-    /// decrement_cursor_safe
+    /// Move cursor to a single character to the left
     pub fn move_cursor_left(&mut self) -> &mut Self {
         self.cursor.previous();
         self
     }
 
+    /// Move cursor to the most left-sided character of the [`Content`]
     pub fn move_cursor_begin(&mut self) -> &mut Self {
         self.cursor.begin();
         self
     }
 
+    /// Move cursor to the most right-sided character of the [`Content`]
     pub fn move_cursor_end(&mut self) -> &mut Self {
         self.cursor.end();
         self
     }
 
+    /// Adds an given character in place of current cursor position and increment cursor once to the right
     pub fn addAndMoveRight(&mut self, item: char) -> &mut Self {
         self.change_cursor_item_to(item).move_cursor_right()
     }
 }
 
 struct Numerical<'a> {
-    edition_buffer: ContentEditor,
+    content_editor: ContentEditor,
     valid_range: Range<u16>,
     number_of_digits: usize,
     // initial values
@@ -144,7 +152,7 @@ impl<'a> Numerical<'a> {
         variable: &'a mut u16,
     ) -> Self {
         Self {
-            edition_buffer: edition_buffer.clone(),
+            content_editor: edition_buffer.clone(),
             valid_range,
             number_of_digits,
             initial_edition_buffer: edition_buffer,
@@ -153,18 +161,18 @@ impl<'a> Numerical<'a> {
     }
 
     pub fn set_u16(&mut self, value: u16) {
-        let initial_cursor_position = self.edition_buffer.initial_cursor_position;
+        let initial_cursor_position = self.content_editor.initial_cursor_position;
         let field_buffer = convert_u16_to_FieldBuffer(value, self.number_of_digits);
-        self.edition_buffer = ContentEditor::new(field_buffer, initial_cursor_position);
+        self.content_editor = ContentEditor::new(field_buffer, initial_cursor_position);
     }
 
     pub fn to_u16(&self) -> u16 {
-        let value = convert_FieldBuffer_to_u16(self.edition_buffer.content.clone());
+        let value = convert_FieldBuffer_to_u16(self.content_editor.content.clone());
         value
     }
 
     pub fn set_edition_buffer(&mut self, edition_buffer: ContentEditor) {
-        self.edition_buffer = edition_buffer;
+        self.content_editor = edition_buffer;
     }
 
     pub fn to_u16_normalized(&self) -> u16 {
@@ -176,15 +184,15 @@ impl<'a> Numerical<'a> {
     }
 
     pub fn get_current_cursor_index(&self) -> usize {
-        self.edition_buffer.cursor.get_current()
+        self.content_editor.cursor.get_current()
     }
 
     pub fn reset_cursor(&mut self) {
-        self.edition_buffer.reset_cursor()
+        self.content_editor.reset_cursor()
     }
 
     pub fn char_indices(&self) -> CharIndices {
-        self.edition_buffer.content.char_indices()
+        self.content_editor.content.char_indices()
     }
 }
 
@@ -208,65 +216,65 @@ impl Numerical<'_> {
         match key {
             // navigation_key left and right
             KeyCode::KEY_SETA_BRANCA_ESQUERDA => {
-                self.edition_buffer.move_cursor_left();
+                self.content_editor.move_cursor_left();
             }
             KeyCode::KEY_SETA_BRANCA_DIREITA => {
-                self.edition_buffer.move_cursor_right();
+                self.content_editor.move_cursor_right();
             }
             KeyCode::KEY_DIRECIONAL_PARA_DIREITA => {
-                self.edition_buffer.move_cursor_right();
+                self.content_editor.move_cursor_right();
             }
             KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => {
-                self.edition_buffer.move_cursor_left();
+                self.content_editor.move_cursor_left();
             }
             // edition keys
             KeyCode::KEY_0 => {
-                self.edition_buffer
+                self.content_editor
                     .change_cursor_item_to('0')
                     .move_cursor_right();
             }
             KeyCode::KEY_1 => {
-                self.edition_buffer
+                self.content_editor
                     .change_cursor_item_to('1')
                     .move_cursor_right();
             }
             KeyCode::KEY_2 => {
-                self.edition_buffer
+                self.content_editor
                     .change_cursor_item_to('2')
                     .move_cursor_right();
             }
             KeyCode::KEY_3 => {
-                self.edition_buffer
+                self.content_editor
                     .change_cursor_item_to('3')
                     .move_cursor_right();
             }
             KeyCode::KEY_4 => {
-                self.edition_buffer
+                self.content_editor
                     .change_cursor_item_to('4')
                     .move_cursor_right();
             }
             KeyCode::KEY_5 => {
-                self.edition_buffer
+                self.content_editor
                     .change_cursor_item_to('5')
                     .move_cursor_right();
             }
             KeyCode::KEY_6 => {
-                self.edition_buffer
+                self.content_editor
                     .change_cursor_item_to('6')
                     .move_cursor_right();
             }
             KeyCode::KEY_7 => {
-                self.edition_buffer
+                self.content_editor
                     .change_cursor_item_to('7')
                     .move_cursor_right();
             }
             KeyCode::KEY_8 => {
-                self.edition_buffer
+                self.content_editor
                     .change_cursor_item_to('8')
                     .move_cursor_right();
             }
             KeyCode::KEY_9 => {
-                self.edition_buffer
+                self.content_editor
                     .change_cursor_item_to('9')
                     .move_cursor_right();
             }
