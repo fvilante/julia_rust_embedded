@@ -14,7 +14,7 @@ pub struct Cursor {     // size = 3 bytes
 }
 
 impl Cursor {
-    pub fn new(range: Range<usize>, current: usize) -> Self {
+    pub fn new(range: Range<usize>, current: u8) -> Self {
         let range_copy = range.start..range.end;
         let current_normalized = Self::__normalize_current(range_copy, current);
         Self {
@@ -26,10 +26,10 @@ impl Cursor {
     }
 
     /// normalize given cursor position to make sure it is inside valid range, also converts it to u8 (compact) format
-    fn __normalize_current(range: Range<usize>, unsafe_cursor_: usize) -> u8 {
+    fn __normalize_current(range: Range<usize>, unsafe_cursor_: u8) -> u8 {
         let min = usize_to_u8_clamper(range.start);
         let max = usize_to_u8_clamper(range.end-1);
-        let unsafe_cursor = usize_to_u8_clamper(unsafe_cursor_);
+        let unsafe_cursor = unsafe_cursor_;
         if unsafe_cursor < min {
             min
         } else if unsafe_cursor > max {
@@ -45,7 +45,7 @@ impl Cursor {
     }
 
     // sets current cursor position
-    pub fn set_current(&mut self, current_cursor_position: usize) {
+    pub fn set_current(&mut self, current_cursor_position: u8) {
         let range = self.start as usize..self.end as usize;
         let current_normalized = Self::__normalize_current(range, current_cursor_position);
         self.current = current_normalized;

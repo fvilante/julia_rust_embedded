@@ -50,11 +50,11 @@ struct EditionBuffer {
     buffer: FieldBuffer,   
     cursor: Cursor,         
     // initial condition
-    pub initial_cursor_position: usize, 
+    pub initial_cursor_position: u8, 
 }
 
 impl EditionBuffer {
-    pub fn new(buffer: FieldBuffer, initial_cursor_position: usize) -> Self {
+    pub fn new(buffer: FieldBuffer, initial_cursor_position: u8) -> Self {
         Self {
             cursor: Cursor::new(0..buffer.len(), initial_cursor_position),
             buffer,
@@ -228,7 +228,7 @@ pub struct NumericalField<'a> {
 }
 
 impl<'a> NumericalField<'a> {
-    pub fn new(variable: &'a mut u16, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
+    pub fn new(variable: &'a mut u16, initial_cursor_position: u8, number_of_digits: usize, valid_range: Range<u16>) -> Self {
         let value = (*variable).clone();
         let array = convert_u16_to_FieldBuffer(value, number_of_digits);
         let edition_buffer = EditionBuffer::new(array.clone(), initial_cursor_position);
@@ -334,7 +334,7 @@ impl<'a> Field<'a> {
         }
     }
 
-    pub fn from_numerical(variable: &'a mut u16, initial_cursor_position: usize, number_of_digits: usize, valid_range: Range<u16>) -> Self {
+    pub fn from_numerical(variable: &'a mut u16, initial_cursor_position: u8, number_of_digits: usize, valid_range: Range<u16>) -> Self {
         let numerical_field = NumericalField::new(variable, initial_cursor_position, number_of_digits, valid_range);
         let field_enum = FieldEnum::Numerical(numerical_field);
         Self::new(field_enum)
