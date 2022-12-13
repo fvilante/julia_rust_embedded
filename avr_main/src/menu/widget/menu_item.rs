@@ -131,7 +131,7 @@ impl MenuItem<'_> {
     }
 
     pub fn draw(&self, canvas: &mut Canvas, lcd_line: LcdLine) {
-        let line = lcd_line.as_u8();
+        let line = lcd_line as u8;
         let point1: Point<u8> = Point::new(self.point_a.pos, line);
         let point2: Point<u8> = Point::new(self.point_b.pos, line);
         self.caption.draw(canvas, point1);

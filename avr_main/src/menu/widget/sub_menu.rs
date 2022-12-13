@@ -6,6 +6,7 @@ use super::{menu_item::{MenuItem, MenuItemArgs}, cursor::Cursor};
 
 //represents the lines of the 40x2 LCD display
 #[derive(PartialEq, Copy, Clone)]
+#[repr(u8)]
 pub enum LcdLine {
     Line0,
     Line1,
@@ -17,13 +18,6 @@ use LcdLine::Line1;
 impl LcdLine {
     pub fn iterator() -> impl Iterator<Item = LcdLine> {
         [Line0, Line1].iter().copied()
-    }
-    
-    pub fn as_u8(&self) -> u8 {
-        match self {
-            Line0 => 0,
-            Line1 => 1,
-        }
     }
 }
 
@@ -52,7 +46,7 @@ impl<'a> SubMenu<'a> {
     }
 
     fn get_current_index(&self, line: LcdLine) -> usize {
-        let lcd_index = line.as_u8() as usize;
+        let lcd_index = line as u8 as usize;
         let line_index = self.first_line_to_render.get_current();
         let index = lcd_index + line_index;
         index
@@ -101,7 +95,7 @@ impl<'a> SubMenu<'a> {
         const EDITING_CURSOR: char = '*';
         const NAVIGATING_CURSOR: char = '>';
         // position cursor
-        canvas.set_cursor(Point::new(0,line.as_u8()));
+        canvas.set_cursor(Point::new(0,line as u8));
         // draw selector char
         match self.get_line_being_edited() {
             Some(line) => {
