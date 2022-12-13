@@ -1,58 +1,40 @@
 use core::ops::Range;
 
-use lib_1::utils::common::usize_to_u8_clamper;
+use lib_1::utils::common::{usize_to_u8_clamper, const_clamp};
 
-/// Stateful Cursor
-/// TODO: Make Cursor<T=u8>
+/// Stateful Cursor that may oscilates between start (inclusive) and end (exclusive)
 #[derive(Copy, Clone)]
 pub struct Cursor {     // size = 3 bytes
-    current: u8,     // oscilates between 'range' values
-    //range: Range<usize>, //(inclusive-exclusive) 
-    start: u8, // min_included
-    end: u8, // max_excluded
+    current: u8,     // oscilates between start (inclusive) and end (exclusive)
+    start: u8, // included
+    end: u8, // excluded
                          
 }
 
 impl Cursor {
-    pub fn new(range: Range<usize>, current: usize) -> Self {
-        let range_copy = range.start..range.end;
-        let current_normalized = Self::__normalize_current(range_copy, current);
+
+    pub const fn new(start: u8, end: u8, current: u8) -> Self {
         Self {
-            current: current_normalized,
-            ///TODO: Improve safety by making this clamping unnecessary, using a generic type T over Cursor<T> typ
-            start: usize_to_u8_clamper(range.start),
-            end: usize_to_u8_clamper(range.end),
+            current: Self::normalize_current(current, start, end),
+            start,
+            end,
         }
     }
 
-    /// normalize given cursor position to make sure it is inside valid range, also converts it to u8 (compact) format
-    fn __normalize_current(range: Range<usize>, unsafe_cursor_: usize) -> u8 {
-        let min = usize_to_u8_clamper(range.start);
-        let max = usize_to_u8_clamper(range.end-1);
-        let unsafe_cursor = usize_to_u8_clamper(unsafe_cursor_);
-        if unsafe_cursor < min {
-            min
-        } else if unsafe_cursor > max {
-            max
-        } else {
-            let safe_cursor = unsafe_cursor;
-            safe_cursor
-        }
+    // Ensures current is inside start (inclusive) and end (exclusive) range
+    const fn normalize_current(current: u8, start: u8, end: u8) -> u8 {
+        const_clamp(current, start, end - 1)     
+    }
+
+    pub const fn from_range(range: Range<usize>, current: u8) -> Self {
+        let start = usize_to_u8_clamper(range.start);
+        let end = usize_to_u8_clamper(range.end);
+        Self::new(start, end, current)
     }
 
     pub fn get_current(&self) -> usize {
         self.current as usize// value already normalized
     }
-
-    // sets current cursor position
-    pub fn set_current(&mut self, current_cursor_position: usize) {
-        let range = self.start as usize..self.end as usize;
-        let current_normalized = Self::__normalize_current(range, current_cursor_position);
-        self.current = current_normalized;
-
-    }
-
-
 
     /// returns true if has reached the upper bound
     pub fn next(&mut self) -> bool {

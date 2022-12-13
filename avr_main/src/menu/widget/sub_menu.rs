@@ -40,7 +40,7 @@ impl<'a> SubMenu<'a> {
         Self {
             menu_list,
             current_lcd_line_selected: Line0,
-            first_line_to_render: Cursor::new(0..size-1, default_initial_menu_item),
+            first_line_to_render: Cursor::from_range(0..size-1, default_initial_menu_item),
             mounted: [mounted_0], //, mounted_1],
         }
     }

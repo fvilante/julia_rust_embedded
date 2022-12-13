@@ -79,7 +79,7 @@ impl<'a> MenuItem<'a> {
                 let point2 = Point1d::new(*point2_);
                 let field = Field::from_numerical(
                     unsafe { &mut *variable },
-                    *initial_cursor_position as usize,
+                    *initial_cursor_position,
                     *number_of_digits as usize,
                     (*valid_range).clone(),
                 );

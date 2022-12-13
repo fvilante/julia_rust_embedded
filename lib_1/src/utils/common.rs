@@ -85,8 +85,8 @@ pub fn convert_u16_to_string_decimal (value: u16) -> String<5> {
     string
 }
 
-
-const fn const_clamp<T>(data: T, min: T, max: T) -> T
+/// Equals std::clamp but with constant function attribute 
+pub const fn const_clamp<T>(data: T, min: T, max: T) -> T
 where
     T: Sized,
     T: ~const Destruct,

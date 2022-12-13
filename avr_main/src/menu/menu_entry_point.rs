@@ -137,7 +137,7 @@ pub fn development_entry_point() -> ! {
 
     let mut value1: u16 = 0;
     let mut value2: u16 = 0;
-    let mut value3 = Cursor::new(0..2, 0);
+    let mut value3 = Cursor::from_range(0..2, 0);
 
     fn to_pointer_mut<T>(ref_: &mut T) -> *mut T {
         ref_ as *mut T
