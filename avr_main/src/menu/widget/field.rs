@@ -48,9 +48,7 @@ fn convert_FieldBuffer_to_u16(data: Content) -> u16 {
 }
 
 /// A string that represents some data being edited by a navigating cursor.
-///
-// TODO: rename to NavigationString (?!)
-struct EditionBuffer {
+struct ContentEditor {
     /// String content being edited
     content: Content,
     /// Current cursor position
@@ -59,7 +57,7 @@ struct EditionBuffer {
     pub initial_cursor_position: u8,
 }
 
-impl EditionBuffer {
+impl ContentEditor {
     /// Constructs a new edition buffer
     pub fn new(initial_content: Content, initial_cursor_position: u8) -> Self {
         let start = 0;
@@ -130,17 +128,17 @@ impl EditionBuffer {
 }
 
 struct Numerical<'a> {
-    edition_buffer: EditionBuffer,
+    edition_buffer: ContentEditor,
     valid_range: Range<u16>,
     number_of_digits: usize,
     // initial values
-    initial_edition_buffer: EditionBuffer,
+    initial_edition_buffer: ContentEditor,
     variable: &'a mut u16,
 }
 
 impl<'a> Numerical<'a> {
     pub fn new(
-        edition_buffer: EditionBuffer,
+        edition_buffer: ContentEditor,
         valid_range: Range<u16>,
         number_of_digits: usize,
         variable: &'a mut u16,
@@ -157,7 +155,7 @@ impl<'a> Numerical<'a> {
     pub fn set_u16(&mut self, value: u16) {
         let initial_cursor_position = self.edition_buffer.initial_cursor_position;
         let field_buffer = convert_u16_to_FieldBuffer(value, self.number_of_digits);
-        self.edition_buffer = EditionBuffer::new(field_buffer, initial_cursor_position);
+        self.edition_buffer = ContentEditor::new(field_buffer, initial_cursor_position);
     }
 
     pub fn to_u16(&self) -> u16 {
@@ -165,7 +163,7 @@ impl<'a> Numerical<'a> {
         value
     }
 
-    pub fn set_edition_buffer(&mut self, edition_buffer: EditionBuffer) {
+    pub fn set_edition_buffer(&mut self, edition_buffer: ContentEditor) {
         self.edition_buffer = edition_buffer;
     }
 
@@ -292,7 +290,7 @@ impl<'a> NumericalField<'a> {
     ) -> Self {
         let value = (*variable).clone();
         let array = convert_u16_to_FieldBuffer(value, number_of_digits);
-        let edition_buffer = EditionBuffer::new(array.clone(), initial_cursor_position);
+        let edition_buffer = ContentEditor::new(array.clone(), initial_cursor_position);
         Self {
             numerical: Numerical::new(edition_buffer, valid_range, number_of_digits, variable),
             blink: RectangularWave::new(600, 300),
