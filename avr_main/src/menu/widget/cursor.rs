@@ -2,6 +2,7 @@ use core::ops::Range;
 
 use lib_1::utils::common::usize_to_u8_clamper;
 
+/// Stateful Cursor
 /// TODO: Make Cursor<T=u8>
 #[derive(Copy, Clone)]
 pub struct Cursor {     // size = 3 bytes
@@ -18,21 +19,17 @@ impl Cursor {
         let current_normalized = Self::__normalize_current(range_copy, current);
         Self {
             current: current_normalized,
-            start: Self::__cast_usize_to_u8(range.start),
-            end: Self::__cast_usize_to_u8(range.end),
+            ///TODO: Improve safety by making this clamping unnecessary, using a generic type T over Cursor<T> typ
+            start: usize_to_u8_clamper(range.start),
+            end: usize_to_u8_clamper(range.end),
         }
-    }
-
-    ///TODO: Improve safety by making this function unnecessary, using a generic type T over Cursor<T> type
-    const fn __cast_usize_to_u8(value: usize) -> u8 {
-        usize_to_u8_clamper(value)
     }
 
     /// normalize given cursor position to make sure it is inside valid range, also converts it to u8 (compact) format
     const fn __normalize_current(range: Range<usize>, unsafe_cursor_: usize) -> u8 {
-        let min = Self::__cast_usize_to_u8(range.start);
-        let max = Self::__cast_usize_to_u8(range.end-1);
-        let unsafe_cursor = Self::__cast_usize_to_u8(unsafe_cursor_);
+        let min = usize_to_u8_clamper(range.start);
+        let max = usize_to_u8_clamper(range.end-1);
+        let unsafe_cursor = usize_to_u8_clamper(unsafe_cursor_);
         if unsafe_cursor < min {
             min
         } else if unsafe_cursor > max {
