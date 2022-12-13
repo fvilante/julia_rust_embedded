@@ -14,45 +14,26 @@ pub struct Cursor {     // size = 3 bytes
 }
 
 impl Cursor {
-    pub fn new(range: Range<usize>, current: u8) -> Self {
-        let range_copy = range.start..range.end;
-        let current_normalized = Self::__normalize_current(range_copy, current);
+
+    pub fn new(start: u8, end: u8, current: u8) -> Self {
+        // Ensures current is inside start and end range
+        let normalized_current = current.clamp(start, end - 1);
         Self {
-            current: current_normalized,
-            ///TODO: Improve safety by making this clamping unnecessary, using a generic type T over Cursor<T> typ
-            start: usize_to_u8_clamper(range.start),
-            end: usize_to_u8_clamper(range.end),
+            current: normalized_current,
+            start,
+            end,
         }
     }
 
-    /// normalize given cursor position to make sure it is inside valid range, also converts it to u8 (compact) format
-    fn __normalize_current(range: Range<usize>, unsafe_cursor_: u8) -> u8 {
-        let min = usize_to_u8_clamper(range.start);
-        let max = usize_to_u8_clamper(range.end-1);
-        let unsafe_cursor = unsafe_cursor_;
-        if unsafe_cursor < min {
-            min
-        } else if unsafe_cursor > max {
-            max
-        } else {
-            let safe_cursor = unsafe_cursor;
-            safe_cursor
-        }
+    pub fn from_range(range: Range<usize>, current: u8) -> Self {
+        let start = usize_to_u8_clamper(range.start);
+        let end = usize_to_u8_clamper(range.end);
+        Self::new(start, end, current)
     }
 
     pub fn get_current(&self) -> usize {
         self.current as usize// value already normalized
     }
-
-    // sets current cursor position
-    pub fn set_current(&mut self, current_cursor_position: u8) {
-        let range = self.start as usize..self.end as usize;
-        let current_normalized = Self::__normalize_current(range, current_cursor_position);
-        self.current = current_normalized;
-
-    }
-
-
 
     /// returns true if has reached the upper bound
     pub fn next(&mut self) -> bool {

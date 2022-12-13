@@ -56,7 +56,7 @@ struct EditionBuffer {
 impl EditionBuffer {
     pub fn new(buffer: FieldBuffer, initial_cursor_position: u8) -> Self {
         Self {
-            cursor: Cursor::new(0..buffer.len(), initial_cursor_position),
+            cursor: Cursor::from_range(0..buffer.len(), initial_cursor_position),
             buffer,
             initial_cursor_position,
         }
@@ -90,7 +90,7 @@ impl EditionBuffer {
     /// Reset cursor to its default initial position
     /// NOTE: This method is not necessary the same as begin() method
     pub fn reset_cursor(&mut self) {
-        self.cursor = Cursor::new(0..self.buffer.len(), self.initial_cursor_position);
+        self.cursor = Cursor::from_range(0..self.buffer.len(), self.initial_cursor_position);
     }
 
     /// increment_cursor_safe
