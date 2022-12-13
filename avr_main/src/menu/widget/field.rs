@@ -85,7 +85,7 @@ impl ContentEditor {
                 s.push(current_char).unwrap();
             }
         }
-        self.content = s.to_owned();
+        self.content = s.clone();
         self
     }
 
