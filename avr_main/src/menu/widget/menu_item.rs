@@ -10,7 +10,7 @@ use crate::{
 
 use super::{
     caption::Caption,
-    field::{Field, FieldBuffer, FieldEnum},
+    field::{Content, Field, FieldEnum},
     optional::OptionsBuffer,
     sub_menu::{LcdLine, SubMenu},
     widget::Editable,
@@ -168,8 +168,8 @@ impl MenuItem<'_> {
 // NOTE: CODE BELOW WAS TESTED AND WORKS, BUT IS JUST A PROOF-OF-CONCEPT.
 
 pub enum MenuItemParsed {
-    PureCaption(String<40>),                                  // [Caption]
-    CaptionWithOneField(String<40>, FieldBuffer, String<10>), // [1st_caption, field_type, last_caption]
+    PureCaption(String<40>),                              // [Caption]
+    CaptionWithOneField(String<40>, Content, String<10>), // [1st_caption, field_type, last_caption]
 }
 
 pub fn parse_menu_item_constructor_string(declaration: FlashString) -> MenuItemParsed {

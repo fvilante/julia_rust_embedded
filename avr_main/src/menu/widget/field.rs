@@ -3,7 +3,7 @@ use core::str::{CharIndices, FromStr};
 
 use alloc::borrow::ToOwned;
 use heapless::{String, Vec};
-use lib_1::utils::common::convert_u16_to_string_decimal;
+use lib_1::utils::common::{convert_u16_to_string_decimal, usize_to_u8_clamper};
 
 use crate::board::lcd;
 use crate::{
@@ -15,16 +15,20 @@ use super::optional::{Optional, OptionsBuffer};
 use super::{edit_mode::EditMode, widget::Editable, widget::Widget};
 use lib_1::utils::cursor::Cursor;
 
+/// Sets the max size of the Content buffer
 const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 6;
 
-pub type FieldBuffer = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
+/// A string that represents some data in memory
+pub type Content = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
 
-//just a type convertion
-fn convert_u16_to_FieldBuffer(data: u16, number_of_digits: usize) -> FieldBuffer {
+/// Creates a FieldBuffer from a u16 value.
+///
+/// TODO: What happens if number_of_digits is out_of_range?
+fn convert_u16_to_FieldBuffer(data: u16, number_of_digits: usize) -> Content {
     const blacket_char: char = '0';
     let s = convert_u16_to_string_decimal(data);
-    let mut base: FieldBuffer = String::from_str(s.as_str()).unwrap();
-    let mut temp: FieldBuffer = String::new();
+    let mut base: Content = String::from_str(s.as_str()).unwrap();
+    let mut temp: Content = String::new();
     //leading zeros
     for _ in base.len()..number_of_digits {
         temp.push(blacket_char);
@@ -36,35 +40,43 @@ fn convert_u16_to_FieldBuffer(data: u16, number_of_digits: usize) -> FieldBuffer
     temp
 }
 
-///NOTE: If error defaults to 0
-fn convert_FieldBuffer_to_u16(data: FieldBuffer) -> u16 {
-    let res = data.parse::<u16>().unwrap_or(0);
-    res
+/// Converts a [`Content`] that is supposed to contains an number into an [`u16`] value
+///
+/// If [`Content`] does not contains a number or if the convertion is not possible returns zero
+fn convert_FieldBuffer_to_u16(data: Content) -> u16 {
+    data.parse::<u16>().unwrap_or(0)
 }
 
-/// TODO: rename to NavigationString (?!)
+/// A string that represents some data being edited by a navigating cursor.
+///
+// TODO: rename to NavigationString (?!)
 struct EditionBuffer {
-    buffer: FieldBuffer,
+    /// String content being edited
+    content: Content,
+    /// Current cursor position
     cursor: Cursor,
-    // initial condition
+    /// The place where the cursor starts
     pub initial_cursor_position: u8,
 }
 
 impl EditionBuffer {
-    pub fn new(buffer: FieldBuffer, initial_cursor_position: u8) -> Self {
+    /// Constructs a new edition buffer
+    pub fn new(initial_content: Content, initial_cursor_position: u8) -> Self {
+        let start = 0;
+        let end = usize_to_u8_clamper(initial_content.len());
         Self {
-            cursor: Cursor::from_range(0..buffer.len(), initial_cursor_position),
-            buffer,
+            cursor: Cursor::new(start, end, initial_cursor_position),
+            content: initial_content,
             initial_cursor_position,
         }
     }
 
     pub fn clone(&self) -> Self {
-        let buffer: FieldBuffer = String::from_str(self.buffer.as_str()).unwrap();
+        let buffer: Content = self.content.clone();
         let cursor = self.cursor.clone();
         Self {
             cursor,
-            buffer,
+            content: buffer,
             initial_cursor_position: self.initial_cursor_position,
         }
     }
@@ -72,22 +84,22 @@ impl EditionBuffer {
     /// TODO: rename to change_cursor_char
     pub fn change_cursor_item_to(&mut self, new_char: char) -> &mut Self {
         let current_cursor = self.cursor.get_current();
-        let mut s: FieldBuffer = String::new();
-        for (index, current_char) in self.buffer.char_indices() {
+        let mut s: Content = String::new();
+        for (index, current_char) in self.content.char_indices() {
             if index == current_cursor {
                 s.push(new_char).unwrap();
             } else {
                 s.push(current_char).unwrap();
             }
         }
-        self.buffer = s.to_owned();
+        self.content = s.to_owned();
         self
     }
 
     /// Reset cursor to its default initial position
     /// NOTE: This method is not necessary the same as begin() method
     pub fn reset_cursor(&mut self) {
-        self.cursor = Cursor::from_range(0..self.buffer.len(), self.initial_cursor_position);
+        self.cursor = Cursor::from_range(0..self.content.len(), self.initial_cursor_position);
     }
 
     /// increment_cursor_safe
@@ -149,7 +161,7 @@ impl<'a> Numerical<'a> {
     }
 
     pub fn to_u16(&self) -> u16 {
-        let value = convert_FieldBuffer_to_u16(self.edition_buffer.buffer.clone());
+        let value = convert_FieldBuffer_to_u16(self.edition_buffer.content.clone());
         value
     }
 
@@ -174,7 +186,7 @@ impl<'a> Numerical<'a> {
     }
 
     pub fn char_indices(&self) -> CharIndices {
-        self.edition_buffer.buffer.char_indices()
+        self.edition_buffer.content.char_indices()
     }
 }
 
