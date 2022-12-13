@@ -15,16 +15,18 @@ use super::optional::{Optional, OptionsBuffer};
 use super::{edit_mode::EditMode, widget::Editable, widget::Widget};
 use lib_1::utils::cursor::Cursor;
 
-/// Sets the max size of the Content buffer
+/// Sets the max size of the [`Content`] type
+///
+/// NOTE: Do not choose a number less than 5 else you cannot represent u16 data types in its decimal representation (ie: 65535)
 const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 6;
 
 /// A string that represents some data in memory
 pub type Content = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
 
-/// Creates a FieldBuffer from a u16 value.
+/// Converts an [`u16`] to a [`Content`]
 ///
 /// TODO: What happens if number_of_digits is out_of_range?
-fn convert_u16_to_FieldBuffer(data: u16, number_of_digits: usize) -> Content {
+fn convert_u16_to_content(data: u16, number_of_digits: usize) -> Content {
     const blacket_char: char = '0';
     let s = convert_u16_to_string_decimal(data);
     let mut base: Content = String::from_str(s.as_str()).unwrap();
@@ -43,8 +45,8 @@ fn convert_u16_to_FieldBuffer(data: u16, number_of_digits: usize) -> Content {
 /// Converts a [`Content`] that is supposed to contains an number into an [`u16`] value
 ///
 /// If [`Content`] does not contains a number or if the convertion is not possible returns zero
-fn convert_FieldBuffer_to_u16(data: Content) -> u16 {
-    data.parse::<u16>().unwrap_or(0)
+fn convert_content_to_u16(content: &Content) -> u16 {
+    content.parse::<u16>().unwrap_or(0)
 }
 
 /// A string that represents some data content being edited by a navigation cursor.
@@ -69,16 +71,6 @@ impl ContentEditor {
             cursor: Cursor::new(start, end, initial_cursor_position),
             content: initial_content,
             initial_cursor_position,
-        }
-    }
-
-    pub fn clone(&self) -> Self {
-        let buffer: Content = self.content.clone();
-        let cursor = self.cursor.clone();
-        Self {
-            cursor,
-            content: buffer,
-            initial_cursor_position: self.initial_cursor_position,
         }
     }
 
@@ -135,10 +127,15 @@ impl ContentEditor {
     }
 }
 
-struct Unsigned16ContentEditor {
-    content_editor: ContentEditor,
+/// Wrapper of the main parameters of the [`Unsigned16Editor`]
+struct Parameters {
     valid_range: Range<u16>,
+    /// Number of digits you want your editor have.
+    ///
+    /// Must be a number between 0 and 5.
+    /// TODO: otherwise it will be clamped to the nearest edge of that range.
     number_of_digits: usize,
+    initial_cursor_position: u8,
 }
 
 /// An `unsigned integer` cursor navigated editor
@@ -146,43 +143,32 @@ struct Unsigned16ContentEditor {
 /// This type does supose that the edition is being performed in memory and does not include the `view` mechanism
 struct Unsigned16Editor<'a> {
     content_editor: ContentEditor,
-    valid_range: Range<u16>,
-    /// Number of digits you want your editor have.
-    ///
-    /// Must be a number between 0 and 5.
-    /// TODO: otherwise it will be clamped to the nearest edge of that range.
-    number_of_digits: usize,
-    /// The initial content is being saved for make possible to `reset` it
-    ///
-    /// TODO: Remove the necessity of this property by avoiding make the Self alive when no edition is hapenning by the user (for example when the info is just being show in screen without any edition mode)
-    initial_edition_buffer: ContentEditor,
+    parameters: Parameters,
     variable: &'a mut u16,
 }
 
 impl<'a> Unsigned16Editor<'a> {
-    pub fn new(
-        contentEditor: ContentEditor,
-        valid_range: Range<u16>,
-        number_of_digits: usize,
-        variable: &'a mut u16,
-    ) -> Self {
+    pub fn new(initial_content: Content, parameters: Parameters, variable: &'a mut u16) -> Self {
         Self {
-            content_editor: contentEditor.clone(),
-            valid_range,
-            number_of_digits,
-            initial_edition_buffer: contentEditor,
+            content_editor: ContentEditor::new(initial_content, parameters.initial_cursor_position),
+            parameters,
             variable,
         }
     }
 
+    pub fn from_u16(initial_value: u16, parameters: Parameters, variable: &'a mut u16) -> Self {
+        let initial_content = convert_u16_to_content(initial_value, parameters.number_of_digits);
+        Self::new(initial_content, parameters, variable)
+    }
+
     pub fn set_u16(&mut self, value: u16) {
         let initial_cursor_position = self.content_editor.initial_cursor_position;
-        let field_buffer = convert_u16_to_FieldBuffer(value, self.number_of_digits);
+        let field_buffer = convert_u16_to_content(value, self.parameters.number_of_digits);
         self.content_editor = ContentEditor::new(field_buffer, initial_cursor_position);
     }
 
     pub fn to_u16(&self) -> u16 {
-        let value = convert_FieldBuffer_to_u16(self.content_editor.content.clone());
+        let value = convert_content_to_u16(&self.content_editor.content);
         value
     }
 
@@ -192,8 +178,8 @@ impl<'a> Unsigned16Editor<'a> {
 
     pub fn to_u16_normalized(&self) -> u16 {
         let value = self.to_u16();
-        let min = self.valid_range.start;
-        let max = self.valid_range.end;
+        let min = self.parameters.valid_range.start;
+        let max = self.parameters.valid_range.end;
         let value_clamped = value.clamp(min, max);
         value_clamped
     }
@@ -311,16 +297,14 @@ impl<'a> NumericalField<'a> {
         number_of_digits: usize,
         valid_range: Range<u16>,
     ) -> Self {
+        let parameters = Parameters {
+            valid_range,
+            number_of_digits,
+            initial_cursor_position,
+        };
         let value = (*variable).clone();
-        let array = convert_u16_to_FieldBuffer(value, number_of_digits);
-        let edition_buffer = ContentEditor::new(array.clone(), initial_cursor_position);
         Self {
-            numerical: Unsigned16Editor::new(
-                edition_buffer,
-                valid_range,
-                number_of_digits,
-                variable,
-            ),
+            numerical: Unsigned16Editor::from_u16(value, parameters, variable),
             blink: RectangularWave::new(600, 300),
         }
     }
@@ -349,7 +333,7 @@ impl NumericalField<'_> {
         canvas.set_cursor(start_point);
         for (position, digit) in self.numerical.char_indices() {
             let blink_char = '_';
-            let mut current_char = digit.clone();
+            let mut current_char = digit;
             let is_current_char_over_cursor = position == self.numerical.get_current_cursor_index();
             let is_time_to_blink = self.blink.read() && is_in_edit_mode; // do not blink if it is not in edit mode
             if is_current_char_over_cursor && is_time_to_blink {
