@@ -2,14 +2,12 @@ use core::ops::Range;
 
 use lib_1::utils::common::usize_to_u8_clamper;
 
-/// Stateful Cursor
-/// TODO: Make Cursor<T=u8>
+/// Stateful Cursor that may oscilates between start (inclusive) and end (exclusive)
 #[derive(Copy, Clone)]
 pub struct Cursor {     // size = 3 bytes
-    current: u8,     // oscilates between 'range' values
-    //range: Range<usize>, //(inclusive-exclusive) 
-    start: u8, // min_included
-    end: u8, // max_excluded
+    current: u8,     // oscilates between start (inclusive) and end (exclusive)
+    start: u8, // included
+    end: u8, // excluded
                          
 }
 
