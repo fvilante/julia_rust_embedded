@@ -154,26 +154,25 @@ impl Clone for Parameters {
 /// An `unsigned integer` cursor navigated editor
 ///
 /// This type does supose that the edition is being performed in memory and does not include the `view` mechanism
-struct Unsigned16Editor<'a> {
+struct Unsigned16Editor {
     content_editor: ContentEditor,
     parameters: Parameters,
-    variable: &'a mut u16,
 }
 
-impl<'a> Unsigned16Editor<'a> {
-    pub fn new(initial_content: Content, parameters: Parameters, variable: &'a mut u16) -> Self {
+impl Unsigned16Editor {
+    pub fn new(initial_content: Content, parameters: Parameters) -> Self {
         Self {
             content_editor: ContentEditor::new(initial_content, parameters.initial_cursor_position),
             parameters,
-            variable,
         }
     }
 
-    pub fn from_u16(initial_value: u16, parameters: Parameters, variable: &'a mut u16) -> Self {
+    pub fn from_u16(initial_value: u16, parameters: Parameters) -> Self {
         let initial_content = convert_u16_to_content(initial_value, parameters.number_of_digits);
-        Self::new(initial_content, parameters, variable)
+        Self::new(initial_content, parameters)
     }
 
+    ///TODO: Remove this method or make it unnecessary if possible
     pub fn set_u16(&mut self, value: u16) {
         let initial_cursor_position = self.content_editor.initial_cursor_position;
         let content = convert_u16_to_content(value, self.parameters.number_of_digits);
@@ -199,6 +198,7 @@ impl<'a> Unsigned16Editor<'a> {
         self.content_editor.cursor.get_current()
     }
 
+    ///TODO: Remove this method or make it unnecessary if possible
     pub fn reset_cursor(&mut self) {
         self.content_editor.reset_cursor()
     }
@@ -209,85 +209,107 @@ impl<'a> Unsigned16Editor<'a> {
     }
 }
 
-impl Unsigned16Editor<'_> {
+pub struct Unsigned16Widget<'a> {
+    number_editor: Unsigned16Editor,
+    variable: &'a mut u16,
+    blink: RectangularWave,
+}
+
+impl<'a> Unsigned16Widget<'a> {
+    pub fn new(variable: &'a mut u16, parameters: Parameters) -> Self {
+        let value = (*variable).clone();
+        Self {
+            number_editor: Unsigned16Editor::from_u16(value, parameters),
+            variable,
+            blink: RectangularWave::new(600, 300),
+        }
+    }
+}
+
+impl Unsigned16Widget<'_> {
     pub fn save_edition(&mut self) {
-        let normalized_value = self.to_u16_clamped();
+        let normalized_value = self.number_editor.to_u16_clamped();
         *self.variable = normalized_value; // saves data
-        self.set_u16(normalized_value); // saves displayed data
-        self.reset_cursor();
+                                           //TODO: Make below lines unnecessary
+        let number_editor = &mut self.number_editor;
+        number_editor.set_u16(normalized_value); // saves displayed data
+        number_editor.reset_cursor();
     }
 
     pub fn abort_edition(&mut self) {
         let original_value = (*self.variable).clone();
-        self.set_u16(original_value); // resets displayed data
-        self.reset_cursor();
+        //TODO: Make below lines unnecessary
+        let number_editor = &mut self.number_editor;
+        number_editor.set_u16(original_value); // resets displayed data
+        number_editor.reset_cursor();
     }
 }
 
-impl Unsigned16Editor<'_> {
+impl Unsigned16Widget<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
+        let content_editor = &mut self.number_editor.content_editor;
         match key {
             // navigation_key left and right
             KeyCode::KEY_SETA_BRANCA_ESQUERDA => {
-                self.content_editor.move_cursor_left();
+                content_editor.move_cursor_left();
             }
             KeyCode::KEY_SETA_BRANCA_DIREITA => {
-                self.content_editor.move_cursor_right();
+                content_editor.move_cursor_right();
             }
             KeyCode::KEY_DIRECIONAL_PARA_DIREITA => {
-                self.content_editor.move_cursor_right();
+                content_editor.move_cursor_right();
             }
             KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => {
-                self.content_editor.move_cursor_left();
+                content_editor.move_cursor_left();
             }
             // edition keys
             KeyCode::KEY_0 => {
-                self.content_editor
+                content_editor
                     .change_cursor_item_to('0')
                     .move_cursor_right();
             }
             KeyCode::KEY_1 => {
-                self.content_editor
+                content_editor
                     .change_cursor_item_to('1')
                     .move_cursor_right();
             }
             KeyCode::KEY_2 => {
-                self.content_editor
+                content_editor
                     .change_cursor_item_to('2')
                     .move_cursor_right();
             }
             KeyCode::KEY_3 => {
-                self.content_editor
+                content_editor
                     .change_cursor_item_to('3')
                     .move_cursor_right();
             }
             KeyCode::KEY_4 => {
-                self.content_editor
+                content_editor
                     .change_cursor_item_to('4')
                     .move_cursor_right();
             }
             KeyCode::KEY_5 => {
-                self.content_editor
+                content_editor
                     .change_cursor_item_to('5')
                     .move_cursor_right();
             }
             KeyCode::KEY_6 => {
-                self.content_editor
+                content_editor
                     .change_cursor_item_to('6')
                     .move_cursor_right();
             }
             KeyCode::KEY_7 => {
-                self.content_editor
+                content_editor
                     .change_cursor_item_to('7')
                     .move_cursor_right();
             }
             KeyCode::KEY_8 => {
-                self.content_editor
+                content_editor
                     .change_cursor_item_to('8')
                     .move_cursor_right();
             }
             KeyCode::KEY_9 => {
-                self.content_editor
+                content_editor
                     .change_cursor_item_to('9')
                     .move_cursor_right();
             }
@@ -297,46 +319,18 @@ impl Unsigned16Editor<'_> {
     }
 }
 
-pub struct Unsigned16Viewer<'a> {
-    numerical: Unsigned16Editor<'a>,
-    blink: RectangularWave,
-}
-
-impl<'a> Unsigned16Viewer<'a> {
-    pub fn new(variable: &'a mut u16, parameters: Parameters) -> Self {
-        let value = (*variable).clone();
-        Self {
-            numerical: Unsigned16Editor::from_u16(value, parameters, variable),
-            blink: RectangularWave::new(600, 300),
-        }
-    }
-}
-
-impl Unsigned16Viewer<'_> {
-    pub fn save_edition(&mut self) {
-        self.numerical.save_edition();
-    }
-
-    pub fn abort_edition(&mut self) {
-        self.numerical.abort_edition();
-    }
-}
-
-impl Unsigned16Viewer<'_> {
-    pub fn send_key(&mut self, key: KeyCode) {
-        self.numerical.send_key(key)
-    }
-
+impl Unsigned16Widget<'_> {
     pub fn update(&mut self) {
         self.blink.update(); // blinks cursor
     }
 
     pub fn draw(&self, canvas: &mut Canvas, start_point: Point, is_in_edit_mode: bool) {
         canvas.set_cursor(start_point);
-        for (position, digit) in self.numerical.char_indices() {
+        for (position, digit) in self.number_editor.char_indices() {
             let blink_char = '_';
             let mut current_char = digit;
-            let is_current_char_over_cursor = position == self.numerical.get_current_cursor_index();
+            let is_current_char_over_cursor =
+                position == self.number_editor.get_current_cursor_index();
             let is_time_to_blink = self.blink.read() && is_in_edit_mode; // do not blink if it is not in edit mode
             if is_current_char_over_cursor && is_time_to_blink {
                 current_char = blink_char;
@@ -347,7 +341,7 @@ impl Unsigned16Viewer<'_> {
 }
 
 pub enum FieldEnum<'a> {
-    Numerical(Unsigned16Viewer<'a>),
+    Numerical(Unsigned16Widget<'a>),
     Optional(Optional<'a>),
 }
 
@@ -406,7 +400,7 @@ impl<'a> Field<'a> {
     }
 
     pub fn from_numerical(variable: &'a mut u16, parameters: Parameters) -> Self {
-        let numerical_field = Unsigned16Viewer::new(variable, parameters);
+        let numerical_field = Unsigned16Widget::new(variable, parameters);
         let field_enum = FieldEnum::Numerical(numerical_field);
         Self::new(field_enum)
     }
