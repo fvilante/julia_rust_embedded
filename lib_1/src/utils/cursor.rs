@@ -35,6 +35,16 @@ impl Cursor {
         self.current as usize // value already normalized
     }
 
+    /// Sets current cursor position
+    ///
+    /// Note that if proposed `cursor_position` is outside the valid range its value is clamped
+    pub fn set_current(&mut self, cursor_position: u8) {
+        let clamped_cursor_position = cursor_position;
+        let normalized_current =
+            Self::normalize_current(clamped_cursor_position, self.start, self.end);
+        self.current = normalized_current;
+    }
+
     /// returns true if has reached the upper bound
     pub fn next(&mut self) -> bool {
         let last_index = self.end - 1;

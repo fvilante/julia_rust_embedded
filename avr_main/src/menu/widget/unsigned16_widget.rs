@@ -58,10 +58,6 @@ struct ContentEditor {
     content: Content,
     /// Tracks current cursor position.
     cursor: Cursor,
-    /// The place where the cursor starts.
-    ///
-    /// TODO: Remove the necessity of this method being avoiding make the Self alive when no edition is hapenning by the user (for example when the info is just being show in screen without any edition mode)
-    pub initial_cursor_position: u8,
 }
 
 impl ContentEditor {
@@ -71,7 +67,6 @@ impl ContentEditor {
         Self {
             cursor: Cursor::new(start, end, initial_cursor_position),
             content: initial_content,
-            initial_cursor_position,
         }
     }
 
@@ -88,14 +83,6 @@ impl ContentEditor {
         }
         self.content = s.clone();
         self
-    }
-
-    /// Reset cursor to its default initial position
-    /// NOTE: This method is not necessary the same as begin() method
-    ///
-    /// TODO: Remove the necessity of this method being avoiding make the Self alive when no edition is hapenning by the user (for example when the info is just being show in screen without any edition mode)
-    pub fn reset_cursor(&mut self) {
-        self.cursor = Cursor::from_range(0..self.content.len(), self.initial_cursor_position);
     }
 
     /// Move cursor to a single character to the right
@@ -174,8 +161,12 @@ impl Unsigned16Editor {
 
     ///TODO: Remove this method or make it unnecessary if possible
     pub fn set_u16(&mut self, value: u16) {
-        let initial_cursor_position = self.content_editor.initial_cursor_position;
-        let content = convert_u16_to_content(value, self.parameters.number_of_digits);
+        let Parameters {
+            initial_cursor_position,
+            number_of_digits,
+            ..
+        } = self.parameters;
+        let content = convert_u16_to_content(value, number_of_digits);
         self.content_editor = ContentEditor::new(content, initial_cursor_position);
     }
 
@@ -197,10 +188,16 @@ impl Unsigned16Editor {
     pub fn get_current_cursor_index(&self) -> usize {
         self.content_editor.cursor.get_current()
     }
-
-    ///TODO: Remove this method or make it unnecessary if possible
+    /// Reset cursor to its default initial position
+    ///
+    /// NOTE: This method is not necessary the same as begin() method
+    ///
+    /// TODO: Remove the necessity of this method being avoiding make the Self alive when no edition is hapenning
+    /// by the user (for example when the info is just being show in screen without any edition mode)
     pub fn reset_cursor(&mut self) {
-        self.content_editor.reset_cursor()
+        let cursor = &mut self.content_editor.cursor;
+        let initial_cursor_position = self.parameters.initial_cursor_position;
+        cursor.set_current(initial_cursor_position);
     }
 
     /// An iterator over the [char]s of a [`Unsigned16Editor`], and their positions.
@@ -209,6 +206,7 @@ impl Unsigned16Editor {
     }
 }
 
+/// This [`Widget`] manages the edition of an [`u16`] by the user using keyboard and lcd display
 pub struct Unsigned16EditorWidget<'a> {
     number_editor: Unsigned16Editor,
     variable: &'a mut u16,
