@@ -26,13 +26,14 @@ pub type Content = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
 /// Converts an [`u16`] to a [`Content`]
 ///
 /// TODO: What happens if number_of_digits is out_of_range?
-fn convert_u16_to_content(data: u16, number_of_digits: usize) -> Content {
+fn convert_u16_to_content(data: u16, number_of_digits: u8) -> Content {
     const blacket_char: char = '0';
     let s = convert_u16_to_string_decimal(data);
     let mut base: Content = String::from_str(s.as_str()).unwrap();
     let mut temp: Content = String::new();
     //leading zeros
-    for _ in base.len()..number_of_digits {
+    let len = usize_to_u8_clamper(base.len());
+    for _ in len..number_of_digits {
         temp.push(blacket_char);
     }
     //actal number
@@ -136,7 +137,7 @@ pub struct Parameters {
     ///
     /// Must be a number between 0 and 5.
     /// TODO: otherwise it will be clamped to the nearest edge of that range.
-    pub number_of_digits: usize,
+    pub number_of_digits: u8,
     pub initial_cursor_position: u8,
 }
 
