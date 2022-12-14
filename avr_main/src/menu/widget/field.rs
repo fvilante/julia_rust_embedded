@@ -128,14 +128,26 @@ impl ContentEditor {
 }
 
 /// Wrapper of the main parameters of the [`Unsigned16Editor`]
-struct Parameters {
-    valid_range: Range<u16>,
+///
+/// TODO: Does not make sense to have a number of digits greater than the valid.range.end. Protect against this condition
+pub struct Parameters {
+    pub valid_range: Range<u16>,
     /// Number of digits you want your editor have.
     ///
     /// Must be a number between 0 and 5.
     /// TODO: otherwise it will be clamped to the nearest edge of that range.
-    number_of_digits: usize,
-    initial_cursor_position: u8,
+    pub number_of_digits: usize,
+    pub initial_cursor_position: u8,
+}
+
+impl Clone for Parameters {
+    fn clone(&self) -> Self {
+        Self {
+            valid_range: self.valid_range.clone(),
+            number_of_digits: self.number_of_digits.clone(),
+            initial_cursor_position: self.initial_cursor_position.clone(),
+        }
+    }
 }
 
 /// An `unsigned integer` cursor navigated editor
@@ -290,17 +302,7 @@ pub struct Unsigned16Viewer<'a> {
 }
 
 impl<'a> Unsigned16Viewer<'a> {
-    pub fn new(
-        variable: &'a mut u16,
-        initial_cursor_position: u8,
-        number_of_digits: usize,
-        valid_range: Range<u16>,
-    ) -> Self {
-        let parameters = Parameters {
-            valid_range,
-            number_of_digits,
-            initial_cursor_position,
-        };
+    pub fn new(variable: &'a mut u16, parameters: Parameters) -> Self {
         let value = (*variable).clone();
         Self {
             numerical: Unsigned16Editor::from_u16(value, parameters, variable),
@@ -402,18 +404,8 @@ impl<'a> Field<'a> {
         }
     }
 
-    pub fn from_numerical(
-        variable: &'a mut u16,
-        initial_cursor_position: u8,
-        number_of_digits: usize,
-        valid_range: Range<u16>,
-    ) -> Self {
-        let numerical_field = Unsigned16Viewer::new(
-            variable,
-            initial_cursor_position,
-            number_of_digits,
-            valid_range,
-        );
+    pub fn from_numerical(variable: &'a mut u16, parameters: Parameters) -> Self {
+        let numerical_field = Unsigned16Viewer::new(variable, parameters);
         let field_enum = FieldEnum::Numerical(numerical_field);
         Self::new(field_enum)
     }

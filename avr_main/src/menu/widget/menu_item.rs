@@ -10,7 +10,7 @@ use crate::{
 
 use super::{
     caption::Caption,
-    field::{Content, Field, FieldEnum},
+    field::{Content, Field, FieldEnum, Parameters},
     optional::OptionsBuffer,
     sub_menu::{LcdLine, SubMenu},
     widget::Editable,
@@ -32,9 +32,7 @@ pub struct NumericalParameterArgs {
     pub point2_: u8,
     pub text: FlashString,
     pub variable: *mut u16, // unsafe
-    pub initial_cursor_position: u8,
-    pub number_of_digits: u8,
-    pub valid_range: Range<u16>,
+    pub parameters: Parameters,
 }
 
 pub struct OptionalParameterArgs {
@@ -86,18 +84,11 @@ impl<'a> MenuItem<'a> {
                 point2_,
                 text,
                 mut variable,
-                initial_cursor_position,
-                number_of_digits,
-                valid_range,
+                parameters,
             } => {
                 let point1 = Point1d::new(*point1_);
                 let point2 = Point1d::new(*point2_);
-                let field = Field::from_numerical(
-                    unsafe { &mut *variable },
-                    *initial_cursor_position,
-                    *number_of_digits as usize,
-                    (*valid_range).clone(),
-                );
+                let field = Field::from_numerical(unsafe { &mut *variable }, (*parameters).clone());
                 let mut menu_item = Self::new(point1, *text, point2, field, None);
                 menu_item
             }

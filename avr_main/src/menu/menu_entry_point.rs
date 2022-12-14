@@ -29,6 +29,7 @@ use crate::board::output_expander::OutputExpander;
 use crate::board::{lcd, output_expander};
 use crate::enviroment::front_panel::FrontPanel;
 use crate::menu::accessor::Accessor;
+use crate::menu::widget::field::Parameters;
 use crate::menu::widget::optional::make_options_buffer_from_array;
 use crate::menu::widget::optional::OptionsBuffer;
 use crate::menu::widget::sub_menu::SubMenu;
@@ -146,9 +147,11 @@ pub fn development_entry_point() -> ! {
         point2_: 33,
         text: FlashString::new(&POSICAO_INICIAL),
         variable: to_pointer_mut(&mut value1),
-        initial_cursor_position: 0,
-        number_of_digits: 4,
-        valid_range: 0..100,
+        parameters: Parameters {
+            initial_cursor_position: 0,
+            number_of_digits: 4,
+            valid_range: 0..100,
+        },
     });
     menu_list.push(menu_item);
 
@@ -158,9 +161,11 @@ pub fn development_entry_point() -> ! {
         point2_: 33,
         text: FlashString::new(&POSICAO_FINAL),
         variable: to_pointer_mut(&mut value2),
-        initial_cursor_position: 0,
-        number_of_digits: 4,
-        valid_range: 0..0xFFFF,
+        parameters: Parameters {
+            initial_cursor_position: 0,
+            number_of_digits: 4,
+            valid_range: 0..9999,
+        },
     });
     menu_list.push(menu_item);
 
