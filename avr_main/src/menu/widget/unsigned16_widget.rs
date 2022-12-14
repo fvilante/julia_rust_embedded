@@ -92,13 +92,15 @@ impl ContentEditor {
 ///
 /// Wrapper of the main parameters of the [`NumberEditor`]
 ///
-/// TODO: Does not make sense to have a number of digits greater than the valid.range.end. Protect against this condition
+/// TODO: Does not make sense to have a number of digits greater than the valid.range.end. Protect against this
+/// condition
 pub struct Format {
     pub valid_range: Range<u16>,
     /// Number of digits you want your editor have.
     ///
     /// Must be a number between 0 and 5.
     /// TODO: otherwise it will be clamped to the nearest edge of that range.
+    /// TODO: Remove this property from format, because it can be infered from the valid_range.END value
     pub number_of_digits: u8,
     pub initial_cursor_position: u8,
 }
@@ -201,7 +203,7 @@ impl NumberEditor {
 }
 
 /// This [`Widget`] manages the edition of an [`u16`] by the user using keyboard and lcd display
-pub struct U16EditorWidget<'a> {
+pub struct NumberEditorWidget<'a> {
     u16_editor: NumberEditor,
     variable: &'a mut u16,
     blink: RectangularWave,
@@ -209,7 +211,7 @@ pub struct U16EditorWidget<'a> {
     format: Format,
 }
 
-impl<'a> U16EditorWidget<'a> {
+impl<'a> NumberEditorWidget<'a> {
     pub fn new(variable: &'a mut u16, format: Format) -> Self {
         let value = (*variable).clone();
         Self {
@@ -221,7 +223,7 @@ impl<'a> U16EditorWidget<'a> {
     }
 }
 
-impl U16EditorWidget<'_> {
+impl NumberEditorWidget<'_> {
     pub fn save_edition(&mut self) {
         let edited_value = self.u16_editor.as_u16();
         *self.variable = edited_value; // saves data.
@@ -240,7 +242,7 @@ impl U16EditorWidget<'_> {
     }
 }
 
-impl U16EditorWidget<'_> {
+impl NumberEditorWidget<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         let content_editor = &mut self.u16_editor.content_editor;
         match key {
@@ -294,7 +296,7 @@ impl U16EditorWidget<'_> {
     }
 }
 
-impl U16EditorWidget<'_> {
+impl NumberEditorWidget<'_> {
     pub fn update(&mut self) {
         self.blink.update(); // blinks cursor
     }
@@ -316,7 +318,7 @@ impl U16EditorWidget<'_> {
 }
 
 pub enum FieldEnum<'a> {
-    Numerical(U16EditorWidget<'a>),
+    Numerical(NumberEditorWidget<'a>),
     Optional(Optional<'a>),
 }
 
@@ -375,7 +377,7 @@ impl<'a> Field<'a> {
     }
 
     pub fn from_numerical(variable: &'a mut u16, parameters: Format) -> Self {
-        let numerical_field = U16EditorWidget::new(variable, parameters);
+        let numerical_field = NumberEditorWidget::new(variable, parameters);
         let field_enum = FieldEnum::Numerical(numerical_field);
         Self::new(field_enum)
     }
