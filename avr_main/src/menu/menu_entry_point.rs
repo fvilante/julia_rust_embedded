@@ -149,7 +149,6 @@ pub fn development_entry_point() -> ! {
         variable: to_pointer_mut(&mut value1),
         parameters: Format {
             initial_cursor_position: 0,
-            number_of_digits: 4,
             valid_range: 0..100,
         },
     });
@@ -163,7 +162,6 @@ pub fn development_entry_point() -> ! {
         variable: to_pointer_mut(&mut value2),
         parameters: Format {
             initial_cursor_position: 0,
-            number_of_digits: 4,
             valid_range: 0..9999,
         },
     });

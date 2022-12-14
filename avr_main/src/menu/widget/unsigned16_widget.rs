@@ -181,20 +181,22 @@ impl ContentEditor {
 /// condition
 pub struct Format {
     pub valid_range: Range<u16>,
-    /// Number of digits you want your editor have.
-    ///
-    /// Must be a number between 0 and 5.
-    /// TODO: otherwise it will be clamped to the nearest edge of that range.
-    /// TODO: Remove this property from format, because it can be infered from the valid_range.END value
-    pub number_of_digits: u8,
     pub initial_cursor_position: u8,
+}
+
+impl Format {
+    /// Given a valid_range.END calculates the least amount of digits necessary to represent it in decimal as a string
+    pub fn get_number_of_digits(&self) -> u8 {
+        let max = self.valid_range.end;
+        let s = convert_u16_to_string_decimal(max);
+        usize_to_u8_clamper(s.len())
+    }
 }
 
 impl Clone for Format {
     fn clone(&self) -> Self {
         Self {
             valid_range: self.valid_range.clone(),
-            number_of_digits: self.number_of_digits.clone(),
             initial_cursor_position: self.initial_cursor_position.clone(),
         }
     }
@@ -221,19 +223,24 @@ impl NumberEditor {
     /// If the `u16` value is greater than max size that `number_of_digits` can contain, than than
     /// the u16 will be clamped silently.
     pub fn from_u16(initial_value: u16, format: Format) -> Self {
-        let initial_content = Content::from_u16_formated(initial_value, format.number_of_digits);
+        let initial_content =
+            Content::from_u16_formated(initial_value, format.get_number_of_digits());
         Self::new(initial_content, format)
     }
 
     ///TODO: Remove this method or make it unnecessary if possible
     pub fn set_u16(&mut self, value: u16, format: Format) {
-        let content = Content::from_u16_formated(value, format.number_of_digits);
+        let content = Content::from_u16_formated(value, format.get_number_of_digits());
         self.content_editor = ContentEditor::new(content, format.initial_cursor_position);
     }
 
-    /// Converts edited value to its [`u16`] representation
-    pub fn as_u16(&self) -> u16 {
-        Content::to_u16(&self.content_editor.content)
+    /// Copy edited value to its [`u16`] representation assuring the value is clamped to `self.format.valid_range`
+    pub fn as_u16_clamped(&self) -> u16 {
+        let current_edited_value = Content::to_u16(&self.content_editor.content);
+        let min = self.format.valid_range.start;
+        let max = self.format.valid_range.end;
+        let clamped_value = current_edited_value.clamp(min, max);
+        clamped_value
     }
 
     pub fn get_current_cursor_index(&self) -> u8 {
