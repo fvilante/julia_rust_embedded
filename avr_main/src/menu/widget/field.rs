@@ -264,54 +264,34 @@ impl Unsigned16Widget<'_> {
             }
             // edition keys
             KeyCode::KEY_0 => {
-                content_editor
-                    .change_cursor_item_to('0')
-                    .move_cursor_right();
+                content_editor.addAndMoveRight('0');
             }
             KeyCode::KEY_1 => {
-                content_editor
-                    .change_cursor_item_to('1')
-                    .move_cursor_right();
+                content_editor.addAndMoveRight('1');
             }
             KeyCode::KEY_2 => {
-                content_editor
-                    .change_cursor_item_to('2')
-                    .move_cursor_right();
+                content_editor.addAndMoveRight('2');
             }
             KeyCode::KEY_3 => {
-                content_editor
-                    .change_cursor_item_to('3')
-                    .move_cursor_right();
+                content_editor.addAndMoveRight('3');
             }
             KeyCode::KEY_4 => {
-                content_editor
-                    .change_cursor_item_to('4')
-                    .move_cursor_right();
+                content_editor.addAndMoveRight('4');
             }
             KeyCode::KEY_5 => {
-                content_editor
-                    .change_cursor_item_to('5')
-                    .move_cursor_right();
+                content_editor.addAndMoveRight('5');
             }
             KeyCode::KEY_6 => {
-                content_editor
-                    .change_cursor_item_to('6')
-                    .move_cursor_right();
+                content_editor.addAndMoveRight('6');
             }
             KeyCode::KEY_7 => {
-                content_editor
-                    .change_cursor_item_to('7')
-                    .move_cursor_right();
+                content_editor.addAndMoveRight('7');
             }
             KeyCode::KEY_8 => {
-                content_editor
-                    .change_cursor_item_to('8')
-                    .move_cursor_right();
+                content_editor.addAndMoveRight('8');
             }
             KeyCode::KEY_9 => {
-                content_editor
-                    .change_cursor_item_to('9')
-                    .move_cursor_right();
+                content_editor.addAndMoveRight('9');
             }
             //everything else -> do nothing
             _ => {}
