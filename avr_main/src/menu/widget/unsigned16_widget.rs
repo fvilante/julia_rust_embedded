@@ -1,5 +1,5 @@
 use core::ops::Range;
-use core::str::{CharIndices, FromStr};
+use core::str::{CharIndices, Chars, FromStr};
 
 use alloc::borrow::ToOwned;
 use heapless::{String, Vec};
@@ -20,8 +20,62 @@ use lib_1::utils::cursor::Cursor;
 /// NOTE: Do not choose a number less than 5 else you cannot represent u16 data types in its decimal representation (ie: 65535)
 const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 6;
 
-/// A string that represents some data in memory (ie: numbers, texts)
-pub type Content = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
+/// A string buffer with static capacity defined and stack allocated
+pub(super) type StringBuffer = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
+
+/// Represents a variable length  data, in memory, though a sequence of characters (ie: numbers, texts).
+///
+/// This type is a wrapper over the [`StringBuffer`] type
+pub struct Content {
+    data: StringBuffer,
+}
+
+impl Content {
+    fn from_raw(data: StringBuffer) -> Self {
+        Self { data }
+    }
+
+    /// New empty content
+    pub fn new() -> Self {
+        Self::from_raw(StringBuffer::new())
+    }
+
+    /// Constructs from [`&str`] returns None if str is greater than buffer capacity (see: [`MAX_NUMBER_OF_CHARS_IN_BUFFER`])
+    pub fn from_str(s: &str) -> Option<Self> {
+        if let Ok(data) = StringBuffer::from_str(s) {
+            Some(Self::from_raw(data))
+        } else {
+            None
+        }
+    }
+
+    /// Returns lenght of Content.
+    ///
+    /// It must be less or equal to [`MAX_NUMBER_OF_CHARS_IN_BUFFER`]
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
+
+    pub fn char_indices(&self) -> CharIndices {
+        self.data.char_indices()
+    }
+
+    pub fn chars(&self) -> Chars<'_> {
+        self.data.chars()
+    }
+
+    pub fn clone(&self) -> Self {
+        Self::from_raw(self.data.clone())
+    }
+
+    pub fn parse<F: FromStr>(&self) -> Option<F> {
+        self.data.parse::<F>().ok()
+    }
+
+    pub fn push(&mut self, c: char) -> Option<()> {
+        self.data.push(c).ok()
+    }
+}
 
 /// A constant sized string that represents some data content being edited by a navigating cursor.
 ///
@@ -46,7 +100,7 @@ impl ContentEditor {
     /// Changes the character in place of the current cursor position to given `new_char`
     pub fn change_cursor_item_to(&mut self, new_char: char) -> &mut Self {
         let current_cursor = self.cursor.get_current();
-        let mut s: Content = String::new();
+        let mut s = Content::new();
         for (index, current_char) in self.content.char_indices() {
             if index == current_cursor as usize {
                 s.push(new_char).unwrap();
@@ -138,8 +192,8 @@ impl NumberEditor {
     fn convert_u16_to_content_and_format_it(data: u16, number_of_digits: u8) -> Content {
         const blacket_char: char = '0';
         let s = convert_u16_to_string_decimal(data);
-        let mut base: Content = String::from_str(s.as_str()).unwrap();
-        let mut temp: Content = String::new();
+        let mut base = Content::from_str(s.as_str()).unwrap();
+        let mut temp = Content::new();
         //leading zeros
         let len = usize_to_u8_clamper(base.len());
         for _ in len..number_of_digits {

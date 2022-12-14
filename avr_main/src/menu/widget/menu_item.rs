@@ -12,7 +12,7 @@ use super::{
     caption::Caption,
     optional::OptionsBuffer,
     sub_menu::{LcdLine, SubMenu},
-    unsigned16_widget::{Content, Field, FieldEnum, Format},
+    unsigned16_widget::{Content, Field, FieldEnum, Format, StringBuffer},
     widget::Editable,
     widget::Widget,
 };
@@ -159,8 +159,8 @@ impl MenuItem<'_> {
 // NOTE: CODE BELOW WAS TESTED AND WORKS, BUT IS JUST A PROOF-OF-CONCEPT.
 
 pub enum MenuItemParsed {
-    PureCaption(String<40>),                              // [Caption]
-    CaptionWithOneField(String<40>, Content, String<10>), // [1st_caption, field_type, last_caption]
+    PureCaption(String<40>),                                   // [Caption]
+    CaptionWithOneField(String<40>, StringBuffer, String<10>), // [1st_caption, field_type, last_caption]
 }
 
 pub fn parse_menu_item_constructor_string(declaration: FlashString) -> MenuItemParsed {
