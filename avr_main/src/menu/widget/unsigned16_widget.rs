@@ -212,33 +212,14 @@ pub struct NumberEditorWidget<'a> {
 }
 
 impl<'a> NumberEditorWidget<'a> {
-    pub fn new(variable: &'a mut u16, format: Format) -> Self {
-        let value = (*variable).clone();
+    pub fn new(initial_value: &'a mut u16, format: Format) -> Self {
+        let value = (*initial_value).clone();
         Self {
             u16_editor: NumberEditor::from_u16(value, format.clone()),
-            variable,
+            variable: initial_value,
             blink: RectangularWave::new(600, 300),
             format: format,
         }
-    }
-}
-
-impl NumberEditorWidget<'_> {
-    pub fn save_edition(&mut self) {
-        let edited_value = self.u16_editor.as_u16();
-        *self.variable = edited_value; // saves data.
-                                       //TODO: Make below lines unnecessary
-        let number_editor = &mut self.u16_editor;
-        let format = number_editor.set_u16(edited_value, self.format.clone()); // saves displayed data
-        number_editor.reset_cursor(self.format.initial_cursor_position);
-    }
-
-    pub fn abort_edition(&mut self) {
-        let original_value = (*self.variable).clone();
-        //TODO: Make below lines unnecessary
-        let number_editor = &mut self.u16_editor;
-        number_editor.set_u16(original_value, self.format.clone()); // saves displayed data
-        number_editor.reset_cursor(self.format.initial_cursor_position);
     }
 }
 
@@ -314,6 +295,25 @@ impl NumberEditorWidget<'_> {
             }
             canvas.print_char(current_char);
         }
+    }
+}
+
+impl NumberEditorWidget<'_> {
+    pub fn save_edition(&mut self) {
+        let edited_value = self.u16_editor.as_u16();
+        *self.variable = edited_value; // saves data.
+                                       //TODO: Make below lines unnecessary
+        let number_editor = &mut self.u16_editor;
+        let format = number_editor.set_u16(edited_value, self.format.clone()); // saves displayed data
+        number_editor.reset_cursor(self.format.initial_cursor_position);
+    }
+
+    pub fn abort_edition(&mut self) {
+        let original_value = (*self.variable).clone();
+        //TODO: Make below lines unnecessary
+        let number_editor = &mut self.u16_editor;
+        number_editor.set_u16(original_value, self.format.clone()); // saves displayed data
+        number_editor.reset_cursor(self.format.initial_cursor_position);
     }
 }
 
