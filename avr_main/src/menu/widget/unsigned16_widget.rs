@@ -209,13 +209,13 @@ impl Unsigned16Editor {
     }
 }
 
-pub struct Unsigned16Widget<'a> {
+pub struct Unsigned16EditorWidget<'a> {
     number_editor: Unsigned16Editor,
     variable: &'a mut u16,
     blink: RectangularWave,
 }
 
-impl<'a> Unsigned16Widget<'a> {
+impl<'a> Unsigned16EditorWidget<'a> {
     pub fn new(variable: &'a mut u16, parameters: Parameters) -> Self {
         let value = (*variable).clone();
         Self {
@@ -226,7 +226,7 @@ impl<'a> Unsigned16Widget<'a> {
     }
 }
 
-impl Unsigned16Widget<'_> {
+impl Unsigned16EditorWidget<'_> {
     pub fn save_edition(&mut self) {
         let normalized_value = self.number_editor.to_u16_clamped();
         *self.variable = normalized_value; // saves data
@@ -245,7 +245,7 @@ impl Unsigned16Widget<'_> {
     }
 }
 
-impl Unsigned16Widget<'_> {
+impl Unsigned16EditorWidget<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         let content_editor = &mut self.number_editor.content_editor;
         match key {
@@ -299,7 +299,7 @@ impl Unsigned16Widget<'_> {
     }
 }
 
-impl Unsigned16Widget<'_> {
+impl Unsigned16EditorWidget<'_> {
     pub fn update(&mut self) {
         self.blink.update(); // blinks cursor
     }
@@ -321,7 +321,7 @@ impl Unsigned16Widget<'_> {
 }
 
 pub enum FieldEnum<'a> {
-    Numerical(Unsigned16Widget<'a>),
+    Numerical(Unsigned16EditorWidget<'a>),
     Optional(Optional<'a>),
 }
 
@@ -380,7 +380,7 @@ impl<'a> Field<'a> {
     }
 
     pub fn from_numerical(variable: &'a mut u16, parameters: Parameters) -> Self {
-        let numerical_field = Unsigned16Widget::new(variable, parameters);
+        let numerical_field = Unsigned16EditorWidget::new(variable, parameters);
         let field_enum = FieldEnum::Numerical(numerical_field);
         Self::new(field_enum)
     }
