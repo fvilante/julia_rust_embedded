@@ -10,9 +10,9 @@ use crate::{
 
 use super::{
     caption::Caption,
-    field::{Content, Field, FieldEnum, Parameters},
     optional::OptionsBuffer,
     sub_menu::{LcdLine, SubMenu},
+    unsigned16_widget::{Content, Field, FieldEnum, Parameters},
     widget::Editable,
     widget::Widget,
 };
