@@ -141,12 +141,12 @@ impl Clone for Parameters {
 /// An `unsigned integer` cursor navigated editor
 ///
 /// This type does supose that the edition is being performed in memory and does not include the `view` mechanism
-struct Unsigned16Editor {
+struct U16Editor {
     content_editor: ContentEditor,
     parameters: Parameters,
 }
 
-impl Unsigned16Editor {
+impl U16Editor {
     pub fn new(initial_content: Content, parameters: Parameters) -> Self {
         Self {
             content_editor: ContentEditor::new(initial_content, parameters.initial_cursor_position),
@@ -207,24 +207,24 @@ impl Unsigned16Editor {
 }
 
 /// This [`Widget`] manages the edition of an [`u16`] by the user using keyboard and lcd display
-pub struct Unsigned16EditorWidget<'a> {
-    u16_editor: Unsigned16Editor,
+pub struct U16EditorWidget<'a> {
+    u16_editor: U16Editor,
     variable: &'a mut u16,
     blink: RectangularWave,
 }
 
-impl<'a> Unsigned16EditorWidget<'a> {
+impl<'a> U16EditorWidget<'a> {
     pub fn new(variable: &'a mut u16, parameters: Parameters) -> Self {
         let value = (*variable).clone();
         Self {
-            u16_editor: Unsigned16Editor::from_u16(value, parameters),
+            u16_editor: U16Editor::from_u16(value, parameters),
             variable,
             blink: RectangularWave::new(600, 300),
         }
     }
 }
 
-impl Unsigned16EditorWidget<'_> {
+impl U16EditorWidget<'_> {
     pub fn save_edition(&mut self) {
         let normalized_value = self.u16_editor.to_u16_clamped();
         *self.variable = normalized_value; // saves data
@@ -243,7 +243,7 @@ impl Unsigned16EditorWidget<'_> {
     }
 }
 
-impl Unsigned16EditorWidget<'_> {
+impl U16EditorWidget<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         let content_editor = &mut self.u16_editor.content_editor;
         match key {
@@ -297,7 +297,7 @@ impl Unsigned16EditorWidget<'_> {
     }
 }
 
-impl Unsigned16EditorWidget<'_> {
+impl U16EditorWidget<'_> {
     pub fn update(&mut self) {
         self.blink.update(); // blinks cursor
     }
@@ -319,7 +319,7 @@ impl Unsigned16EditorWidget<'_> {
 }
 
 pub enum FieldEnum<'a> {
-    Numerical(Unsigned16EditorWidget<'a>),
+    Numerical(U16EditorWidget<'a>),
     Optional(Optional<'a>),
 }
 
@@ -378,7 +378,7 @@ impl<'a> Field<'a> {
     }
 
     pub fn from_numerical(variable: &'a mut u16, parameters: Parameters) -> Self {
-        let numerical_field = Unsigned16EditorWidget::new(variable, parameters);
+        let numerical_field = U16EditorWidget::new(variable, parameters);
         let field_enum = FieldEnum::Numerical(numerical_field);
         Self::new(field_enum)
     }
