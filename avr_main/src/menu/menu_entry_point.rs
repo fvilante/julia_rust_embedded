@@ -32,7 +32,7 @@ use crate::menu::accessor::Accessor;
 use crate::menu::widget::optional::make_options_buffer_from_array;
 use crate::menu::widget::optional::OptionsBuffer;
 use crate::menu::widget::sub_menu::SubMenu;
-use crate::menu::widget::unsigned16_widget::Parameters;
+use crate::menu::widget::unsigned16_widget::Format;
 use crate::menu::widget::widget::Widget;
 use crate::menu::widget::widget_tests::SystemEnviroment;
 use crate::microcontroler::delay::delay_ms;
@@ -147,7 +147,7 @@ pub fn development_entry_point() -> ! {
         point2_: 33,
         text: FlashString::new(&POSICAO_INICIAL),
         variable: to_pointer_mut(&mut value1),
-        parameters: Parameters {
+        parameters: Format {
             initial_cursor_position: 0,
             number_of_digits: 4,
             valid_range: 0..100,
@@ -161,7 +161,7 @@ pub fn development_entry_point() -> ! {
         point2_: 33,
         text: FlashString::new(&POSICAO_FINAL),
         variable: to_pointer_mut(&mut value2),
-        parameters: Parameters {
+        parameters: Format {
             initial_cursor_position: 0,
             number_of_digits: 4,
             valid_range: 0..9999,

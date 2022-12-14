@@ -12,7 +12,7 @@ use super::{
     caption::Caption,
     optional::OptionsBuffer,
     sub_menu::{LcdLine, SubMenu},
-    unsigned16_widget::{Content, Field, FieldEnum, Parameters},
+    unsigned16_widget::{Content, Field, FieldEnum, Format},
     widget::Editable,
     widget::Widget,
 };
@@ -32,7 +32,7 @@ pub struct NumericalParameterArgs {
     pub point2_: u8,
     pub text: FlashString,
     pub variable: *mut u16, // unsafe
-    pub parameters: Parameters,
+    pub parameters: Format,
 }
 
 pub struct OptionalParameterArgs {

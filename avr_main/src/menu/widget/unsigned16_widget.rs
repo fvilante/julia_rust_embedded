@@ -88,10 +88,10 @@ impl ContentEditor {
     }
 }
 
-/// Wrapper of the main parameters of the [`Unsigned16Editor`]
+/// Wrapper of the main parameters of the [`NumberEditor`]
 ///
 /// TODO: Does not make sense to have a number of digits greater than the valid.range.end. Protect against this condition
-pub struct Parameters {
+pub struct Format {
     pub valid_range: Range<u16>,
     /// Number of digits you want your editor have.
     ///
@@ -101,7 +101,7 @@ pub struct Parameters {
     pub initial_cursor_position: u8,
 }
 
-impl Clone for Parameters {
+impl Clone for Format {
     fn clone(&self) -> Self {
         Self {
             valid_range: self.valid_range.clone(),
@@ -111,15 +111,13 @@ impl Clone for Parameters {
     }
 }
 
-/// Edits any unsigned interger using specified format
-///
-/// Just a wrapper around [`ContentEditor`] to constrain its data type to any value up to [`u16`] values
+/// Just decorator around [`ContentEditor`] for deal with formated numbers
 struct NumberEditor {
     content_editor: ContentEditor,
 }
 
 impl NumberEditor {
-    /// Private constructs a new U16Editor. NOTE: Use method `from_u16` instead
+    /// Private constructor. NOTE: Use method `from_u16` instead
     fn new(initial_content: Content, initial_cursor_position: u8) -> Self {
         Self {
             content_editor: ContentEditor::new(initial_content, initial_cursor_position),
@@ -155,7 +153,7 @@ impl NumberEditor {
         content.parse::<u16>().unwrap_or(0)
     }
 
-    /// Constructs an [`U16Editor`] from a [`u16`] type.
+    /// Constructs an `Self` from a given [`u16`] value and a given `Format`.
     ///
     /// Use `number_of_digits` to represent the max digits you want for your u16 representation
     /// If the `u16` value is greater than max size that `number_of_digits` can contain, than than
@@ -204,11 +202,11 @@ pub struct U16EditorWidget<'a> {
     variable: &'a mut u16,
     blink: RectangularWave,
     ///TODO: Check if this property should exists, and if it should exists here
-    parameters: Parameters,
+    parameters: Format,
 }
 
 impl<'a> U16EditorWidget<'a> {
-    pub fn new(variable: &'a mut u16, parameters: Parameters) -> Self {
+    pub fn new(variable: &'a mut u16, parameters: Format) -> Self {
         let value = (*variable).clone();
         Self {
             u16_editor: NumberEditor::from_u16(
@@ -384,7 +382,7 @@ impl<'a> Field<'a> {
         }
     }
 
-    pub fn from_numerical(variable: &'a mut u16, parameters: Parameters) -> Self {
+    pub fn from_numerical(variable: &'a mut u16, parameters: Format) -> Self {
         let numerical_field = U16EditorWidget::new(variable, parameters);
         let field_enum = FieldEnum::Numerical(numerical_field);
         Self::new(field_enum)
