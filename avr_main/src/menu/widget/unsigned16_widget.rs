@@ -49,6 +49,37 @@ impl Content {
         }
     }
 
+    /// Converts an [`u16`] to a [`Content`] and format the resulting number to the specified `number_of_digits`
+    ///
+    /// TODO: Use `number_of_digits` to represent the max digits you want for your u16 representation
+    /// If the `u16` value is greater than max size that `number_of_digits` can contain, than than
+    /// the u16 will be clamped silently.
+    fn from_u16_formated(data: u16, number_of_digits: u8) -> Content {
+        const blacket_char: char = '0';
+        let s = convert_u16_to_string_decimal(data);
+        let mut base = Content::from_str(s.as_str()).unwrap();
+        let mut temp = Content::new();
+        //leading zeros
+        let len = usize_to_u8_clamper(base.len());
+        for _ in len..number_of_digits {
+            temp.push(blacket_char);
+        }
+        //actal number
+        for char in base.chars() {
+            temp.push(char);
+        }
+        temp
+    }
+
+    /// Converts a [`Content`] that is supposed to contains an number into an [`u16`] value
+    ///
+    /// If [`Content`] does not contains a number or if the convertion is not possible returns zero
+    fn to_u16(&self) -> u16 {
+        self.parse::<u16>().unwrap_or(0)
+    }
+
+    // ============== [ wrapping over heapless::String methods ] ================
+
     /// Returns lenght of Content.
     ///
     /// It must be less or equal to [`MAX_NUMBER_OF_CHARS_IN_BUFFER`]
@@ -184,56 +215,25 @@ impl NumberEditor {
         }
     }
 
-    /// Converts an [`u16`] to a [`Content`] and format the resulting number to the specified `number_of_digits`
-    ///
-    /// TODO: Use `number_of_digits` to represent the max digits you want for your u16 representation
-    /// If the `u16` value is greater than max size that `number_of_digits` can contain, than than
-    /// the u16 will be clamped silently.
-    fn convert_u16_to_content_and_format_it(data: u16, number_of_digits: u8) -> Content {
-        const blacket_char: char = '0';
-        let s = convert_u16_to_string_decimal(data);
-        let mut base = Content::from_str(s.as_str()).unwrap();
-        let mut temp = Content::new();
-        //leading zeros
-        let len = usize_to_u8_clamper(base.len());
-        for _ in len..number_of_digits {
-            temp.push(blacket_char);
-        }
-        //actal number
-        for char in base.chars() {
-            temp.push(char);
-        }
-        temp
-    }
-
-    /// Converts a [`Content`] that is supposed to contains an number into an [`u16`] value
-    ///
-    /// If [`Content`] does not contains a number or if the convertion is not possible returns zero
-    fn convert_content_to_u16(content: &Content) -> u16 {
-        content.parse::<u16>().unwrap_or(0)
-    }
-
     /// Constructs an `Self` from a given [`u16`] value and a given `Format`.
     ///
     /// Use `number_of_digits` to represent the max digits you want for your u16 representation
     /// If the `u16` value is greater than max size that `number_of_digits` can contain, than than
     /// the u16 will be clamped silently.
     pub fn from_u16(initial_value: u16, format: Format) -> Self {
-        let initial_content =
-            Self::convert_u16_to_content_and_format_it(initial_value, format.number_of_digits);
+        let initial_content = Content::from_u16_formated(initial_value, format.number_of_digits);
         Self::new(initial_content, format)
     }
 
     ///TODO: Remove this method or make it unnecessary if possible
     pub fn set_u16(&mut self, value: u16, format: Format) {
-        let content = Self::convert_u16_to_content_and_format_it(value, format.number_of_digits);
+        let content = Content::from_u16_formated(value, format.number_of_digits);
         self.content_editor = ContentEditor::new(content, format.initial_cursor_position);
     }
 
     /// Converts edited value to its [`u16`] representation
     pub fn as_u16(&self) -> u16 {
-        let value = Self::convert_content_to_u16(&self.content_editor.content);
-        value
+        Content::to_u16(&self.content_editor.content)
     }
 
     pub fn get_current_cursor_index(&self) -> u8 {

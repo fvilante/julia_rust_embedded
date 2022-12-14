@@ -74,6 +74,7 @@ pub fn convert_u16_to_str_hex(data: u16) -> (char, char, char, char) {
 }
 
 //NOTE: value above 65535 are clamped
+//TODO: Make this function unfalible
 pub fn convert_u16_to_string_decimal(value: u16) -> String<5> {
     let mut buffer = itoa::Buffer::new();
     let printed = buffer.format(value as u64);
