@@ -110,7 +110,7 @@ impl Optional<'_> {
         const close_brackets: char = ']';
         let current_index = self.editing_cursor.get_current();
         self.__blinks_char_if_in_editing_mode(canvas, open_brackets, is_in_editing_mode);
-        let flash_string = self.options[current_index];
+        let flash_string = self.options[current_index as usize];
         canvas.print_flash_str(flash_string);
         self.__blinks_char_if_in_editing_mode(canvas, close_brackets, is_in_editing_mode);
     }

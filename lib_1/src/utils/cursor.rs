@@ -31,8 +31,8 @@ impl Cursor {
         Self::new(start, end, current)
     }
 
-    pub fn get_current(&self) -> usize {
-        self.current as usize // value already normalized
+    pub fn get_current(&self) -> u8 {
+        self.current // value already normalized
     }
 
     /// Sets current cursor position

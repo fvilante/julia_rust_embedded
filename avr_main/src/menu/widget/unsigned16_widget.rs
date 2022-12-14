@@ -75,7 +75,7 @@ impl ContentEditor {
         let current_cursor = self.cursor.get_current();
         let mut s: Content = String::new();
         for (index, current_char) in self.content.char_indices() {
-            if index == current_cursor {
+            if index == current_cursor as usize {
                 s.push(new_char).unwrap();
             } else {
                 s.push(current_char).unwrap();
@@ -185,7 +185,7 @@ impl Unsigned16Editor {
         value_clamped
     }
 
-    pub fn get_current_cursor_index(&self) -> usize {
+    pub fn get_current_cursor_index(&self) -> u8 {
         self.content_editor.cursor.get_current()
     }
     /// Reset cursor to its default initial position
@@ -308,7 +308,7 @@ impl Unsigned16EditorWidget<'_> {
             let blink_char = '_';
             let mut current_char = digit;
             let is_current_char_over_cursor =
-                position == self.number_editor.get_current_cursor_index();
+                position == self.number_editor.get_current_cursor_index() as usize;
             let is_time_to_blink = self.blink.read() && is_in_edit_mode; // do not blink if it is not in edit mode
             if is_current_char_over_cursor && is_time_to_blink {
                 current_char = blink_char;

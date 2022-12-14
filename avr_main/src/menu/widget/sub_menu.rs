@@ -49,8 +49,8 @@ impl<'a> SubMenu<'a> {
         }
     }
 
-    fn get_current_index(&self, line: LcdLine) -> usize {
-        let lcd_index = line as usize;
+    fn get_current_index(&self, line: LcdLine) -> u8 {
+        let lcd_index = line as u8;
         let line_index = self.first_line_to_render.get_current();
         let index = lcd_index + line_index;
         index
