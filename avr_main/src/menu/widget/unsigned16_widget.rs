@@ -208,7 +208,7 @@ impl Unsigned16Editor {
 
 /// This [`Widget`] manages the edition of an [`u16`] by the user using keyboard and lcd display
 pub struct Unsigned16EditorWidget<'a> {
-    number_editor: Unsigned16Editor,
+    u16_editor: Unsigned16Editor,
     variable: &'a mut u16,
     blink: RectangularWave,
 }
@@ -217,7 +217,7 @@ impl<'a> Unsigned16EditorWidget<'a> {
     pub fn new(variable: &'a mut u16, parameters: Parameters) -> Self {
         let value = (*variable).clone();
         Self {
-            number_editor: Unsigned16Editor::from_u16(value, parameters),
+            u16_editor: Unsigned16Editor::from_u16(value, parameters),
             variable,
             blink: RectangularWave::new(600, 300),
         }
@@ -226,10 +226,10 @@ impl<'a> Unsigned16EditorWidget<'a> {
 
 impl Unsigned16EditorWidget<'_> {
     pub fn save_edition(&mut self) {
-        let normalized_value = self.number_editor.to_u16_clamped();
+        let normalized_value = self.u16_editor.to_u16_clamped();
         *self.variable = normalized_value; // saves data
                                            //TODO: Make below lines unnecessary
-        let number_editor = &mut self.number_editor;
+        let number_editor = &mut self.u16_editor;
         number_editor.set_u16(normalized_value); // saves displayed data
         number_editor.reset_cursor();
     }
@@ -237,7 +237,7 @@ impl Unsigned16EditorWidget<'_> {
     pub fn abort_edition(&mut self) {
         let original_value = (*self.variable).clone();
         //TODO: Make below lines unnecessary
-        let number_editor = &mut self.number_editor;
+        let number_editor = &mut self.u16_editor;
         number_editor.set_u16(original_value); // resets displayed data
         number_editor.reset_cursor();
     }
@@ -245,7 +245,7 @@ impl Unsigned16EditorWidget<'_> {
 
 impl Unsigned16EditorWidget<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
-        let content_editor = &mut self.number_editor.content_editor;
+        let content_editor = &mut self.u16_editor.content_editor;
         match key {
             // navigation_key left and right
             KeyCode::KEY_SETA_BRANCA_ESQUERDA => {
@@ -302,14 +302,14 @@ impl Unsigned16EditorWidget<'_> {
         self.blink.update(); // blinks cursor
     }
 
-    pub fn draw(&self, canvas: &mut Canvas, start_point: Point, is_in_edit_mode: bool) {
+    pub fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         canvas.set_cursor(start_point);
-        for (position, digit) in self.number_editor.char_indices() {
-            let blink_char = '_';
+        for (position, digit) in self.u16_editor.char_indices() {
+            const blink_char: char = '_';
             let mut current_char = digit;
             let is_current_char_over_cursor =
-                position == self.number_editor.get_current_cursor_index() as usize;
-            let is_time_to_blink = self.blink.read() && is_in_edit_mode; // do not blink if it is not in edit mode
+                position == self.u16_editor.get_current_cursor_index() as usize;
+            let is_time_to_blink = self.blink.read();
             if is_current_char_over_cursor && is_time_to_blink {
                 current_char = blink_char;
             }
@@ -356,7 +356,7 @@ impl FieldEnum<'_> {
 
     pub fn draw(&self, canvas: &mut Canvas, start_point: Point, is_in_editing_mode: bool) {
         match self {
-            Self::Numerical(x) => x.draw(canvas, start_point, is_in_editing_mode),
+            Self::Numerical(x) => x.draw(canvas, start_point),
             Self::Optional(x) => x.draw(canvas, start_point, is_in_editing_mode),
         }
     }

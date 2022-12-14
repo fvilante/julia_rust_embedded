@@ -24,6 +24,7 @@ impl RectangularWave<X> {
         }
     }
 
+    /// Restarts the wave form
     pub fn reset(&mut self) -> &mut Self {
         let initial_state = true;
         self.next_time_point = now() + self.up_interval.clone() as u64;
@@ -31,6 +32,9 @@ impl RectangularWave<X> {
         self
     }
 
+    /// Updates the counter
+    ///
+    /// You should call this method in a frequency relative to the wave form being generated
     pub fn update(&mut self) -> &mut Self {
         let is_it_moment_to_change_state = now() > self.next_time_point;
         if is_it_moment_to_change_state {
@@ -49,6 +53,9 @@ impl RectangularWave<X> {
         self
     }
 
+    /// Reads current wave form state
+    ///
+    /// Do not forgot that you have to call [`update`] method frequently to calculate the waveform and maintain it up-to-date
     pub fn read(&self) -> bool {
         self.current_state
     }
