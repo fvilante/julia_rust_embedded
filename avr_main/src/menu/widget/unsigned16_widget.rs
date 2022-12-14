@@ -88,6 +88,8 @@ impl ContentEditor {
     }
 }
 
+/// Format parameters for [`NumberEditor`]
+///
 /// Wrapper of the main parameters of the [`NumberEditor`]
 ///
 /// TODO: Does not make sense to have a number of digits greater than the valid.range.end. Protect against this condition
@@ -114,13 +116,15 @@ impl Clone for Format {
 /// Just decorator around [`ContentEditor`] for deal with formated numbers
 struct NumberEditor {
     content_editor: ContentEditor,
+    format: Format,
 }
 
 impl NumberEditor {
     /// Private constructor. NOTE: Use method `from_u16` instead
-    fn new(initial_content: Content, initial_cursor_position: u8) -> Self {
+    fn new(initial_content: Content, format: Format) -> Self {
         Self {
-            content_editor: ContentEditor::new(initial_content, initial_cursor_position),
+            content_editor: ContentEditor::new(initial_content, format.initial_cursor_position),
+            format,
         }
     }
 
@@ -158,16 +162,16 @@ impl NumberEditor {
     /// Use `number_of_digits` to represent the max digits you want for your u16 representation
     /// If the `u16` value is greater than max size that `number_of_digits` can contain, than than
     /// the u16 will be clamped silently.
-    pub fn from_u16(initial_value: u16, number_of_digits: u8, initial_cursor_position: u8) -> Self {
+    pub fn from_u16(initial_value: u16, format: Format) -> Self {
         let initial_content =
-            Self::convert_u16_to_content_and_format_it(initial_value, number_of_digits);
-        Self::new(initial_content, initial_cursor_position)
+            Self::convert_u16_to_content_and_format_it(initial_value, format.number_of_digits);
+        Self::new(initial_content, format)
     }
 
     ///TODO: Remove this method or make it unnecessary if possible
-    pub fn set_u16(&mut self, value: u16, number_of_digits: u8, initial_cursor_position: u8) {
-        let content = Self::convert_u16_to_content_and_format_it(value, number_of_digits);
-        self.content_editor = ContentEditor::new(content, initial_cursor_position);
+    pub fn set_u16(&mut self, value: u16, format: Format) {
+        let content = Self::convert_u16_to_content_and_format_it(value, format.number_of_digits);
+        self.content_editor = ContentEditor::new(content, format.initial_cursor_position);
     }
 
     /// Converts edited value to its [`u16`] representation
@@ -202,21 +206,17 @@ pub struct U16EditorWidget<'a> {
     variable: &'a mut u16,
     blink: RectangularWave,
     ///TODO: Check if this property should exists, and if it should exists here
-    parameters: Format,
+    format: Format,
 }
 
 impl<'a> U16EditorWidget<'a> {
-    pub fn new(variable: &'a mut u16, parameters: Format) -> Self {
+    pub fn new(variable: &'a mut u16, format: Format) -> Self {
         let value = (*variable).clone();
         Self {
-            u16_editor: NumberEditor::from_u16(
-                value,
-                parameters.number_of_digits,
-                parameters.initial_cursor_position,
-            ),
+            u16_editor: NumberEditor::from_u16(value, format.clone()),
             variable,
             blink: RectangularWave::new(600, 300),
-            parameters,
+            format: format,
         }
     }
 }
@@ -227,24 +227,16 @@ impl U16EditorWidget<'_> {
         *self.variable = edited_value; // saves data.
                                        //TODO: Make below lines unnecessary
         let number_editor = &mut self.u16_editor;
-        number_editor.set_u16(
-            edited_value,
-            self.parameters.number_of_digits,
-            self.parameters.initial_cursor_position,
-        ); // saves displayed data
-        number_editor.reset_cursor(self.parameters.initial_cursor_position);
+        let format = number_editor.set_u16(edited_value, self.format.clone()); // saves displayed data
+        number_editor.reset_cursor(self.format.initial_cursor_position);
     }
 
     pub fn abort_edition(&mut self) {
         let original_value = (*self.variable).clone();
         //TODO: Make below lines unnecessary
         let number_editor = &mut self.u16_editor;
-        number_editor.set_u16(
-            original_value,
-            self.parameters.number_of_digits,
-            self.parameters.initial_cursor_position,
-        ); // saves displayed data
-        number_editor.reset_cursor(self.parameters.initial_cursor_position);
+        number_editor.set_u16(original_value, self.format.clone()); // saves displayed data
+        number_editor.reset_cursor(self.format.initial_cursor_position);
     }
 }
 
