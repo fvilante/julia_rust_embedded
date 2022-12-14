@@ -3,6 +3,7 @@ use heapless::String;
 use super::{flash::FlashString, point::Point};
 use crate::{board::lcd, utils::generic_string::GenericString};
 
+///TODO: Reimplement it using [`Cursor`]'s type
 struct CursorPosition {
     point: Point,
 }
@@ -45,6 +46,12 @@ impl CursorPosition {
     }
 }
 
+/// A memory representation of the LCD display.
+///
+/// Its function is to make possible do cache displayed information reducing
+/// screen flackering. You decide how many frames per second you want to send this to screen through the method [`render`]
+///
+/// For more see: [double buffer](https://en.wikipedia.org/wiki/Multiple_buffering#Double_buffering_in_computer_graphics)
 pub struct Canvas {
     is_initialized: bool,
     cursor_position: CursorPosition, // for screen_buffer_input
