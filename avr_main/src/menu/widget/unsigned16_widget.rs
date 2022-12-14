@@ -20,37 +20,10 @@ use lib_1::utils::cursor::Cursor;
 /// NOTE: Do not choose a number less than 5 else you cannot represent u16 data types in its decimal representation (ie: 65535)
 const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 6;
 
-/// A string that represents some data in memory
+/// A string that represents some data in memory (ie: numbers, texts)
 pub type Content = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
 
-/// Converts an [`u16`] to a [`Content`]
-///
-/// TODO: What happens if number_of_digits is out_of_range?
-fn convert_u16_to_content(data: u16, number_of_digits: u8) -> Content {
-    const blacket_char: char = '0';
-    let s = convert_u16_to_string_decimal(data);
-    let mut base: Content = String::from_str(s.as_str()).unwrap();
-    let mut temp: Content = String::new();
-    //leading zeros
-    let len = usize_to_u8_clamper(base.len());
-    for _ in len..number_of_digits {
-        temp.push(blacket_char);
-    }
-    //actal number
-    for char in base.chars() {
-        temp.push(char);
-    }
-    temp
-}
-
-/// Converts a [`Content`] that is supposed to contains an number into an [`u16`] value
-///
-/// If [`Content`] does not contains a number or if the convertion is not possible returns zero
-fn convert_content_to_u16(content: &Content) -> u16 {
-    content.parse::<u16>().unwrap_or(0)
-}
-
-/// A string that represents some data content being edited by a navigation cursor.
+/// A constant sized string that represents some data content being edited by a navigating cursor.
 ///
 /// This type is agnostic to the type of data being edited, that means you can use this type to edit numbers and even text
 struct ContentEditor {
@@ -138,51 +111,71 @@ impl Clone for Parameters {
     }
 }
 
-/// An `unsigned integer` cursor navigated editor
+/// Edits any unsigned interger using specified format
 ///
-/// This type does supose that the edition is being performed in memory and does not include the `view` mechanism
-struct U16Editor {
+/// Just a wrapper around [`ContentEditor`] to constrain its data type to any value up to [`u16`] values
+struct NumberEditor {
     content_editor: ContentEditor,
-    parameters: Parameters,
 }
 
-impl U16Editor {
-    pub fn new(initial_content: Content, parameters: Parameters) -> Self {
+impl NumberEditor {
+    /// Private constructs a new U16Editor. NOTE: Use method `from_u16` instead
+    fn new(initial_content: Content, initial_cursor_position: u8) -> Self {
         Self {
-            content_editor: ContentEditor::new(initial_content, parameters.initial_cursor_position),
-            parameters,
+            content_editor: ContentEditor::new(initial_content, initial_cursor_position),
         }
     }
 
-    pub fn from_u16(initial_value: u16, parameters: Parameters) -> Self {
-        let initial_content = convert_u16_to_content(initial_value, parameters.number_of_digits);
-        Self::new(initial_content, parameters)
+    /// Converts an [`u16`] to a [`Content`] and format the resulting number to the specified `number_of_digits`
+    ///
+    /// TODO: Use `number_of_digits` to represent the max digits you want for your u16 representation
+    /// If the `u16` value is greater than max size that `number_of_digits` can contain, than than
+    /// the u16 will be clamped silently.
+    fn convert_u16_to_content_and_format_it(data: u16, number_of_digits: u8) -> Content {
+        const blacket_char: char = '0';
+        let s = convert_u16_to_string_decimal(data);
+        let mut base: Content = String::from_str(s.as_str()).unwrap();
+        let mut temp: Content = String::new();
+        //leading zeros
+        let len = usize_to_u8_clamper(base.len());
+        for _ in len..number_of_digits {
+            temp.push(blacket_char);
+        }
+        //actal number
+        for char in base.chars() {
+            temp.push(char);
+        }
+        temp
+    }
+
+    /// Converts a [`Content`] that is supposed to contains an number into an [`u16`] value
+    ///
+    /// If [`Content`] does not contains a number or if the convertion is not possible returns zero
+    fn convert_content_to_u16(content: &Content) -> u16 {
+        content.parse::<u16>().unwrap_or(0)
+    }
+
+    /// Constructs an [`U16Editor`] from a [`u16`] type.
+    ///
+    /// Use `number_of_digits` to represent the max digits you want for your u16 representation
+    /// If the `u16` value is greater than max size that `number_of_digits` can contain, than than
+    /// the u16 will be clamped silently.
+    pub fn from_u16(initial_value: u16, number_of_digits: u8, initial_cursor_position: u8) -> Self {
+        let initial_content =
+            Self::convert_u16_to_content_and_format_it(initial_value, number_of_digits);
+        Self::new(initial_content, initial_cursor_position)
     }
 
     ///TODO: Remove this method or make it unnecessary if possible
-    pub fn set_u16(&mut self, value: u16) {
-        let Parameters {
-            initial_cursor_position,
-            number_of_digits,
-            ..
-        } = self.parameters;
-        let content = convert_u16_to_content(value, number_of_digits);
+    pub fn set_u16(&mut self, value: u16, number_of_digits: u8, initial_cursor_position: u8) {
+        let content = Self::convert_u16_to_content_and_format_it(value, number_of_digits);
         self.content_editor = ContentEditor::new(content, initial_cursor_position);
     }
 
     /// Converts edited value to its [`u16`] representation
     pub fn as_u16(&self) -> u16 {
-        let value = convert_content_to_u16(&self.content_editor.content);
+        let value = Self::convert_content_to_u16(&self.content_editor.content);
         value
-    }
-
-    /// Normalizes (clamp) the internal value to obey [`Parameters`] restrictions, in special the range condition
-    pub fn to_u16_clamped(&self) -> u16 {
-        let value = self.as_u16();
-        let min = self.parameters.valid_range.start;
-        let max = self.parameters.valid_range.end;
-        let value_clamped = value.clamp(min, max);
-        value_clamped
     }
 
     pub fn get_current_cursor_index(&self) -> u8 {
@@ -194,9 +187,8 @@ impl U16Editor {
     ///
     /// TODO: Remove the necessity of this method being avoiding make the Self alive when no edition is hapenning
     /// by the user (for example when the info is just being show in screen without any edition mode)
-    pub fn reset_cursor(&mut self) {
+    pub fn reset_cursor(&mut self, initial_cursor_position: u8) {
         let cursor = &mut self.content_editor.cursor;
-        let initial_cursor_position = self.parameters.initial_cursor_position;
         cursor.set_current(initial_cursor_position);
     }
 
@@ -208,38 +200,53 @@ impl U16Editor {
 
 /// This [`Widget`] manages the edition of an [`u16`] by the user using keyboard and lcd display
 pub struct U16EditorWidget<'a> {
-    u16_editor: U16Editor,
+    u16_editor: NumberEditor,
     variable: &'a mut u16,
     blink: RectangularWave,
+    ///TODO: Check if this property should exists, and if it should exists here
+    parameters: Parameters,
 }
 
 impl<'a> U16EditorWidget<'a> {
     pub fn new(variable: &'a mut u16, parameters: Parameters) -> Self {
         let value = (*variable).clone();
         Self {
-            u16_editor: U16Editor::from_u16(value, parameters),
+            u16_editor: NumberEditor::from_u16(
+                value,
+                parameters.number_of_digits,
+                parameters.initial_cursor_position,
+            ),
             variable,
             blink: RectangularWave::new(600, 300),
+            parameters,
         }
     }
 }
 
 impl U16EditorWidget<'_> {
     pub fn save_edition(&mut self) {
-        let normalized_value = self.u16_editor.to_u16_clamped();
-        *self.variable = normalized_value; // saves data
-                                           //TODO: Make below lines unnecessary
+        let edited_value = self.u16_editor.as_u16();
+        *self.variable = edited_value; // saves data.
+                                       //TODO: Make below lines unnecessary
         let number_editor = &mut self.u16_editor;
-        number_editor.set_u16(normalized_value); // saves displayed data
-        number_editor.reset_cursor();
+        number_editor.set_u16(
+            edited_value,
+            self.parameters.number_of_digits,
+            self.parameters.initial_cursor_position,
+        ); // saves displayed data
+        number_editor.reset_cursor(self.parameters.initial_cursor_position);
     }
 
     pub fn abort_edition(&mut self) {
         let original_value = (*self.variable).clone();
         //TODO: Make below lines unnecessary
         let number_editor = &mut self.u16_editor;
-        number_editor.set_u16(original_value); // resets displayed data
-        number_editor.reset_cursor();
+        number_editor.set_u16(
+            original_value,
+            self.parameters.number_of_digits,
+            self.parameters.initial_cursor_position,
+        ); // saves displayed data
+        number_editor.reset_cursor(self.parameters.initial_cursor_position);
     }
 }
 
