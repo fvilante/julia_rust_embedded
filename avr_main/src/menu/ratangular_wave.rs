@@ -1,14 +1,15 @@
 use crate::microcontroler::timer::now;
 
-type X = u64; // TODO: I do not know why, but to change this type to reduce ram consuption is producing a little bug which is not to blink displayed NumericalField when editing
+/// TODO: I do not know why, but to change this type to reduce ram consuption is producing a little bug
+/// which is not to blink displayed NumericalField when editing
+type X = u64;
 
 /// Generates a non-synchronous assymetric parametrizable retangular wave form
 pub struct RectangularWave<T = X> {
-    // TOTAL = 13 bytes (IF X = u16)
-    up_interval: T,       // size = 2 bytes
-    down_interval: T,     // size = 2 bytes
-    next_time_point: u64, // size = 8 bytes
-    current_state: bool,  // size = 1 bytes
+    up_interval: T,
+    down_interval: T,
+    next_time_point: u64,
+    current_state: bool,
 }
 
 impl RectangularWave<X> {
