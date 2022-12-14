@@ -202,28 +202,25 @@ impl NumberEditor {
     }
 }
 
-/// This [`Widget`] manages the edition of an [`u16`] by the user using keyboard and lcd display
-pub struct NumberEditorWidget<'a> {
+/// This [`Widget`] manages the edition of an number (unsigned integer) by the user using the keyboard and lcd display
+pub struct NumberEditorWidget {
     u16_editor: NumberEditor,
-    variable: &'a mut u16,
+    /// This class is responsible to generate the blinking character effect
     blink: RectangularWave,
-    ///TODO: Check if this property should exists, and if it should exists here
-    format: Format,
 }
 
-impl<'a> NumberEditorWidget<'a> {
-    pub fn new(initial_value: &'a mut u16, format: Format) -> Self {
-        let value = (*initial_value).clone();
+impl NumberEditorWidget {
+    pub fn new(initial_value: u16, format: Format) -> Self {
+        const T_ON: u16 = 600;
+        const T_OFF: u16 = 300;
         Self {
-            u16_editor: NumberEditor::from_u16(value, format.clone()),
-            variable: initial_value,
-            blink: RectangularWave::new(600, 300),
-            format: format,
+            u16_editor: NumberEditor::from_u16(initial_value, format.clone()),
+            blink: RectangularWave::new(T_ON as u64, T_OFF as u64),
         }
     }
 }
 
-impl NumberEditorWidget<'_> {
+impl NumberEditorWidget {
     pub fn send_key(&mut self, key: KeyCode) {
         let content_editor = &mut self.u16_editor.content_editor;
         match key {
@@ -275,9 +272,7 @@ impl NumberEditorWidget<'_> {
             _ => {}
         }
     }
-}
 
-impl NumberEditorWidget<'_> {
     pub fn update(&mut self) {
         self.blink.update(); // blinks cursor
     }
@@ -298,7 +293,7 @@ impl NumberEditorWidget<'_> {
     }
 }
 
-impl NumberEditorWidget<'_> {
+/* impl NumberEditorWidget<'_> {
     pub fn save_edition(&mut self) {
         let edited_value = self.u16_editor.as_u16();
         *self.variable = edited_value; // saves data.
@@ -315,25 +310,33 @@ impl NumberEditorWidget<'_> {
         number_editor.set_u16(original_value, self.format.clone()); // saves displayed data
         number_editor.reset_cursor(self.format.initial_cursor_position);
     }
-}
+} */
 
 pub enum FieldEnum<'a> {
-    Numerical(NumberEditorWidget<'a>),
+    Numerical(NumberEditorWidget),
     Optional(Optional<'a>),
 }
 
 impl FieldEnum<'_> {
     pub fn save_edition(&mut self) {
         match self {
-            Self::Numerical(x) => x.save_edition(),
-            Self::Optional(x) => x.save_edition(),
+            Self::Numerical(x) => {
+                todo!();
+            } //x.save_edition(),
+            Self::Optional(x) => {
+                todo!();
+            } //x.save_edition(),
         }
     }
 
     pub fn abort_edition(&mut self) {
         match self {
-            Self::Numerical(x) => x.abort_edition(),
-            Self::Optional(x) => x.abort_edition(),
+            Self::Numerical(x) => {
+                todo!();
+            } //x.abort_edition(),
+            Self::Optional(x) => {
+                todo!();
+            } //x.abort_edition(),
         }
     }
 }
@@ -377,7 +380,8 @@ impl<'a> Field<'a> {
     }
 
     pub fn from_numerical(variable: &'a mut u16, parameters: Format) -> Self {
-        let numerical_field = NumberEditorWidget::new(variable, parameters);
+        let initial_value = (*variable).clone();
+        let numerical_field = NumberEditorWidget::new(initial_value, parameters);
         let field_enum = FieldEnum::Numerical(numerical_field);
         Self::new(field_enum)
     }
