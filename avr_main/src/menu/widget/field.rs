@@ -163,21 +163,19 @@ impl<'a> Unsigned16Editor<'a> {
 
     pub fn set_u16(&mut self, value: u16) {
         let initial_cursor_position = self.content_editor.initial_cursor_position;
-        let field_buffer = convert_u16_to_content(value, self.parameters.number_of_digits);
-        self.content_editor = ContentEditor::new(field_buffer, initial_cursor_position);
+        let content = convert_u16_to_content(value, self.parameters.number_of_digits);
+        self.content_editor = ContentEditor::new(content, initial_cursor_position);
     }
 
-    pub fn to_u16(&self) -> u16 {
+    /// Converts edited value to its [`u16`] representation
+    pub fn as_u16(&self) -> u16 {
         let value = convert_content_to_u16(&self.content_editor.content);
         value
     }
 
-    pub fn set_edition_buffer(&mut self, edition_buffer: ContentEditor) {
-        self.content_editor = edition_buffer;
-    }
-
-    pub fn to_u16_normalized(&self) -> u16 {
-        let value = self.to_u16();
+    /// Normalizes (clamp) the internal value to obey [`Parameters`] restrictions, in special the range condition
+    pub fn to_u16_clamped(&self) -> u16 {
+        let value = self.as_u16();
         let min = self.parameters.valid_range.start;
         let max = self.parameters.valid_range.end;
         let value_clamped = value.clamp(min, max);
@@ -192,6 +190,7 @@ impl<'a> Unsigned16Editor<'a> {
         self.content_editor.reset_cursor()
     }
 
+    /// An iterator over the [char]s of a [`Unsigned16Editor`], and their positions.
     pub fn char_indices(&self) -> CharIndices {
         self.content_editor.content.char_indices()
     }
@@ -199,7 +198,7 @@ impl<'a> Unsigned16Editor<'a> {
 
 impl Unsigned16Editor<'_> {
     pub fn save_edition(&mut self) {
-        let normalized_value = self.to_u16_normalized();
+        let normalized_value = self.to_u16_clamped();
         *self.variable = normalized_value; // saves data
         self.set_u16(normalized_value); // saves displayed data
         self.reset_cursor();
@@ -285,12 +284,12 @@ impl Unsigned16Editor<'_> {
     }
 }
 
-pub struct NumericalField<'a> {
+pub struct Unsigned16Viewer<'a> {
     numerical: Unsigned16Editor<'a>,
     blink: RectangularWave,
 }
 
-impl<'a> NumericalField<'a> {
+impl<'a> Unsigned16Viewer<'a> {
     pub fn new(
         variable: &'a mut u16,
         initial_cursor_position: u8,
@@ -310,7 +309,7 @@ impl<'a> NumericalField<'a> {
     }
 }
 
-impl NumericalField<'_> {
+impl Unsigned16Viewer<'_> {
     pub fn save_edition(&mut self) {
         self.numerical.save_edition();
     }
@@ -320,7 +319,7 @@ impl NumericalField<'_> {
     }
 }
 
-impl NumericalField<'_> {
+impl Unsigned16Viewer<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         self.numerical.send_key(key)
     }
@@ -345,7 +344,7 @@ impl NumericalField<'_> {
 }
 
 pub enum FieldEnum<'a> {
-    Numerical(NumericalField<'a>),
+    Numerical(Unsigned16Viewer<'a>),
     Optional(Optional<'a>),
 }
 
@@ -409,7 +408,7 @@ impl<'a> Field<'a> {
         number_of_digits: usize,
         valid_range: Range<u16>,
     ) -> Self {
-        let numerical_field = NumericalField::new(
+        let numerical_field = Unsigned16Viewer::new(
             variable,
             initial_cursor_position,
             number_of_digits,
