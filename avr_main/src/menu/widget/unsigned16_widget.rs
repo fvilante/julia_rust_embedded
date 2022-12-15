@@ -111,14 +111,14 @@ impl Content {
 /// A constant sized string that represents some data content being edited by a navigating cursor.
 ///
 /// This type is agnostic to the type of data being edited, that means you can use this type to edit numbers and even text
-struct ContentEditor {
+struct InputEditor {
     /// String content being edited.
     content: Content,
     /// Tracks current cursor position.
     cursor: Cursor,
 }
 
-impl ContentEditor {
+impl InputEditor {
     pub fn new(initial_content: Content, initial_cursor_position: u8) -> Self {
         let start = 0;
         let end = usize_to_u8_clamper(initial_content.len());
@@ -173,9 +173,9 @@ impl ContentEditor {
     }
 }
 
-/// Format parameters for [`NumberEditor`]
+/// Format parameters for [`NumberInputEditor`]
 ///
-/// Wrapper of the main parameters of the [`NumberEditor`]
+/// Wrapper of the main parameters of the [`NumberInputEditor`]
 ///
 /// TODO: Does not make sense to have a number of digits greater than the valid.range.end. Protect against this
 /// condition
@@ -202,17 +202,17 @@ impl Clone for Format {
     }
 }
 
-/// Just decorator around [`ContentEditor`] for deal with formated numbers
-struct NumberEditor {
-    content_editor: ContentEditor,
+/// Just decorator around [`InputEditor`] for deal with formated numbers
+struct NumberInputEditor {
+    content_editor: InputEditor,
     format: Format,
 }
 
-impl NumberEditor {
+impl NumberInputEditor {
     /// Private constructor. NOTE: Use method `from_u16` instead
     fn new(initial_content: Content, format: Format) -> Self {
         Self {
-            content_editor: ContentEditor::new(initial_content, format.initial_cursor_position),
+            content_editor: InputEditor::new(initial_content, format.initial_cursor_position),
             format,
         }
     }
@@ -231,7 +231,7 @@ impl NumberEditor {
     ///TODO: Remove this method or make it unnecessary if possible
     pub fn set_u16(&mut self, value: u16, format: Format) {
         let content = Content::from_u16_formated(value, format.get_number_of_digits());
-        self.content_editor = ContentEditor::new(content, format.initial_cursor_position);
+        self.content_editor = InputEditor::new(content, format.initial_cursor_position);
     }
 
     /// Copy edited value to its [`u16`] representation assuring the value is clamped to `self.format.valid_range`
@@ -264,24 +264,24 @@ impl NumberEditor {
 }
 
 /// This [`Widget`] manages the edition of an number (unsigned integer) by the user using the keyboard and lcd display
-pub struct NumberEditorWidget {
-    u16_editor: NumberEditor,
+pub struct NumberInputEditorWidget {
+    u16_editor: NumberInputEditor,
     /// This class is responsible to generate the blinking character effect
     blink: RectangularWave,
 }
 
-impl NumberEditorWidget {
+impl NumberInputEditorWidget {
     pub fn new(initial_value: u16, format: Format) -> Self {
         const T_ON: u16 = 600;
         const T_OFF: u16 = 300;
         Self {
-            u16_editor: NumberEditor::from_u16(initial_value, format.clone()),
+            u16_editor: NumberInputEditor::from_u16(initial_value, format.clone()),
             blink: RectangularWave::new(T_ON as u64, T_OFF as u64),
         }
     }
 }
 
-impl NumberEditorWidget {
+impl NumberInputEditorWidget {
     pub fn send_key(&mut self, key: KeyCode) {
         let content_editor = &mut self.u16_editor.content_editor;
         match key {
@@ -354,7 +354,7 @@ impl NumberEditorWidget {
     }
 }
 
-/* impl NumberEditorWidget<'_> {
+/* impl NumberInputEditorWidget<'_> {
     pub fn save_edition(&mut self) {
         let edited_value = self.u16_editor.as_u16();
         *self.variable = edited_value; // saves data.
@@ -374,7 +374,7 @@ impl NumberEditorWidget {
 } */
 
 pub enum FieldEnum<'a> {
-    Numerical(NumberEditorWidget),
+    Numerical(NumberInputEditorWidget),
     Optional(Optional<'a>),
 }
 
@@ -442,7 +442,7 @@ impl<'a> Field<'a> {
 
     pub fn from_numerical(variable: &'a mut u16, parameters: Format) -> Self {
         let initial_value = (*variable).clone();
-        let numerical_field = NumberEditorWidget::new(initial_value, parameters);
+        let numerical_field = NumberInputEditorWidget::new(initial_value, parameters);
         let field_enum = FieldEnum::Numerical(numerical_field);
         Self::new(field_enum)
     }
