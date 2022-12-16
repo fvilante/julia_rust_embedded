@@ -390,14 +390,32 @@ impl Widget for NumberInputEditorWidget {
     }
 } */
 
+/// Makes possible to edit a position of memory using Lcd display and keyboard
+/// esc abort edition, and enter confirm edition
+///
 /// Abstracts all kind of fields existent offering an equal interface for all of them (Note: New Fields
 /// may be added in the future)
-pub enum FieldWrapper {
+pub enum Field {
     Numerical(NumberInputEditorWidget),
     Optional(OptionEditorWidget),
 }
 
-impl Widget for FieldWrapper {
+impl Field {
+    pub fn from_numerical(initial_value: u16, parameters: Format) -> Self {
+        const initial_editing_mode: bool = false; // does not start in edit mode
+        let numerical_field =
+            NumberInputEditorWidget::new(initial_value, parameters, initial_editing_mode);
+        Self::Numerical(numerical_field)
+    }
+
+    pub fn from_optional(initial_selection: Cursor, options: OptionsBuffer) -> Self {
+        const initial_editing_mode: bool = false; // does not start in edit mode
+        let optional = OptionEditorWidget::new(initial_selection, options, initial_editing_mode);
+        Self::Optional(optional)
+    }
+}
+
+impl Widget for Field {
     fn send_key(&mut self, key: KeyCode) {
         match self {
             Self::Numerical(x) => x.send_key(key),
@@ -420,7 +438,7 @@ impl Widget for FieldWrapper {
     }
 }
 
-impl Editable for FieldWrapper {
+impl Editable for Field {
     fn set_edit_mode(&mut self, value: bool) {
         match self {
             Self::Numerical(x) => x.set_edit_mode(value),
@@ -433,57 +451,5 @@ impl Editable for FieldWrapper {
             Self::Numerical(x) => x.is_in_edit_mode(),
             Self::Optional(x) => x.is_in_edit_mode(),
         }
-    }
-}
-
-//Makes possible to edit a position of memory using Lcd display and keyboard
-//esc abort edition, and enter confirm edition
-pub struct Field {
-    field_wrapper: FieldWrapper,
-}
-
-impl Field {
-    pub fn new(field_wrapper: FieldWrapper) -> Self {
-        Self { field_wrapper }
-    }
-
-    pub fn from_numerical(initial_value: u16, parameters: Format) -> Self {
-        const initial_editing_mode: bool = false; // does not start in edit mode
-        let numerical_field =
-            NumberInputEditorWidget::new(initial_value, parameters, initial_editing_mode);
-        let field_wrapper = FieldWrapper::Numerical(numerical_field);
-        Self::new(field_wrapper)
-    }
-
-    pub fn from_optional(initial_selection: Cursor, options: OptionsBuffer) -> Self {
-        const initial_editing_mode: bool = false; // does not start in edit mode
-        let optional = OptionEditorWidget::new(initial_selection, options, initial_editing_mode);
-        let field_enum = FieldWrapper::Optional(optional);
-        Self::new(field_enum)
-    }
-}
-
-impl Widget for Field {
-    fn send_key(&mut self, key: KeyCode) {
-        self.field_wrapper.send_key(key)
-    }
-
-    fn update(&mut self) {
-        self.field_wrapper.update()
-    }
-
-    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
-        let is_in_edit_mode = self.is_in_edit_mode();
-        self.field_wrapper.draw(canvas, start_point)
-    }
-}
-
-impl Editable for Field {
-    fn set_edit_mode(&mut self, value: bool) {
-        self.field_wrapper.set_edit_mode(value);
-    }
-
-    fn is_in_edit_mode(&self) -> bool {
-        self.field_wrapper.is_in_edit_mode()
     }
 }
