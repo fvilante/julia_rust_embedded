@@ -7,7 +7,7 @@ use crate::{
         flash::FlashString,
         keyboard::Keyboard,
         point::Point,
-        widget::{cursor::Cursor, optional::Optional},
+        widget::{cursor::Cursor, optional::OptionalEditableWidget},
     },
 };
 use avr_progmem::progmem;

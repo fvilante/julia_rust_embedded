@@ -37,6 +37,7 @@ impl WidgetHelper {
     }
 }
 
+/// Represents an editable type (ie: editable Widget)
 pub trait Editable {
     fn set_edit_mode(&mut self, value: bool);
     fn is_in_edit_mode(&self) -> bool;

@@ -11,7 +11,7 @@ use crate::{
     menu::{accessor::Accessor, canvas::Canvas, point::Point, ratangular_wave::RectangularWave},
 };
 
-use super::optional::{Optional, OptionsBuffer};
+use super::optional::{OptionalEditableWidget, OptionsBuffer};
 use super::{edit_mode::EditMode, widget::Editable, widget::Widget};
 use lib_1::utils::cursor::Cursor;
 
@@ -375,7 +375,7 @@ impl Widget for NumberInputEditorWidget {
 
 pub enum FieldEnum {
     Numerical(NumberInputEditorWidget),
-    Optional(Optional),
+    Optional(OptionalEditableWidget),
 }
 
 impl FieldEnum {
@@ -448,8 +448,9 @@ impl Field {
     }
 
     pub fn from_optional<'a>(options: OptionsBuffer, variable: &'a mut Cursor) -> Self {
+        const is_in_edit_mode: bool = false; // does not start in edit mode
         let initial_selection = (*variable).clone();
-        let optional = Optional::new(initial_selection, options);
+        let optional = OptionalEditableWidget::new(initial_selection, options, is_in_edit_mode);
         let field_enum = FieldEnum::Optional(optional);
         Self::new(field_enum)
     }

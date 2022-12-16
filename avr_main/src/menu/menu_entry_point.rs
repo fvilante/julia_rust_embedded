@@ -18,7 +18,7 @@ use super::widget::menu_item::MenuItem;
 use super::widget::menu_item::MenuItemArgs;
 use super::widget::menu_item::MenuItemParsed;
 use super::widget::menu_item::{NumericalParameterArgs, OptionalParameterArgs};
-use super::widget::optional::Optional;
+use super::widget::optional::OptionalEditableWidget;
 use super::widget::splash::Splash;
 use super::widget::sub_menu::MenuList;
 use super::widget::unsigned16_widget::Content;

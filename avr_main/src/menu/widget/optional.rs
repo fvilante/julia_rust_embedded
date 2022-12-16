@@ -23,15 +23,16 @@ pub fn make_options_buffer_from_array<const ArraySize: usize>(
     options
 }
 
-pub struct Optional {
+pub struct OptionalEditableWidget {
     options: OptionsBuffer,
     editing_selection: Cursor,
     original_selection: Cursor,
     blink: RectangularWave,
+    edit_mode: EditMode,
 }
 
-impl Optional {
-    pub fn new(initial_selection: Cursor, options: OptionsBuffer) -> Self {
+impl OptionalEditableWidget {
+    pub fn new(initial_selection: Cursor, options: OptionsBuffer, is_in_edit_mode: bool) -> Self {
         const T_ON: u64 = 600;
         const T_OFF: u64 = 300;
         Self {
@@ -39,11 +40,12 @@ impl Optional {
             editing_selection: initial_selection.clone(),
             original_selection: initial_selection,
             blink: RectangularWave::new(T_ON, T_OFF),
+            edit_mode: EditMode::new(is_in_edit_mode),
         }
     }
 
     /// helper function
-    fn __blinks_char_if_in_editing_mode(
+    fn blinks_char_if_in_editing_mode(
         &self,
         canvas: &mut Canvas,
         char: char,
@@ -64,6 +66,16 @@ impl Optional {
     }
 }
 
+impl Editable for OptionalEditableWidget {
+    fn set_edit_mode(&mut self, value: bool) {
+        self.edit_mode.set_edit_mode(value)
+    }
+
+    fn is_in_edit_mode(&self) -> bool {
+        self.is_in_edit_mode()
+    }
+}
+
 /* impl Optional<'_> {
     pub fn abort_edition(&mut self) {
         let recupered_info = self.original_cursor.clone();
@@ -78,7 +90,7 @@ impl Optional {
     }
 } */
 
-impl Widget for Optional {
+impl Widget for OptionalEditableWidget {
     fn send_key(&mut self, key: KeyCode) {
         match key {
             // navigation_key left and right
@@ -105,14 +117,14 @@ impl Widget for Optional {
     }
 
     fn draw(&self, canvas: &mut Canvas, start_point: Point) {
-        const is_in_editing_mode: bool = true; // TODO: remove the necessity of this constant if and when possible
         canvas.set_cursor(start_point);
         const open_brackets: char = '[';
         const close_brackets: char = ']';
+        let is_in_editing_mode = self.is_in_edit_mode();
         let current_index = self.editing_selection.get_current();
-        self.__blinks_char_if_in_editing_mode(canvas, open_brackets, is_in_editing_mode);
+        self.blinks_char_if_in_editing_mode(canvas, open_brackets, is_in_editing_mode);
         let flash_string = self.options[current_index as usize];
         canvas.print_flash_str(flash_string);
-        self.__blinks_char_if_in_editing_mode(canvas, close_brackets, is_in_editing_mode);
+        self.blinks_char_if_in_editing_mode(canvas, close_brackets, is_in_editing_mode);
     }
 }
