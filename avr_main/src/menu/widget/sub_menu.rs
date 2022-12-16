@@ -30,7 +30,7 @@ pub type MenuList = Vec<MenuItemArgs, 6>;
 
 pub struct SubMenu<'a> {
     menu_list: MenuList,                // all itens of submenu
-    current_lcd_line_selected: LcdLine, // lcd line reference
+    current_lcd_line_selected: LcdLine, // lcd line reference  //TODO implement it as a Cursor
     first_line_to_render: Cursor, // line of the vector 'MenuList' which must be the first line to render in the first line of the lcd
     mounted: [MenuItem<'a>; 1],
 }
