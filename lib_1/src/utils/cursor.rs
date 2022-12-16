@@ -2,19 +2,27 @@ use core::ops::Range;
 
 use super::common::{const_clamp, usize_to_u8_clamper};
 
-/// Stateful Cursor that may oscilates between start (inclusive) and end (exclusive)
+/// The purpose of a [`Cursor`] is to statefully move a current unsigned integer around a predefined interval of values
+/// normally defined between start (inclusive) and end (exclusive). Through a serie of defined methods.
+///
 #[derive(Copy, Clone)]
 pub struct Cursor {
     // size = 3 bytes
-    current: u8, // oscilates between start (inclusive) and end (exclusive)
+    current: u8, // varies between start (inclusive) and end (exclusive)
     start: u8,   // included
     end: u8,     // excluded
 }
 
 impl Cursor {
-    pub const fn new(start: u8, end: u8, current: u8) -> Self {
+    /// Constructs new instance.
+    ///
+    /// The `start` and `end` parameters represents the interval of valid values, consider also the following convention:
+    /// -   `start` (included),
+    /// -   `end` (excluded),
+    /// -   `initial_value` (included).
+    pub const fn new(start: u8, end: u8, initial_value: u8) -> Self {
         Self {
-            current: Self::normalize_current(current, start, end),
+            current: Self::normalize_current(initial_value, start, end),
             start,
             end,
         }
@@ -31,8 +39,10 @@ impl Cursor {
         Self::new(start, end, current)
     }
 
+    /// Value returned is already normalized, that means that it will never be out of the defined interval
     pub fn get_current(&self) -> u8 {
-        self.current // value already normalized
+        // value already normalized
+        self.current
     }
 
     /// Sets current cursor position
@@ -43,6 +53,10 @@ impl Cursor {
         let normalized_current =
             Self::normalize_current(clamped_cursor_position, self.start, self.end);
         self.current = normalized_current;
+    }
+
+    pub fn get_range(&self) -> Range<u8> {
+        self.start..self.end
     }
 
     /// returns true if has reached the upper bound
