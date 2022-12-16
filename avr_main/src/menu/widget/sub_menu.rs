@@ -4,49 +4,73 @@ use crate::{
     menu::{canvas::Canvas, point::Point},
     unwrap_option,
 };
-use core::{cell::Cell, slice::Iter};
+use core::{cell::Cell, ops::Range, slice::Iter};
 use heapless::Vec;
 use lib_1::arena::arena::Arena;
 use lib_1::utils::cursor::Cursor;
 
-//represents the lines of the 40x2 LCD display
+/// Helper type to represent each lines of the 40x2 LCD display.
+///
+/// You may consider this type just to avoid to cast the two lcd lines direct to a `u8` type.
 #[derive(PartialEq, Copy, Clone)]
 #[repr(u8)]
 pub enum LcdLine {
-    Line0,
-    Line1,
+    Line0 = 0,
+    Line1 = 1,
 }
-
-use LcdLine::Line0;
-use LcdLine::Line1;
 
 impl LcdLine {
     pub fn iterator() -> impl Iterator<Item = LcdLine> {
-        [Line0, Line1].iter().copied()
+        [LcdLine::Line0, LcdLine::Line1].iter().copied()
+    }
+}
+
+impl From<u8> for LcdLine {
+    fn from(value: u8) -> Self {
+        match value {
+            0 => LcdLine::Line0,
+            1 => LcdLine::Line1,
+            _ => LcdLine::Line0, // default
+        }
     }
 }
 
 pub type MenuList = Vec<MenuItemArgs, 6>;
 
 pub struct SubMenu<'a> {
-    menu_list: MenuList,                // all itens of submenu
-    current_lcd_line_selected: LcdLine, // lcd line reference  //TODO implement it as a Cursor
-    first_line_to_render: Cursor, // line of the vector 'MenuList' which must be the first line to render in the first line of the lcd
+    /// List of all submenu items.
+    menu_list: MenuList,
+    /// Controls the line of menu (see: LcdLine) which is current selected.
+    lcd_line_cursor: Cursor,
+    /// First line to render in the lcd screen in relation to the [`MenuList`].
+    first_line_to_render: Cursor,
     mounted: [MenuItem<'a>; 1],
 }
 
 impl<'a> SubMenu<'a> {
     pub fn new(mut menu_list: MenuList) -> Self {
         let size = menu_list.len();
-        let default_initial_menu_item = 0;
         let mounted_0 = MenuItem::from_menu_args(&menu_list[0]);
-        //let mounted_1 = MenuItem::from_menu_args(&menu_list[1]);
         Self {
             menu_list,
-            current_lcd_line_selected: Line0,
-            first_line_to_render: Cursor::from_range(0..size - 1, default_initial_menu_item),
-            mounted: [mounted_0], //, mounted_1],
+            lcd_line_cursor: {
+                const number_of_lcd_lines: u8 = 2;
+                const initial_line_selected: u8 = 0;
+                Cursor::new(0, number_of_lcd_lines, initial_line_selected)
+            },
+            first_line_to_render: {
+                let default_initial_menu_item = 0;
+                Cursor::from_range(0..size - 1, default_initial_menu_item)
+            },
+            mounted: {
+                //let mounted_1 = MenuItem::from_menu_args(&menu_list[1]);
+                [mounted_0] //, mounted_1]
+            },
         }
+    }
+
+    fn get_current_lcd_line(&self) -> LcdLine {
+        LcdLine::from(self.lcd_line_cursor.get_current())
     }
 
     fn get_current_index(&self, line: LcdLine) -> u8 {
@@ -76,9 +100,7 @@ impl<'a> SubMenu<'a> {
         self.first_line_to_render.previous();
     }
 
-    //
-
-    // if is in edit mode for some line returns Some<Line> else None
+    /// If is in edit mode for some line returns Some(LcdLine) else None.
     fn get_line_being_edited(&self) -> Option<LcdLine> {
         for line in LcdLine::iterator() {
             let is_editing_some_line = self.get_menu_item(line).is_in_edit_mode();
@@ -114,40 +136,34 @@ impl<'a> SubMenu<'a> {
 
 impl<'a> SubMenu<'a> {
     pub fn send_key(&mut self, key: KeyCode) {
-        let is_editing_some_line = self.get_line_being_edited();
-
-        match is_editing_some_line {
-            //is editing some line
-            Some(current_line) => {
-                // delegate keys
-                self.get_menu_item_mut(current_line).send_key(key);
-            }
-
-            //not editing any line
-            None => {
-                // navigate menu
-                match key {
-                    KeyCode::KEY_DIRECIONAL_PARA_BAIXO => match self.current_lcd_line_selected {
-                        LcdLine::Line0 => {
-                            self.current_lcd_line_selected = Line1;
-                        }
-                        LcdLine::Line1 => {
-                            self.scroll_down();
-                        }
-                    },
-                    KeyCode::KEY_DIRECIONAL_PARA_CIMA => match self.current_lcd_line_selected {
-                        LcdLine::Line0 => {
-                            self.scroll_up();
-                        }
-                        LcdLine::Line1 => {
-                            self.current_lcd_line_selected = Line0;
-                        }
-                    },
-                    KeyCode::KEY_ENTER => {
-                        let line = self.current_lcd_line_selected;
-                        self.get_menu_item_mut(line).set_edit_mode(true);
+        if let Some(line_being_edited) = self.get_line_being_edited() {
+            // if is editing some line, delegate keys to sub widgets.
+            self.get_menu_item_mut(line_being_edited).send_key(key);
+        } else {
+            // if not editing any line we are responsible to show up/down menu navigation.
+            match key {
+                KeyCode::KEY_DIRECIONAL_PARA_BAIXO => {
+                    let already_on_bottom = self.lcd_line_cursor.next();
+                    if already_on_bottom {
+                        self.scroll_down()
                     }
-                    _ => {}
+                }
+
+                KeyCode::KEY_DIRECIONAL_PARA_CIMA => {
+                    let already_on_top = self.lcd_line_cursor.previous();
+                    if already_on_top {
+                        self.scroll_up()
+                    }
+                }
+
+                KeyCode::KEY_ENTER => {
+                    // Enters edit mode on sub-widgets.
+                    let line = self.get_current_lcd_line();
+                    self.get_menu_item_mut(line).set_edit_mode(true);
+                }
+
+                _ => {
+                    // ignore other keys
                 }
             }
         }
@@ -163,7 +179,7 @@ impl<'a> SubMenu<'a> {
         // clear screen
         canvas.clear();
         // draw menu item selector
-        let current_line = self.current_lcd_line_selected;
+        let current_line = self.get_current_lcd_line();
         self.draw_menu_item_selector(current_line, canvas);
         // draw menu items
         for line in LcdLine::iterator() {
