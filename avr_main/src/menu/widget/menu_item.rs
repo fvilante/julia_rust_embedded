@@ -88,7 +88,8 @@ impl<'a> MenuItem<'a> {
             } => {
                 let point1 = Point1d::new(*point1_);
                 let point2 = Point1d::new(*point2_);
-                let field = Field::from_numerical(unsafe { &mut *variable }, (*parameters).clone());
+                let initial_value = unsafe { *variable };
+                let field = Field::from_numerical(initial_value, (*parameters).clone());
                 let mut menu_item = Self::new(point1, *text, point2, field, None);
                 menu_item
             }
@@ -108,7 +109,8 @@ impl<'a> MenuItem<'a> {
                 options_list_cloned.clone_from(options_list);
                 let point1 = Point1d::new(*point1_);
                 let point2 = Point1d::new(*point2_);
-                let field = Field::from_optional(options_list_cloned, unsafe { &mut *variable });
+                let initial_selection = unsafe { *variable };
+                let field = Field::from_optional(initial_selection, options_list_cloned);
                 let mut menu_item = Self::new(point1, *text, point2, field, None);
                 menu_item
             }

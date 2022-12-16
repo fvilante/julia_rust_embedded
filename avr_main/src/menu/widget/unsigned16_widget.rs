@@ -444,33 +444,43 @@ impl Widget for FieldWrapper {
     }
 }
 
+impl Editable for FieldWrapper {
+    fn set_edit_mode(&mut self, value: bool) {
+        match self {
+            Self::Numerical(x) => x.set_edit_mode(value),
+            Self::Optional(x) => x.set_edit_mode(value),
+        }
+    }
+
+    fn is_in_edit_mode(&self) -> bool {
+        match self {
+            Self::Numerical(x) => x.is_in_edit_mode(),
+            Self::Optional(x) => x.is_in_edit_mode(),
+        }
+    }
+}
+
 //Makes possible to edit a position of memory using Lcd display and keyboard
 //esc abort edition, and enter confirm edition
 pub struct Field {
     field_wrapper: FieldWrapper,
-    edit_mode: EditMode,
 }
 
 impl Field {
     pub fn new(field_wrapper: FieldWrapper) -> Self {
-        Self {
-            field_wrapper,
-            edit_mode: EditMode::new(false),
-        }
+        Self { field_wrapper }
     }
 
-    pub fn from_numerical<'a>(variable: &'a mut u16, parameters: Format) -> Self {
+    pub fn from_numerical(initial_value: u16, parameters: Format) -> Self {
         const is_in_edit_mode: bool = false; // does not start in edit mode
-        let initial_value = (*variable).clone();
         let numerical_field =
             NumberInputEditorWidget::new(initial_value, parameters, is_in_edit_mode);
-        let field_enum = FieldWrapper::Numerical(numerical_field);
-        Self::new(field_enum)
+        let field_wrapper = FieldWrapper::Numerical(numerical_field);
+        Self::new(field_wrapper)
     }
 
-    pub fn from_optional<'a>(options: OptionsBuffer, variable: &'a mut Cursor) -> Self {
+    pub fn from_optional(initial_selection: Cursor, options: OptionsBuffer) -> Self {
         const is_in_edit_mode: bool = false; // does not start in edit mode
-        let initial_selection = (*variable).clone();
         let optional = OptionEditorWidget::new(initial_selection, options, is_in_edit_mode);
         let field_enum = FieldWrapper::Optional(optional);
         Self::new(field_enum)
@@ -511,10 +521,10 @@ impl Widget for Field {
 
 impl Editable for Field {
     fn set_edit_mode(&mut self, value: bool) {
-        self.edit_mode.set_edit_mode(value);
+        self.field_wrapper.set_edit_mode(value);
     }
 
     fn is_in_edit_mode(&self) -> bool {
-        self.edit_mode.is_in_edit_mode()
+        self.field_wrapper.is_in_edit_mode()
     }
 }
