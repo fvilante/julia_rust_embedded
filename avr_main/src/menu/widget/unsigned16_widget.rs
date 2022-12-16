@@ -392,12 +392,12 @@ impl Widget for NumberInputEditorWidget {
 
 /// Abstracts all kind of fields existent offering an equal interface for all of them (Note: New Fields
 /// may be added in the future)
-pub enum FieldInternal {
+pub enum FieldWrapper {
     Numerical(NumberInputEditorWidget),
     Optional(OptionEditorWidget),
 }
 
-impl FieldInternal {
+impl FieldWrapper {
     pub fn save_edition(&mut self) {
         match self {
             Self::Numerical(x) => {
@@ -421,7 +421,7 @@ impl FieldInternal {
     }
 }
 
-impl Widget for FieldInternal {
+impl Widget for FieldWrapper {
     fn send_key(&mut self, key: KeyCode) {
         match self {
             Self::Numerical(x) => x.send_key(key),
@@ -447,14 +447,14 @@ impl Widget for FieldInternal {
 //Makes possible to edit a position of memory using Lcd display and keyboard
 //esc abort edition, and enter confirm edition
 pub struct Field {
-    field_enum: FieldInternal,
+    field_wrapper: FieldWrapper,
     edit_mode: EditMode,
 }
 
 impl Field {
-    pub fn new(field_enum: FieldInternal) -> Self {
+    pub fn new(field_wrapper: FieldWrapper) -> Self {
         Self {
-            field_enum,
+            field_wrapper,
             edit_mode: EditMode::new(false),
         }
     }
@@ -464,7 +464,7 @@ impl Field {
         let initial_value = (*variable).clone();
         let numerical_field =
             NumberInputEditorWidget::new(initial_value, parameters, is_in_edit_mode);
-        let field_enum = FieldInternal::Numerical(numerical_field);
+        let field_enum = FieldWrapper::Numerical(numerical_field);
         Self::new(field_enum)
     }
 
@@ -472,7 +472,7 @@ impl Field {
         const is_in_edit_mode: bool = false; // does not start in edit mode
         let initial_selection = (*variable).clone();
         let optional = OptionEditorWidget::new(initial_selection, options, is_in_edit_mode);
-        let field_enum = FieldInternal::Optional(optional);
+        let field_enum = FieldWrapper::Optional(optional);
         Self::new(field_enum)
     }
 }
@@ -484,28 +484,28 @@ impl Widget for Field {
                 // cancel edition
                 KeyCode::KEY_ESC => {
                     self.set_edit_mode(false); // terminate edition
-                    self.field_enum.abort_edition();
+                    self.field_wrapper.abort_edition();
                 }
 
                 // saves edition
                 KeyCode::KEY_ENTER => {
                     self.set_edit_mode(false); // terminate edition
-                    self.field_enum.save_edition();
+                    self.field_wrapper.save_edition();
                 }
 
                 //delegate everything else
-                _ => self.field_enum.send_key(key),
+                _ => self.field_wrapper.send_key(key),
             };
         }
     }
 
     fn update(&mut self) {
-        self.field_enum.update()
+        self.field_wrapper.update()
     }
 
     fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         let is_in_edit_mode = self.is_in_edit_mode();
-        self.field_enum.draw(canvas, start_point)
+        self.field_wrapper.draw(canvas, start_point)
     }
 }
 
