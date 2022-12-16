@@ -44,6 +44,7 @@ pub struct SubMenu<'a> {
     lcd_line_cursor: Cursor,
     /// First line to render in the lcd screen in relation to the [`MenuList`].
     first_line_to_render: Cursor,
+    /// State of widgets which are currently mounted on screen.
     mounted: [MenuItem<'a>; 1],
 }
 
@@ -73,6 +74,8 @@ impl<'a> SubMenu<'a> {
         LcdLine::from(self.lcd_line_cursor.get_current())
     }
 
+    /// Returns the index that points on the element in the `MenuList` that should be rendered in the equivalente
+    /// `LcdLine` position on Lcd display.
     fn get_current_index(&self, line: LcdLine) -> u8 {
         let lcd_index = line as u8;
         let line_index = self.first_line_to_render.get_current();
