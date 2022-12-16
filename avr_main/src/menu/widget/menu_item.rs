@@ -12,7 +12,7 @@ use super::{
     caption::Caption,
     optional::OptionsBuffer,
     sub_menu::{LcdLine, SubMenu},
-    unsigned16_widget::{Content, Field, FieldEnum, Format, StringBuffer},
+    unsigned16_widget::{Content, Field, FieldInternal, Format, StringBuffer},
     widget::Editable,
     widget::Widget,
 };

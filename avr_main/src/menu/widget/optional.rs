@@ -23,7 +23,7 @@ pub fn make_options_buffer_from_array<const ArraySize: usize>(
     options
 }
 
-pub struct OptionalEditableWidget {
+pub struct OptionEditorWidget {
     options: OptionsBuffer,
     editing_selection: Cursor,
     original_selection: Cursor,
@@ -31,7 +31,7 @@ pub struct OptionalEditableWidget {
     edit_mode: EditMode,
 }
 
-impl OptionalEditableWidget {
+impl OptionEditorWidget {
     pub fn new(initial_selection: Cursor, options: OptionsBuffer, is_in_edit_mode: bool) -> Self {
         const T_ON: u64 = 600;
         const T_OFF: u64 = 300;
@@ -66,7 +66,7 @@ impl OptionalEditableWidget {
     }
 }
 
-impl Editable for OptionalEditableWidget {
+impl Editable for OptionEditorWidget {
     fn set_edit_mode(&mut self, value: bool) {
         self.edit_mode.set_edit_mode(value)
     }
@@ -90,7 +90,7 @@ impl Editable for OptionalEditableWidget {
     }
 } */
 
-impl Widget for OptionalEditableWidget {
+impl Widget for OptionEditorWidget {
     fn send_key(&mut self, key: KeyCode) {
         match key {
             // navigation_key left and right

@@ -11,7 +11,7 @@ use crate::{
     menu::{accessor::Accessor, canvas::Canvas, point::Point, ratangular_wave::RectangularWave},
 };
 
-use super::optional::{OptionalEditableWidget, OptionsBuffer};
+use super::optional::{OptionEditorWidget, OptionsBuffer};
 use super::{edit_mode::EditMode, widget::Editable, widget::Widget};
 use lib_1::utils::cursor::Cursor;
 
@@ -390,20 +390,22 @@ impl Widget for NumberInputEditorWidget {
     }
 } */
 
-pub enum FieldEnum {
+/// Abstracts all kind of fields existent offering an equal interface for all of them (Note: New Fields
+/// may be added in the future)
+pub enum FieldInternal {
     Numerical(NumberInputEditorWidget),
-    Optional(OptionalEditableWidget),
+    Optional(OptionEditorWidget),
 }
 
-impl FieldEnum {
+impl FieldInternal {
     pub fn save_edition(&mut self) {
         match self {
             Self::Numerical(x) => {
                 todo!();
-            } //x.save_edition(),
+            }
             Self::Optional(x) => {
                 todo!();
-            } //x.save_edition(),
+            }
         }
     }
 
@@ -411,15 +413,15 @@ impl FieldEnum {
         match self {
             Self::Numerical(x) => {
                 todo!();
-            } //x.abort_edition(),
+            }
             Self::Optional(x) => {
                 todo!();
-            } //x.abort_edition(),
+            }
         }
     }
 }
 
-impl Widget for FieldEnum {
+impl Widget for FieldInternal {
     fn send_key(&mut self, key: KeyCode) {
         match self {
             Self::Numerical(x) => x.send_key(key),
@@ -445,12 +447,12 @@ impl Widget for FieldEnum {
 //Makes possible to edit a position of memory using Lcd display and keyboard
 //esc abort edition, and enter confirm edition
 pub struct Field {
-    field_enum: FieldEnum,
+    field_enum: FieldInternal,
     edit_mode: EditMode,
 }
 
 impl Field {
-    pub fn new(field_enum: FieldEnum) -> Self {
+    pub fn new(field_enum: FieldInternal) -> Self {
         Self {
             field_enum,
             edit_mode: EditMode::new(false),
@@ -462,15 +464,15 @@ impl Field {
         let initial_value = (*variable).clone();
         let numerical_field =
             NumberInputEditorWidget::new(initial_value, parameters, is_in_edit_mode);
-        let field_enum = FieldEnum::Numerical(numerical_field);
+        let field_enum = FieldInternal::Numerical(numerical_field);
         Self::new(field_enum)
     }
 
     pub fn from_optional<'a>(options: OptionsBuffer, variable: &'a mut Cursor) -> Self {
         const is_in_edit_mode: bool = false; // does not start in edit mode
         let initial_selection = (*variable).clone();
-        let optional = OptionalEditableWidget::new(initial_selection, options, is_in_edit_mode);
-        let field_enum = FieldEnum::Optional(optional);
+        let optional = OptionEditorWidget::new(initial_selection, options, is_in_edit_mode);
+        let field_enum = FieldInternal::Optional(optional);
         Self::new(field_enum)
     }
 }
