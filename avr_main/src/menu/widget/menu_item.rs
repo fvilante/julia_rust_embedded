@@ -54,7 +54,7 @@ pub struct MenuItem<'a> {
     point_a: Point1d,
     caption: Caption,
     point_b: Point1d,
-    field: Field<'a>,
+    field: Field,
     sub_menu: Option<&'a mut SubMenu<'a>>,
 }
 
@@ -65,7 +65,7 @@ impl<'a> MenuItem<'a> {
         point_a: Point1d,
         text: FlashString,
         point_b: Point1d,
-        field: Field<'a>,
+        field: Field,
         sub_menu: Option<&'a mut SubMenu<'a>>,
     ) -> Self {
         Self {

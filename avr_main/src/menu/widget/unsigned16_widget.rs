@@ -272,11 +272,11 @@ pub struct NumberInputEditorWidget {
 
 impl NumberInputEditorWidget {
     pub fn new(initial_value: u16, format: Format) -> Self {
-        const T_ON: u16 = 600;
-        const T_OFF: u16 = 300;
+        const T_ON: u64 = 600;
+        const T_OFF: u64 = 300;
         Self {
             u16_editor: NumberInputEditor::from_u16(initial_value, format.clone()),
-            blink: RectangularWave::new(T_ON as u64, T_OFF as u64),
+            blink: RectangularWave::new(T_ON, T_OFF),
         }
     }
 }
@@ -373,12 +373,12 @@ impl Widget for NumberInputEditorWidget {
     }
 } */
 
-pub enum FieldEnum<'a> {
+pub enum FieldEnum {
     Numerical(NumberInputEditorWidget),
-    Optional(Optional<'a>),
+    Optional(Optional),
 }
 
-impl FieldEnum<'_> {
+impl FieldEnum {
     pub fn save_edition(&mut self) {
         match self {
             Self::Numerical(x) => {
@@ -402,7 +402,7 @@ impl FieldEnum<'_> {
     }
 }
 
-impl FieldEnum<'_> {
+impl FieldEnum {
     pub fn send_key(&mut self, key: KeyCode) {
         match self {
             Self::Numerical(x) => x.send_key(key),
@@ -417,44 +417,45 @@ impl FieldEnum<'_> {
         }
     }
 
-    pub fn draw(&self, canvas: &mut Canvas, start_point: Point, is_in_editing_mode: bool) {
+    pub fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         match self {
             Self::Numerical(x) => x.draw(canvas, start_point),
-            Self::Optional(x) => x.draw(canvas, start_point, is_in_editing_mode),
+            Self::Optional(x) => x.draw(canvas, start_point),
         }
     }
 }
 
 //Makes possible to edit a position of memory using Lcd display and keyboard
 //esc abort edition, and enter confirm edition
-pub struct Field<'a> {
-    field_enum: FieldEnum<'a>,
+pub struct Field {
+    field_enum: FieldEnum,
     edit_mode: EditMode,
 }
 
-impl<'a> Field<'a> {
-    pub fn new(field_enum: FieldEnum<'a>) -> Self {
+impl Field {
+    pub fn new(field_enum: FieldEnum) -> Self {
         Self {
             field_enum,
             edit_mode: EditMode::new(false),
         }
     }
 
-    pub fn from_numerical(variable: &'a mut u16, parameters: Format) -> Self {
+    pub fn from_numerical<'a>(variable: &'a mut u16, parameters: Format) -> Self {
         let initial_value = (*variable).clone();
         let numerical_field = NumberInputEditorWidget::new(initial_value, parameters);
         let field_enum = FieldEnum::Numerical(numerical_field);
         Self::new(field_enum)
     }
 
-    pub fn from_optional(options: OptionsBuffer, variable: &'a mut Cursor) -> Self {
-        let optional = Optional::new(options, variable);
+    pub fn from_optional<'a>(options: OptionsBuffer, variable: &'a mut Cursor) -> Self {
+        let initial_selection = (*variable).clone();
+        let optional = Optional::new(initial_selection, options);
         let field_enum = FieldEnum::Optional(optional);
         Self::new(field_enum)
     }
 }
 
-impl Widget for Field<'_> {
+impl Widget for Field {
     fn send_key(&mut self, key: KeyCode) {
         if self.is_in_edit_mode() {
             match key {
@@ -482,11 +483,11 @@ impl Widget for Field<'_> {
 
     fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         let is_in_edit_mode = self.is_in_edit_mode();
-        self.field_enum.draw(canvas, start_point, is_in_edit_mode)
+        self.field_enum.draw(canvas, start_point)
     }
 }
 
-impl<'a> Field<'a> {
+impl Field {
     pub fn set_edit_mode(&mut self, value: bool) {
         self.edit_mode.set_edit_mode(value);
     }
