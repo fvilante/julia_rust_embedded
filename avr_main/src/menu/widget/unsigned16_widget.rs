@@ -402,22 +402,22 @@ impl FieldEnum {
     }
 }
 
-impl FieldEnum {
-    pub fn send_key(&mut self, key: KeyCode) {
+impl Widget for FieldEnum {
+    fn send_key(&mut self, key: KeyCode) {
         match self {
             Self::Numerical(x) => x.send_key(key),
             Self::Optional(x) => x.send_key(key),
         }
     }
 
-    pub fn update(&mut self) {
+    fn update(&mut self) {
         match self {
             Self::Numerical(x) => x.update(),
             Self::Optional(x) => x.update(),
         }
     }
 
-    pub fn draw(&self, canvas: &mut Canvas, start_point: Point) {
+    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         match self {
             Self::Numerical(x) => x.draw(canvas, start_point),
             Self::Optional(x) => x.draw(canvas, start_point),
