@@ -472,16 +472,16 @@ impl Field {
     }
 
     pub fn from_numerical(initial_value: u16, parameters: Format) -> Self {
-        const is_in_edit_mode: bool = false; // does not start in edit mode
+        const initial_editing_mode: bool = false; // does not start in edit mode
         let numerical_field =
-            NumberInputEditorWidget::new(initial_value, parameters, is_in_edit_mode);
+            NumberInputEditorWidget::new(initial_value, parameters, initial_editing_mode);
         let field_wrapper = FieldWrapper::Numerical(numerical_field);
         Self::new(field_wrapper)
     }
 
     pub fn from_optional(initial_selection: Cursor, options: OptionsBuffer) -> Self {
-        const is_in_edit_mode: bool = false; // does not start in edit mode
-        let optional = OptionEditorWidget::new(initial_selection, options, is_in_edit_mode);
+        const initial_editing_mode: bool = false; // does not start in edit mode
+        let optional = OptionEditorWidget::new(initial_selection, options, initial_editing_mode);
         let field_enum = FieldWrapper::Optional(optional);
         Self::new(field_enum)
     }
