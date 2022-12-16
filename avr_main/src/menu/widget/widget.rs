@@ -1,9 +1,15 @@
-use crate::{board::keyboard::KeyCode, menu::canvas::Canvas};
+use crate::{
+    board::keyboard::KeyCode,
+    menu::{canvas::Canvas, point::Point},
+};
 
+/// A component that can be draw on lcd display, receive key strokes from keyboard and update its own state
 pub trait Widget {
     fn send_key(&mut self, key: KeyCode);
     fn update(&mut self);
-    fn draw(&self, canvas: &mut Canvas);
+    /// `start_point` points to the coordinates to start to draw the widget
+    /// TODO: Not sure this parameter should be a rectangle or even do not exist
+    fn draw(&self, canvas: &mut Canvas, start_point: Point);
 }
 
 pub type IWidget<'a> = &'a mut dyn Widget;
@@ -24,9 +30,9 @@ impl WidgetHelper {
         }
     }
 
-    pub fn draw(self_widget: &Option<IWidget>, canvas: &mut Canvas) {
+    pub fn draw(self_widget: &Option<IWidget>, canvas: &mut Canvas, start_point: Point) {
         if let Some(widget) = &*self_widget {
-            widget.draw(canvas)
+            widget.draw(canvas, start_point)
         }
     }
 }

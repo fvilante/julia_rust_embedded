@@ -281,8 +281,8 @@ impl NumberInputEditorWidget {
     }
 }
 
-impl NumberInputEditorWidget {
-    pub fn send_key(&mut self, key: KeyCode) {
+impl Widget for NumberInputEditorWidget {
+    fn send_key(&mut self, key: KeyCode) {
         let content_editor = &mut self.u16_editor.content_editor;
         match key {
             // navigation_key left and right
@@ -334,11 +334,11 @@ impl NumberInputEditorWidget {
         }
     }
 
-    pub fn update(&mut self) {
+    fn update(&mut self) {
         self.blink.update(); // blinks cursor
     }
 
-    pub fn draw(&self, canvas: &mut Canvas, start_point: Point) {
+    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         canvas.set_cursor(start_point);
         for (position, digit) in self.u16_editor.char_indices() {
             const blink_char: char = '_';
@@ -454,8 +454,8 @@ impl<'a> Field<'a> {
     }
 }
 
-impl Field<'_> {
-    pub fn send_key(&mut self, key: KeyCode) {
+impl Widget for Field<'_> {
+    fn send_key(&mut self, key: KeyCode) {
         if self.is_in_edit_mode() {
             match key {
                 // cancel edition
@@ -476,11 +476,11 @@ impl Field<'_> {
         }
     }
 
-    pub fn update(&mut self) {
+    fn update(&mut self) {
         self.field_enum.update()
     }
 
-    pub fn draw(&self, canvas: &mut Canvas, start_point: Point) {
+    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         let is_in_edit_mode = self.is_in_edit_mode();
         self.field_enum.draw(canvas, start_point, is_in_edit_mode)
     }

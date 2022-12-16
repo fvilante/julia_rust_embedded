@@ -117,7 +117,7 @@ impl<'a> Widget for Splash<'a> {
         }
     }
 
-    fn draw(&self, canvas: &mut Canvas) {
+    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         canvas.clear();
         match self.current_state {
             State::Initial => {}
@@ -129,7 +129,7 @@ impl<'a> Widget for Splash<'a> {
             State::End => {
                 //delegate / by-pass
                 if let Some(widget) = &self.widget {
-                    (*widget).draw(canvas)
+                    (*widget).draw(canvas, start_point)
                 }
             }
         }

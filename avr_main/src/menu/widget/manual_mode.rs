@@ -59,7 +59,7 @@ impl Widget for ManualModeMenu {
 
     fn update(&mut self) {}
 
-    fn draw(&self, canvas: &mut Canvas) {
+    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         fn helper_get_first_screen(line_number: u8) -> (Point, FlashString) {
             if line_number == 0 {
                 let line0 = FlashString::new(&LINE0);

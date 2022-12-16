@@ -40,7 +40,7 @@ impl Widget for MenuExecucao {
 
     fn update(&mut self) {}
 
-    fn draw(&self, canvas: &mut Canvas) {
+    fn draw(&self, canvas: &mut Canvas, _start_point: Point) {
         canvas.clear();
         for line_number in 0..2 {
             let (point, flash_string) = Self::get_line_helper(line_number);

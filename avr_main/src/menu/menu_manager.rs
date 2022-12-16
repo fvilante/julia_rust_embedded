@@ -1,5 +1,6 @@
 use super::{
     canvas::Canvas,
+    point::Point,
     widget::{
         splash::Splash,
         widget::{IWidget, Widget, WidgetHelper},
@@ -26,7 +27,7 @@ impl<'a> Widget for MenuManager<'a> {
         WidgetHelper::update(&mut self.root_widget)
     }
 
-    fn draw(&self, canvas: &mut Canvas) {
-        WidgetHelper::draw(&self.root_widget, canvas)
+    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
+        WidgetHelper::draw(&self.root_widget, canvas, start_point)
     }
 }

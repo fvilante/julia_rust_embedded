@@ -100,11 +100,11 @@ impl Widget for MainMenu {
         }
     }
 
-    fn draw(&self, canvas: &mut Canvas) {
+    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         match self.current_state {
             State::MAIN_MENU => self.draw_main_menu(canvas),
-            State::MANUAL => self.menu_manual.draw(canvas),
-            State::EXECUCAO => self.menu_execucao.draw(canvas),
+            State::MANUAL => self.menu_manual.draw(canvas, start_point),
+            State::EXECUCAO => self.menu_execucao.draw(canvas, start_point),
             State::PROGRAMA => todo!(),
         }
     }
