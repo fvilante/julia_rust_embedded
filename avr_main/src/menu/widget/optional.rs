@@ -72,7 +72,7 @@ impl Editable for OptionalEditableWidget {
     }
 
     fn is_in_edit_mode(&self) -> bool {
-        self.is_in_edit_mode()
+        self.edit_mode.is_in_edit_mode()
     }
 }
 
