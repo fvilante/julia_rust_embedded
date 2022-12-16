@@ -507,12 +507,12 @@ impl Widget for Field {
     }
 }
 
-impl Field {
-    pub fn set_edit_mode(&mut self, value: bool) {
+impl Editable for Field {
+    fn set_edit_mode(&mut self, value: bool) {
         self.edit_mode.set_edit_mode(value);
     }
 
-    pub fn is_in_edit_mode(&self) -> bool {
+    fn is_in_edit_mode(&self) -> bool {
         self.edit_mode.is_in_edit_mode()
     }
 }
