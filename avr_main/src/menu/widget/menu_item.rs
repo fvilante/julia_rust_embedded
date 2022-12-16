@@ -127,7 +127,24 @@ impl<'a> MenuItem<'a> {
 
 impl MenuItem<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
-        self.field.send_key(key);
+        if self.is_in_edit_mode() {
+            match key {
+                // cancel edition
+                KeyCode::KEY_ESC => {
+                    self.set_edit_mode(false); // terminate edition
+                    todo!(); //abort_edition();
+                }
+
+                // saves edition
+                KeyCode::KEY_ENTER => {
+                    self.set_edit_mode(false); // terminate edition
+                    todo!(); //save_edition();
+                }
+
+                //delegate everything else
+                _ => self.field.send_key(key),
+            };
+        }
     }
 
     pub fn update(&mut self) {

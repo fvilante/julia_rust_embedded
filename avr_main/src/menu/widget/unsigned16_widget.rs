@@ -397,30 +397,6 @@ pub enum FieldWrapper {
     Optional(OptionEditorWidget),
 }
 
-impl FieldWrapper {
-    pub fn save_edition(&mut self) {
-        match self {
-            Self::Numerical(x) => {
-                todo!();
-            }
-            Self::Optional(x) => {
-                todo!();
-            }
-        }
-    }
-
-    pub fn abort_edition(&mut self) {
-        match self {
-            Self::Numerical(x) => {
-                todo!();
-            }
-            Self::Optional(x) => {
-                todo!();
-            }
-        }
-    }
-}
-
 impl Widget for FieldWrapper {
     fn send_key(&mut self, key: KeyCode) {
         match self {
@@ -489,24 +465,7 @@ impl Field {
 
 impl Widget for Field {
     fn send_key(&mut self, key: KeyCode) {
-        if self.is_in_edit_mode() {
-            match key {
-                // cancel edition
-                KeyCode::KEY_ESC => {
-                    self.set_edit_mode(false); // terminate edition
-                    self.field_wrapper.abort_edition();
-                }
-
-                // saves edition
-                KeyCode::KEY_ENTER => {
-                    self.set_edit_mode(false); // terminate edition
-                    self.field_wrapper.save_edition();
-                }
-
-                //delegate everything else
-                _ => self.field_wrapper.send_key(key),
-            };
-        }
+        self.field_wrapper.send_key(key)
     }
 
     fn update(&mut self) {
