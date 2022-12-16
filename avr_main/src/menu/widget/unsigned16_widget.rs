@@ -268,69 +268,85 @@ pub struct NumberInputEditorWidget {
     u16_editor: NumberInputEditor,
     /// This class is responsible to generate the blinking character effect
     blink: RectangularWave,
+    edit_mode: EditMode,
 }
 
 impl NumberInputEditorWidget {
-    pub fn new(initial_value: u16, format: Format) -> Self {
+    pub fn new(initial_value: u16, format: Format, is_in_edit_mode: bool) -> Self {
         const T_ON: u64 = 600;
         const T_OFF: u64 = 300;
         Self {
             u16_editor: NumberInputEditor::from_u16(initial_value, format.clone()),
             blink: RectangularWave::new(T_ON, T_OFF),
+            edit_mode: EditMode::new(is_in_edit_mode),
         }
+    }
+}
+
+impl Editable for NumberInputEditorWidget {
+    fn set_edit_mode(&mut self, value: bool) {
+        self.edit_mode.set_edit_mode(value)
+    }
+
+    fn is_in_edit_mode(&self) -> bool {
+        self.edit_mode.is_in_edit_mode()
     }
 }
 
 impl Widget for NumberInputEditorWidget {
     fn send_key(&mut self, key: KeyCode) {
-        let content_editor = &mut self.u16_editor.content_editor;
-        match key {
-            // navigation_key left and right
-            KeyCode::KEY_SETA_BRANCA_ESQUERDA => {
-                content_editor.move_cursor_left();
+        if self.is_in_edit_mode() {
+            let content_editor = &mut self.u16_editor.content_editor;
+            match key {
+                // navigation_key left and right
+                KeyCode::KEY_SETA_BRANCA_ESQUERDA => {
+                    content_editor.move_cursor_left();
+                }
+                KeyCode::KEY_SETA_BRANCA_DIREITA => {
+                    content_editor.move_cursor_right();
+                }
+                KeyCode::KEY_DIRECIONAL_PARA_DIREITA => {
+                    content_editor.move_cursor_right();
+                }
+                KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => {
+                    content_editor.move_cursor_left();
+                }
+                // edition keys
+                KeyCode::KEY_0 => {
+                    content_editor.addAndMoveRight('0');
+                }
+                KeyCode::KEY_1 => {
+                    content_editor.addAndMoveRight('1');
+                }
+                KeyCode::KEY_2 => {
+                    content_editor.addAndMoveRight('2');
+                }
+                KeyCode::KEY_3 => {
+                    content_editor.addAndMoveRight('3');
+                }
+                KeyCode::KEY_4 => {
+                    content_editor.addAndMoveRight('4');
+                }
+                KeyCode::KEY_5 => {
+                    content_editor.addAndMoveRight('5');
+                }
+                KeyCode::KEY_6 => {
+                    content_editor.addAndMoveRight('6');
+                }
+                KeyCode::KEY_7 => {
+                    content_editor.addAndMoveRight('7');
+                }
+                KeyCode::KEY_8 => {
+                    content_editor.addAndMoveRight('8');
+                }
+                KeyCode::KEY_9 => {
+                    content_editor.addAndMoveRight('9');
+                }
+                //everything else -> do nothing
+                _ => {}
             }
-            KeyCode::KEY_SETA_BRANCA_DIREITA => {
-                content_editor.move_cursor_right();
-            }
-            KeyCode::KEY_DIRECIONAL_PARA_DIREITA => {
-                content_editor.move_cursor_right();
-            }
-            KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => {
-                content_editor.move_cursor_left();
-            }
-            // edition keys
-            KeyCode::KEY_0 => {
-                content_editor.addAndMoveRight('0');
-            }
-            KeyCode::KEY_1 => {
-                content_editor.addAndMoveRight('1');
-            }
-            KeyCode::KEY_2 => {
-                content_editor.addAndMoveRight('2');
-            }
-            KeyCode::KEY_3 => {
-                content_editor.addAndMoveRight('3');
-            }
-            KeyCode::KEY_4 => {
-                content_editor.addAndMoveRight('4');
-            }
-            KeyCode::KEY_5 => {
-                content_editor.addAndMoveRight('5');
-            }
-            KeyCode::KEY_6 => {
-                content_editor.addAndMoveRight('6');
-            }
-            KeyCode::KEY_7 => {
-                content_editor.addAndMoveRight('7');
-            }
-            KeyCode::KEY_8 => {
-                content_editor.addAndMoveRight('8');
-            }
-            KeyCode::KEY_9 => {
-                content_editor.addAndMoveRight('9');
-            }
-            //everything else -> do nothing
-            _ => {}
+        } else {
+            // ignore keys -> do nothing
         }
     }
 
@@ -340,13 +356,14 @@ impl Widget for NumberInputEditorWidget {
 
     fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         canvas.set_cursor(start_point);
+        let is_in_edit_mode = self.is_in_edit_mode();
         for (position, digit) in self.u16_editor.char_indices() {
             const blink_char: char = '_';
             let mut current_char = digit;
             let is_current_char_over_cursor =
                 position == self.u16_editor.get_current_cursor_index() as usize;
             let is_time_to_blink = self.blink.read();
-            if is_current_char_over_cursor && is_time_to_blink {
+            if is_current_char_over_cursor && is_time_to_blink && is_in_edit_mode {
                 current_char = blink_char;
             }
             canvas.print_char(current_char);
@@ -441,8 +458,10 @@ impl Field {
     }
 
     pub fn from_numerical<'a>(variable: &'a mut u16, parameters: Format) -> Self {
+        const is_in_edit_mode: bool = false; // does not start in edit mode
         let initial_value = (*variable).clone();
-        let numerical_field = NumberInputEditorWidget::new(initial_value, parameters);
+        let numerical_field =
+            NumberInputEditorWidget::new(initial_value, parameters, is_in_edit_mode);
         let field_enum = FieldEnum::Numerical(numerical_field);
         Self::new(field_enum)
     }
