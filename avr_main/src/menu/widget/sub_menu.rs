@@ -1,4 +1,4 @@
-use super::menu_item::{MenuItem, MenuItemArgs};
+use super::menu_item::{MenuItemArgs, MenuItemWidget};
 use crate::{
     board::keyboard::KeyCode,
     menu::{canvas::Canvas, point::Point},
@@ -37,6 +37,8 @@ impl From<u8> for LcdLine {
 
 pub type MenuList = Vec<MenuItemArgs, 6>;
 
+const TOTAL_NUMBER_OF_LINES_IN_LCD: u8 = 2;
+
 pub struct SubMenu<'a> {
     /// List of all submenu items.
     menu_list: MenuList,
@@ -45,28 +47,25 @@ pub struct SubMenu<'a> {
     /// First line to render in the lcd screen in relation to the [`MenuList`].
     first_line_to_render: Cursor,
     /// State of widgets which are currently mounted on screen.
-    mounted: [MenuItem<'a>; 1],
+    mounted: [MenuItemWidget<'a>; 1], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
 }
 
 impl<'a> SubMenu<'a> {
     pub fn new(mut menu_list: MenuList) -> Self {
         let size = menu_list.len();
-        let mounted_0 = MenuItem::from_menu_args(&menu_list[0]);
+        let mounted_0 = MenuItemWidget::from_menu_args(&mut menu_list[0]);
+        //let mounted_1 = MenuItemWidget::from_menu_args(&mut menu_list[1]);
         Self {
             menu_list,
             lcd_line_cursor: {
-                const number_of_lcd_lines: u8 = 2;
                 const initial_line_selected: u8 = 0;
-                Cursor::new(0, number_of_lcd_lines, initial_line_selected)
+                Cursor::new(0, TOTAL_NUMBER_OF_LINES_IN_LCD, initial_line_selected)
             },
             first_line_to_render: {
                 let default_initial_menu_item = 0;
                 Cursor::from_range(0..size - 1, default_initial_menu_item)
             },
-            mounted: {
-                //let mounted_1 = MenuItem::from_menu_args(&menu_list[1]);
-                [mounted_0] //, mounted_1]
-            },
+            mounted: [mounted_0], //, mounted_1],
         }
     }
 
@@ -74,25 +73,24 @@ impl<'a> SubMenu<'a> {
         LcdLine::from(self.lcd_line_cursor.get_current())
     }
 
-    /// Returns the index that points on the element in the `MenuList` that should be rendered in the equivalente
-    /// `LcdLine` position on Lcd display.
-    fn get_current_index(&self, line: LcdLine) -> u8 {
-        let lcd_index = line as u8;
-        let line_index = self.first_line_to_render.get_current();
-        let index = lcd_index + line_index;
-        index
+    /// Mount widgets that are being renderized
+    fn mount(&mut self) {
+        /* let first_line_to_render = self.first_line_to_render.get_current();
+        for lcd_line in LcdLine::iterator() {
+            let index = lcd_line as u8;
+            let mut menu_item_args = self
+                .menu_list
+                .get_mut((first_line_to_render + index) as usize)
+                .unwrap();
+            let menu_item_widget = MenuItemWidget::from_menu_args(&mut menu_item_args);
+            //TODO: REMOVE THIS UNSAFE INDEXING CALL, REFACTOR TO SOMETHING MORE SAFE
+            self.mounted[index as usize] = menu_item_widget;
+        } */
     }
 
-    fn get_menu_item_mut(&mut self, line: LcdLine) -> &mut MenuItem<'a> {
-        //let index = self.get_current_index(line);
-        //self.menu_list.get_mut(index).unwrap()
+    fn get_mounted_item_in_lcd_mut(&mut self, line: LcdLine) -> &mut MenuItemWidget<'a> {
+        //&mut self.mounted[line as u8 as usize] // TODO: Check if this call is safe
         &mut self.mounted[0]
-    }
-
-    fn get_menu_item(&self, line: LcdLine) -> &MenuItem<'a> {
-        //let index = self.get_current_index(line);
-        //self.menu_list.get(index).unwrap()]
-        &self.mounted[0]
     }
 
     fn scroll_down(&mut self) {
@@ -104,9 +102,10 @@ impl<'a> SubMenu<'a> {
     }
 
     /// If is in edit mode for some line returns Some(LcdLine) else None.
-    fn get_line_being_edited(&self) -> Option<LcdLine> {
+    /// TODO: Remove mutability of self when possible
+    fn get_line_being_edited(&mut self) -> Option<LcdLine> {
         for line in LcdLine::iterator() {
-            let is_editing_some_line = self.get_menu_item(line).is_in_edit_mode();
+            let is_editing_some_line = self.get_mounted_item_in_lcd_mut(line).is_in_edit_mode();
             if is_editing_some_line {
                 return Some(line);
             }
@@ -114,13 +113,10 @@ impl<'a> SubMenu<'a> {
         None
     }
 
-    // false = line0, true = line1
-    fn set_editing_mode_for_line(&mut self, line: LcdLine, value: bool) {
-        self.get_menu_item_mut(line).set_edit_mode(value)
-    }
-
     /// helper function to draw submenu cursor on screen
-    fn draw_menu_item_selector(&self, line: LcdLine, canvas: &mut Canvas) {
+    ///
+    /// TODO: remove mutability on self when possible
+    fn draw_menu_item_selector(&mut self, line: LcdLine, canvas: &mut Canvas) {
         const EDITING_CURSOR: char = '*';
         const NAVIGATING_CURSOR: char = '>';
         // position cursor
@@ -141,7 +137,8 @@ impl<'a> SubMenu<'a> {
     pub fn send_key(&mut self, key: KeyCode) {
         if let Some(line_being_edited) = self.get_line_being_edited() {
             // if is editing some line, delegate keys to sub widgets.
-            self.get_menu_item_mut(line_being_edited).send_key(key);
+            self.get_mounted_item_in_lcd_mut(line_being_edited)
+                .send_key(key);
         } else {
             // if not editing any line we are responsible to show up/down menu navigation.
             match key {
@@ -162,7 +159,7 @@ impl<'a> SubMenu<'a> {
                 KeyCode::KEY_ENTER => {
                     // Enters edit mode on sub-widgets.
                     let line = self.get_current_lcd_line();
-                    self.get_menu_item_mut(line).set_edit_mode(true);
+                    self.get_mounted_item_in_lcd_mut(line).set_edit_mode(true);
                 }
 
                 _ => {
@@ -174,19 +171,20 @@ impl<'a> SubMenu<'a> {
 
     pub fn update(&mut self) {
         for line in LcdLine::iterator() {
-            self.get_menu_item_mut(line).update();
+            self.get_mounted_item_in_lcd_mut(line).update();
         }
     }
 
-    pub fn draw(&self, canvas: &mut Canvas) {
+    /// TODO: Remove motability of self when possible.
+    pub fn draw(&mut self, canvas: &mut Canvas) {
         // clear screen
         canvas.clear();
         // draw menu item selector
-        let current_line = self.get_current_lcd_line();
-        self.draw_menu_item_selector(current_line, canvas);
+        let line = self.get_current_lcd_line();
+        self.draw_menu_item_selector(line, canvas);
         // draw menu items
         for line in LcdLine::iterator() {
-            self.get_menu_item(line).draw(canvas, line);
+            self.get_mounted_item_in_lcd_mut(line).draw(canvas, line);
         }
     }
 }

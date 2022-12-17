@@ -9,6 +9,9 @@ pub trait Widget {
     fn update(&mut self);
     /// `start_point` points to the coordinates to start to draw the widget
     /// TODO: Not sure this parameter should be a rectangle or even do not exist
+    /// TODO: Instead of `start_point` i should give a rectangle where the widget is responsible to draw it self
+    /// while the client is responsible to define where this rectangle is placed in the screen. This kind of implementation
+    /// make draw() method more generic
     fn draw(&self, canvas: &mut Canvas, start_point: Point);
 }
 

@@ -14,9 +14,9 @@ use super::widget::manual_mode::ManualModeMenu;
 use super::widget::manual_mode::ManualModeState;
 use super::widget::menu_item;
 use super::widget::menu_item::parse_menu_item_constructor_string;
-use super::widget::menu_item::MenuItem;
 use super::widget::menu_item::MenuItemArgs;
 use super::widget::menu_item::MenuItemParsed;
+use super::widget::menu_item::MenuItemWidget;
 use super::widget::menu_item::{NumericalParameterArgs, OptionalParameterArgs};
 use super::widget::optional::OptionEditorWidget;
 use super::widget::splash::Splash;
@@ -131,9 +131,9 @@ pub fn development_entry_point() -> ! {
 
     // -----
 
-    let mut value1: u16 = 0;
-    let mut value2: u16 = 0;
-    let mut value3 = Cursor::from_range(0..2, 0);
+    static mut value1: u16 = 0;
+    static mut value2: u16 = 0;
+    static mut value3: Cursor = Cursor::from_range(0..2, 0);
 
     fn to_pointer_mut<T>(ref_: &mut T) -> *mut T {
         ref_ as *mut T
@@ -146,7 +146,7 @@ pub fn development_entry_point() -> ! {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&POSICAO_INICIAL),
-        variable: to_pointer_mut(&mut value1),
+        variable: unsafe { &mut value1 },
         parameters: Format {
             initial_cursor_position: 0,
             valid_range: 0..100,
@@ -159,7 +159,7 @@ pub fn development_entry_point() -> ! {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&POSICAO_FINAL),
-        variable: to_pointer_mut(&mut value2),
+        variable: unsafe { &mut value2 },
         parameters: Format {
             initial_cursor_position: 0,
             valid_range: 0..9999,
@@ -173,7 +173,7 @@ pub fn development_entry_point() -> ! {
         point1_: 1,
         point2_: 33,
         text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
-        variable: to_pointer_mut(&mut value3),
+        variable: unsafe { &mut value3 },
         options_list: make_options_buffer_from_array([
             FlashString::new(&O1),
             FlashString::new(&O2),
