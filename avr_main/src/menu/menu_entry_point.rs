@@ -122,7 +122,7 @@ pub fn development_entry_point() -> ! {
     //            menu_manager.send_key(key);
     //        }
     //
-    //        menu_manager.update();
+    //        menu_manager.upe();
     //        menu_manager.draw(&mut canvas);
     //        canvas.render();
     //    }
@@ -131,6 +131,50 @@ pub fn development_entry_point() -> ! {
 
     // -----
 
+    /*     let x = parse_menu_item_template_string(FlashString::new(&MENU_ITEM_1)).unwrap();
+       canvas.clear();
+       canvas.print_char('A');
+
+       loop {
+           canvas.render()
+       }
+       match x {
+           TemplateStringParsed::PureCaption(text) => {
+               lcd::print("Pure caption: ");
+               lcd::print(text.as_str());
+           }
+           TemplateStringParsed::ParameterWithOneFieldAndUnitOfMeasurement(text, field, uom) => {
+               lcd::print("With field and UOM: ");
+               lcd::print(text.as_str());
+               lcd::print(",");
+               lcd::print(field.as_str());
+               lcd::print(",");
+               lcd::print(uom.as_str());
+           }
+           TemplateStringParsed::ParameterWithOneField(text, field) => {
+               lcd::print("With field and UOM ->");
+               lcd::print(text.as_str());
+               lcd::print(",");
+               lcd::print(field.as_str());
+           }
+       }
+
+       loop {}
+    */
+
+    /////
+
+    progmem! {
+        static progmem string MENU_ITEM_1 = "Posicao inicial             ${nnnnn} mm";
+    }
+
+    let flash_string = FlashString::new(&MENU_ITEM_1);
+    let pattern = &['i', 'n'];
+    let index = flash_string.find_index(pattern).unwrap();
+    lcd::print_u8_in_hex(index);
+    loop {}
+
+    ///
     static mut value1: u16 = 0;
     static mut value2: u16 = 0;
     static mut value3: Cursor = Cursor::from_range(0..2, 0);

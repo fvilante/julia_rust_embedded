@@ -12,6 +12,11 @@ pub struct FlashString {
     size_N: u8, // size in quantity of u8's
 }
 
+/* pub enum FindParam {
+    Byte(u8),
+    Bytes(&[u8]),
+} */
+
 impl FlashString {
     pub fn new<const N: usize>(val: &PmString<N>) -> Self {
         let ptr = val.as_bytes().as_ptr() as *const u8;
@@ -44,11 +49,34 @@ impl FlashString {
         };
     }
 
-    /*     /// Search for `char` in the [`FlashString`] and returns Some(index_position) or None
-    pub fn find_char_index(&self, char_to_find: char) -> Option<u8> {
-        for each in self.chars()
-
-    } */
+    /// Search for a sliece of bytes in the [`FlashString`] and returns Some(index_position) or None
+    pub fn find_index(&self, pattern: &[char]) -> Option<u8> {
+        let mut is_first_run = true;
+        let mut index = 0;
+        let mut possible_index = 0;
+        for (byte, current_index) in self.chars_indices() {
+            // if one more byte found.
+            if byte as char == pattern[index] {
+                // if first run save current index.
+                if is_first_run {
+                    is_first_run = false;
+                    possible_index = current_index;
+                }
+                index += 1; // points to next byte_to_find.
+                            // bound check.
+                if index as usize >= pattern.len() {
+                    // does match
+                    return Some(possible_index);
+                }
+            } else {
+                // false match, so reset
+                is_first_run = true;
+                possible_index = 0;
+                index = 0;
+            }
+        }
+        None
+    }
 }
 
 pub struct FlashStringIterator {
