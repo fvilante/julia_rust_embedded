@@ -21,10 +21,10 @@ impl FlashString {
         }
     }
 
-    pub fn chars(self) -> FlashStringIterator {
+    pub fn chars_indices(&self) -> FlashStringIterator {
         FlashStringIterator {
-            flash_string: (self),
-            counter: (0),
+            flash_string: self.clone(),
+            counter: 0,
         }
     }
 
@@ -37,12 +37,18 @@ impl FlashString {
         if s.capacity() < self.size_N as usize {
             return None;
         } else {
-            for byte in self.chars() {
+            for (byte, _index) in self.chars_indices() {
                 s.push(byte as char);
             }
             return Some(s.to_owned());
         };
     }
+
+    /*     /// Search for `char` in the [`FlashString`] and returns Some(index_position) or None
+    pub fn find_char_index(&self, char_to_find: char) -> Option<u8> {
+        for each in self.chars()
+
+    } */
 }
 
 pub struct FlashStringIterator {
@@ -50,17 +56,24 @@ pub struct FlashStringIterator {
     counter: u8,
 }
 
+type Char = u8;
+type CharIndex = u8;
+
 impl Iterator for FlashStringIterator {
-    type Item = u8;
+    type Item = (Char, CharIndex);
 
     fn next(&mut self) -> Option<Self::Item> {
         let is_running = self.counter < self.flash_string.size_N;
         if is_running {
             let byte = unsafe {
+                // reads next byte from flash
                 ProgMem::new(self.flash_string.flash_ptr.add(self.counter as usize)).load()
             };
-            self.counter += 1;
-            Some(byte)
+            let current_index = self.counter;
+            let next_index = self.counter + 1;
+            let response = (byte, current_index);
+            self.counter = next_index; // updates counter index
+            Some(response)
         } else {
             None
         }

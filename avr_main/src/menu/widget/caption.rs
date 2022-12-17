@@ -30,7 +30,7 @@ impl Caption {
 
     pub fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         canvas.set_cursor(start_point);
-        for byte in self.text.chars() {
+        for (byte, _index) in self.text.chars_indices() {
             canvas.print_char(byte as char);
         }
     }

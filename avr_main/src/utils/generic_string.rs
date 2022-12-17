@@ -23,7 +23,7 @@ impl<'a> GenericString<'a> {
     pub fn iter(&self) -> WrapperIterator<'a> {
         match self {
             Self::FlashString(flash) => WrapperIterator {
-                flash: Some(flash.chars()),
+                flash: Some(flash.chars_indices()),
                 ram: None,
             },
 
@@ -53,7 +53,11 @@ impl<'a> Iterator for WrapperIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(flash_iterator) = &mut self.flash {
-            flash_iterator.next()
+            if let Some((byte, index)) = flash_iterator.next() {
+                Some(byte)
+            } else {
+                None
+            }
         } else if let Some(ram_iterator) = &mut self.ram {
             if let Some(byte) = ram_iterator.next() {
                 Some(convert_char_to_u8(byte))

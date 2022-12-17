@@ -163,7 +163,9 @@ pub enum TemplateStringParsed {
     ParameterWithOneField(String<40>, StringBuffer),
 }
 
-pub fn parse_menu_item_template_string(template_string: FlashString) -> TemplateStringParsed {
+pub fn parse_menu_item_template_string(
+    template_string: FlashString,
+) -> Option<TemplateStringParsed> {
     // example of declaration content = "Posicao inicial     ${nnnnn} mm/s"
     let s: String<40> = template_string.to_string().unwrap();
     let begin_token: &[char] = &['$', '{'];
@@ -181,16 +183,20 @@ pub fn parse_menu_item_template_string(template_string: FlashString) -> Template
                     let field_type = y.0;
                     let last_caption_ = y.1;
                     let last_caption = &last_caption_[end_token.len()..last_caption_.len()];
-                    TemplateStringParsed::ParameterWithOneFieldAndUnitOfMeasurement(
-                        String::from_str(first_caption).unwrap(),
-                        String::from_str(field_type).unwrap(),
-                        String::from_str(last_caption).unwrap(),
+                    Some(
+                        TemplateStringParsed::ParameterWithOneFieldAndUnitOfMeasurement(
+                            String::from_str(first_caption).unwrap(),
+                            String::from_str(field_type).unwrap(),
+                            String::from_str(last_caption).unwrap(),
+                        ),
                     )
                 }
                 None => {
                     //false open, everything is caption
                     let caption = s.as_str();
-                    TemplateStringParsed::PureCaption(String::from_str(caption).unwrap())
+                    Some(TemplateStringParsed::PureCaption(
+                        String::from_str(caption).unwrap(),
+                    ))
                 }
             }
         }
@@ -198,7 +204,9 @@ pub fn parse_menu_item_template_string(template_string: FlashString) -> Template
         None => {
             //caption entire string
             let caption = s.as_str();
-            TemplateStringParsed::PureCaption(String::from_str(caption).unwrap())
+            Some(TemplateStringParsed::PureCaption(
+                String::from_str(caption).unwrap(),
+            ))
         }
     }
 }

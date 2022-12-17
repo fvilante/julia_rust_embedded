@@ -80,7 +80,7 @@ impl Canvas {
     }
 
     pub fn print_flash_str(&mut self, flash_string: FlashString) {
-        for char in flash_string.chars() {
+        for (char, _index) in flash_string.chars_indices() {
             self.print_char(char as char);
         }
     }
