@@ -157,18 +157,17 @@ impl MenuItemWidget<'_> {
 // CODE BELOW IS NOT ACTIVE YET, IT IS HERE TO SUGGEST FUTURE IMPLEMENTATION (REMOVE IT IF CONSIDERED NOT NECESSARY)
 // NOTE: CODE BELOW WAS TESTED AND WORKS, BUT IS JUST A PROOF-OF-CONCEPT.
 
-pub enum MenuItemParsed {
-    PureCaption(String<40>),                                   // [Caption]
-    CaptionWithOneField(String<40>, StringBuffer, String<10>), // [1st_caption, field_type, last_caption]
+pub enum TemplateStringParsed {
+    PureCaption(String<40>), // [Caption]
+    ParameterWithOneFieldAndUnitOfMeasurement(String<40>, StringBuffer, String<10>), // [1st_caption, field_type, last_caption]
+    ParameterWithOneField(String<40>, StringBuffer),
 }
 
-pub fn parse_menu_item_constructor_string(declaration: FlashString) -> MenuItemParsed {
+pub fn parse_menu_item_template_string(template_string: FlashString) -> TemplateStringParsed {
     // example of declaration content = "Posicao inicial     ${nnnnn} mm/s"
-    let s: String<40> = declaration
-        .to_string()
-        .unwrap_or(String::from_str("Error: Small container").unwrap());
-    let begin_token: &[_] = &['$', '{'];
-    let end_token: &[_] = &['}'];
+    let s: String<40> = template_string.to_string().unwrap();
+    let begin_token: &[char] = &['$', '{'];
+    let end_token: &[char] = &['}'];
     match s.find(begin_token) {
         Some(begin_index) => {
             //1st caption ends in begin_index
@@ -182,7 +181,7 @@ pub fn parse_menu_item_constructor_string(declaration: FlashString) -> MenuItemP
                     let field_type = y.0;
                     let last_caption_ = y.1;
                     let last_caption = &last_caption_[end_token.len()..last_caption_.len()];
-                    MenuItemParsed::CaptionWithOneField(
+                    TemplateStringParsed::ParameterWithOneFieldAndUnitOfMeasurement(
                         String::from_str(first_caption).unwrap(),
                         String::from_str(field_type).unwrap(),
                         String::from_str(last_caption).unwrap(),
@@ -191,7 +190,7 @@ pub fn parse_menu_item_constructor_string(declaration: FlashString) -> MenuItemP
                 None => {
                     //false open, everything is caption
                     let caption = s.as_str();
-                    MenuItemParsed::PureCaption(String::from_str(caption).unwrap())
+                    TemplateStringParsed::PureCaption(String::from_str(caption).unwrap())
                 }
             }
         }
@@ -199,7 +198,7 @@ pub fn parse_menu_item_constructor_string(declaration: FlashString) -> MenuItemP
         None => {
             //caption entire string
             let caption = s.as_str();
-            MenuItemParsed::PureCaption(String::from_str(caption).unwrap())
+            TemplateStringParsed::PureCaption(String::from_str(caption).unwrap())
         }
     }
 }
