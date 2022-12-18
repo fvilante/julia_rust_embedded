@@ -1,3 +1,4 @@
+use core::ops::Range;
 use core::str::FromStr;
 
 use alloc::borrow::ToOwned;
@@ -8,8 +9,12 @@ use heapless::String;
 
 #[derive(Copy, Clone)]
 pub struct FlashString {
+    /// This pointer MUST NEVER be dereferenced because it represents a pointer to Flash DOMAIN, but rust does not
+    /// understand it natively. Is the metods in this class to work with this pointer instead of using the pointer
+    /// directly (except if you know what are you doing)
     flash_ptr: *const u8,
-    size_N: u8, // size in quantity of u8's
+    /// Number of characters in the flash_ptr. If zero, than the string is considered empty
+    length: u8,
 }
 
 /* pub enum FindParam {
@@ -18,11 +23,15 @@ pub struct FlashString {
 } */
 
 impl FlashString {
+    pub fn from_raw(flash_ptr: *const u8, length: u8) -> Self {
+        Self { flash_ptr, length }
+    }
+
     pub fn new<const N: usize>(val: &PmString<N>) -> Self {
         let ptr = val.as_bytes().as_ptr() as *const u8;
         Self {
             flash_ptr: ptr,
-            size_N: N as u8,
+            length: N as u8,
         }
     }
 
@@ -33,13 +42,13 @@ impl FlashString {
         }
     }
 
-    pub fn len(&self) -> usize {
-        self.size_N as usize
+    pub fn len(&self) -> u8 {
+        self.length
     }
 
     pub fn to_string<const T: usize>(&self) -> Option<String<T>> {
         let mut s: String<T> = String::new();
-        if s.capacity() < self.size_N as usize {
+        if s.capacity() < self.length as usize {
             return None;
         } else {
             for (byte, _index) in self.chars_indices() {
@@ -77,6 +86,29 @@ impl FlashString {
         }
         None
     }
+
+    /// Splits the string in two parts by a given index.
+    ///
+    /// Tries to imitate behaviour of heapless::String::split_at
+    pub fn split_at(&self, mid_index: u8) -> (FlashString, FlashString) {
+        let first = self.get_from_range(0..mid_index);
+        let second = self.get_from_range(mid_index..self.len());
+        (first, second)
+    }
+
+    /// Returns a substring based on given range.
+    ///
+    /// The range refers to the string index, where range.start (incluive) and range.end (exclusive).
+    /// If range exceeds the string size, than a clamp is applied.
+    pub fn get_from_range(&self, range: Range<u8>) -> FlashString {
+        let first_possible_index = 0;
+        let last_possible_index = self.len();
+        let index_start = range.start.clamp(first_possible_index, last_possible_index);
+        let index_end = range.end.clamp(first_possible_index, last_possible_index);
+        let length = index_end - index_start;
+        let new_start_address = unsafe { self.flash_ptr.add(index_start as usize) };
+        FlashString::from_raw(new_start_address, length)
+    }
 }
 
 pub struct FlashStringIterator {
@@ -91,7 +123,7 @@ impl Iterator for FlashStringIterator {
     type Item = (Char, CharIndex);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let is_running = self.counter < self.flash_string.size_N;
+        let is_running = self.counter < self.flash_string.length;
         if is_running {
             let byte = unsafe {
                 // reads next byte from flash

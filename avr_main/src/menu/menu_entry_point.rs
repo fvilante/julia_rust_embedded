@@ -166,13 +166,17 @@ pub fn development_entry_point() -> ! {
 
     progmem! {
         static progmem string MENU_ITEM_1 = "Posicao inicial             ${nnnnn} mm";
+        static progmem string MENU_ITEM_2 = "0123456789";
     }
 
-    let flash_string = FlashString::new(&MENU_ITEM_1);
-    let pattern = &['i', 'n'];
-    let index = flash_string.find_index(pattern).unwrap();
-    lcd::print_u8_in_hex(index);
-    loop {}
+    let flash_string = FlashString::new(&MENU_ITEM_2);
+    let (first, second) = flash_string.split_at(3);
+    canvas.print_flash_str(first);
+    canvas.print_char('-');
+    canvas.print_flash_str(second);
+    loop {
+        canvas.render();
+    }
 
     ///
     static mut value1: u16 = 0;
