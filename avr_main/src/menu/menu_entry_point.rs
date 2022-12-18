@@ -131,36 +131,32 @@ pub fn development_entry_point() -> ! {
 
     // -----
 
-    /*     let x = parse_menu_item_template_string(FlashString::new(&MENU_ITEM_1)).unwrap();
-       canvas.clear();
-       canvas.print_char('A');
+    let x = parse_menu_item_template_string(FlashString::new(&MENU_ITEM_1)).unwrap();
 
-       loop {
-           canvas.render()
-       }
-       match x {
-           TemplateStringParsed::PureCaption(text) => {
-               lcd::print("Pure caption: ");
-               lcd::print(text.as_str());
-           }
-           TemplateStringParsed::ParameterWithOneFieldAndUnitOfMeasurement(text, field, uom) => {
-               lcd::print("With field and UOM: ");
-               lcd::print(text.as_str());
-               lcd::print(",");
-               lcd::print(field.as_str());
-               lcd::print(",");
-               lcd::print(uom.as_str());
-           }
-           TemplateStringParsed::ParameterWithOneField(text, field) => {
-               lcd::print("With field and UOM ->");
-               lcd::print(text.as_str());
-               lcd::print(",");
-               lcd::print(field.as_str());
-           }
-       }
+    match x {
+        TemplateStringParsed::PureCaption(text) => {
+            canvas.print("Pure caption: ");
+            canvas.print_flash_str(text);
+        }
+        TemplateStringParsed::ParameterWithOneFieldAndUnitOfMeasurement(text, field, uom) => {
+            canvas.print("With field and UOM: ");
+            canvas.print_flash_str(text);
+            canvas.print(",");
+            canvas.print_flash_str(field);
+            canvas.print(",");
+            canvas.print_flash_str(uom);
+        }
+        TemplateStringParsed::ParameterWithOneField(text, field) => {
+            canvas.print("With field and UOM ->");
+            canvas.print_flash_str(text);
+            canvas.print(",");
+            canvas.print_flash_str(field);
+        }
+    }
 
-       loop {}
-    */
+    loop {
+        canvas.render()
+    }
 
     /////
 

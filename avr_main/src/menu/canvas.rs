@@ -72,6 +72,12 @@ impl Canvas {
 
     // input part
 
+    pub fn print(&mut self, str: &str) {
+        for char in str.chars() {
+            self.print_char(char)
+        }
+    }
+
     pub fn print_char(&mut self, char: char) {
         let index = self.cursor_position.get_index();
         self.screen_buffer_input[index as usize] = char as u8; //TODO: check if this convertion is safe

@@ -19,7 +19,7 @@ use super::{
 use avr_progmem::string::PmString;
 use core::{cell::Cell, ops::Range, str::FromStr};
 use heapless::{String, Vec};
-use lib_1::utils::cursor::Cursor;
+use lib_1::utils::{common::usize_to_u8_clamper, cursor::Cursor};
 use lib_1::{
     arena::arena::{Arena, ArenaId},
     utils::common::convert_u16_to_string_decimal,
@@ -158,55 +158,54 @@ impl MenuItemWidget<'_> {
 // NOTE: CODE BELOW WAS TESTED AND WORKS, BUT IS JUST A PROOF-OF-CONCEPT.
 
 pub enum TemplateStringParsed {
-    PureCaption(String<40>), // [Caption]
-    ParameterWithOneFieldAndUnitOfMeasurement(String<40>, StringBuffer, String<10>), // [1st_caption, field_type, last_caption]
-    ParameterWithOneField(String<40>, StringBuffer),
+    PureCaption(FlashString), // [Caption]
+    ParameterWithOneFieldAndUnitOfMeasurement(FlashString, FlashString, FlashString), // [1st_caption, field_type, last_caption]
+    ParameterWithOneField(FlashString, FlashString),
 }
 
-pub fn parse_menu_item_template_string(
-    template_string: FlashString,
-) -> Option<TemplateStringParsed> {
+pub fn parse_menu_item_template_string(s: FlashString) -> Option<TemplateStringParsed> {
     // example of declaration content = "Posicao inicial     ${nnnnn} mm/s"
-    let s: String<40> = template_string.to_string().unwrap();
     let begin_token: &[char] = &['$', '{'];
     let end_token: &[char] = &['}'];
-    match s.find(begin_token) {
+    match s.find_index(begin_token) {
         Some(begin_index) => {
             //1st caption ends in begin_index
-            let x = s.split_at(begin_index + begin_token.len());
+            let begin_token_len = usize_to_u8_clamper(begin_token.len());
+            let x = s.split_at(begin_index + begin_token_len);
             let first_caption_ = x.0;
-            let first_caption = &first_caption_[0..first_caption_.len() - begin_token.len()];
+            let first_caption =
+                first_caption_.get_from_range(0..first_caption_.len() - begin_token_len);
             let remain = x.1;
-            match remain.find(end_token) {
+            match remain.find_index(end_token) {
                 Some(end_index) => {
+                    let end_token_len = usize_to_u8_clamper(end_token.len());
                     let y = remain.split_at(end_index);
                     let field_type = y.0;
                     let last_caption_ = y.1;
-                    let last_caption = &last_caption_[end_token.len()..last_caption_.len()];
+                    let last_caption =
+                        last_caption_.get_from_range(end_token_len..last_caption_.len());
                     Some(
                         TemplateStringParsed::ParameterWithOneFieldAndUnitOfMeasurement(
-                            String::from_str(first_caption).unwrap(),
-                            String::from_str(field_type).unwrap(),
-                            String::from_str(last_caption).unwrap(),
+                            first_caption,
+                            field_type,
+                            last_caption,
                         ),
                     )
                 }
                 None => {
+                    /// TODO: WHY THIS PART IS DUPLICATED ?
                     //false open, everything is caption
-                    let caption = s.as_str();
-                    Some(TemplateStringParsed::PureCaption(
-                        String::from_str(caption).unwrap(),
-                    ))
+                    let caption = s;
+                    Some(TemplateStringParsed::PureCaption(caption))
                 }
             }
         }
 
         None => {
+            /// TODO: WHY THIS PART IS DUPLICATED ?
             //caption entire string
-            let caption = s.as_str();
-            Some(TemplateStringParsed::PureCaption(
-                String::from_str(caption).unwrap(),
-            ))
+            let caption = s;
+            Some(TemplateStringParsed::PureCaption(caption))
         }
     }
 }
