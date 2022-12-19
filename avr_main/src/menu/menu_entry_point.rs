@@ -140,17 +140,17 @@ pub fn development_entry_point() -> ! {
     for template in parser {
         match template {
             TemplateKind::Caption(text) => {
-                canvas.print("Cap(");
+                canvas.print("Caption(");
                 canvas.print_flash_str(text);
                 canvas.print(") ");
             }
             TemplateKind::Field(text) => {
-                canvas.print("Fld(");
+                canvas.print("Field(");
                 canvas.print_flash_str(text);
                 canvas.print(") ");
             }
             TemplateKind::IllFormed(text) => {
-                canvas.print("ill(");
+                canvas.print("Ill(");
                 canvas.print_flash_str(text);
                 canvas.print(") ");
             }

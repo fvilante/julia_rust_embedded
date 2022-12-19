@@ -151,7 +151,10 @@ impl MenuItemWidget<'_> {
     }
 }
 
-/// example of declaration content = "Posicao inicial     ${nnnnn} mm/s"
+/// Creates a parser for a menu_item template string
+///
+/// It parses the template string (for example: "Posicao inicial     ${nnnnn} mm/s") returning an interator
+/// decomposing the parsed string
 pub fn make_template_iterator(flash_string: FlashString) -> FlashTemplateIterator {
     FlashTemplateIterator {
         reminder: Some(flash_string),
@@ -160,7 +163,9 @@ pub fn make_template_iterator(flash_string: FlashString) -> FlashTemplateIterato
 }
 
 pub enum TemplateKind {
+    /// Pure caption
     Caption(FlashString),
+    /// Pure field
     Field(FlashString),
     /// Represent not well formed template string.
     ///
@@ -176,20 +181,22 @@ pub struct FlashTemplateIterator {
     is_inside_token: bool,
 }
 
-const begin_token: &[char] = &['$', '{'];
-const end_token: &[char] = &['}'];
+const BEGIN_TOKEN: &[char] = &['$', '{'];
+const END_TOKEN: &[char] = &['}'];
 
 impl Iterator for FlashTemplateIterator {
     type Item = TemplateKind;
 
     fn next(&mut self) -> Option<Self::Item> {
+        // TODO: Improve readability of below code
+
         let Some(reminder) = self.reminder else {
             return None;
         };
 
         if self.is_inside_token {
             // If it is inside token we are waiting for an end token
-            let Some(end_index) = reminder.find_index(&end_token) else {
+            let Some(end_index) = reminder.find_index(&END_TOKEN) else {
                 // Ill formed (open_token without end_token).
                 self.is_inside_token = false;
                 self.reminder = None;
@@ -209,7 +216,7 @@ impl Iterator for FlashTemplateIterator {
             // TODO: Maybe in future we should create escape code for the Tokens chars
         } else {
             // If  not is_inside_token then we are looking for begin_token
-            let Some(begin_index) = reminder.find_index(&begin_token) else {
+            let Some(begin_index) = reminder.find_index(&BEGIN_TOKEN) else {
                 // but begin token does not exist then
                 // this is a pure text (without token)
                 self.is_inside_token = false;
