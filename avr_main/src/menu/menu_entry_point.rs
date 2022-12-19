@@ -13,10 +13,8 @@ use super::widget::main_menu::State;
 use super::widget::manual_mode::ManualModeMenu;
 use super::widget::manual_mode::ManualModeState;
 use super::widget::menu_item;
-use super::widget::menu_item::parse_menu_item_template_string;
 use super::widget::menu_item::MenuItemArgs;
 use super::widget::menu_item::MenuItemWidget;
-use super::widget::menu_item::TemplateStringParsed;
 use super::widget::menu_item::{NumericalParameterArgs, OptionalParameterArgs};
 use super::widget::optional::OptionEditorWidget;
 use super::widget::splash::Splash;
@@ -135,24 +133,24 @@ pub fn development_entry_point() -> ! {
 
     progmem! {
         static progmem string MENU_ITEM_1 = "Posicao inicial             ${nnnnn} mm";
-        static progmem string MENU_ITEM_2 = "0123456789 ${:2}, ${flavio}, ${juca} neles";
+        static progmem string MENU_ITEM_2 = "012${:2}, ${flavio}, ${juca} neles";
     }
 
-    let parser = make_template_iterator(FlashString::new(&MENU_ITEM_1));
+    let parser = make_template_iterator(FlashString::new(&MENU_ITEM_2));
     for template in parser {
         match template {
             TemplateKind::Caption(text) => {
-                canvas.print("Caption(");
+                canvas.print("Cap(");
                 canvas.print_flash_str(text);
                 canvas.print(") ");
             }
             TemplateKind::Field(text) => {
-                canvas.print("Field(");
+                canvas.print("Fld(");
                 canvas.print_flash_str(text);
                 canvas.print(") ");
             }
             TemplateKind::IllFormed(text) => {
-                canvas.print("IllFormed(");
+                canvas.print("ill(");
                 canvas.print_flash_str(text);
                 canvas.print(") ");
             }
@@ -161,36 +159,6 @@ pub fn development_entry_point() -> ! {
 
     loop {
         canvas.render();
-    }
-
-    let x = parse_menu_item_template_string(FlashString::new(&MENU_ITEM_2)).unwrap();
-
-    match x {
-        TemplateStringParsed::PureCaption(text) => {
-            canvas.print("Pure caption: '");
-            canvas.print_flash_str(text);
-            canvas.print("'.");
-        }
-        TemplateStringParsed::ParameterWithOneFieldAndUnitOfMeasurement(text, field, uom) => {
-            canvas.print("With field and UOM: '");
-            canvas.print_flash_str(text);
-            canvas.print("', '");
-            canvas.print_flash_str(field);
-            canvas.print("', '");
-            canvas.print_flash_str(uom);
-            canvas.print("'.");
-        }
-        TemplateStringParsed::ParameterWithOneField(text, field) => {
-            canvas.print("With field and UOM: '");
-            canvas.print_flash_str(text);
-            canvas.print("', '");
-            canvas.print_flash_str(field);
-            canvas.print("'.");
-        }
-    }
-
-    loop {
-        canvas.render()
     }
 
     /////

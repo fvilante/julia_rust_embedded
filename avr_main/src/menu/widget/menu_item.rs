@@ -151,66 +151,6 @@ impl MenuItemWidget<'_> {
     }
 }
 
-// =========================================================================
-// BELLOW CODE: EXAMPLE OF CODE FOR INSTANTIATE MENUITEMS FROM TEMPLATE STRINGS
-// example of template declaration content = "Posicao inicial     ${nnnnn} mm/s"
-// CODE BELOW IS NOT ACTIVE YET, IT IS HERE TO SUGGEST FUTURE IMPLEMENTATION (REMOVE IT IF CONSIDERED NOT NECESSARY)
-// NOTE: CODE BELOW WAS TESTED AND WORKS, BUT IS JUST A PROOF-OF-CONCEPT.
-
-pub enum TemplateStringParsed {
-    PureCaption(FlashString), // [Caption]
-    ParameterWithOneFieldAndUnitOfMeasurement(FlashString, FlashString, FlashString), // [1st_caption, field_type, last_caption]
-    ParameterWithOneField(FlashString, FlashString),
-}
-
-pub fn parse_menu_item_template_string(s: FlashString) -> Option<TemplateStringParsed> {
-    // example of declaration content = "Posicao inicial     ${nnnnn} mm/s"
-    const begin_token: &[char] = &['$', '{'];
-    const end_token: &[char] = &['}'];
-    match s.find_index(begin_token) {
-        Some(begin_index) => {
-            //1st caption ends in begin_index
-            let begin_token_len = usize_to_u8_clamper(begin_token.len());
-            let x = s.split_at(begin_index + begin_token_len);
-            let first_caption_ = x.0;
-            let first_caption =
-                first_caption_.sub_string(0..first_caption_.len() - begin_token_len);
-            let remain = x.1;
-            match remain.find_index(end_token) {
-                Some(end_index) => {
-                    let end_token_len = usize_to_u8_clamper(end_token.len());
-                    let y = remain.split_at(end_index);
-                    let field_type = y.0;
-                    let last_caption_ = y.1;
-                    let last_caption = last_caption_.sub_string(end_token_len..last_caption_.len());
-                    Some(
-                        TemplateStringParsed::ParameterWithOneFieldAndUnitOfMeasurement(
-                            first_caption,
-                            field_type,
-                            last_caption,
-                        ),
-                    )
-                }
-                None => {
-                    /// TODO: WHY THIS PART IS DUPLICATED ?
-                    //false open, everything is caption
-                    let caption = s;
-                    Some(TemplateStringParsed::PureCaption(caption))
-                }
-            }
-        }
-
-        None => {
-            /// TODO: WHY THIS PART IS DUPLICATED ?
-            //caption entire string
-            let caption = s;
-            Some(TemplateStringParsed::PureCaption(caption))
-        }
-    }
-}
-
-///////// New implementation
-
 /// example of declaration content = "Posicao inicial     ${nnnnn} mm/s"
 pub fn make_template_iterator(flash_string: FlashString) -> FlashTemplateIterator {
     FlashTemplateIterator {
