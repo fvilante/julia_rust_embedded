@@ -94,8 +94,8 @@ impl FlashString {
     ///
     /// Tries to imitate behaviour of heapless::String::split_at
     pub fn split_at(&self, mid_index: u8) -> (FlashString, FlashString) {
-        let first = self.get_from_range(0..mid_index);
-        let second = self.get_from_range(mid_index..self.len());
+        let first = self.sub_string(0..mid_index);
+        let second = self.sub_string(mid_index..self.len());
         (first, second)
     }
 
@@ -103,7 +103,7 @@ impl FlashString {
     ///
     /// The range refers to the string index, where range.start (incluive) and range.end (exclusive).
     /// If range exceeds the string size, than a clamp is applied.
-    pub fn get_from_range(&self, range: Range<u8>) -> FlashString {
+    pub fn sub_string(&self, range: Range<u8>) -> FlashString {
         let first_possible_index = 0;
         let last_possible_index = self.len();
         let index_start = range.start.clamp(first_possible_index, last_possible_index);

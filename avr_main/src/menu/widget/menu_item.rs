@@ -165,8 +165,8 @@ pub enum TemplateStringParsed {
 
 pub fn parse_menu_item_template_string(s: FlashString) -> Option<TemplateStringParsed> {
     // example of declaration content = "Posicao inicial     ${nnnnn} mm/s"
-    let begin_token: &[char] = &['$', '{'];
-    let end_token: &[char] = &['}'];
+    const begin_token: &[char] = &['$', '{'];
+    const end_token: &[char] = &['}'];
     match s.find_index(begin_token) {
         Some(begin_index) => {
             //1st caption ends in begin_index
@@ -174,7 +174,7 @@ pub fn parse_menu_item_template_string(s: FlashString) -> Option<TemplateStringP
             let x = s.split_at(begin_index + begin_token_len);
             let first_caption_ = x.0;
             let first_caption =
-                first_caption_.get_from_range(0..first_caption_.len() - begin_token_len);
+                first_caption_.sub_string(0..first_caption_.len() - begin_token_len);
             let remain = x.1;
             match remain.find_index(end_token) {
                 Some(end_index) => {
@@ -182,8 +182,7 @@ pub fn parse_menu_item_template_string(s: FlashString) -> Option<TemplateStringP
                     let y = remain.split_at(end_index);
                     let field_type = y.0;
                     let last_caption_ = y.1;
-                    let last_caption =
-                        last_caption_.get_from_range(end_token_len..last_caption_.len());
+                    let last_caption = last_caption_.sub_string(end_token_len..last_caption_.len());
                     Some(
                         TemplateStringParsed::ParameterWithOneFieldAndUnitOfMeasurement(
                             first_caption,
@@ -206,6 +205,82 @@ pub fn parse_menu_item_template_string(s: FlashString) -> Option<TemplateStringP
             //caption entire string
             let caption = s;
             Some(TemplateStringParsed::PureCaption(caption))
+        }
+    }
+}
+
+///////// New implementation
+
+/// example of declaration content = "Posicao inicial     ${nnnnn} mm/s"
+pub fn make_template_iterator(flash_string: FlashString) -> FlashTemplateIterator {
+    FlashTemplateIterator {
+        reminder: Some(flash_string),
+        is_inside_token: false,
+    }
+}
+
+pub enum TemplateKind {
+    Caption(FlashString),
+    Field(FlashString),
+    /// Represent not well formed template string.
+    ///
+    /// For example when you open a token but do not closes it before the end of the template string
+    /// (ie: "Foo bar ${xxxxx  ").
+    IllFormed(FlashString),
+}
+
+/// Flash template string parser
+pub struct FlashTemplateIterator {
+    /// contatins the string that still must to be parsed, at the end of iteration its value is None
+    reminder: Option<FlashString>,
+    is_inside_token: bool,
+}
+
+const begin_token: &[char] = &['$', '{'];
+const end_token: &[char] = &['}'];
+
+impl Iterator for FlashTemplateIterator {
+    type Item = TemplateKind;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let Some(reminder) = self.reminder else {
+            return None;
+        };
+
+        if self.is_inside_token {
+            // If it is inside token we are waiting for an end token
+            let Some(end_index) = reminder.find_index(&end_token) else {
+                // Ill formed (open_token without end_token).
+                self.is_inside_token = false;
+                self.reminder = None;
+                return Some(TemplateKind::IllFormed(reminder));
+            };
+            // Well formed token. (end_token located)
+            self.is_inside_token = false;
+            let field: FlashString = reminder.sub_string(0..end_index + 1);
+            let new_reminder = reminder.sub_string(end_index + 1..reminder.len());
+            self.reminder = if new_reminder.len() == 0 {
+                None
+            } else {
+                Some(new_reminder)
+            };
+            return Some(TemplateKind::Field(field));
+            // NOTE: We will ignore the second Start_Token in the case of an Start_Token -> Start_Token -> End_Token
+            // TODO: Maybe in future we should create escape code for the Tokens chars
+        } else {
+            // If  not is_inside_token then we are looking for begin_token
+            let Some(begin_index) = reminder.find_index(&begin_token) else {
+                // but begin token does not exist then
+                // this is a pure text (without token)
+                self.is_inside_token = false;
+                self.reminder = None;
+                return Some(TemplateKind::Caption(reminder));
+            };
+            // begin_token exists
+            self.is_inside_token = true;
+            let caption: FlashString = reminder.sub_string(0..begin_index);
+            self.reminder = Some(reminder.sub_string(begin_index..reminder.len()));
+            return Some(TemplateKind::Caption(caption));
         }
     }
 }

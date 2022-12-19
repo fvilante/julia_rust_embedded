@@ -29,6 +29,8 @@ use crate::board::output_expander::OutputExpander;
 use crate::board::{lcd, output_expander};
 use crate::enviroment::front_panel::FrontPanel;
 use crate::menu::accessor::Accessor;
+use crate::menu::widget::menu_item::make_template_iterator;
+use crate::menu::widget::menu_item::TemplateKind;
 use crate::menu::widget::optional::make_options_buffer_from_array;
 use crate::menu::widget::optional::OptionsBuffer;
 use crate::menu::widget::sub_menu::SubMenu;
@@ -134,6 +136,31 @@ pub fn development_entry_point() -> ! {
     progmem! {
         static progmem string MENU_ITEM_1 = "Posicao inicial             ${nnnnn} mm";
         static progmem string MENU_ITEM_2 = "0123456789 ${:2}, ${flavio}, ${juca} neles";
+    }
+
+    let parser = make_template_iterator(FlashString::new(&MENU_ITEM_1));
+    for template in parser {
+        match template {
+            TemplateKind::Caption(text) => {
+                canvas.print("Caption(");
+                canvas.print_flash_str(text);
+                canvas.print(") ");
+            }
+            TemplateKind::Field(text) => {
+                canvas.print("Field(");
+                canvas.print_flash_str(text);
+                canvas.print(") ");
+            }
+            TemplateKind::IllFormed(text) => {
+                canvas.print("IllFormed(");
+                canvas.print_flash_str(text);
+                canvas.print(") ");
+            }
+        }
+    }
+
+    loop {
+        canvas.render();
     }
 
     let x = parse_menu_item_template_string(FlashString::new(&MENU_ITEM_2)).unwrap();
