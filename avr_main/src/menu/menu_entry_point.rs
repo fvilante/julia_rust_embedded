@@ -134,25 +134,26 @@ pub fn development_entry_point() -> ! {
     progmem! {
         static progmem string MENU_ITEM_1 = "Posicao inicial             ${nnnnn} mm";
         static progmem string MENU_ITEM_2 = "012${:2}, ${flavio}, ${juca} neles";
+        static progmem string MENU_ITEM_3 = "0123 ${456} 789 ${ ABC ";
     }
 
-    let parser = make_template_iterator(FlashString::new(&MENU_ITEM_2));
+    let parser = make_template_iterator(FlashString::new(&MENU_ITEM_3));
     for template in parser {
         match template {
             TemplateKind::Caption(text) => {
-                canvas.print("Caption(");
+                canvas.print("Caption\"");
                 canvas.print_flash_str(text);
-                canvas.print(") ");
+                canvas.print("\" ");
             }
             TemplateKind::Field(text) => {
-                canvas.print("Field(");
+                canvas.print("Field\"");
                 canvas.print_flash_str(text);
-                canvas.print(") ");
+                canvas.print("\" ");
             }
             TemplateKind::IllFormed(text) => {
-                canvas.print("Ill(");
+                canvas.print("Ill\"");
                 canvas.print_flash_str(text);
-                canvas.print(") ");
+                canvas.print("\" ");
             }
         }
     }
