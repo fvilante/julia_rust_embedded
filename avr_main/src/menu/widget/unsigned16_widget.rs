@@ -176,9 +176,6 @@ impl InputEditor {
 /// Format parameters for [`NumberInputEditor`]
 ///
 /// Wrapper of the main parameters of the [`NumberInputEditor`]
-///
-/// TODO: Does not make sense to have a number of digits greater than the valid.range.end. Protect against this
-/// condition
 pub struct Format {
     pub valid_range: Range<u16>,
     pub initial_cursor_position: u8,
@@ -187,6 +184,7 @@ pub struct Format {
 impl Format {
     /// Given a valid_range.END calculates the least amount of digits necessary to represent it in decimal as a string
     pub fn get_number_of_digits(&self) -> u8 {
+        // TODO: When possible this code may be refactored to use pure math
         let max = self.valid_range.end;
         let s = convert_u16_to_string_decimal(max);
         usize_to_u8_clamper(s.len())
