@@ -184,12 +184,11 @@ pub struct FlashTemplateIterator {
 const BEGIN_TOKEN: &[char] = &['$', '{'];
 const END_TOKEN: &[char] = &['}'];
 
+// TODO: Improve readability of below code
 impl Iterator for FlashTemplateIterator {
     type Item = TemplateKind;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // TODO: Improve readability of below code
-
         let Some(reminder) = self.reminder else {
             return None;
         };

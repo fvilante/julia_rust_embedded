@@ -137,7 +137,7 @@ pub fn development_entry_point() -> ! {
         static progmem string MENU_ITEM_3 = "0123 ${456} 789 ${ ABC ";
     }
 
-    let parser = make_template_iterator(FlashString::new(&MENU_ITEM_3));
+    let parser = make_template_iterator(FlashString::new(&MENU_ITEM_1));
     for template in parser {
         match template {
             TemplateKind::Caption(text) => {
