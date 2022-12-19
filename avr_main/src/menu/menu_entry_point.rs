@@ -131,26 +131,34 @@ pub fn development_entry_point() -> ! {
 
     // -----
 
-    let x = parse_menu_item_template_string(FlashString::new(&MENU_ITEM_1)).unwrap();
+    progmem! {
+        static progmem string MENU_ITEM_1 = "Posicao inicial             ${nnnnn} mm";
+        static progmem string MENU_ITEM_2 = "0123456789 ${:2}, ${flavio}, ${juca} neles";
+    }
+
+    let x = parse_menu_item_template_string(FlashString::new(&MENU_ITEM_2)).unwrap();
 
     match x {
         TemplateStringParsed::PureCaption(text) => {
-            canvas.print("Pure caption: ");
+            canvas.print("Pure caption: '");
             canvas.print_flash_str(text);
+            canvas.print("'.");
         }
         TemplateStringParsed::ParameterWithOneFieldAndUnitOfMeasurement(text, field, uom) => {
-            canvas.print("With field and UOM: ");
+            canvas.print("With field and UOM: '");
             canvas.print_flash_str(text);
-            canvas.print(",");
+            canvas.print("', '");
             canvas.print_flash_str(field);
-            canvas.print(",");
+            canvas.print("', '");
             canvas.print_flash_str(uom);
+            canvas.print("'.");
         }
         TemplateStringParsed::ParameterWithOneField(text, field) => {
-            canvas.print("With field and UOM ->");
+            canvas.print("With field and UOM: '");
             canvas.print_flash_str(text);
-            canvas.print(",");
+            canvas.print("', '");
             canvas.print_flash_str(field);
+            canvas.print("'.");
         }
     }
 
@@ -159,11 +167,6 @@ pub fn development_entry_point() -> ! {
     }
 
     /////
-
-    progmem! {
-        static progmem string MENU_ITEM_1 = "Posicao inicial             ${nnnnn} mm";
-        static progmem string MENU_ITEM_2 = "0123456789";
-    }
 
     let flash_string = FlashString::new(&MENU_ITEM_2);
     let (first, second) = flash_string.split_at(3);

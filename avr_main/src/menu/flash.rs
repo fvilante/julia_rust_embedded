@@ -27,6 +27,7 @@ impl FlashString {
         Self { flash_ptr, length }
     }
 
+    /// Creates a new [`FlashString`].
     pub fn new<const N: usize>(val: &PmString<N>) -> Self {
         let ptr = val.as_bytes().as_ptr() as *const u8;
         Self {
@@ -35,6 +36,7 @@ impl FlashString {
         }
     }
 
+    /// Returns the chars indices of this [`FlashString`].
     pub fn chars_indices(&self) -> FlashStringIterator {
         FlashStringIterator {
             flash_string: self.clone(),
@@ -42,6 +44,7 @@ impl FlashString {
         }
     }
 
+    /// Returns the length of this [`FlashString`].
     pub fn len(&self) -> u8 {
         self.length
     }
