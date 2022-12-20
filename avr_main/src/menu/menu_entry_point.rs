@@ -131,7 +131,7 @@ pub fn development_entry_point() -> ! {
 
     // -----
 
-    progmem! {
+    /*  progmem! {
         static progmem string MENU_ITEM_1 = "Posicao inicial             ${nnnnn} mm";
         static progmem string MENU_ITEM_2 = "012${:2}, ${flavio}, ${juca} neles";
         static progmem string MENU_ITEM_3 = "0123 ${456} 789 ${ ABC ";
@@ -160,18 +160,7 @@ pub fn development_entry_point() -> ! {
 
     loop {
         canvas.render();
-    }
-
-    /////
-
-    let flash_string = FlashString::new(&MENU_ITEM_2);
-    let (first, second) = flash_string.split_at(3);
-    canvas.print_flash_str(first);
-    canvas.print_char('-');
-    canvas.print_flash_str(second);
-    loop {
-        canvas.render();
-    }
+    } */
 
     ///
     static mut value1: u16 = 0;
@@ -214,7 +203,7 @@ pub fn development_entry_point() -> ! {
     //options
     let mut menu_item = MenuItemArgs::Optional(OptionalParameterArgs {
         point1_: 1,
-        point2_: 33,
+        point2_: 30,
         text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
         variable: unsafe { &mut value3 },
         options_list: make_options_buffer_from_array([
@@ -227,40 +216,43 @@ pub fn development_entry_point() -> ! {
     menu_list.push(menu_item);
 
     // =========================================================
-    //    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
-    //        point1_: 1,
-    //        point2_: 33,
-    //        text: FlashString::new(&POSICAO_FINAL),
-    //        variable: &mut db.file_03,
-    //        initial_cursor_position: 0,
-    //        number_of_digits: 4,
-    //        valid_range: 0..100,
-    //    });
-    //    menu_list.push(menu_item);//
-    //
-    //    // =========================================================
-    //    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
-    //        point1_: 1,
-    //        point2_: 33,
-    //        text: FlashString::new(&POSICAO_FINAL),
-    //        variable: &mut db.file_04,
-    //        initial_cursor_position: 0,
-    //        number_of_digits: 4,
-    //        valid_range: 0..0xFFFF,
-    //    });
-    //    menu_list.push(menu_item);
-    //
-    //    // =========================================================
-    //    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {
-    //        point1_: 1,
-    //        point2_: 33,
-    //        text: FlashString::new(&POSICAO_INICIAL),
-    //        variable: &mut db.file_05,
-    //        initial_cursor_position: 0,
-    //        number_of_digits: 4,
-    //        valid_range: 0..100,
-    //    });
-    //    menu_list.push(menu_item);
+    let mut menu_item = MenuItemArgs::Numerical(NumericalParameterArgs {
+        point1_: 1,
+        point2_: 33,
+        text: FlashString::new(&POSICAO_FINAL),
+        variable: unsafe { &mut value2 },
+        parameters: Format {
+            initial_cursor_position: 0,
+            valid_range: 0..9999,
+        },
+    });
+    menu_list.push(menu_item);
+
+    // =========================================================
+    let mut menu_item = MenuItemArgs::Numerical(NumericalParameterArgs {
+        point1_: 1,
+        point2_: 33,
+        text: FlashString::new(&POSICAO_INICIAL),
+        variable: unsafe { &mut value1 },
+        parameters: Format {
+            initial_cursor_position: 0,
+            valid_range: 0..100,
+        },
+    });
+    menu_list.push(menu_item);
+
+    /*     // =========================================================
+    let mut menu_item = MenuItemArgs::Numerical(NumericalParameterArgs {
+        point1_: 1,
+        point2_: 33,
+        text: FlashString::new(&POSICAO_FINAL),
+        variable: unsafe { &mut value2 },
+        parameters: Format {
+            initial_cursor_position: 0,
+            valid_range: 0..9999,
+        },
+    });
+    menu_list.push(menu_item); */
 
     // =========================================================
     //    let mut menu_item = MenuItem::from_numerical(NumericalParameterArgs {

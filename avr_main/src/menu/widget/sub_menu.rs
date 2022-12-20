@@ -47,14 +47,14 @@ pub struct SubMenu<'a> {
     /// First line to render in the lcd screen in relation to the [`MenuList`].
     first_line_to_render: Cursor,
     /// State of widgets which are currently mounted on screen.
-    mounted: [MenuItemWidget<'a>; 1], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
+    mounted: [MenuItemWidget<'a>; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
 }
 
 impl<'a> SubMenu<'a> {
     pub fn new(mut menu_list: MenuList) -> Self {
-        let size = menu_list.len();
+        let menu_list_length = menu_list.len();
         let mounted_0 = MenuItemWidget::from_menu_args(&mut menu_list[0]);
-        //let mounted_1 = MenuItemWidget::from_menu_args(&mut menu_list[1]);
+        let mounted_1 = MenuItemWidget::from_menu_args(&mut menu_list[1]);
         Self {
             menu_list,
             lcd_line_cursor: {
@@ -63,9 +63,12 @@ impl<'a> SubMenu<'a> {
             },
             first_line_to_render: {
                 let default_initial_menu_item = 0;
-                Cursor::from_range(0..size - 1, default_initial_menu_item)
+                Cursor::from_range(
+                    0..menu_list_length - (TOTAL_NUMBER_OF_LINES_IN_LCD - 1) as usize,
+                    default_initial_menu_item,
+                )
             },
-            mounted: [mounted_0], //, mounted_1],
+            mounted: [mounted_0, mounted_1],
         }
     }
 
@@ -73,32 +76,49 @@ impl<'a> SubMenu<'a> {
         LcdLine::from(self.lcd_line_cursor.get_current())
     }
 
-    /// Mount widgets that are being renderized
-    fn mount(&mut self) {
-        /* let first_line_to_render = self.first_line_to_render.get_current();
-        for lcd_line in LcdLine::iterator() {
-            let index = lcd_line as u8;
-            let mut menu_item_args = self
-                .menu_list
-                .get_mut((first_line_to_render + index) as usize)
-                .unwrap();
-            let menu_item_widget = MenuItemWidget::from_menu_args(&mut menu_item_args);
-            //TODO: REMOVE THIS UNSAFE INDEXING CALL, REFACTOR TO SOMETHING MORE SAFE
-            self.mounted[index as usize] = menu_item_widget;
-        } */
+    /// Finds the given LcdLine in the MenuList collection (as MenuList index)
+    fn get_current_index_for(&self, line: LcdLine) -> u8 {
+        let lcd_line = line as u8;
+        let first_line_to_render = self.first_line_to_render.get_current();
+        let item_index = lcd_line + first_line_to_render;
+        item_index
     }
 
-    fn get_mounted_item_in_lcd_mut(&mut self, line: LcdLine) -> &mut MenuItemWidget<'a> {
-        //&mut self.mounted[line as u8 as usize] // TODO: Check if this call is safe
-        &mut self.mounted[0]
+    /// Mount widgets that are being renderized
+    fn mount(&mut self) {
+        for lcd_line in LcdLine::iterator() {
+            let index = self.get_current_index_for(lcd_line) as usize;
+            let mut menu_item_args = self.menu_list.get_mut(index).unwrap();
+            let menu_item_widget = MenuItemWidget::from_menu_args(&mut menu_item_args);
+            if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
+                // mount item
+                *elem = menu_item_widget;
+            } else {
+                panic!("Menu error 02");
+            }
+        }
+    }
+
+    fn get_mounted_item_in_lcd_mut(&mut self, lcd_line: LcdLine) -> &mut MenuItemWidget<'a> {
+        if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
+            return elem;
+        } else {
+            panic!("Menu error 01");
+        }
     }
 
     fn scroll_down(&mut self) {
-        self.first_line_to_render.next();
+        let has_exhausted = self.first_line_to_render.next();
+        if !has_exhausted {
+            self.mount();
+        }
     }
 
     fn scroll_up(&mut self) {
-        self.first_line_to_render.previous();
+        let has_exhausted = self.first_line_to_render.previous();
+        if !has_exhausted {
+            self.mount();
+        }
     }
 
     /// If is in edit mode for some line returns Some(LcdLine) else None.
