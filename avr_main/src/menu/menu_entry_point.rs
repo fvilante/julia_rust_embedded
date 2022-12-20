@@ -27,6 +27,7 @@ use crate::board::output_expander::OutputExpander;
 use crate::board::{lcd, output_expander};
 use crate::enviroment::front_panel::FrontPanel;
 use crate::menu::accessor::Accessor;
+use crate::menu::flash::FlashSlice;
 use crate::menu::widget::menu_item::make_template_iterator;
 use crate::menu::widget::menu_item::TemplateKind;
 use crate::menu::widget::optional::make_options_buffer_from_array;
@@ -81,8 +82,9 @@ progmem! {
     static progmem string O4 = "Nego  ";
 
     //NOTE: it is possible to load any type in progmem not only strings
-    static progmem A0: [u8; 6] = [0,1,2,3,4,5];
+    static progmem TABLE_01: [u8; 6] = [0,1,2,3,4,5];
     static progmem string ERRO_01 = "Erro de construcao de string";
+
 }
 
 pub fn development_entry_point() -> ! {
@@ -93,6 +95,13 @@ pub fn development_entry_point() -> ! {
         mut keyboard,
         ..
     } = SystemEnviroment::new();
+
+    let slice = FlashSlice::new(&TABLE_01);
+    lcd::lcd_initialize();
+    for data in slice.to_iterator() {
+        lcd::print_u8_in_hex(data);
+    }
+    loop {}
 
     canvas.render();
 
