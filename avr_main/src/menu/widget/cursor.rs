@@ -5,7 +5,6 @@ use lib_1::utils::common::{const_clamp, usize_to_u8_clamper};
 /// Stateful Cursor that may oscilates between start (inclusive) and end (exclusive)
 #[derive(Copy, Clone)]
 pub struct Cursor {
-    // size = 3 bytes
     current: u8, // oscilates between start (inclusive) and end (exclusive)
     start: u8,   // included
     end: u8,     // excluded
