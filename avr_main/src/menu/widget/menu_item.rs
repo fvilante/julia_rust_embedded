@@ -31,7 +31,7 @@ pub struct NumericalParameterArgs {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
-    pub variable: &'static mut u16,
+    //pub variable: &'static mut u16,
     pub parameters: Format,
 }
 
@@ -39,7 +39,7 @@ pub struct OptionalParameterArgs {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
-    pub variable: &'static mut Cursor,
+    //pub variable: &'static mut Cursor,
     pub options_list: OptionsBuffer,
 }
 
@@ -80,7 +80,7 @@ impl<'a> MenuItemWidget<'a> {
     pub fn from_numerical(args: &mut NumericalParameterArgs) -> MenuItemWidget<'a> {
         let point1 = Point1d::new(args.point1_);
         let point2 = Point1d::new(args.point2_);
-        let initial_value = (*args.variable).clone();
+        let initial_value = 20; //(*args.variable).clone();
         let field = Field::from_numerical(initial_value, (args.parameters).clone());
         let mut menu_item = Self::new(point1, args.text, point2, field, None);
         menu_item
@@ -91,7 +91,7 @@ impl<'a> MenuItemWidget<'a> {
         options_list_cloned.clone_from(&args.options_list);
         let point1 = Point1d::new(args.point1_);
         let point2 = Point1d::new(args.point2_);
-        let initial_selection = (*args.variable).clone();
+        let initial_selection = Cursor::new(0, 2, 0); //(*args.variable).clone();
         let field = Field::from_optional(initial_selection, options_list_cloned);
         let mut menu_item = Self::new(point1, args.text, point2, field, None);
         menu_item

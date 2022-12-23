@@ -40,6 +40,7 @@ use crate::microcontroler::delay::delay_ms;
 use crate::microcontroler::timer::now;
 use alloc::string::ToString;
 use avr_progmem::string::PmString;
+use avr_progmem::wrapper::ProgMem;
 use core::cell::Cell;
 use core::ops::Range;
 use core::str::FromStr;
@@ -88,6 +89,43 @@ progmem! {
     ];
     static progmem string ERRO_01 = "Erro de construcao de string";
 
+    static progmem TABLE_A: [X;3] = [
+        X {
+            point1_: 1,
+            point2_: 30,
+            format: Format {
+                start: 0,
+                end: 9999,
+                initial_cursor_position: 2,
+            }
+        },
+        X {
+            point1_: 1,
+            point2_: 30,
+            format: Format {
+                start: 0,
+                end: 9999,
+                initial_cursor_position: 3,
+            }
+        },
+        X {
+            point1_: 1,
+            point2_: 30,
+            format: Format {
+                start: 0,
+                end: 9999,
+                initial_cursor_position: 4,
+            }
+        }
+    ];
+
+}
+
+#[derive(Copy, Clone)]
+struct X {
+    point1_: u8,
+    point2_: u8,
+    format: Format,
 }
 
 pub struct SubMenuList {
@@ -109,15 +147,11 @@ impl SubMenuList {
         let mut menu_list: MenuList = Vec::new();
 
         let mut menu_item = MenuItemArgs::Numerical(NumericalParameterArgs {
-            point1_: 1,
-            point2_: 33,
+            point1_: TABLE_A.load_at(0).point1_,
+            point2_: TABLE_A.load_at(0).point2_,
             text: FlashString::new(&POSICAO_INICIAL),
-            variable: unsafe { &mut value1 },
-            parameters: Format {
-                initial_cursor_position: 0,
-                start: 0,
-                end: 9999,
-            },
+            //variable: unsafe { &mut value1 },
+            parameters: TABLE_A.load_at(0).format,
         });
         menu_list.push(menu_item);
 
@@ -126,7 +160,7 @@ impl SubMenuList {
             point1_: 1,
             point2_: 33,
             text: FlashString::new(&POSICAO_FINAL),
-            variable: unsafe { &mut value2 },
+            //variable: unsafe { &mut value2 },
             parameters: Format {
                 initial_cursor_position: 0,
                 start: 0,
@@ -141,7 +175,7 @@ impl SubMenuList {
             point1_: 1,
             point2_: 30,
             text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
-            variable: unsafe { &mut value3 },
+            //variable: unsafe { &mut value3 },
             options_list: make_options_buffer_from_array([
                 FlashString::new(&O1),
                 FlashString::new(&O2),
@@ -156,7 +190,7 @@ impl SubMenuList {
             point1_: 1,
             point2_: 33,
             text: FlashString::new(&POSICAO_FINAL),
-            variable: unsafe { &mut value2 },
+            //variable: unsafe { &mut value2 },
             parameters: Format {
                 initial_cursor_position: 0,
                 start: 0,
@@ -170,7 +204,7 @@ impl SubMenuList {
             point1_: 1,
             point2_: 33,
             text: FlashString::new(&POSICAO_INICIAL),
-            variable: unsafe { &mut value1 },
+            //variable: unsafe { &mut value1 },
             parameters: Format {
                 initial_cursor_position: 0,
                 start: 0,
