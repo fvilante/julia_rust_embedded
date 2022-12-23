@@ -176,8 +176,15 @@ impl InputEditor {
 /// Format parameters for [`NumberInputEditor`]
 ///
 /// Wrapper of the main parameters of the [`NumberInputEditor`]
+#[derive(Copy, Clone)]
 pub struct Format {
-    pub valid_range: Range<u16>,
+    /// Initial admissible value (included)
+    pub start: u16,
+    /// Final admissible value (excluded)
+    pub end: u16,
+    /// In what digit cursor should start in. (from left to right, starting at 0 and going until Self::get_number_of_digits)
+    ///
+    /// The total number of digits is based in the number of digits necessary to represent the `Format::end` value
     pub initial_cursor_position: u8,
 }
 
@@ -185,18 +192,13 @@ impl Format {
     /// Given a valid_range.END calculates the least amount of digits necessary to represent it in decimal as a string
     pub fn get_number_of_digits(&self) -> u8 {
         // TODO: When possible this code may be refactored to use pure math
-        let max = self.valid_range.end;
+        let max = self.end;
         let s = convert_u16_to_string_decimal(max);
         usize_to_u8_clamper(s.len())
     }
-}
 
-impl Clone for Format {
-    fn clone(&self) -> Self {
-        Self {
-            valid_range: self.valid_range.clone(),
-            initial_cursor_position: self.initial_cursor_position.clone(),
-        }
+    pub fn get_valid_range(&self) -> Range<u16> {
+        self.start..self.end
     }
 }
 
@@ -235,8 +237,8 @@ impl NumberInputEditor {
     /// Copy edited value to its [`u16`] representation assuring the value is clamped to `self.format.valid_range`
     pub fn as_u16_clamped(&self) -> u16 {
         let current_edited_value = Content::to_u16(&self.content_editor.content);
-        let min = self.format.valid_range.start;
-        let max = self.format.valid_range.end;
+        let min = self.format.get_valid_range().start;
+        let max = self.format.get_valid_range().end;
         let clamped_value = current_edited_value.clamp(min, max);
         clamped_value
     }

@@ -115,7 +115,8 @@ impl SubMenuList {
             variable: unsafe { &mut value1 },
             parameters: Format {
                 initial_cursor_position: 0,
-                valid_range: 0..100,
+                start: 0,
+                end: 9999,
             },
         });
         menu_list.push(menu_item);
@@ -128,7 +129,8 @@ impl SubMenuList {
             variable: unsafe { &mut value2 },
             parameters: Format {
                 initial_cursor_position: 0,
-                valid_range: 0..9999,
+                start: 0,
+                end: 9999,
             },
         });
         menu_list.push(menu_item);
@@ -157,7 +159,8 @@ impl SubMenuList {
             variable: unsafe { &mut value2 },
             parameters: Format {
                 initial_cursor_position: 0,
-                valid_range: 0..9999,
+                start: 0,
+                end: 9999,
             },
         });
         menu_list.push(menu_item);
@@ -170,7 +173,8 @@ impl SubMenuList {
             variable: unsafe { &mut value1 },
             parameters: Format {
                 initial_cursor_position: 0,
-                valid_range: 0..100,
+                start: 0,
+                end: 9999,
             },
         });
         menu_list.push(menu_item);
