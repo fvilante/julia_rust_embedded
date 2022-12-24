@@ -135,8 +135,8 @@ impl SubMenuList {
         Self {}
     }
 
-    pub fn get_item(&mut self, index: usize) -> Option<MenuItemArgs> {
-        match index {
+    pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
+        let menu_item_args = match index {
             0 => {
                 Some(MenuItemArgs::Numerical(NumericalParameterArgs {
                     point1_: 1,
@@ -394,6 +394,12 @@ impl SubMenuList {
             }
 
             _ => None,
+        };
+
+        if let Some(menu_args) = menu_item_args {
+            Some(MenuItemWidget::from_menu_args(menu_args))
+        } else {
+            None
         }
     }
 

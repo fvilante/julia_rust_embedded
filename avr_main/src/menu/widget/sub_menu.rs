@@ -53,9 +53,11 @@ pub struct SubMenu<'a> {
 impl<'a> SubMenu<'a> {
     pub fn new(mut menu_list: SubMenuList) -> Self {
         let menu_list_length = menu_list.len();
-        let mounted_0 = MenuItemWidget::from_menu_args(menu_list.get_item(0).unwrap());
-        let mounted_1 = MenuItemWidget::from_menu_args(menu_list.get_item(1).unwrap());
+        let mounted_0 = menu_list.get_item(0).unwrap();
+        let mounted_1 = menu_list.get_item(1).unwrap();
+
         Self {
+            mounted: [mounted_0, mounted_1],
             menu_list,
             lcd_line_cursor: {
                 const initial_line_selected: u8 = 0;
@@ -68,7 +70,6 @@ impl<'a> SubMenu<'a> {
                     default_initial_menu_item,
                 )
             },
-            mounted: [mounted_0, mounted_1],
         }
     }
 
@@ -88,8 +89,7 @@ impl<'a> SubMenu<'a> {
     fn mount(&mut self) {
         for lcd_line in LcdLine::iterator() {
             let index = self.get_current_index_for(lcd_line) as usize;
-            let mut menu_item_args = self.menu_list.get_item(index).unwrap();
-            let menu_item_widget = MenuItemWidget::from_menu_args(menu_item_args);
+            let mut menu_item_widget = self.menu_list.get_item(index).unwrap();
             if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
                 // mount item
                 *elem = menu_item_widget;
