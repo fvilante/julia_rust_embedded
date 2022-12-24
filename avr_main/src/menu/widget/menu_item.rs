@@ -77,7 +77,7 @@ impl<'a> MenuItemWidget<'a> {
         }
     }
 
-    pub fn from_numerical(args: &mut NumericalParameterArgs) -> MenuItemWidget<'a> {
+    pub fn from_numerical(args: NumericalParameterArgs) -> MenuItemWidget<'a> {
         let point1 = Point1d::new(args.point1_);
         let point2 = Point1d::new(args.point2_);
         let initial_value = 20; //(*args.variable).clone();
@@ -86,7 +86,7 @@ impl<'a> MenuItemWidget<'a> {
         menu_item
     }
 
-    pub fn from_optional(args: &mut OptionalParameterArgs) -> MenuItemWidget<'a> {
+    pub fn from_optional(args: OptionalParameterArgs) -> MenuItemWidget<'a> {
         let mut options_list_cloned = Vec::new();
         options_list_cloned.clone_from(&args.options_list);
         let point1 = Point1d::new(args.point1_);
@@ -97,7 +97,7 @@ impl<'a> MenuItemWidget<'a> {
         menu_item
     }
 
-    pub fn from_menu_args(args: &mut MenuItemArgs) -> Self {
+    pub fn from_menu_args(args: MenuItemArgs) -> Self {
         match args {
             MenuItemArgs::Numerical(args) => Self::from_numerical(args),
             MenuItemArgs::Optional(args) => Self::from_optional(args),

@@ -128,100 +128,277 @@ struct X {
     format: Format,
 }
 
-pub struct SubMenuList {
-    menu_list: MenuList,
-}
+pub struct SubMenuList {}
 
 impl SubMenuList {
     pub fn new() -> Self {
-        Self {
-            menu_list: Self::init(),
+        Self {}
+    }
+
+    pub fn get_item(&mut self, index: usize) -> Option<MenuItemArgs> {
+        match index {
+            0 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_INICIAL),
+                    //variable: unsafe { &mut value1 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            1 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_FINAL),
+                    //variable: unsafe { &mut value2 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            2 => {
+                Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                    point1_: 1,
+                    point2_: 30,
+                    text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
+                    //variable: unsafe { &mut value3 },
+                    options_list: make_options_buffer_from_array([
+                        FlashString::new(&O1),
+                        FlashString::new(&O2),
+                        FlashString::new(&O3),
+                        FlashString::new(&O4),
+                    ]),
+                }))
+            }
+
+            3 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_INICIAL),
+                    //variable: unsafe { &mut value2 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            4 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_FINAL),
+                    //variable: unsafe { &mut value2 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            5 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_INICIAL),
+                    //variable: unsafe { &mut value2 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            //
+            6 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_INICIAL),
+                    //variable: unsafe { &mut value1 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            7 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_FINAL),
+                    //variable: unsafe { &mut value2 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            8 => {
+                Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                    point1_: 1,
+                    point2_: 30,
+                    text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
+                    //variable: unsafe { &mut value3 },
+                    options_list: make_options_buffer_from_array([
+                        FlashString::new(&O1),
+                        FlashString::new(&O2),
+                        FlashString::new(&O3),
+                        FlashString::new(&O4),
+                    ]),
+                }))
+            }
+
+            9 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_INICIAL),
+                    //variable: unsafe { &mut value2 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            10 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_FINAL),
+                    //variable: unsafe { &mut value2 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            11 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_INICIAL),
+                    //variable: unsafe { &mut value2 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            12 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_INICIAL),
+                    //variable: unsafe { &mut value1 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            13 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_FINAL),
+                    //variable: unsafe { &mut value2 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            14 => {
+                Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                    point1_: 1,
+                    point2_: 30,
+                    text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
+                    //variable: unsafe { &mut value3 },
+                    options_list: make_options_buffer_from_array([
+                        FlashString::new(&O1),
+                        FlashString::new(&O2),
+                        FlashString::new(&O3),
+                        FlashString::new(&O4),
+                    ]),
+                }))
+            }
+
+            15 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_INICIAL),
+                    //variable: unsafe { &mut value2 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            16 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_FINAL),
+                    //variable: unsafe { &mut value2 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            17 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_INICIAL),
+                    //variable: unsafe { &mut value2 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            _ => None,
         }
     }
 
-    fn init() -> MenuList {
-        static mut value1: u16 = 0;
-        static mut value2: u16 = 0;
-        static mut value3: Cursor = Cursor::from_range(0..2, 0);
-
-        let mut menu_list: MenuList = Vec::new();
-
-        let mut menu_item = MenuItemArgs::Numerical(NumericalParameterArgs {
-            point1_: TABLE_A.load_at(0).point1_,
-            point2_: TABLE_A.load_at(0).point2_,
-            text: FlashString::new(&POSICAO_INICIAL),
-            //variable: unsafe { &mut value1 },
-            parameters: TABLE_A.load_at(0).format,
-        });
-        menu_list.push(menu_item);
-
-        // =========================================================
-        let mut menu_item = MenuItemArgs::Numerical(NumericalParameterArgs {
-            point1_: 1,
-            point2_: 33,
-            text: FlashString::new(&POSICAO_FINAL),
-            //variable: unsafe { &mut value2 },
-            parameters: Format {
-                initial_cursor_position: 0,
-                start: 0,
-                end: 9999,
-            },
-        });
-        menu_list.push(menu_item);
-
-        // =========================================================
-        //options
-        let mut menu_item = MenuItemArgs::Optional(OptionalParameterArgs {
-            point1_: 1,
-            point2_: 30,
-            text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
-            //variable: unsafe { &mut value3 },
-            options_list: make_options_buffer_from_array([
-                FlashString::new(&O1),
-                FlashString::new(&O2),
-                FlashString::new(&O3),
-                FlashString::new(&O4),
-            ]),
-        });
-        menu_list.push(menu_item);
-
-        // =========================================================
-        let mut menu_item = MenuItemArgs::Numerical(NumericalParameterArgs {
-            point1_: 1,
-            point2_: 33,
-            text: FlashString::new(&POSICAO_FINAL),
-            //variable: unsafe { &mut value2 },
-            parameters: Format {
-                initial_cursor_position: 0,
-                start: 0,
-                end: 9999,
-            },
-        });
-        menu_list.push(menu_item);
-
-        // =========================================================
-        let mut menu_item = MenuItemArgs::Numerical(NumericalParameterArgs {
-            point1_: 1,
-            point2_: 33,
-            text: FlashString::new(&POSICAO_INICIAL),
-            //variable: unsafe { &mut value1 },
-            parameters: Format {
-                initial_cursor_position: 0,
-                start: 0,
-                end: 9999,
-            },
-        });
-        menu_list.push(menu_item);
-
-        menu_list
-    }
-
-    pub fn get_mut(&mut self, index: usize) -> Option<&mut MenuItemArgs> {
-        self.menu_list.get_mut(index)
-    }
-
     pub fn len(&self) -> usize {
-        self.menu_list.len()
+        17
     }
 }
 
