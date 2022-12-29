@@ -62,6 +62,7 @@ impl MenuStorage {
 
 static MENU_STORAGE: MenuStorage = MenuStorage::new();
 
+#[derive(Copy, Clone)]
 pub enum SubMenuHandle {
     MenuPrograma,
     MenuArquivoDeEixo,
@@ -134,7 +135,7 @@ impl MenuPrograma {
                         FlashString::new(&O3),
                         FlashString::new(&O4),
                     ]),
-                    child: None,
+                    child: Some(SubMenuHandle::MenuArquivoDeEixo),
                 }))
             }
 

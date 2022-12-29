@@ -154,6 +154,15 @@ impl SubMenuRender {
 }
 
 impl SubMenuRender {
+    pub fn clone_from(&mut self, origin: Self) {
+        self.current_menu = origin.current_menu;
+        self.lcd_line_cursor = origin.lcd_line_cursor;
+        self.first_line_to_render = origin.first_line_to_render;
+        self.mounted = origin.mounted;
+    }
+}
+
+impl SubMenuRender {
     pub fn send_key(&mut self, key: KeyCode) {
         if let Some(line_being_edited) = self.get_line_being_edited() {
             // if is editing some line, delegate keys to sub widgets.
@@ -177,9 +186,15 @@ impl SubMenuRender {
                 }
 
                 KeyCode::KEY_ENTER => {
-                    // Enters edit mode on sub-widgets.
                     let line = self.get_current_lcd_line();
-                    self.get_mounted_item_in_lcd_mut(line).set_edit_mode(true);
+                    let current_menu_item = self.get_mounted_item_in_lcd_mut(line);
+                    if let Some(child_handle) = current_menu_item.child {
+                        // TEMP CODE: if current mitem has a child submenu, opens it.
+                        self.clone_from(Self::new(child_handle));
+                    } else {
+                        // Enters edit mode on sub-widgets.
+                        current_menu_item.set_edit_mode(true);
+                    }
                 }
 
                 _ => {

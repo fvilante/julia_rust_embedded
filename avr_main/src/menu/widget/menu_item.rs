@@ -58,7 +58,7 @@ pub struct MenuItemWidget {
     caption: Caption,
     point_b: Point1d,
     field: Field,
-    child: Option<SubMenuHandle>,
+    pub child: Option<SubMenuHandle>,
 }
 
 impl MenuItemWidget {
