@@ -90,9 +90,30 @@ progmem! {
     static progmem string ERRO_01 = "Erro de construcao de string";
 }
 
-pub struct SubMenu {}
+pub enum SubMenuHandle {
+    MenuPrograma(MenuPrograma),
+    MenuArquivoDeEixo(MenuArquivoDeEixo),
+}
 
-impl SubMenu {
+impl SubMenuHandle {
+    pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
+        match self {
+            SubMenuHandle::MenuPrograma(x) => x.get_item(index),
+            SubMenuHandle::MenuArquivoDeEixo(x) => x.get_item(index),
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        match self {
+            SubMenuHandle::MenuPrograma(x) => x.len(),
+            SubMenuHandle::MenuArquivoDeEixo(x) => x.len(),
+        }
+    }
+}
+
+pub struct MenuPrograma;
+
+impl MenuPrograma {
     pub fn new() -> Self {
         Self {}
     }
@@ -370,6 +391,73 @@ impl SubMenu {
     }
 }
 
+pub struct MenuArquivoDeEixo;
+
+impl MenuArquivoDeEixo {
+    pub fn new() -> Self {
+        Self {}
+    }
+
+    pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
+        let menu_item_args = match index {
+            0 => {
+                Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                    point1_: 1,
+                    point2_: 30,
+                    text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
+                    //variable: unsafe { &mut value3 },
+                    options_list: make_options_buffer_from_array([
+                        FlashString::new(&O1),
+                        FlashString::new(&O2),
+                        FlashString::new(&O3),
+                        FlashString::new(&O4),
+                    ]),
+                }))
+            }
+
+            1 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_INICIAL),
+                    //variable: unsafe { &mut value2 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            2 => {
+                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                    point1_: 1,
+                    point2_: 33,
+                    text: FlashString::new(&POSICAO_FINAL),
+                    //variable: unsafe { &mut value2 },
+                    parameters: Format {
+                        initial_cursor_position: 0,
+                        start: 0,
+                        end: 9999,
+                    },
+                }))
+            }
+
+            _ => None,
+        };
+
+        if let Some(menu_args) = menu_item_args {
+            Some(MenuItemWidget::from_menu_args(menu_args))
+        } else {
+            None
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        3
+    }
+}
+
 ///
 
 pub fn development_entry_point() -> ! {
@@ -390,9 +478,11 @@ pub fn development_entry_point() -> ! {
 
     canvas.render(); */
 
-    let sub_menu_list = SubMenu::new();
+    let menu_programa = MenuPrograma::new();
+    let menu_arquivo_de_eixo = MenuArquivoDeEixo::new();
+    let menu_programa_handle = SubMenuHandle::MenuArquivoDeEixo(menu_arquivo_de_eixo);
 
-    let mut submenu = SubMenuRender::new(sub_menu_list);
+    let mut submenu = SubMenuRender::new(menu_programa_handle);
 
     let fps = 30; // frames_per_second
     let mut next_frame: u64 = now() + (1000 / fps);

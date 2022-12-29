@@ -1,7 +1,11 @@
 use super::menu_item::{MenuItemArgs, MenuItemWidget};
 use crate::{
     board::keyboard::KeyCode,
-    menu::{canvas::Canvas, menu_entry_point::SubMenu, point::Point},
+    menu::{
+        canvas::Canvas,
+        menu_entry_point::{MenuPrograma, SubMenuHandle},
+        point::Point,
+    },
     unwrap_option,
 };
 use core::{cell::Cell, ops::Range, slice::Iter};
@@ -41,7 +45,7 @@ const TOTAL_NUMBER_OF_LINES_IN_LCD: u8 = 2;
 
 pub struct SubMenuRender<'a> {
     /// List of all submenu items.
-    menu_list: SubMenu,
+    current_menu: SubMenuHandle,
     /// Controls the line of menu (see: LcdLine) which is current selected.
     lcd_line_cursor: Cursor,
     /// First line to render in the lcd screen in relation to the [`MenuList`].
@@ -51,14 +55,14 @@ pub struct SubMenuRender<'a> {
 }
 
 impl<'a> SubMenuRender<'a> {
-    pub fn new(mut menu_list: SubMenu) -> Self {
+    pub fn new(mut menu_list: SubMenuHandle) -> Self {
         let menu_list_length = menu_list.len();
         let mounted_0 = menu_list.get_item(0).unwrap();
         let mounted_1 = menu_list.get_item(1).unwrap();
 
         Self {
             mounted: [mounted_0, mounted_1],
-            menu_list,
+            current_menu: menu_list,
             lcd_line_cursor: {
                 const initial_line_selected: u8 = 0;
                 Cursor::new(0, TOTAL_NUMBER_OF_LINES_IN_LCD, initial_line_selected)
@@ -89,7 +93,7 @@ impl<'a> SubMenuRender<'a> {
     fn mount(&mut self) {
         for lcd_line in LcdLine::iterator() {
             let index = self.get_current_index_for(lcd_line) as usize;
-            let mut menu_item_widget = self.menu_list.get_item(index).unwrap();
+            let mut menu_item_widget = self.current_menu.get_item(index).unwrap();
             if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
                 // mount item
                 *elem = menu_item_widget;
