@@ -12,7 +12,7 @@ use crate::{
 use super::{
     caption::Caption,
     optional::OptionsBuffer,
-    sub_menu::{LcdLine, SubMenuRender},
+    sub_menu_render::{LcdLine, SubMenuRender},
     unsigned16_widget::{Content, Field, Format, StringBuffer},
     widget::Editable,
     widget::Widget,

@@ -7,7 +7,7 @@ pub mod manual_mode;
 pub mod menu_item;
 pub mod optional;
 pub mod splash;
-pub mod sub_menu;
+pub mod sub_menu_render;
 pub mod unsigned16_widget;
 pub mod widget;
 pub mod widget_tests;
