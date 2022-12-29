@@ -4,6 +4,7 @@ use crate::{
         accessor::Accessor,
         canvas::Canvas,
         flash::FlashString,
+        menu_entry_point::SubMenuHandle,
         point::{Point, Point1d},
     },
 };
@@ -50,15 +51,15 @@ pub enum MenuItemArgs {
 
 // -----------------------------------
 
-pub struct MenuItemWidget<'a> {
+pub struct MenuItemWidget {
     point_a: Point1d,
     caption: Caption,
     point_b: Point1d,
     field: Field,
-    sub_menu: Option<&'a mut SubMenuRender<'a>>,
+    child: Option<SubMenuHandle>,
 }
 
-impl<'a> MenuItemWidget<'a> {
+impl MenuItemWidget {
     /// NOTE: client should put point1 and point2 in the same line
     /// point1 = position of caption, point2 = position of field
     pub fn new(
@@ -66,18 +67,18 @@ impl<'a> MenuItemWidget<'a> {
         text: FlashString,
         point_b: Point1d,
         field: Field,
-        sub_menu: Option<&'a mut SubMenuRender<'a>>,
+        child: Option<SubMenuHandle>,
     ) -> Self {
         Self {
             point_a,
             caption: Caption::new(text),
             point_b,
             field,
-            sub_menu,
+            child,
         }
     }
 
-    pub fn from_numerical(args: NumericalParameterArgs) -> MenuItemWidget<'a> {
+    pub fn from_numerical(args: NumericalParameterArgs) -> MenuItemWidget {
         let point1 = Point1d::new(args.point1_);
         let point2 = Point1d::new(args.point2_);
         let initial_value = 20; //(*args.variable).clone();
@@ -86,7 +87,7 @@ impl<'a> MenuItemWidget<'a> {
         menu_item
     }
 
-    pub fn from_optional(args: OptionalParameterArgs) -> MenuItemWidget<'a> {
+    pub fn from_optional(args: OptionalParameterArgs) -> MenuItemWidget {
         let mut options_list_cloned = Vec::new();
         options_list_cloned.clone_from(&args.options_list);
         let point1 = Point1d::new(args.point1_);
@@ -105,7 +106,7 @@ impl<'a> MenuItemWidget<'a> {
     }
 }
 
-impl MenuItemWidget<'_> {
+impl MenuItemWidget {
     pub fn send_key(&mut self, key: KeyCode) {
         if self.is_in_edit_mode() {
             match key {
@@ -141,7 +142,7 @@ impl MenuItemWidget<'_> {
     }
 }
 
-impl MenuItemWidget<'_> {
+impl MenuItemWidget {
     pub fn set_edit_mode(&mut self, value: bool) {
         self.field.set_edit_mode(value);
     }

@@ -43,7 +43,7 @@ pub type MenuList = Vec<MenuItemArgs, 6>;
 
 const TOTAL_NUMBER_OF_LINES_IN_LCD: u8 = 2;
 
-pub struct SubMenuRender<'a> {
+pub struct SubMenuRender {
     /// List of all submenu items.
     current_menu: SubMenuHandle,
     /// Controls the line of menu (see: LcdLine) which is current selected.
@@ -51,10 +51,10 @@ pub struct SubMenuRender<'a> {
     /// First line to render in the lcd screen in relation to the [`MenuList`].
     first_line_to_render: Cursor,
     /// State of widgets which are currently mounted on screen.
-    mounted: [MenuItemWidget<'a>; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
+    mounted: [MenuItemWidget; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
 }
 
-impl<'a> SubMenuRender<'a> {
+impl SubMenuRender {
     pub fn new(mut menu_list: SubMenuHandle) -> Self {
         let menu_list_length = menu_list.len();
         let mounted_0 = menu_list.get_item(0).unwrap();
@@ -103,7 +103,7 @@ impl<'a> SubMenuRender<'a> {
         }
     }
 
-    fn get_mounted_item_in_lcd_mut(&mut self, lcd_line: LcdLine) -> &mut MenuItemWidget<'a> {
+    fn get_mounted_item_in_lcd_mut(&mut self, lcd_line: LcdLine) -> &mut MenuItemWidget {
         if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
             return elem;
         } else {
@@ -157,7 +157,7 @@ impl<'a> SubMenuRender<'a> {
     }
 }
 
-impl<'a> SubMenuRender<'a> {
+impl SubMenuRender {
     pub fn send_key(&mut self, key: KeyCode) {
         if let Some(line_being_edited) = self.get_line_being_edited() {
             // if is editing some line, delegate keys to sub widgets.

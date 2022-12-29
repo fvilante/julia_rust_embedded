@@ -96,7 +96,7 @@ pub enum SubMenuHandle {
 }
 
 impl SubMenuHandle {
-    pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
+    pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget> {
         match self {
             SubMenuHandle::MenuPrograma(x) => x.get_item(index),
             SubMenuHandle::MenuArquivoDeEixo(x) => x.get_item(index),
@@ -118,7 +118,7 @@ impl MenuPrograma {
         Self {}
     }
 
-    pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
+    pub fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         let menu_item_args = match index {
             0 => {
                 Some(MenuItemArgs::Numerical(NumericalParameterArgs {
@@ -398,7 +398,7 @@ impl MenuArquivoDeEixo {
         Self {}
     }
 
-    pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
+    pub fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         let menu_item_args = match index {
             0 => {
                 Some(MenuItemArgs::Optional(OptionalParameterArgs {
