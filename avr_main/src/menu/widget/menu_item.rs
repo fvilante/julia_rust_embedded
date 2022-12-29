@@ -34,6 +34,7 @@ pub struct NumericalParameterArgs {
     pub text: FlashString,
     //pub variable: &'static mut u16,
     pub parameters: Format,
+    pub child: Option<SubMenuHandle>,
 }
 
 pub struct OptionalParameterArgs {
@@ -42,6 +43,7 @@ pub struct OptionalParameterArgs {
     pub text: FlashString,
     //pub variable: &'static mut Cursor,
     pub options_list: OptionsBuffer,
+    pub child: Option<SubMenuHandle>,
 }
 
 pub enum MenuItemArgs {
@@ -83,7 +85,7 @@ impl MenuItemWidget {
         let point2 = Point1d::new(args.point2_);
         let initial_value = 20; //(*args.variable).clone();
         let field = Field::from_numerical(initial_value, (args.parameters).clone());
-        let mut menu_item = Self::new(point1, args.text, point2, field, None);
+        let mut menu_item = Self::new(point1, args.text, point2, field, args.child);
         menu_item
     }
 
@@ -94,7 +96,7 @@ impl MenuItemWidget {
         let point2 = Point1d::new(args.point2_);
         let initial_selection = Cursor::new(0, 2, 0); //(*args.variable).clone();
         let field = Field::from_optional(initial_selection, options_list_cloned);
-        let mut menu_item = Self::new(point1, args.text, point2, field, None);
+        let mut menu_item = Self::new(point1, args.text, point2, field, args.child);
         menu_item
     }
 

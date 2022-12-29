@@ -131,6 +131,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: Some(SubMenuHandle::MenuArquivoDeEixo(MenuArquivoDeEixo::new())),
                 }))
             }
 
@@ -145,6 +146,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -160,6 +162,7 @@ impl MenuPrograma {
                         FlashString::new(&O3),
                         FlashString::new(&O4),
                     ]),
+                    child: None,
                 }))
             }
 
@@ -174,6 +177,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -188,6 +192,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -202,6 +207,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -217,6 +223,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -231,6 +238,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -246,6 +254,7 @@ impl MenuPrograma {
                         FlashString::new(&O3),
                         FlashString::new(&O4),
                     ]),
+                    child: None,
                 }))
             }
 
@@ -260,6 +269,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -274,6 +284,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -288,6 +299,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -302,6 +314,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -316,6 +329,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -331,6 +345,7 @@ impl MenuPrograma {
                         FlashString::new(&O3),
                         FlashString::new(&O4),
                     ]),
+                    child: None,
                 }))
             }
 
@@ -345,6 +360,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -359,6 +375,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -373,6 +390,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -412,6 +430,7 @@ impl MenuArquivoDeEixo {
                         FlashString::new(&O3),
                         FlashString::new(&O4),
                     ]),
+                    child: None,
                 }))
             }
 
@@ -426,6 +445,7 @@ impl MenuArquivoDeEixo {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
@@ -440,6 +460,7 @@ impl MenuArquivoDeEixo {
                         start: 0,
                         end: 9999,
                     },
+                    child: None,
                 }))
             }
 
