@@ -76,11 +76,9 @@ pub fn development_entry_point() -> ! {
 
     canvas.render(); */
 
-    let menu_programa = MenuPrograma::new();
-    let menu_arquivo_de_eixo = MenuArquivoDeEixo::new();
-    let menu_programa_handle = SubMenuHandle::MenuArquivoDeEixo(menu_arquivo_de_eixo);
+    let menu_root = SubMenuHandle::MenuPrograma;
 
-    let mut submenu = SubMenuRender::new(menu_programa_handle);
+    let mut submenu = SubMenuRender::new(menu_root);
 
     let fps = 30; // frames_per_second
     let mut next_frame: u64 = now() + (1000 / fps);

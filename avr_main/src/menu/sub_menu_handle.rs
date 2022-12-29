@@ -46,23 +46,39 @@ progmem! {
     static progmem string ERRO_01 = "Erro de construcao de string";
 }
 
+struct MenuStorage {
+    pub MenuPrograma: MenuPrograma,
+    pub MenuArquivoDeEixo: MenuArquivoDeEixo,
+}
+
+impl MenuStorage {
+    pub const fn new() -> Self {
+        Self {
+            MenuPrograma: MenuPrograma::new(),
+            MenuArquivoDeEixo: MenuArquivoDeEixo::new(),
+        }
+    }
+}
+
+static MENU_STORAGE: MenuStorage = MenuStorage::new();
+
 pub enum SubMenuHandle {
-    MenuPrograma(MenuPrograma),
-    MenuArquivoDeEixo(MenuArquivoDeEixo),
+    MenuPrograma,
+    MenuArquivoDeEixo,
 }
 
 impl SubMenuHandle {
     pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget> {
         match self {
-            SubMenuHandle::MenuPrograma(x) => x.get_item(index),
-            SubMenuHandle::MenuArquivoDeEixo(x) => x.get_item(index),
+            SubMenuHandle::MenuPrograma => MENU_STORAGE.MenuPrograma.get_item(index),
+            SubMenuHandle::MenuArquivoDeEixo => MENU_STORAGE.MenuArquivoDeEixo.get_item(index),
         }
     }
 
     pub fn len(&self) -> usize {
         match self {
-            SubMenuHandle::MenuPrograma(x) => x.len(),
-            SubMenuHandle::MenuArquivoDeEixo(x) => x.len(),
+            SubMenuHandle::MenuPrograma => MENU_STORAGE.MenuPrograma.len(),
+            SubMenuHandle::MenuArquivoDeEixo => MENU_STORAGE.MenuArquivoDeEixo.len(),
         }
     }
 }
@@ -70,7 +86,7 @@ impl SubMenuHandle {
 pub struct MenuPrograma;
 
 impl MenuPrograma {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {}
     }
 
@@ -87,7 +103,7 @@ impl MenuPrograma {
                         start: 0,
                         end: 9999,
                     },
-                    child: Some(SubMenuHandle::MenuArquivoDeEixo(MenuArquivoDeEixo::new())),
+                    child: Some(SubMenuHandle::MenuArquivoDeEixo),
                 }))
             }
 
@@ -368,7 +384,7 @@ impl MenuPrograma {
 pub struct MenuArquivoDeEixo;
 
 impl MenuArquivoDeEixo {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {}
     }
 
