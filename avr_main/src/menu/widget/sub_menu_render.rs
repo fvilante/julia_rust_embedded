@@ -37,58 +37,105 @@ impl From<u8> for LcdLine {
 
 pub type MenuList = Vec<MenuItemArgs, 6>;
 
-const TOTAL_NUMBER_OF_LINES_IN_LCD: u8 = 2;
-
-pub struct SubMenuRender {
-    /// List of all submenu items.
-    current_menu: SubMenuHandle,
+/// Controls the state of the navigation on sub menu.
+///
+/// TODO: The memory footprint size this struct may be optimized going from 6 bytes to at least 3 bytes if I made a custom Cursor
+/// because `Cursor::Start` is always zero, and `Cursor:End` of `lcd_line_cursor` is always 2 or const statically defined.  
+#[derive(Copy, Clone)]
+pub struct NavigationState {
     /// Controls the line of menu (see: LcdLine) which is current selected.
     lcd_line_cursor: Cursor,
     /// First line to render in the lcd screen in relation to the [`MenuList`].
     first_line_to_render: Cursor,
-    /// State of widgets which are currently mounted on screen.
-    mounted: [MenuItemWidget; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
 }
 
-impl SubMenuRender {
-    pub fn new(mut menu_list: SubMenuHandle) -> Self {
-        let menu_list_length = menu_list.len();
-        let mounted_0 = menu_list.get_item(0).unwrap();
-        let mounted_1 = menu_list.get_item(1).unwrap();
-
+impl NavigationState {
+    pub fn new_from_submenu_handle(handle: SubMenuHandle) -> Self {
+        /// This application uses a LCD 40 collumns by 2 Lines in future this may be generalized
+        const TOTAL_NUMBER_OF_LINES_IN_LCD: u8 = 2;
         Self {
-            mounted: [mounted_0, mounted_1],
-            current_menu: menu_list,
             lcd_line_cursor: {
-                const initial_line_selected: u8 = 0;
-                Cursor::new(0, TOTAL_NUMBER_OF_LINES_IN_LCD, initial_line_selected)
+                const default_initial_line_selected: u8 = 0;
+                Cursor::new(
+                    0,
+                    TOTAL_NUMBER_OF_LINES_IN_LCD,
+                    default_initial_line_selected,
+                )
             },
             first_line_to_render: {
                 let default_initial_menu_item = 0;
                 Cursor::from_range(
-                    0..menu_list_length - (TOTAL_NUMBER_OF_LINES_IN_LCD - 1) as usize,
+                    0..handle.len() - (TOTAL_NUMBER_OF_LINES_IN_LCD - 1) as usize,
                     default_initial_menu_item,
                 )
             },
         }
     }
 
-    fn get_current_lcd_line(&self) -> LcdLine {
+    /// Scrolls menu down, return true if it the scrooll has already been exausted
+    pub fn scroll_down(&mut self) -> bool {
+        let has_exhausted = self.first_line_to_render.next();
+        has_exhausted
+    }
+
+    /// Scrolls menu up, return true if it the scrooll has already been exausted
+    pub fn scroll_up(&mut self) -> bool {
+        let has_exhausted = self.first_line_to_render.previous();
+        has_exhausted
+    }
+
+    pub fn key_down(&mut self) {
+        let is_exhasted = self.lcd_line_cursor.next();
+        if is_exhasted {
+            self.scroll_down();
+        };
+    }
+
+    pub fn key_up(&mut self) {
+        let is_exhasted = self.lcd_line_cursor.previous();
+        if is_exhasted {
+            self.scroll_up();
+        };
+    }
+
+    pub fn get_current_lcd_line(&self) -> LcdLine {
         LcdLine::from(self.lcd_line_cursor.get_current())
     }
 
-    /// Finds the given LcdLine in the MenuList collection (as MenuList index)
-    fn get_current_index_for(&self, line: LcdLine) -> u8 {
+    /// Finds for a given LcdLine the index of the item currently selected (in respect to menu list)
+    pub fn get_current_index_for(&self, line: LcdLine) -> u8 {
         let lcd_line = line as u8;
         let first_line_to_render = self.first_line_to_render.get_current();
         let item_index = lcd_line + first_line_to_render;
         item_index
     }
+}
+
+pub struct SubMenuRender {
+    /// List of all submenu items.
+    current_menu: SubMenuHandle,
+    navigation_state: NavigationState,
+    /// State of widgets which are currently mounted on screen.
+    mounted: [MenuItemWidget; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
+}
+
+impl SubMenuRender {
+    pub fn new(mut menu_handle: SubMenuHandle) -> Self {
+        let menu_handle_length = menu_handle.len();
+        let mounted_0 = menu_handle.get_item(0).unwrap();
+        let mounted_1 = menu_handle.get_item(1).unwrap();
+
+        Self {
+            mounted: [mounted_0, mounted_1],
+            navigation_state: NavigationState::new_from_submenu_handle(menu_handle),
+            current_menu: menu_handle,
+        }
+    }
 
     /// Mount widgets that are being renderized
     fn mount(&mut self) {
         for lcd_line in LcdLine::iterator() {
-            let index = self.get_current_index_for(lcd_line) as usize;
+            let index = self.navigation_state.get_current_index_for(lcd_line) as usize;
             let mut menu_item_widget = self.current_menu.get_item(index).unwrap();
             if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
                 // mount item
@@ -99,7 +146,8 @@ impl SubMenuRender {
         }
     }
 
-    fn get_mounted_item_in_lcd_mut(&mut self, lcd_line: LcdLine) -> &mut MenuItemWidget {
+    /// Get mounted item for a particular line (mutable reference)
+    fn get_mounted_item_for_line(&mut self, lcd_line: LcdLine) -> &mut MenuItemWidget {
         if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
             return elem;
         } else {
@@ -107,25 +155,28 @@ impl SubMenuRender {
         }
     }
 
-    fn scroll_down(&mut self) {
-        let has_exhausted = self.first_line_to_render.next();
-        if !has_exhausted {
-            self.mount();
-        }
+    /// Get mounted item in the current line which is selected by user
+    fn get_current_selected_mounted_item(&mut self) -> &mut MenuItemWidget {
+        let line = self.navigation_state.get_current_lcd_line();
+        let current_menu_item = self.get_mounted_item_for_line(line);
+        current_menu_item
     }
 
-    fn scroll_up(&mut self) {
-        let has_exhausted = self.first_line_to_render.previous();
-        if !has_exhausted {
-            self.mount();
-        }
+    fn key_down(&mut self) {
+        self.navigation_state.key_down();
+        self.mount();
+    }
+
+    fn key_up(&mut self) {
+        self.navigation_state.key_up();
+        self.mount();
     }
 
     /// If is in edit mode for some line returns Some(LcdLine) else None.
     /// TODO: Remove mutability of self when possible
     fn get_line_being_edited(&mut self) -> Option<LcdLine> {
         for line in LcdLine::iterator() {
-            let is_editing_some_line = self.get_mounted_item_in_lcd_mut(line).is_in_edit_mode();
+            let is_editing_some_line = self.get_mounted_item_for_line(line).is_in_edit_mode();
             if is_editing_some_line {
                 return Some(line);
             }
@@ -156,8 +207,7 @@ impl SubMenuRender {
 impl SubMenuRender {
     pub fn clone_from(&mut self, origin: Self) {
         self.current_menu = origin.current_menu;
-        self.lcd_line_cursor = origin.lcd_line_cursor;
-        self.first_line_to_render = origin.first_line_to_render;
+        self.navigation_state = origin.navigation_state;
         self.mounted = origin.mounted;
     }
 }
@@ -166,28 +216,21 @@ impl SubMenuRender {
     pub fn send_key(&mut self, key: KeyCode) {
         if let Some(line_being_edited) = self.get_line_being_edited() {
             // if is editing some line, delegate keys to sub widgets.
-            self.get_mounted_item_in_lcd_mut(line_being_edited)
+            self.get_mounted_item_for_line(line_being_edited)
                 .send_key(key);
         } else {
             // if not editing any line we are responsible to show up/down menu navigation.
             match key {
                 KeyCode::KEY_DIRECIONAL_PARA_BAIXO => {
-                    let already_on_bottom = self.lcd_line_cursor.next();
-                    if already_on_bottom {
-                        self.scroll_down()
-                    }
+                    self.key_down();
                 }
 
                 KeyCode::KEY_DIRECIONAL_PARA_CIMA => {
-                    let already_on_top = self.lcd_line_cursor.previous();
-                    if already_on_top {
-                        self.scroll_up()
-                    }
+                    self.key_up();
                 }
 
                 KeyCode::KEY_ENTER => {
-                    let line = self.get_current_lcd_line();
-                    let current_menu_item = self.get_mounted_item_in_lcd_mut(line);
+                    let current_menu_item = self.get_current_selected_mounted_item();
                     if let Some(child_handle) = current_menu_item.child {
                         // TEMP CODE: if current mitem has a child submenu, opens it.
                         self.clone_from(Self::new(child_handle));
@@ -206,7 +249,7 @@ impl SubMenuRender {
 
     pub fn update(&mut self) {
         for line in LcdLine::iterator() {
-            self.get_mounted_item_in_lcd_mut(line).update();
+            self.get_mounted_item_for_line(line).update();
         }
     }
 
@@ -215,11 +258,11 @@ impl SubMenuRender {
         // clear screen
         canvas.clear();
         // draw menu item selector
-        let line = self.get_current_lcd_line();
+        let line = self.navigation_state.get_current_lcd_line();
         self.draw_menu_item_selector(line, canvas);
         // draw menu items
         for line in LcdLine::iterator() {
-            self.get_mounted_item_in_lcd_mut(line).draw(canvas, line);
+            self.get_mounted_item_for_line(line).draw(canvas, line);
         }
     }
 }
