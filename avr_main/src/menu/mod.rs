@@ -6,4 +6,5 @@ pub mod menu_entry_point;
 pub mod menu_manager;
 pub mod point;
 pub mod ratangular_wave;
+pub mod sub_menu_handle;
 pub mod widget;

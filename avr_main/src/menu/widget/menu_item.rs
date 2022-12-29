@@ -4,8 +4,8 @@ use crate::{
         accessor::Accessor,
         canvas::Canvas,
         flash::FlashString,
-        menu_entry_point::SubMenuHandle,
         point::{Point, Point1d},
+        sub_menu_handle::SubMenuHandle,
     },
 };
 

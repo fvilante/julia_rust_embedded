@@ -1,11 +1,7 @@
 use super::menu_item::{MenuItemArgs, MenuItemWidget};
 use crate::{
     board::keyboard::KeyCode,
-    menu::{
-        canvas::Canvas,
-        menu_entry_point::{MenuPrograma, SubMenuHandle},
-        point::Point,
-    },
+    menu::{canvas::Canvas, point::Point, sub_menu_handle::SubMenuHandle},
     unwrap_option,
 };
 use core::{cell::Cell, ops::Range, slice::Iter};
