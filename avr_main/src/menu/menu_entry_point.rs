@@ -32,7 +32,7 @@ use crate::menu::widget::menu_item::make_template_iterator;
 use crate::menu::widget::menu_item::TemplateKind;
 use crate::menu::widget::optional::make_options_buffer_from_array;
 use crate::menu::widget::optional::OptionsBuffer;
-use crate::menu::widget::sub_menu::SubMenu;
+use crate::menu::widget::sub_menu::SubMenuRender;
 use crate::menu::widget::unsigned16_widget::Format;
 use crate::menu::widget::widget::Widget;
 use crate::menu::widget::widget_tests::SystemEnviroment;
@@ -128,9 +128,9 @@ struct X {
     format: Format,
 }
 
-pub struct SubMenuList {}
+pub struct SubMenu {}
 
-impl SubMenuList {
+impl SubMenu {
     pub fn new() -> Self {
         Self {}
     }
@@ -428,9 +428,9 @@ pub fn development_entry_point() -> ! {
 
     canvas.render(); */
 
-    let sub_menu_list = SubMenuList::new();
+    let sub_menu_list = SubMenu::new();
 
-    let mut submenu = SubMenu::new(sub_menu_list);
+    let mut submenu = SubMenuRender::new(sub_menu_list);
 
     let fps = 30; // frames_per_second
     let mut next_frame: u64 = now() + (1000 / fps);

@@ -11,7 +11,7 @@ use crate::{
 use super::{
     caption::Caption,
     optional::OptionsBuffer,
-    sub_menu::{LcdLine, SubMenu},
+    sub_menu::{LcdLine, SubMenuRender},
     unsigned16_widget::{Content, Field, Format, StringBuffer},
     widget::Editable,
     widget::Widget,
@@ -55,7 +55,7 @@ pub struct MenuItemWidget<'a> {
     caption: Caption,
     point_b: Point1d,
     field: Field,
-    sub_menu: Option<&'a mut SubMenu<'a>>,
+    sub_menu: Option<&'a mut SubMenuRender<'a>>,
 }
 
 impl<'a> MenuItemWidget<'a> {
@@ -66,7 +66,7 @@ impl<'a> MenuItemWidget<'a> {
         text: FlashString,
         point_b: Point1d,
         field: Field,
-        sub_menu: Option<&'a mut SubMenu<'a>>,
+        sub_menu: Option<&'a mut SubMenuRender<'a>>,
     ) -> Self {
         Self {
             point_a,

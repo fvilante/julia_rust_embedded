@@ -1,7 +1,7 @@
 use super::menu_item::{MenuItemArgs, MenuItemWidget};
 use crate::{
     board::keyboard::KeyCode,
-    menu::{canvas::Canvas, menu_entry_point::SubMenuList, point::Point},
+    menu::{canvas::Canvas, menu_entry_point::SubMenu, point::Point},
     unwrap_option,
 };
 use core::{cell::Cell, ops::Range, slice::Iter};
@@ -39,9 +39,9 @@ pub type MenuList = Vec<MenuItemArgs, 6>;
 
 const TOTAL_NUMBER_OF_LINES_IN_LCD: u8 = 2;
 
-pub struct SubMenu<'a> {
+pub struct SubMenuRender<'a> {
     /// List of all submenu items.
-    menu_list: SubMenuList,
+    menu_list: SubMenu,
     /// Controls the line of menu (see: LcdLine) which is current selected.
     lcd_line_cursor: Cursor,
     /// First line to render in the lcd screen in relation to the [`MenuList`].
@@ -50,8 +50,8 @@ pub struct SubMenu<'a> {
     mounted: [MenuItemWidget<'a>; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
 }
 
-impl<'a> SubMenu<'a> {
-    pub fn new(mut menu_list: SubMenuList) -> Self {
+impl<'a> SubMenuRender<'a> {
+    pub fn new(mut menu_list: SubMenu) -> Self {
         let menu_list_length = menu_list.len();
         let mounted_0 = menu_list.get_item(0).unwrap();
         let mounted_1 = menu_list.get_item(1).unwrap();
@@ -153,7 +153,7 @@ impl<'a> SubMenu<'a> {
     }
 }
 
-impl<'a> SubMenu<'a> {
+impl<'a> SubMenuRender<'a> {
     pub fn send_key(&mut self, key: KeyCode) {
         if let Some(line_being_edited) = self.get_line_being_edited() {
             // if is editing some line, delegate keys to sub widgets.
