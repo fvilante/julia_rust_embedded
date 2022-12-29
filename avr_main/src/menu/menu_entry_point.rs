@@ -88,44 +88,6 @@ progmem! {
         0
     ];
     static progmem string ERRO_01 = "Erro de construcao de string";
-
-    static progmem TABLE_A: [X;3] = [
-        X {
-            point1_: 1,
-            point2_: 30,
-            format: Format {
-                start: 0,
-                end: 9999,
-                initial_cursor_position: 2,
-            }
-        },
-        X {
-            point1_: 1,
-            point2_: 30,
-            format: Format {
-                start: 0,
-                end: 9999,
-                initial_cursor_position: 3,
-            }
-        },
-        X {
-            point1_: 1,
-            point2_: 30,
-            format: Format {
-                start: 0,
-                end: 9999,
-                initial_cursor_position: 4,
-            }
-        }
-    ];
-
-}
-
-#[derive(Copy, Clone)]
-struct X {
-    point1_: u8,
-    point2_: u8,
-    format: Format,
 }
 
 pub struct SubMenu {}
