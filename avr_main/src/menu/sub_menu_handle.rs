@@ -1,3 +1,5 @@
+use core::u8;
+
 use avr_progmem::progmem;
 
 use super::{
@@ -378,7 +380,12 @@ impl MenuPrograma {
     }
 
     pub fn len(&self) -> usize {
-        17
+        for index in 0..u8::MAX {
+            if let None = self.get_item(index as usize) {
+                return index as usize;
+            }
+        }
+        return 0;
     }
 }
 
