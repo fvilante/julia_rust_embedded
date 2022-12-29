@@ -71,7 +71,7 @@ pub enum SubMenuHandle {
 }
 
 impl SubMenuHandle {
-    pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget> {
+    pub fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match self {
             SubMenuHandle::MenuPrograma => MENU_STORAGE.MenuPrograma.get_item(index),
             SubMenuHandle::MenuArquivoDeEixo => MENU_STORAGE.MenuArquivoDeEixo.get_item(index),
@@ -86,14 +86,28 @@ impl SubMenuHandle {
     }
 }
 
+pub trait SubMenuTrait {
+    fn get_item(&self, index: usize) -> Option<MenuItemWidget>;
+    fn len(&self) -> usize {
+        for index in 0..u8::MAX {
+            if let None = self.get_item(index as usize) {
+                return index as usize;
+            }
+        }
+        return 0;
+    }
+}
+
 pub struct MenuPrograma;
 
 impl MenuPrograma {
     pub const fn new() -> Self {
         Self {}
     }
+}
 
-    pub fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
+impl SubMenuTrait for MenuPrograma {
+    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         let menu_item_args = match index {
             0 => {
                 Some(MenuItemArgs::Numerical(NumericalParameterArgs {
@@ -378,15 +392,6 @@ impl MenuPrograma {
             None
         }
     }
-
-    pub fn len(&self) -> usize {
-        for index in 0..u8::MAX {
-            if let None = self.get_item(index as usize) {
-                return index as usize;
-            }
-        }
-        return 0;
-    }
 }
 
 pub struct MenuArquivoDeEixo;
@@ -395,8 +400,10 @@ impl MenuArquivoDeEixo {
     pub const fn new() -> Self {
         Self {}
     }
+}
 
-    pub fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
+impl SubMenuTrait for MenuArquivoDeEixo {
+    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         let menu_item_args = match index {
             0 => {
                 Some(MenuItemArgs::Optional(OptionalParameterArgs {
@@ -452,9 +459,5 @@ impl MenuArquivoDeEixo {
         } else {
             None
         }
-    }
-
-    pub fn len(&self) -> usize {
-        3
     }
 }
