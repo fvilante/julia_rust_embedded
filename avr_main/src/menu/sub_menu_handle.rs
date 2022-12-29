@@ -64,28 +64,6 @@ impl MenuStorage {
 
 static MENU_STORAGE: MenuStorage = MenuStorage::new();
 
-#[derive(Copy, Clone)]
-pub enum SubMenuHandle {
-    MenuPrograma,
-    MenuArquivoDeEixo,
-}
-
-impl SubMenuHandle {
-    pub fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
-        match self {
-            SubMenuHandle::MenuPrograma => MENU_STORAGE.MenuPrograma.get_item(index),
-            SubMenuHandle::MenuArquivoDeEixo => MENU_STORAGE.MenuArquivoDeEixo.get_item(index),
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        match self {
-            SubMenuHandle::MenuPrograma => MENU_STORAGE.MenuPrograma.len(),
-            SubMenuHandle::MenuArquivoDeEixo => MENU_STORAGE.MenuArquivoDeEixo.len(),
-        }
-    }
-}
-
 pub trait SubMenuTrait {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget>;
     fn len(&self) -> usize {
@@ -95,6 +73,20 @@ pub trait SubMenuTrait {
             }
         }
         return 0;
+    }
+}
+
+#[derive(Copy, Clone)]
+pub enum SubMenuHandle {
+    MenuPrograma,
+    MenuArquivoDeEixo,
+}
+impl SubMenuTrait for SubMenuHandle {
+    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
+        match self {
+            SubMenuHandle::MenuPrograma => MENU_STORAGE.MenuPrograma.get_item(index),
+            SubMenuHandle::MenuArquivoDeEixo => MENU_STORAGE.MenuArquivoDeEixo.get_item(index),
+        }
     }
 }
 
