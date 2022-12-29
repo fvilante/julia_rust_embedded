@@ -1,4 +1,5 @@
 use super::menu_item::{MenuItemArgs, MenuItemWidget};
+use crate::menu::menu_entry_point::SubMenuTrait;
 use crate::{
     board::keyboard::KeyCode,
     menu::{canvas::Canvas, menu_entry_point::SubMenu, point::Point},

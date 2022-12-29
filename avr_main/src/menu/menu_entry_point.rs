@@ -90,14 +90,21 @@ progmem! {
     static progmem string ERRO_01 = "Erro de construcao de string";
 }
 
-pub struct SubMenu {}
+pub trait SubMenuTrait {
+    fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>>;
+    fn len(&self) -> usize;
+}
+
+pub struct SubMenu;
 
 impl SubMenu {
     pub fn new() -> Self {
         Self {}
     }
+}
 
-    pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
+impl SubMenuTrait for SubMenu {
+    fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
         let menu_item_args = match index {
             0 => {
                 Some(MenuItemArgs::Numerical(NumericalParameterArgs {
@@ -365,7 +372,7 @@ impl SubMenu {
         }
     }
 
-    pub fn len(&self) -> usize {
+    fn len(&self) -> usize {
         17
     }
 }
