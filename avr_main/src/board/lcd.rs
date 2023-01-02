@@ -1,5 +1,3 @@
-// DEPRECATED: use lcd_2.rs instead!
-// FIX: When possible remove this deprecated model from project
 // driver for off-board lcd HITACH HD44780 display
 
 use ruduino::cores::atmega328p::port;
