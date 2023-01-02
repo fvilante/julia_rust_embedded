@@ -15,7 +15,7 @@ const LOW: bool = false;
 const MAX_LINES: u8 = 4;
 
 // lcd internal state
-static mut _DISPLAYFUNCTIO: u8 = 0x00;
+static mut _DISPLAYFUNCTION: u8 = 0x00;
 static mut _DISPLAYCONTROL: u8 = 0x00;
 static mut _DISPLAYMODE: u8 = 0x00;
 static mut _ROW_OFFSETS: [u8; 4] = [0; 4];
@@ -335,7 +335,7 @@ fn lcd_init() {
     init_lcd_pins();
 
     unsafe {
-        _DISPLAYFUNCTIO = LCD_4BITMODE | LCD_1LINE | LCD_5X8DOTS;
+        _DISPLAYFUNCTION = LCD_4BITMODE | LCD_1LINE | LCD_5X8DOTS;
     }
 
     //lcd_begin(16,1);
@@ -344,7 +344,7 @@ fn lcd_init() {
 fn lcd_begin(cols: u8, lines: u8) {
     if lines > 1 {
         unsafe {
-            _DISPLAYFUNCTIO |= LCD_2LINE;
+            _DISPLAYFUNCTION |= LCD_2LINE;
         };
     }
     unsafe {
@@ -384,7 +384,7 @@ fn lcd_begin(cols: u8, lines: u8) {
     // ==========================
 
     // finally, set # lines, font size, etc.
-    command(LCD_FUNCTIONSET | unsafe { _DISPLAYFUNCTIO });
+    command(LCD_FUNCTIONSET | unsafe { _DISPLAYFUNCTION });
 
     // turn the display on with no cursor or blinking default
     unsafe { _DISPLAYCONTROL = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF };

@@ -2,7 +2,7 @@ use core::{marker::Destruct, str::FromStr};
 use heapless::String;
 
 // return (byteLow, byteHigh)
-pub fn word_to_byte(word: u16) -> (u8, u8) {
+pub const fn word_to_byte(word: u16) -> (u8, u8) {
     let low_ = word & 0x00FF;
     let byte_low = low_ as u8;
     let high_ = (word >> 8) & 0x00FF;
@@ -12,12 +12,12 @@ pub fn word_to_byte(word: u16) -> (u8, u8) {
 
 // NOTE: Deprecated! Use "get_bit_at_as_bool" instead.
 // position 0 = bit0, position 1 = bit1, ...
-pub fn get_bit_at(byte: u8, position: u8) -> u8 {
+pub const fn get_bit_at(byte: u8, position: u8) -> u8 {
     byte & (1 << position)
 }
 
 // position 0 = bit0, position 1 = bit1, ...
-pub fn get_bit_at_as_bool(byte: u8, position: u8) -> bool {
+pub const fn get_bit_at_as_bool(byte: u8, position: u8) -> bool {
     let bit = byte & (1 << position);
     if bit == 0 {
         false
@@ -27,20 +27,20 @@ pub fn get_bit_at_as_bool(byte: u8, position: u8) -> bool {
 }
 
 // position 0 = bit0, position 1 = bit1, ...
-pub fn set_bit_at(byte: u8, position: u8) -> u8 {
+pub const fn set_bit_at(byte: u8, position: u8) -> u8 {
     byte | (1 << position)
 }
 
-pub fn invert(byte: u8) -> u8 {
+pub const fn invert(byte: u8) -> u8 {
     !byte
 }
 
 // position 0 = bit0, position 1 = bit1, ...
-pub fn reset_bit_at(byte: u8, position: u8) -> u8 {
+pub const fn reset_bit_at(byte: u8, position: u8) -> u8 {
     !set_bit_at(!byte, position)
 }
 
-pub fn configure_bit(byte: u8, position: u8, data_bit: bool) -> u8 {
+pub const fn configure_bit(byte: u8, position: u8, data_bit: bool) -> u8 {
     match data_bit {
         true => set_bit_at(byte, position),
         false => reset_bit_at(byte, position),
@@ -52,7 +52,7 @@ const TABLE: [char; 16] = [
 ];
 
 // NOTE: return folows the order: "Most Significant on Right"
-pub fn convert_u8_to_str_hex(data: u8) -> (char, char) {
+pub const fn convert_u8_to_str_hex(data: u8) -> (char, char) {
     let low: u8 = data & 0b00001111;
     let high: u8 = (data & 0b11110000) >> 4;
 
@@ -63,7 +63,7 @@ pub fn convert_u8_to_str_hex(data: u8) -> (char, char) {
 }
 
 // NOTE: return folows the order: "Most Significant on Right"
-pub fn convert_u16_to_str_hex(data: u16) -> (char, char, char, char) {
+pub const fn convert_u16_to_str_hex(data: u16) -> (char, char, char, char) {
     let low: u8 = (data & 0x00FF) as u8;
     let high: u8 = ((data & 0xFF00) >> 8) as u8;
 
