@@ -67,6 +67,9 @@ static MENU_STORAGE: MenuStorage = MenuStorage::new();
 pub trait SubMenuTrait {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget>;
     fn len(&self) -> usize {
+        /// TODO: This algoritm may be highly optimized, because the length is obtained instantiating &
+        /// throwing away all the menu items in memory. A better option may be to restructure datastructures
+        /// to calculate this size in static time.
         for index in 0..u8::MAX {
             if let None = self.get_item(index as usize) {
                 return index as usize;
