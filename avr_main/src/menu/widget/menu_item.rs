@@ -28,47 +28,48 @@ use lib_1::{
 
 // -----------------------------------
 
-pub struct NumericalParameterArgs {
+pub struct NumericalParameterArgs<'a> {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
-    //pub variable: &'static mut u16,
     pub parameters: Format,
     pub child: Option<SubMenuHandle>,
+    pub variable: &'a Cell<u16>,
 }
 
-pub struct OptionalParameterArgs {
+pub struct OptionalParameterArgs<'a> {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
     //pub variable: &'static mut Cursor,
     pub options_list: OptionsBuffer,
     pub child: Option<SubMenuHandle>,
+    pub variable: &'a Cell<Cursor>,
 }
 
-pub enum MenuItemArgs {
-    Numerical(NumericalParameterArgs),
-    Optional(OptionalParameterArgs),
+pub enum MenuItemArgs<'a> {
+    Numerical(NumericalParameterArgs<'a>),
+    Optional(OptionalParameterArgs<'a>),
 }
 
 // -----------------------------------
 
-pub struct MenuItemWidget {
+pub struct MenuItemWidget<'a> {
     point_a: Point1d,
     caption: Caption,
     point_b: Point1d,
-    field: Field,
+    field: Field<'a>,
     pub child: Option<SubMenuHandle>,
 }
 
-impl MenuItemWidget {
+impl<'a> MenuItemWidget<'a> {
     /// NOTE: client should put point1 and point2 in the same line
     /// point1 = position of caption, point2 = position of field
     pub fn new(
         point_a: Point1d,
         text: FlashString,
         point_b: Point1d,
-        field: Field,
+        field: Field<'a>,
         child: Option<SubMenuHandle>,
     ) -> Self {
         Self {
@@ -80,27 +81,26 @@ impl MenuItemWidget {
         }
     }
 
-    pub fn from_numerical(args: NumericalParameterArgs) -> MenuItemWidget {
+    pub fn from_numerical(args: NumericalParameterArgs<'a>) -> MenuItemWidget<'a> {
         let point1 = Point1d::new(args.point1_);
         let point2 = Point1d::new(args.point2_);
-        let initial_value = 20; //(*args.variable).clone();
-        let field = Field::from_numerical(initial_value, (args.parameters).clone());
+        let field = Field::from_numerical(args.variable, (args.parameters).clone());
         let mut menu_item = Self::new(point1, args.text, point2, field, args.child);
         menu_item
     }
 
-    pub fn from_optional(args: OptionalParameterArgs) -> MenuItemWidget {
+    pub fn from_optional(args: OptionalParameterArgs<'a>) -> MenuItemWidget<'a> {
         let mut options_list_cloned = Vec::new();
         options_list_cloned.clone_from(&args.options_list);
         let point1 = Point1d::new(args.point1_);
         let point2 = Point1d::new(args.point2_);
         let initial_selection = Cursor::new(0, 2, 0); //(*args.variable).clone();
-        let field = Field::from_optional(initial_selection, options_list_cloned);
+        let field = Field::from_optional(args.variable, options_list_cloned);
         let mut menu_item = Self::new(point1, args.text, point2, field, args.child);
         menu_item
     }
 
-    pub fn from_menu_args(args: MenuItemArgs) -> Self {
+    pub fn from_menu_args(args: MenuItemArgs<'a>) -> Self {
         match args {
             MenuItemArgs::Numerical(args) => Self::from_numerical(args),
             MenuItemArgs::Optional(args) => Self::from_optional(args),
@@ -108,7 +108,7 @@ impl MenuItemWidget {
     }
 }
 
-impl MenuItemWidget {
+impl MenuItemWidget<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         if self.is_in_edit_mode() {
             match key {
@@ -144,7 +144,7 @@ impl MenuItemWidget {
     }
 }
 
-impl MenuItemWidget {
+impl MenuItemWidget<'_> {
     pub fn set_edit_mode(&mut self, value: bool) {
         self.field.set_edit_mode(value);
     }

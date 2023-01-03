@@ -36,7 +36,7 @@ impl From<u8> for LcdLine {
     }
 }
 
-pub type MenuList = Vec<MenuItemArgs, 6>;
+pub type MenuList<'a> = Vec<MenuItemArgs<'a>, 6>;
 
 /// Controls the state of the navigation on sub menu.
 ///
@@ -112,22 +112,23 @@ impl NavigationState {
     }
 }
 
-pub struct SubMenuRender {
+pub struct SubMenuRender<'a> {
     /// List of all submenu items.
     current_menu: SubMenuHandle,
     navigation_state: NavigationState,
     /// State of widgets which are currently mounted on screen.
-    mounted: [MenuItemWidget; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
+    mounted: [MenuItemWidget<'a>; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
 }
 
-impl SubMenuRender {
-    pub fn new(mut menu_handle: SubMenuHandle) -> Self {
+impl<'a> SubMenuRender<'a> {
+    pub fn new(menu_handle: SubMenuHandle) -> Self {
         let menu_handle_length = menu_handle.len();
-        let mounted_0 = menu_handle.get_item(0).unwrap();
-        let mounted_1 = menu_handle.get_item(1).unwrap();
 
         Self {
-            mounted: [mounted_0, mounted_1],
+            mounted: [
+                menu_handle.get_item(0).unwrap(),
+                menu_handle.get_item(1).unwrap(),
+            ],
             navigation_state: NavigationState::new_from_submenu_handle(menu_handle),
             current_menu: menu_handle,
         }
@@ -148,7 +149,7 @@ impl SubMenuRender {
     }
 
     /// Get mounted item for a particular line (mutable reference)
-    fn get_mounted_item_for_line(&mut self, lcd_line: LcdLine) -> &mut MenuItemWidget {
+    fn get_mounted_item_for_line(&mut self, lcd_line: LcdLine) -> &mut MenuItemWidget<'a> {
         if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
             return elem;
         } else {
@@ -157,7 +158,7 @@ impl SubMenuRender {
     }
 
     /// Get mounted item in the current line which is selected by user
-    fn get_current_selected_mounted_item(&mut self) -> &mut MenuItemWidget {
+    fn get_current_selected_mounted_item(&mut self) -> &mut MenuItemWidget<'a> {
         let line = self.navigation_state.get_current_lcd_line();
         let current_menu_item = self.get_mounted_item_for_line(line);
         current_menu_item
@@ -205,7 +206,7 @@ impl SubMenuRender {
     }
 }
 
-impl SubMenuRender {
+impl SubMenuRender<'_> {
     pub fn clone_from(&mut self, origin: Self) {
         self.current_menu = origin.current_menu;
         self.navigation_state = origin.navigation_state;
@@ -213,7 +214,7 @@ impl SubMenuRender {
     }
 }
 
-impl SubMenuRender {
+impl SubMenuRender<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         if let Some(line_being_edited) = self.get_line_being_edited() {
             // if is editing some line, delegate keys to sub widgets.

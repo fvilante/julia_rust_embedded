@@ -1,6 +1,7 @@
-use core::u8;
+use core::{cell::Cell, u8};
 
 use avr_progmem::progmem;
+use lib_1::utils::cursor::Cursor;
 
 use super::{
     flash::FlashString,
@@ -62,7 +63,7 @@ impl MenuStorage {
     }
 }
 
-static MENU_STORAGE: MenuStorage = MenuStorage::new();
+static mut MENU_STORAGE: MenuStorage = MenuStorage::new();
 
 pub trait SubMenuTrait {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget>;
@@ -84,20 +85,44 @@ pub enum SubMenuHandle {
     MenuPrograma,
     MenuArquivoDeEixo,
 }
-impl SubMenuTrait for SubMenuHandle {
-    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
+impl SubMenuHandle {
+    pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
         match self {
-            SubMenuHandle::MenuPrograma => MENU_STORAGE.MenuPrograma.get_item(index),
-            SubMenuHandle::MenuArquivoDeEixo => MENU_STORAGE.MenuArquivoDeEixo.get_item(index),
+            SubMenuHandle::MenuPrograma => unsafe { MENU_STORAGE.MenuPrograma.get_item(index) },
+            SubMenuHandle::MenuArquivoDeEixo => unsafe {
+                MENU_STORAGE.MenuArquivoDeEixo.get_item(index)
+            },
         }
+    }
+
+    pub fn len(&self) -> usize {
+        /// TODO: This algoritm may be highly optimized, because the length is obtained instantiating &
+        /// throwing away all the menu items in memory. A better option may be to restructure datastructures
+        /// to calculate this size in static time.
+        for index in 0..u8::MAX {
+            if let None = self.get_item(index as usize) {
+                return index as usize;
+            }
+        }
+        return 0;
     }
 }
 
-pub struct MenuPrograma;
+pub struct MenuPrograma {
+    value0: Cell<u16>,
+    value1: Cell<u16>,
+    value2: Cell<Cursor>,
+    value3: Cell<u16>,
+}
 
 impl MenuPrograma {
     pub const fn new() -> Self {
-        Self {}
+        Self {
+            value0: Cell::new(0),
+            value1: Cell::new(15),
+            value2: Cell::new(Cursor::new(0, 2, 0)),
+            value3: Cell::new(0),
+        }
     }
 }
 
@@ -116,6 +141,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: Some(SubMenuHandle::MenuArquivoDeEixo),
+                    variable: &self.value0,
                 }))
             }
 
@@ -131,6 +157,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value1,
                 }))
             }
 
@@ -147,6 +174,7 @@ impl SubMenuTrait for MenuPrograma {
                         FlashString::new(&O4),
                     ]),
                     child: Some(SubMenuHandle::MenuArquivoDeEixo),
+                    variable: &self.value2,
                 }))
             }
 
@@ -162,6 +190,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -177,6 +206,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -192,6 +222,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -208,6 +239,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -223,6 +255,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -239,6 +272,7 @@ impl SubMenuTrait for MenuPrograma {
                         FlashString::new(&O4),
                     ]),
                     child: None,
+                    variable: &self.value2,
                 }))
             }
 
@@ -254,6 +288,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -269,6 +304,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -284,6 +320,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -299,6 +336,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -314,6 +352,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -330,6 +369,7 @@ impl SubMenuTrait for MenuPrograma {
                         FlashString::new(&O4),
                     ]),
                     child: None,
+                    variable: &self.value2,
                 }))
             }
 
@@ -345,6 +385,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -360,6 +401,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -375,9 +417,9 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
-
             _ => None,
         };
 
@@ -389,11 +431,19 @@ impl SubMenuTrait for MenuPrograma {
     }
 }
 
-pub struct MenuArquivoDeEixo;
+pub struct MenuArquivoDeEixo {
+    value0: Cell<Cursor>,
+    value1: Cell<u16>,
+    value2: Cell<u16>,
+}
 
 impl MenuArquivoDeEixo {
     pub const fn new() -> Self {
-        Self {}
+        Self {
+            value0: Cell::new(Cursor::new(0, 2, 1)),
+            value1: Cell::new(0),
+            value2: Cell::new(0),
+        }
     }
 }
 
@@ -413,6 +463,7 @@ impl SubMenuTrait for MenuArquivoDeEixo {
                         FlashString::new(&O4),
                     ]),
                     child: None,
+                    variable: &self.value0,
                 }))
             }
 
@@ -428,6 +479,7 @@ impl SubMenuTrait for MenuArquivoDeEixo {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value1,
                 }))
             }
 
@@ -443,6 +495,7 @@ impl SubMenuTrait for MenuArquivoDeEixo {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value2,
                 }))
             }
 

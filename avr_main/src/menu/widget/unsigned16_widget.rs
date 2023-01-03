@@ -1,3 +1,4 @@
+use core::cell::Cell;
 use core::ops::Range;
 use core::str::{CharIndices, Chars, FromStr};
 
@@ -264,26 +265,29 @@ impl NumberInputEditor {
 }
 
 /// This [`Widget`] manages the edition of an number (unsigned integer) by the user using the keyboard and lcd display
-pub struct NumberInputEditorWidget {
+pub struct NumberInputEditorWidget<'a> {
     u16_editor: NumberInputEditor,
     /// This class is responsible to generate the blinking character effect
     blink: RectangularWave,
     edit_mode: EditMode,
+    variable: &'a Cell<u16>,
 }
 
-impl NumberInputEditorWidget {
-    pub fn new(initial_value: u16, format: Format, is_in_edit_mode: bool) -> Self {
+impl<'a> NumberInputEditorWidget<'a> {
+    pub fn new(variable: &'a Cell<u16>, format: Format, is_in_edit_mode: bool) -> Self {
         const T_ON: u64 = 600;
         const T_OFF: u64 = 300;
+        let __initial_value = variable.get();
         Self {
-            u16_editor: NumberInputEditor::from_u16(initial_value, format.clone()),
+            u16_editor: NumberInputEditor::from_u16(__initial_value, format.clone()),
             blink: RectangularWave::new(T_ON, T_OFF),
             edit_mode: EditMode::new(is_in_edit_mode),
+            variable,
         }
     }
 }
 
-impl Editable for NumberInputEditorWidget {
+impl Editable for NumberInputEditorWidget<'_> {
     fn set_edit_mode(&mut self, value: bool) {
         self.edit_mode.set_edit_mode(value)
     }
@@ -293,7 +297,7 @@ impl Editable for NumberInputEditorWidget {
     }
 }
 
-impl Widget for NumberInputEditorWidget {
+impl Widget for NumberInputEditorWidget<'_> {
     fn send_key(&mut self, key: KeyCode) {
         if self.is_in_edit_mode() {
             let content_editor = &mut self.u16_editor.content_editor;
@@ -395,27 +399,27 @@ impl Widget for NumberInputEditorWidget {
 ///
 /// Abstracts all kind of fields existent offering an equal interface for all of them (Note: New Fields
 /// may be added in the future)
-pub enum Field {
-    Numerical(NumberInputEditorWidget),
-    Optional(OptionEditorWidget),
+pub enum Field<'a> {
+    Numerical(NumberInputEditorWidget<'a>),
+    Optional(OptionEditorWidget<'a>),
 }
 
-impl Field {
-    pub fn from_numerical(initial_value: u16, parameters: Format) -> Self {
+impl<'a> Field<'a> {
+    pub fn from_numerical(variable: &'a Cell<u16>, parameters: Format) -> Self {
         const initial_editing_mode: bool = false; // does not start in edit mode
         let numerical_field =
-            NumberInputEditorWidget::new(initial_value, parameters, initial_editing_mode);
+            NumberInputEditorWidget::new(variable, parameters, initial_editing_mode);
         Self::Numerical(numerical_field)
     }
 
-    pub fn from_optional(initial_selection: Cursor, options: OptionsBuffer) -> Self {
+    pub fn from_optional(variable: &'a Cell<Cursor>, options: OptionsBuffer) -> Self {
         const initial_editing_mode: bool = false; // does not start in edit mode
-        let optional = OptionEditorWidget::new(initial_selection, options, initial_editing_mode);
+        let optional = OptionEditorWidget::new(variable, options, initial_editing_mode);
         Self::Optional(optional)
     }
 }
 
-impl Widget for Field {
+impl Widget for Field<'_> {
     fn send_key(&mut self, key: KeyCode) {
         match self {
             Self::Numerical(x) => x.send_key(key),
@@ -438,7 +442,7 @@ impl Widget for Field {
     }
 }
 
-impl Editable for Field {
+impl Editable for Field<'_> {
     fn set_edit_mode(&mut self, value: bool) {
         match self {
             Self::Numerical(x) => x.set_edit_mode(value),
