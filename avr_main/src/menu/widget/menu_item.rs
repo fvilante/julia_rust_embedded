@@ -37,18 +37,19 @@ pub struct NumericalParameterArgs<'a> {
     pub variable: &'a Cell<u16>,
 }
 
-pub struct OptionalParameterArgs {
+pub struct OptionalParameterArgs<'a> {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
     //pub variable: &'static mut Cursor,
     pub options_list: OptionsBuffer,
     pub child: Option<SubMenuHandle>,
+    pub variable: &'a Cell<Cursor>,
 }
 
 pub enum MenuItemArgs<'a> {
     Numerical(NumericalParameterArgs<'a>),
-    Optional(OptionalParameterArgs),
+    Optional(OptionalParameterArgs<'a>),
 }
 
 // -----------------------------------
@@ -88,7 +89,7 @@ impl<'a> MenuItemWidget<'a> {
         menu_item
     }
 
-    pub fn from_optional(args: OptionalParameterArgs) -> MenuItemWidget<'a> {
+    pub fn from_optional(args: OptionalParameterArgs<'a>) -> MenuItemWidget<'a> {
         let mut options_list_cloned = Vec::new();
         options_list_cloned.clone_from(&args.options_list);
         let point1 = Point1d::new(args.point1_);
