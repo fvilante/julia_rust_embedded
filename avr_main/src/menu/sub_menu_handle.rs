@@ -84,14 +84,26 @@ pub enum SubMenuHandle {
     MenuPrograma,
     MenuArquivoDeEixo,
 }
-impl SubMenuTrait for SubMenuHandle {
-    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
+impl SubMenuHandle {
+    pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
         match self {
             SubMenuHandle::MenuPrograma => unsafe { MENU_STORAGE.MenuPrograma.get_item(index) },
             SubMenuHandle::MenuArquivoDeEixo => unsafe {
                 MENU_STORAGE.MenuArquivoDeEixo.get_item(index)
             },
         }
+    }
+
+    pub fn len(&self) -> usize {
+        /// TODO: This algoritm may be highly optimized, because the length is obtained instantiating &
+        /// throwing away all the menu items in memory. A better option may be to restructure datastructures
+        /// to calculate this size in static time.
+        for index in 0..u8::MAX {
+            if let None = self.get_item(index as usize) {
+                return index as usize;
+            }
+        }
+        return 0;
     }
 }
 
