@@ -1,4 +1,4 @@
-use core::u8;
+use core::{cell::Cell, u8};
 
 use avr_progmem::progmem;
 
@@ -62,7 +62,7 @@ impl MenuStorage {
     }
 }
 
-static MENU_STORAGE: MenuStorage = MenuStorage::new();
+static mut MENU_STORAGE: MenuStorage = MenuStorage::new();
 
 pub trait SubMenuTrait {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget>;
@@ -87,17 +87,27 @@ pub enum SubMenuHandle {
 impl SubMenuTrait for SubMenuHandle {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match self {
-            SubMenuHandle::MenuPrograma => MENU_STORAGE.MenuPrograma.get_item(index),
-            SubMenuHandle::MenuArquivoDeEixo => MENU_STORAGE.MenuArquivoDeEixo.get_item(index),
+            SubMenuHandle::MenuPrograma => unsafe { MENU_STORAGE.MenuPrograma.get_item(index) },
+            SubMenuHandle::MenuArquivoDeEixo => unsafe {
+                MENU_STORAGE.MenuArquivoDeEixo.get_item(index)
+            },
         }
     }
 }
 
-pub struct MenuPrograma;
+pub struct MenuPrograma {
+    value0: Cell<u16>,
+    value1: Cell<u16>,
+    value3: Cell<u16>,
+}
 
 impl MenuPrograma {
     pub const fn new() -> Self {
-        Self {}
+        Self {
+            value0: Cell::new(0),
+            value1: Cell::new(0),
+            value3: Cell::new(0),
+        }
     }
 }
 
@@ -116,6 +126,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: Some(SubMenuHandle::MenuArquivoDeEixo),
+                    variable: &self.value0,
                 }))
             }
 
@@ -131,6 +142,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value1,
                 }))
             }
 
@@ -162,9 +174,10 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
-
+            /*
             4 => {
                 Some(MenuItemArgs::Numerical(NumericalParameterArgs {
                     point1_: 1,
@@ -376,8 +389,7 @@ impl SubMenuTrait for MenuPrograma {
                     },
                     child: None,
                 }))
-            }
-
+            } */
             _ => None,
         };
 
@@ -389,11 +401,17 @@ impl SubMenuTrait for MenuPrograma {
     }
 }
 
-pub struct MenuArquivoDeEixo;
+pub struct MenuArquivoDeEixo {
+    value1: Cell<u16>,
+    value2: Cell<u16>,
+}
 
 impl MenuArquivoDeEixo {
     pub const fn new() -> Self {
-        Self {}
+        Self {
+            value1: Cell::new(0),
+            value2: Cell::new(0),
+        }
     }
 }
 
@@ -428,6 +446,7 @@ impl SubMenuTrait for MenuArquivoDeEixo {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value1,
                 }))
             }
 
@@ -443,6 +462,7 @@ impl SubMenuTrait for MenuArquivoDeEixo {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value2,
                 }))
             }
 
