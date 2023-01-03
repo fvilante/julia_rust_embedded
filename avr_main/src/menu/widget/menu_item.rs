@@ -95,7 +95,7 @@ impl<'a> MenuItemWidget<'a> {
         let point1 = Point1d::new(args.point1_);
         let point2 = Point1d::new(args.point2_);
         let initial_selection = Cursor::new(0, 2, 0); //(*args.variable).clone();
-        let field = Field::from_optional(initial_selection, options_list_cloned);
+        let field = Field::from_optional(args.variable, options_list_cloned);
         let mut menu_item = Self::new(point1, args.text, point2, field, args.child);
         menu_item
     }

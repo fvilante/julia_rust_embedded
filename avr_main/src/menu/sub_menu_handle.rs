@@ -120,7 +120,7 @@ impl MenuPrograma {
         Self {
             value0: Cell::new(0),
             value1: Cell::new(15),
-            value2: Cell::new(Cursor::new(0, 1, 0)),
+            value2: Cell::new(Cursor::new(0, 2, 0)),
             value3: Cell::new(0),
         }
     }
@@ -426,7 +426,7 @@ pub struct MenuArquivoDeEixo {
 impl MenuArquivoDeEixo {
     pub const fn new() -> Self {
         Self {
-            value0: Cell::new(Cursor::new(0, 1, 0)),
+            value0: Cell::new(Cursor::new(0, 2, 1)),
             value1: Cell::new(0),
             value2: Cell::new(0),
         }

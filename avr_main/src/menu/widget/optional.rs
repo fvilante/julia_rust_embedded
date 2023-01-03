@@ -1,3 +1,5 @@
+use core::cell::Cell;
+
 use heapless::Vec;
 
 use super::edit_mode::EditMode;
@@ -23,24 +25,27 @@ pub fn make_options_buffer_from_array<const ArraySize: usize>(
     options
 }
 
-pub struct OptionEditorWidget {
+pub struct OptionEditorWidget<'a> {
     options: OptionsBuffer,
     editing_selection: Cursor,
     original_selection: Cursor,
     blink: RectangularWave,
     edit_mode: EditMode,
+    variable: &'a Cell<Cursor>,
 }
 
-impl OptionEditorWidget {
-    pub fn new(initial_selection: Cursor, options: OptionsBuffer, is_in_edit_mode: bool) -> Self {
+impl<'a> OptionEditorWidget<'a> {
+    pub fn new(variable: &'a Cell<Cursor>, options: OptionsBuffer, is_in_edit_mode: bool) -> Self {
         const T_ON: u64 = 600;
         const T_OFF: u64 = 300;
+        let initial_value = variable.get();
         Self {
             options: options.clone(),
-            editing_selection: initial_selection.clone(),
-            original_selection: initial_selection,
+            editing_selection: initial_value,
+            original_selection: initial_value,
             blink: RectangularWave::new(T_ON, T_OFF),
             edit_mode: EditMode::new(is_in_edit_mode),
+            variable,
         }
     }
 
@@ -66,7 +71,7 @@ impl OptionEditorWidget {
     }
 }
 
-impl Editable for OptionEditorWidget {
+impl Editable for OptionEditorWidget<'_> {
     fn set_edit_mode(&mut self, value: bool) {
         self.edit_mode.set_edit_mode(value)
     }
@@ -90,7 +95,7 @@ impl Editable for OptionEditorWidget {
     }
 } */
 
-impl Widget for OptionEditorWidget {
+impl Widget for OptionEditorWidget<'_> {
     fn send_key(&mut self, key: KeyCode) {
         match key {
             // navigation_key left and right

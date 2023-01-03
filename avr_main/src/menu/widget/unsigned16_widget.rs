@@ -401,7 +401,7 @@ impl Widget for NumberInputEditorWidget<'_> {
 /// may be added in the future)
 pub enum Field<'a> {
     Numerical(NumberInputEditorWidget<'a>),
-    Optional(OptionEditorWidget),
+    Optional(OptionEditorWidget<'a>),
 }
 
 impl<'a> Field<'a> {
@@ -412,9 +412,9 @@ impl<'a> Field<'a> {
         Self::Numerical(numerical_field)
     }
 
-    pub fn from_optional(initial_selection: Cursor, options: OptionsBuffer) -> Self {
+    pub fn from_optional(variable: &'a Cell<Cursor>, options: OptionsBuffer) -> Self {
         const initial_editing_mode: bool = false; // does not start in edit mode
-        let optional = OptionEditorWidget::new(initial_selection, options, initial_editing_mode);
+        let optional = OptionEditorWidget::new(variable, options, initial_editing_mode);
         Self::Optional(optional)
     }
 }
