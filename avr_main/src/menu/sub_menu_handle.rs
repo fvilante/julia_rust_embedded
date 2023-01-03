@@ -117,7 +117,7 @@ impl MenuPrograma {
     pub const fn new() -> Self {
         Self {
             value0: Cell::new(0),
-            value1: Cell::new(0),
+            value1: Cell::new(15),
             value3: Cell::new(0),
         }
     }

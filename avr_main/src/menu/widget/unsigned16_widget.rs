@@ -274,16 +274,12 @@ pub struct NumberInputEditorWidget<'a> {
 }
 
 impl<'a> NumberInputEditorWidget<'a> {
-    pub fn new(
-        variable: &'a Cell<u16>,
-        initial_value: u16,
-        format: Format,
-        is_in_edit_mode: bool,
-    ) -> Self {
+    pub fn new(variable: &'a Cell<u16>, format: Format, is_in_edit_mode: bool) -> Self {
         const T_ON: u64 = 600;
         const T_OFF: u64 = 300;
+        let __initial_value = variable.get();
         Self {
-            u16_editor: NumberInputEditor::from_u16(initial_value, format.clone()),
+            u16_editor: NumberInputEditor::from_u16(__initial_value, format.clone()),
             blink: RectangularWave::new(T_ON, T_OFF),
             edit_mode: EditMode::new(is_in_edit_mode),
             variable,
@@ -409,10 +405,10 @@ pub enum Field<'a> {
 }
 
 impl<'a> Field<'a> {
-    pub fn from_numerical(variable: &'a Cell<u16>, initial_value: u16, parameters: Format) -> Self {
+    pub fn from_numerical(variable: &'a Cell<u16>, parameters: Format) -> Self {
         const initial_editing_mode: bool = false; // does not start in edit mode
         let numerical_field =
-            NumberInputEditorWidget::new(variable, initial_value, parameters, initial_editing_mode);
+            NumberInputEditorWidget::new(variable, parameters, initial_editing_mode);
         Self::Numerical(numerical_field)
     }
 

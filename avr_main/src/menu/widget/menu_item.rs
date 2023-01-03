@@ -32,7 +32,6 @@ pub struct NumericalParameterArgs<'a> {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
-    //pub variable: &'static mut u16,
     pub parameters: Format,
     pub child: Option<SubMenuHandle>,
     pub variable: &'a Cell<u16>,
@@ -84,8 +83,7 @@ impl<'a> MenuItemWidget<'a> {
     pub fn from_numerical(args: NumericalParameterArgs<'a>) -> MenuItemWidget<'a> {
         let point1 = Point1d::new(args.point1_);
         let point2 = Point1d::new(args.point2_);
-        let initial_value = 20; //(*args.variable).clone();
-        let field = Field::from_numerical(args.variable, initial_value, (args.parameters).clone());
+        let field = Field::from_numerical(args.variable, (args.parameters).clone());
         let mut menu_item = Self::new(point1, args.text, point2, field, args.child);
         menu_item
     }
