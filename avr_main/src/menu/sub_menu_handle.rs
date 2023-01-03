@@ -193,7 +193,7 @@ impl SubMenuTrait for MenuPrograma {
                     variable: &self.value3,
                 }))
             }
-            /*
+
             4 => {
                 Some(MenuItemArgs::Numerical(NumericalParameterArgs {
                     point1_: 1,
@@ -206,6 +206,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -221,6 +222,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -237,6 +239,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -252,6 +255,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -268,6 +272,7 @@ impl SubMenuTrait for MenuPrograma {
                         FlashString::new(&O4),
                     ]),
                     child: None,
+                    variable: &self.value2,
                 }))
             }
 
@@ -283,6 +288,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -298,6 +304,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -313,6 +320,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -328,6 +336,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -343,6 +352,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -359,6 +369,7 @@ impl SubMenuTrait for MenuPrograma {
                         FlashString::new(&O4),
                     ]),
                     child: None,
+                    variable: &self.value2,
                 }))
             }
 
@@ -374,6 +385,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -389,6 +401,7 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
             }
 
@@ -404,8 +417,9 @@ impl SubMenuTrait for MenuPrograma {
                         end: 9999,
                     },
                     child: None,
+                    variable: &self.value3,
                 }))
-            } */
+            }
             _ => None,
         };
 
