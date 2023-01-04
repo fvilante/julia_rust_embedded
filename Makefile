@@ -63,3 +63,7 @@ size:
 	@$(AVR_SIZE) --mcu=$(MCU) $(BUILD_DIR)/avr_main.elf
 	@$(AVR_SIZE) -C --mcu=$(MCU) $(BUILD_DIR)/avr_main.elf
 	
+
+# See in google: "Gource" it is a tool to graphically visualize a repository
+gource:
+	gource  --auto-skip-seconds 1 --seconds-per-day 1 --default-user-image .\temp\fvilante.JPG --highlight-users --highlight-dirs --title Projeto_Julia_Rust_AVR --key --fullscreen
