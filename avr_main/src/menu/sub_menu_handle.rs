@@ -31,7 +31,13 @@ progmem! {
 
 
     static progmem string E0 = "Erro de carga de parametro";
-    static progmem string PARAMETROS_DE_MOVIMENTO = "Parametros de movimento...";
+    static progmem string PARAMETROS_DE_MOVIMENTO = "Parametro de Movimento...";
+    static progmem string PARAMETROS_DE_IMPRESSAO = "Parametros de Impressao...";
+    static progmem string CONFIGURACAO_DO_CICLO = "Configuracao do Ciclo...";
+    static progmem string CONFIGURACAO_DA_IMPRESSORA = "Configuracao da impressora...";
+    static progmem string INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO = "Intertravamento: dois eixos e pas/pas..";
+    static progmem string PARAMETROS_SELECAO_DE_MENSAGEM = "Parametros de Selecao de mensagem...";
+
     static progmem string POSICAO_INICIAL = "Posicao Inicial";
     static progmem string POSICAO_FINAL = "Posicao Final";
     static progmem string VELOCIDADE_DE_AVANCO = "Velocidade de Avanco";
@@ -112,14 +118,14 @@ impl SubMenuHandle {
     }
 }
 
-pub struct MenuPrograma {
+pub struct MenuArquivoDeEixo {
     value0: Cell<u16>,
     value1: Cell<u16>,
     value2: Cell<Cursor>,
     value3: Cell<u16>,
 }
 
-impl MenuPrograma {
+impl MenuArquivoDeEixo {
     pub const fn new() -> Self {
         Self {
             value0: Cell::new(0),
@@ -130,280 +136,45 @@ impl MenuPrograma {
     }
 }
 
-impl SubMenuTrait for MenuPrograma {
+impl SubMenuTrait for MenuArquivoDeEixo {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         let menu_item_args = match index {
             0 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
                 point1_: 1,
                 text: FlashString::new(&PARAMETROS_DE_MOVIMENTO),
-                child: Some(SubMenuHandle::MenuArquivoDeEixo),
+                child: Some(SubMenuHandle::MenuPrograma),
             })),
 
-            1 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_FINAL),
-                    //variable: unsafe { &mut value2 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value1,
-                }))
-            }
+            1 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
+                point1_: 1,
+                text: FlashString::new(&PARAMETROS_DE_IMPRESSAO),
+                child: Some(SubMenuHandle::MenuPrograma),
+            })),
 
-            2 => {
-                Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                    point1_: 1,
-                    point2_: 30,
-                    text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
-                    //variable: unsafe { &mut value3 },
-                    options_list: make_options_buffer_from_array([
-                        FlashString::new(&O1),
-                        FlashString::new(&O2),
-                        FlashString::new(&O3),
-                        FlashString::new(&O4),
-                    ]),
-                    child: Some(SubMenuHandle::MenuArquivoDeEixo),
-                    variable: &self.value2,
-                }))
-            }
+            2 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
+                point1_: 1,
+                text: FlashString::new(&CONFIGURACAO_DO_CICLO),
+                child: Some(SubMenuHandle::MenuPrograma),
+            })),
 
             3 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
                 point1_: 1,
-                text: FlashString::new(&PARAMETROS_DE_MOVIMENTO),
-                child: Some(SubMenuHandle::MenuArquivoDeEixo),
+                text: FlashString::new(&CONFIGURACAO_DA_IMPRESSORA),
+                child: Some(SubMenuHandle::MenuPrograma),
             })),
 
-            4 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_FINAL),
-                    //variable: unsafe { &mut value2 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value3,
-                }))
-            }
+            4 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
+                point1_: 1,
+                text: FlashString::new(&INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO),
+                child: Some(SubMenuHandle::MenuPrograma),
+            })),
 
-            5 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_INICIAL),
-                    //variable: unsafe { &mut value2 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value3,
-                }))
-            }
+            5 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
+                point1_: 1,
+                text: FlashString::new(&PARAMETROS_SELECAO_DE_MENSAGEM),
+                child: Some(SubMenuHandle::MenuPrograma),
+            })),
 
-            //
-            6 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_INICIAL),
-                    //variable: unsafe { &mut value1 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value3,
-                }))
-            }
-
-            7 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_FINAL),
-                    //variable: unsafe { &mut value2 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value3,
-                }))
-            }
-
-            8 => {
-                Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                    point1_: 1,
-                    point2_: 30,
-                    text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
-                    //variable: unsafe { &mut value3 },
-                    options_list: make_options_buffer_from_array([
-                        FlashString::new(&O1),
-                        FlashString::new(&O2),
-                        FlashString::new(&O3),
-                        FlashString::new(&O4),
-                    ]),
-                    child: None,
-                    variable: &self.value2,
-                }))
-            }
-
-            9 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_INICIAL),
-                    //variable: unsafe { &mut value2 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value3,
-                }))
-            }
-
-            10 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_FINAL),
-                    //variable: unsafe { &mut value2 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value3,
-                }))
-            }
-
-            11 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_INICIAL),
-                    //variable: unsafe { &mut value2 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value3,
-                }))
-            }
-
-            12 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_INICIAL),
-                    //variable: unsafe { &mut value1 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value3,
-                }))
-            }
-
-            13 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_FINAL),
-                    //variable: unsafe { &mut value2 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value3,
-                }))
-            }
-
-            14 => {
-                Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                    point1_: 1,
-                    point2_: 30,
-                    text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
-                    //variable: unsafe { &mut value3 },
-                    options_list: make_options_buffer_from_array([
-                        FlashString::new(&O1),
-                        FlashString::new(&O2),
-                        FlashString::new(&O3),
-                        FlashString::new(&O4),
-                    ]),
-                    child: None,
-                    variable: &self.value2,
-                }))
-            }
-
-            15 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_INICIAL),
-                    //variable: unsafe { &mut value2 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value3,
-                }))
-            }
-
-            16 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_FINAL),
-                    //variable: unsafe { &mut value2 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value3,
-                }))
-            }
-
-            17 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_INICIAL),
-                    //variable: unsafe { &mut value2 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value3,
-                }))
-            }
             _ => None,
         };
 
@@ -415,13 +186,13 @@ impl SubMenuTrait for MenuPrograma {
     }
 }
 
-pub struct MenuArquivoDeEixo {
+pub struct MenuPrograma {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
     value2: Cell<u16>,
 }
 
-impl MenuArquivoDeEixo {
+impl MenuPrograma {
     pub const fn new() -> Self {
         Self {
             value0: Cell::new(Cursor::new(0, 2, 1)),
@@ -431,7 +202,7 @@ impl MenuArquivoDeEixo {
     }
 }
 
-impl SubMenuTrait for MenuArquivoDeEixo {
+impl SubMenuTrait for MenuPrograma {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         let menu_item_args = match index {
             0 => {
