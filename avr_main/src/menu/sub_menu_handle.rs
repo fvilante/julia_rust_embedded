@@ -62,13 +62,19 @@ progmem! {
     static progmem string NUMERO_DE_MULTIPLAS_IMPRESSOES = "Numero de multiplas impressoes";
     static progmem string PASSO_DAS_MULTIPLAS_IMPRESSOES = "passo das multiplas impressoes";
 
+    // CONFIGURACAO DE CICLO
+
+    static progmem string RETARDO_NO_START_AUTOMATICO = "Retardo no start automatico";
+    static progmem string RETARDO_NO_START_EXTERNO = "Retardo no start externo";
+    static progmem string START_AUTOMATICO_NO_AVANCO = "Start automatico no avanco";
+    static progmem string START_AUTOMATICO_NO_RETORNO = "Start automatico no retorno";
+    static progmem string MODO_DE_TRABALHO_DO_EIXO = "Modo de trabalho do eixo";
 
 
-
-    static progmem string START_AUTOMATICO_NO_AVANCO = "Start Automatico no Avanco";
-    static progmem string START_AUTOMATICO_NO_RETORNO = "Start Automatico no Retorno";
-    static progmem string LIGADA = "Ligado";
-    static progmem string DESLIGADA = "Deslig";
+    static progmem string LIGADO = "Ligado";
+    static progmem string DESLIGADO = "Deslig";
+    static progmem string CONTINUO = "Contin";
+    static progmem string PASSO_A_PASSO = "PasPas";
     static progmem string O3 = "Juca  ";
     static progmem string O4 = "Nego  ";
 
@@ -84,6 +90,7 @@ struct MenuStorage {
     pub MenuArquivoDeEixo: MenuArquivoDeEixo,
     pub MenuParametrosDeMovimento: MenuParametrosDeMovimento,
     pub MenuParametrosDeImpressao: MenuParametrosDeImpressao,
+    pub MenuParametrosDeCiclo: MenuParametrosDeCiclo,
 }
 
 impl MenuStorage {
@@ -92,6 +99,7 @@ impl MenuStorage {
             MenuArquivoDeEixo: MenuArquivoDeEixo::new(),
             MenuParametrosDeMovimento: MenuParametrosDeMovimento::new(),
             MenuParametrosDeImpressao: MenuParametrosDeImpressao::new(),
+            MenuParametrosDeCiclo: MenuParametrosDeCiclo::new(),
         }
     }
 }
@@ -118,6 +126,7 @@ pub enum SubMenuHandle {
     MenuArquivoDeEixo,
     MenuParametrosDeMovimento,
     MenuParametrosDeImpressao,
+    MenuParametrosDeCiclo,
 }
 impl SubMenuHandle {
     pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
@@ -130,6 +139,9 @@ impl SubMenuHandle {
             },
             SubMenuHandle::MenuParametrosDeImpressao => unsafe {
                 MENU_STORAGE.MenuParametrosDeImpressao.get_item(index)
+            },
+            SubMenuHandle::MenuParametrosDeCiclo => unsafe {
+                MENU_STORAGE.MenuParametrosDeCiclo.get_item(index)
             },
         }
     }
@@ -173,7 +185,7 @@ impl SubMenuTrait for MenuArquivoDeEixo {
             2 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
                 point1_: 1,
                 text: FlashString::new(&CONFIGURACAO_DO_CICLO),
-                child: Some(SubMenuHandle::MenuParametrosDeMovimento),
+                child: Some(SubMenuHandle::MenuParametrosDeCiclo),
             })),
 
             3 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
@@ -413,8 +425,8 @@ impl SubMenuTrait for MenuParametrosDeImpressao {
                 point2_: 30,
                 text: FlashString::new(&MENSAGEM_REVERSA_LIGADA),
                 options_list: make_options_buffer_from_array([
-                    FlashString::new(&LIGADA),
-                    FlashString::new(&DESLIGADA),
+                    FlashString::new(&LIGADO),
+                    FlashString::new(&DESLIGADO),
                 ]),
                 child: None,
                 variable: &self.value0,
@@ -444,6 +456,98 @@ impl SubMenuTrait for MenuParametrosDeImpressao {
                 },
                 child: None,
                 variable: &self.value1,
+            })),
+
+            _ => None,
+        };
+
+        if let Some(menu_args) = menu_item_args {
+            Some(MenuItemWidget::from_menu_args(menu_args))
+        } else {
+            None
+        }
+    }
+}
+
+pub struct MenuParametrosDeCiclo {
+    value0: Cell<Cursor>,
+    value1: Cell<u16>,
+    value2: Cell<u16>,
+}
+
+impl MenuParametrosDeCiclo {
+    pub const fn new() -> Self {
+        Self {
+            value0: Cell::new(Cursor::new(0, 2, 1)),
+            value1: Cell::new(0),
+            value2: Cell::new(0),
+        }
+    }
+}
+
+impl SubMenuTrait for MenuParametrosDeCiclo {
+    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
+        let menu_item_args = match index {
+            0 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&RETARDO_NO_START_AUTOMATICO),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            1 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&RETARDO_NO_START_EXTERNO),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value2,
+            })),
+
+            2 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                point1_: 1,
+                point2_: 30,
+                text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
+                options_list: make_options_buffer_from_array([
+                    FlashString::new(&DESLIGADO),
+                    FlashString::new(&LIGADO),
+                ]),
+                child: None,
+                variable: &self.value0,
+            })),
+
+            3 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                point1_: 1,
+                point2_: 30,
+                text: FlashString::new(&START_AUTOMATICO_NO_RETORNO),
+                options_list: make_options_buffer_from_array([
+                    FlashString::new(&DESLIGADO),
+                    FlashString::new(&LIGADO),
+                ]),
+                child: None,
+                variable: &self.value0,
+            })),
+
+            4 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                point1_: 1,
+                point2_: 30,
+                text: FlashString::new(&MODO_DE_TRABALHO_DO_EIXO),
+                options_list: make_options_buffer_from_array([
+                    FlashString::new(&CONTINUO),
+                    FlashString::new(&PASSO_A_PASSO),
+                ]),
+                child: None,
+                variable: &self.value0,
             })),
 
             _ => None,
