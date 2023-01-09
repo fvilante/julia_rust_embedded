@@ -57,8 +57,7 @@ pub enum MenuItemArgs<'a> {
 pub struct MenuItemWidget<'a> {
     point_a: Point1d,
     caption: Caption,
-    point_b: Point1d,
-    field: Option<Field<'a>>,
+    point_and_field: Option<(Point1d, Field<'a>)>,
     pub child: Option<SubMenuHandle>,
 }
 
@@ -69,14 +68,13 @@ impl<'a> MenuItemWidget<'a> {
         point_a: Point1d,
         text: FlashString,
         point_b: Point1d,
-        field: Option<Field<'a>>,
+        point_and_field: Option<(Point1d, Field<'a>)>,
         child: Option<SubMenuHandle>,
     ) -> Self {
         Self {
             point_a,
             caption: Caption::new(text),
-            point_b,
-            field,
+            point_and_field,
             child,
         }
     }
@@ -85,7 +83,7 @@ impl<'a> MenuItemWidget<'a> {
         let point1 = Point1d::new(args.point1_);
         let point2 = Point1d::new(args.point2_);
         let field = Field::from_numerical(args.variable, (args.parameters).clone());
-        let mut menu_item = Self::new(point1, args.text, point2, Some(field), args.child);
+        let mut menu_item = Self::new(point1, args.text, point2, Some((point2, field)), args.child);
         menu_item
     }
 
@@ -96,7 +94,7 @@ impl<'a> MenuItemWidget<'a> {
         let point2 = Point1d::new(args.point2_);
         let initial_selection = Cursor::new(0, 2, 0); //(*args.variable).clone();
         let field = Field::from_optional(args.variable, options_list_cloned);
-        let mut menu_item = Self::new(point1, args.text, point2, Some(field), args.child);
+        let mut menu_item = Self::new(point1, args.text, point2, Some((point2, field)), args.child);
         menu_item
     }
 
@@ -126,7 +124,7 @@ impl MenuItemWidget<'_> {
 
                 //delegate everything else
                 _ => {
-                    if let Some(field) = &mut self.field {
+                    if let Some((_, field)) = &mut self.point_and_field {
                         field.send_key(key);
                     };
                 }
@@ -136,7 +134,7 @@ impl MenuItemWidget<'_> {
 
     pub fn update(&mut self) {
         self.caption.update();
-        if let Some(field) = &mut self.field {
+        if let Some((_, field)) = &mut self.point_and_field {
             field.update();
         };
     }
@@ -144,9 +142,9 @@ impl MenuItemWidget<'_> {
     pub fn draw(&self, canvas: &mut Canvas, lcd_line: LcdLine) {
         let line = lcd_line as u8;
         let point1: Point<u8> = Point::new(self.point_a.pos, line);
-        let point2: Point<u8> = Point::new(self.point_b.pos, line);
         self.caption.draw(canvas, point1);
-        if let Some(field) = &self.field {
+        if let Some((point2, field)) = &self.point_and_field {
+            let point2: Point<u8> = Point::new(point2.pos, line);
             field.draw(canvas, point2);
         };
     }
@@ -154,13 +152,13 @@ impl MenuItemWidget<'_> {
 
 impl MenuItemWidget<'_> {
     pub fn set_edit_mode(&mut self, value: bool) {
-        if let Some(field) = &mut self.field {
+        if let Some((_, field)) = &mut self.point_and_field {
             field.set_edit_mode(value);
         };
     }
 
     pub fn is_in_edit_mode(&self) -> bool {
-        if let Some(field) = &self.field {
+        if let Some((_, field)) = &self.point_and_field {
             field.is_in_edit_mode()
         } else {
             false

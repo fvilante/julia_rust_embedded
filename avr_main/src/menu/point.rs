@@ -10,6 +10,7 @@ impl<T> Point<T> {
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct Point1d<T = u8> {
     pub pos: T,
 }
