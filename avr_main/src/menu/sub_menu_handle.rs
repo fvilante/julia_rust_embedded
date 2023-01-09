@@ -70,11 +70,20 @@ progmem! {
     static progmem string START_AUTOMATICO_NO_RETORNO = "Start automatico no retorno";
     static progmem string MODO_DE_TRABALHO_DO_EIXO = "Modo de trabalho do eixo";
 
+    // CONFIGURACAO DA IMPRESSORA
+
+    static progmem string LOGICA_DO_SINAL_DE_IMPRESSAO = "Logica do sinal de impressao";
+    static progmem string LARGURA_DO_SINAL_DE_IMPRESSAO = "Largura do sinal dimpressao";
+    static progmem string REVERSAO_DE_MENSAGEM_VIA_SERIAL = "Reversao dmensagem via serial";
+    static progmem string SELECAO_DE_MENSAGEM_VIA_SERIAL = "Selecao de mensagem via serial";
+
 
     static progmem string LIGADO = "Ligado";
     static progmem string DESLIGADO = "Deslig";
     static progmem string CONTINUO = "Contin";
     static progmem string PASSO_A_PASSO = "PasPas";
+    static progmem string ABERTO = "Aberto";
+    static progmem string FECHADO = "fechado";
     static progmem string O3 = "Juca  ";
     static progmem string O4 = "Nego  ";
 
@@ -91,6 +100,7 @@ struct MenuStorage {
     pub MenuParametrosDeMovimento: MenuParametrosDeMovimento,
     pub MenuParametrosDeImpressao: MenuParametrosDeImpressao,
     pub MenuParametrosDeCiclo: MenuParametrosDeCiclo,
+    pub MenuConfiguracaoDaImpressora: MenuConfiguracaoDaImpressora,
 }
 
 impl MenuStorage {
@@ -100,6 +110,7 @@ impl MenuStorage {
             MenuParametrosDeMovimento: MenuParametrosDeMovimento::new(),
             MenuParametrosDeImpressao: MenuParametrosDeImpressao::new(),
             MenuParametrosDeCiclo: MenuParametrosDeCiclo::new(),
+            MenuConfiguracaoDaImpressora: MenuConfiguracaoDaImpressora::new(),
         }
     }
 }
@@ -127,6 +138,7 @@ pub enum SubMenuHandle {
     MenuParametrosDeMovimento,
     MenuParametrosDeImpressao,
     MenuParametrosDeCiclo,
+    MenuConfiguracaoDaImpressora,
 }
 impl SubMenuHandle {
     pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
@@ -142,6 +154,9 @@ impl SubMenuHandle {
             },
             SubMenuHandle::MenuParametrosDeCiclo => unsafe {
                 MENU_STORAGE.MenuParametrosDeCiclo.get_item(index)
+            },
+            SubMenuHandle::MenuConfiguracaoDaImpressora => unsafe {
+                MENU_STORAGE.MenuConfiguracaoDaImpressora.get_item(index)
             },
         }
     }
@@ -472,7 +487,6 @@ impl SubMenuTrait for MenuParametrosDeImpressao {
 pub struct MenuParametrosDeCiclo {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
-    value2: Cell<u16>,
 }
 
 impl MenuParametrosDeCiclo {
@@ -480,7 +494,6 @@ impl MenuParametrosDeCiclo {
         Self {
             value0: Cell::new(Cursor::new(0, 2, 1)),
             value1: Cell::new(0),
-            value2: Cell::new(0),
         }
     }
 }
@@ -561,6 +574,82 @@ impl SubMenuTrait for MenuParametrosDeCiclo {
     }
 }
 
+pub struct MenuConfiguracaoDaImpressora {
+    value0: Cell<Cursor>,
+    value1: Cell<u16>,
+}
+
+impl MenuConfiguracaoDaImpressora {
+    pub const fn new() -> Self {
+        Self {
+            value0: Cell::new(Cursor::new(0, 2, 1)),
+            value1: Cell::new(0),
+        }
+    }
+}
+
+impl SubMenuTrait for MenuConfiguracaoDaImpressora {
+    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
+        let menu_item_args = match index {
+            0 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                point1_: 1,
+                point2_: 30,
+                text: FlashString::new(&LOGICA_DO_SINAL_DE_IMPRESSAO),
+                options_list: make_options_buffer_from_array([
+                    FlashString::new(&LIGADO),
+                    FlashString::new(&DESLIGADO),
+                ]),
+                child: None,
+                variable: &self.value0,
+            })),
+
+            1 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&LARGURA_DO_SINAL_DE_IMPRESSAO),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            2 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                point1_: 1,
+                point2_: 30,
+                text: FlashString::new(&REVERSAO_DE_MENSAGEM_VIA_SERIAL),
+                options_list: make_options_buffer_from_array([
+                    FlashString::new(&LIGADO),
+                    FlashString::new(&DESLIGADO),
+                ]),
+                child: None,
+                variable: &self.value0,
+            })),
+
+            3 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                point1_: 1,
+                point2_: 30,
+                text: FlashString::new(&SELECAO_DE_MENSAGEM_VIA_SERIAL),
+                options_list: make_options_buffer_from_array([
+                    FlashString::new(&LIGADO),
+                    FlashString::new(&DESLIGADO),
+                ]),
+                child: None,
+                variable: &self.value0,
+            })),
+
+            _ => None,
+        };
+
+        if let Some(menu_args) = menu_item_args {
+            Some(MenuItemWidget::from_menu_args(menu_args))
+        } else {
+            None
+        }
+    }
+}
 /*
 
 pub struct Teste2 {
