@@ -6,7 +6,10 @@ use lib_1::utils::cursor::Cursor;
 use super::{
     flash::FlashString,
     widget::{
-        menu_item::{MenuItemArgs, MenuItemWidget, NumericalParameterArgs, OptionalParameterArgs},
+        menu_item::{
+            MenuItemArgs, MenuItemWidget, NumericalParameterArgs, OptionalParameterArgs,
+            SubmenuTitleArgs,
+        },
         optional::make_options_buffer_from_array,
         unsigned16_widget::Format,
     },
@@ -28,6 +31,7 @@ progmem! {
 
 
     static progmem string E0 = "Erro de carga de parametro";
+    static progmem string PARAMETROS_DE_MOVIMENTO = "Parametros de movimento...";
     static progmem string POSICAO_INICIAL = "Posicao Inicial";
     static progmem string POSICAO_FINAL = "Posicao Final";
     static progmem string VELOCIDADE_DE_AVANCO = "Velocidade de Avanco";
@@ -129,21 +133,11 @@ impl MenuPrograma {
 impl SubMenuTrait for MenuPrograma {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         let menu_item_args = match index {
-            0 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_INICIAL),
-                    //variable: unsafe { &mut value1 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: Some(SubMenuHandle::MenuArquivoDeEixo),
-                    variable: &self.value0,
-                }))
-            }
+            0 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
+                point1_: 1,
+                text: FlashString::new(&PARAMETROS_DE_MOVIMENTO),
+                child: Some(SubMenuHandle::MenuArquivoDeEixo),
+            })),
 
             1 => {
                 Some(MenuItemArgs::Numerical(NumericalParameterArgs {
@@ -178,21 +172,11 @@ impl SubMenuTrait for MenuPrograma {
                 }))
             }
 
-            3 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_INICIAL),
-                    //variable: unsafe { &mut value2 },
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value3,
-                }))
-            }
+            3 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
+                point1_: 1,
+                text: FlashString::new(&PARAMETROS_DE_MOVIMENTO),
+                child: Some(SubMenuHandle::MenuArquivoDeEixo),
+            })),
 
             4 => {
                 Some(MenuItemArgs::Numerical(NumericalParameterArgs {

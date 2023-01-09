@@ -47,9 +47,16 @@ pub struct OptionalParameterArgs<'a> {
     pub variable: &'a Cell<Cursor>,
 }
 
+pub struct SubmenuTitleArgs {
+    pub point1_: u8,
+    pub text: FlashString,
+    pub child: Option<SubMenuHandle>,
+}
+
 pub enum MenuItemArgs<'a> {
     Numerical(NumericalParameterArgs<'a>),
     Optional(OptionalParameterArgs<'a>),
+    SubmenuTitle(SubmenuTitleArgs),
 }
 
 // -----------------------------------
@@ -95,10 +102,18 @@ impl<'a> MenuItemWidget<'a> {
         menu_item
     }
 
+    pub fn from_submenu_title(args: SubmenuTitleArgs) -> MenuItemWidget<'a> {
+        let point1 = Point1d::new(args.point1_);
+        let text = args.text;
+        let mut menu_item = Self::new((point1, text), None, args.child);
+        menu_item
+    }
+
     pub fn from_menu_args(args: MenuItemArgs<'a>) -> Self {
         match args {
             MenuItemArgs::Numerical(args) => Self::from_numerical(args),
             MenuItemArgs::Optional(args) => Self::from_optional(args),
+            MenuItemArgs::SubmenuTitle(args) => Self::from_submenu_title(args),
         }
     }
 }
