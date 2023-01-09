@@ -206,7 +206,7 @@ impl SubMenuTrait for MenuArquivoDeEixo {
             3 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
                 point1_: 1,
                 text: FlashString::new(&CONFIGURACAO_DA_IMPRESSORA),
-                child: Some(SubMenuHandle::MenuParametrosDeMovimento),
+                child: Some(SubMenuHandle::MenuConfiguracaoDaImpressora),
             })),
 
             4 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
@@ -524,7 +524,7 @@ impl SubMenuTrait for MenuParametrosDeCiclo {
                     end: 9999,
                 },
                 child: None,
-                variable: &self.value2,
+                variable: &self.value1,
             })),
 
             2 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
