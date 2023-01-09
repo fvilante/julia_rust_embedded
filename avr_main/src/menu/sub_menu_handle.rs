@@ -31,6 +31,9 @@ progmem! {
 
 
     static progmem string E0 = "Erro de carga de parametro";
+
+    //ARQUIVO DE EIXO
+
     static progmem string PARAMETROS_DE_MOVIMENTO = "Parametro de Movimento...";
     static progmem string PARAMETROS_DE_IMPRESSAO = "Parametros de Impressao...";
     static progmem string CONFIGURACAO_DO_CICLO = "Configuracao do Ciclo...";
@@ -38,16 +41,34 @@ progmem! {
     static progmem string INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO = "Intertravamento: dois eixos e pas/pas..";
     static progmem string PARAMETROS_SELECAO_DE_MENSAGEM = "Parametros de Selecao de mensagem...";
 
-    static progmem string POSICAO_INICIAL = "Posicao Inicial";
-    static progmem string POSICAO_FINAL = "Posicao Final";
-    static progmem string VELOCIDADE_DE_AVANCO = "Velocidade de Avanco";
-    static progmem string VELOCIDADE_DE_RETORNO = "Velocidade de Retorno";
-    static progmem string S4 = "Aceleracao de Avanco";
-    static progmem string S5 = "Aceleracao de Retorno";
+    // PARAMETROS DE MOVIMENTO
+
+    static progmem string POSICAO_INICIAL = "Posicao inicial";
+    static progmem string POSICAO_FINAL = "Posicao final";
+    static progmem string ACELERACAO_DE_AVANCO = "Aceleracao de avanco";
+    static progmem string ACELERACAO_DE_RETORNO = "Aceleracao de retorno";
+    static progmem string VELOCIDADE_DE_AVANCO = "Velocidade de avanco";
+    static progmem string VELOCIDADE_DE_RETORNO = "Velocidade de retorno";
+
+    // PARAMETROS DE IMPRESSAO
+
+    static progmem string NUMERO_DE_MENSAGEM_NO_AVANCO = "Numero de mensagem no avanco";
+    static progmem string NUMERO_DE_MENSAGEM_NO_RETORNO= "Numero de mensagem no retorno";
+    static progmem string PRIMEIRO_MENSAGEM_NO_AVANCO= "Primeira mensagem no avanco";
+    static progmem string PRIMEIRO_MENSAGEM_NO_RETORNO= "Primeira mensagem no retorno";
+    static progmem string ULTIMA_MENSAGEM_NO_AVANCO = "Ultima mensagem no avanco";
+    static progmem string ULTIMA_MENSAGEM_NO_RETORNO = "Ultima mensagem no retorno";
+    static progmem string MENSAGEM_REVERSA_LIGADA = "Mensagem reversa ligada";
+    static progmem string NUMERO_DE_MULTIPLAS_IMPRESSOES = "Numero de multiplas impressoes";
+    static progmem string PASSO_DAS_MULTIPLAS_IMPRESSOES = "passo das multiplas impressoes";
+
+
+
+
     static progmem string START_AUTOMATICO_NO_AVANCO = "Start Automatico no Avanco";
     static progmem string START_AUTOMATICO_NO_RETORNO = "Start Automatico no Retorno";
-    static progmem string O1 = "Ligado";
-    static progmem string O2 = "Deslig";
+    static progmem string LIGADA = "Ligado";
+    static progmem string DESLIGADA = "Deslig";
     static progmem string O3 = "Juca  ";
     static progmem string O4 = "Nego  ";
 
@@ -60,15 +81,17 @@ progmem! {
 }
 
 struct MenuStorage {
-    pub MenuPrograma: MenuPrograma,
     pub MenuArquivoDeEixo: MenuArquivoDeEixo,
+    pub MenuParametrosDeMovimento: MenuParametrosDeMovimento,
+    pub MenuParametrosDeImpressao: MenuParametrosDeImpressao,
 }
 
 impl MenuStorage {
     pub const fn new() -> Self {
         Self {
-            MenuPrograma: MenuPrograma::new(),
             MenuArquivoDeEixo: MenuArquivoDeEixo::new(),
+            MenuParametrosDeMovimento: MenuParametrosDeMovimento::new(),
+            MenuParametrosDeImpressao: MenuParametrosDeImpressao::new(),
         }
     }
 }
@@ -92,15 +115,21 @@ pub trait SubMenuTrait {
 
 #[derive(Copy, Clone)]
 pub enum SubMenuHandle {
-    MenuPrograma,
     MenuArquivoDeEixo,
+    MenuParametrosDeMovimento,
+    MenuParametrosDeImpressao,
 }
 impl SubMenuHandle {
     pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
         match self {
-            SubMenuHandle::MenuPrograma => unsafe { MENU_STORAGE.MenuPrograma.get_item(index) },
             SubMenuHandle::MenuArquivoDeEixo => unsafe {
                 MENU_STORAGE.MenuArquivoDeEixo.get_item(index)
+            },
+            SubMenuHandle::MenuParametrosDeMovimento => unsafe {
+                MENU_STORAGE.MenuParametrosDeMovimento.get_item(index)
+            },
+            SubMenuHandle::MenuParametrosDeImpressao => unsafe {
+                MENU_STORAGE.MenuParametrosDeImpressao.get_item(index)
             },
         }
     }
@@ -118,21 +147,11 @@ impl SubMenuHandle {
     }
 }
 
-pub struct MenuArquivoDeEixo {
-    value0: Cell<u16>,
-    value1: Cell<u16>,
-    value2: Cell<Cursor>,
-    value3: Cell<u16>,
-}
+pub struct MenuArquivoDeEixo {}
 
 impl MenuArquivoDeEixo {
     pub const fn new() -> Self {
-        Self {
-            value0: Cell::new(0),
-            value1: Cell::new(15),
-            value2: Cell::new(Cursor::new(0, 2, 0)),
-            value3: Cell::new(0),
-        }
+        Self {}
     }
 }
 
@@ -142,37 +161,37 @@ impl SubMenuTrait for MenuArquivoDeEixo {
             0 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
                 point1_: 1,
                 text: FlashString::new(&PARAMETROS_DE_MOVIMENTO),
-                child: Some(SubMenuHandle::MenuPrograma),
+                child: Some(SubMenuHandle::MenuParametrosDeMovimento),
             })),
 
             1 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
                 point1_: 1,
                 text: FlashString::new(&PARAMETROS_DE_IMPRESSAO),
-                child: Some(SubMenuHandle::MenuPrograma),
+                child: Some(SubMenuHandle::MenuParametrosDeImpressao),
             })),
 
             2 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
                 point1_: 1,
                 text: FlashString::new(&CONFIGURACAO_DO_CICLO),
-                child: Some(SubMenuHandle::MenuPrograma),
+                child: Some(SubMenuHandle::MenuParametrosDeMovimento),
             })),
 
             3 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
                 point1_: 1,
                 text: FlashString::new(&CONFIGURACAO_DA_IMPRESSORA),
-                child: Some(SubMenuHandle::MenuPrograma),
+                child: Some(SubMenuHandle::MenuParametrosDeMovimento),
             })),
 
             4 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
                 point1_: 1,
                 text: FlashString::new(&INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO),
-                child: Some(SubMenuHandle::MenuPrograma),
+                child: Some(SubMenuHandle::MenuParametrosDeMovimento),
             })),
 
             5 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
                 point1_: 1,
                 text: FlashString::new(&PARAMETROS_SELECAO_DE_MENSAGEM),
-                child: Some(SubMenuHandle::MenuPrograma),
+                child: Some(SubMenuHandle::MenuParametrosDeMovimento),
             })),
 
             _ => None,
@@ -186,13 +205,13 @@ impl SubMenuTrait for MenuArquivoDeEixo {
     }
 }
 
-pub struct MenuPrograma {
+pub struct MenuParametrosDeMovimento {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
     value2: Cell<u16>,
 }
 
-impl MenuPrograma {
+impl MenuParametrosDeMovimento {
     pub const fn new() -> Self {
         Self {
             value0: Cell::new(Cursor::new(0, 2, 1)),
@@ -202,15 +221,268 @@ impl MenuPrograma {
     }
 }
 
-impl SubMenuTrait for MenuPrograma {
+impl SubMenuTrait for MenuParametrosDeMovimento {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         let menu_item_args = match index {
-            0 => {
+            0 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&POSICAO_INICIAL),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            1 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&POSICAO_FINAL),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            2 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&ACELERACAO_DE_AVANCO),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            3 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&ACELERACAO_DE_RETORNO),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            4 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&VELOCIDADE_DE_AVANCO),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            5 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&VELOCIDADE_DE_RETORNO),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            _ => None,
+        };
+
+        if let Some(menu_args) = menu_item_args {
+            Some(MenuItemWidget::from_menu_args(menu_args))
+        } else {
+            None
+        }
+    }
+}
+
+pub struct MenuParametrosDeImpressao {
+    value0: Cell<Cursor>,
+    value1: Cell<u16>,
+}
+
+impl MenuParametrosDeImpressao {
+    pub const fn new() -> Self {
+        Self {
+            value0: Cell::new(Cursor::new(0, 2, 1)),
+            value1: Cell::new(0),
+        }
+    }
+}
+
+impl SubMenuTrait for MenuParametrosDeImpressao {
+    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
+        let menu_item_args = match index {
+            0 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 35,
+                text: FlashString::new(&NUMERO_DE_MENSAGEM_NO_AVANCO),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 99,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            1 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 35,
+                text: FlashString::new(&NUMERO_DE_MENSAGEM_NO_RETORNO),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 99,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            2 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&PRIMEIRO_MENSAGEM_NO_AVANCO),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            3 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&PRIMEIRO_MENSAGEM_NO_RETORNO),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            4 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&ULTIMA_MENSAGEM_NO_AVANCO),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            5 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&ULTIMA_MENSAGEM_NO_RETORNO),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            6 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                point1_: 1,
+                point2_: 30,
+                text: FlashString::new(&MENSAGEM_REVERSA_LIGADA),
+                options_list: make_options_buffer_from_array([
+                    FlashString::new(&LIGADA),
+                    FlashString::new(&DESLIGADA),
+                ]),
+                child: None,
+                variable: &self.value0,
+            })),
+
+            7 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 35,
+                text: FlashString::new(&NUMERO_DE_MULTIPLAS_IMPRESSOES),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 99,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            8 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&PASSO_DAS_MULTIPLAS_IMPRESSOES),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            _ => None,
+        };
+
+        if let Some(menu_args) = menu_item_args {
+            Some(MenuItemWidget::from_menu_args(menu_args))
+        } else {
+            None
+        }
+    }
+}
+
+/*
+
+pub struct Teste2 {
+    value0: Cell<Cursor>,
+    value1: Cell<u16>,
+    value2: Cell<u16>,
+}
+
+impl Teste2 {
+    pub const fn new() -> Self {
+        Self {
+            value0: Cell::new(Cursor::new(0, 2, 1)),
+            value1: Cell::new(0),
+            value2: Cell::new(0),
+        }
+    }
+}
+
+impl SubMenuTrait for Teste2 {
+    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
+        let menu_item_args = match index {
+            1 => {
                 Some(MenuItemArgs::Optional(OptionalParameterArgs {
                     point1_: 1,
                     point2_: 30,
                     text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
-                    //variable: unsafe { &mut value3 },
                     options_list: make_options_buffer_from_array([
                         FlashString::new(&O1),
                         FlashString::new(&O2),
@@ -222,12 +494,11 @@ impl SubMenuTrait for MenuPrograma {
                 }))
             }
 
-            1 => {
+            0 => {
                 Some(MenuItemArgs::Numerical(NumericalParameterArgs {
                     point1_: 1,
                     point2_: 33,
                     text: FlashString::new(&POSICAO_INICIAL),
-                    //variable: unsafe { &mut value2 },
                     parameters: Format {
                         initial_cursor_position: 0,
                         start: 0,
@@ -243,7 +514,6 @@ impl SubMenuTrait for MenuPrograma {
                     point1_: 1,
                     point2_: 33,
                     text: FlashString::new(&POSICAO_FINAL),
-                    //variable: unsafe { &mut value2 },
                     parameters: Format {
                         initial_cursor_position: 0,
                         start: 0,
@@ -264,3 +534,5 @@ impl SubMenuTrait for MenuPrograma {
         }
     }
 }
+
+ */

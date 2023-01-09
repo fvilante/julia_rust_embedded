@@ -5,7 +5,6 @@ use super::menu_manager::MenuManager;
 use super::point::Point;
 use super::point::Point1d;
 use super::sub_menu_handle::MenuArquivoDeEixo;
-use super::sub_menu_handle::MenuPrograma;
 use super::sub_menu_handle::SubMenuHandle;
 use super::widget::caption::Caption;
 use super::widget::execucao;
