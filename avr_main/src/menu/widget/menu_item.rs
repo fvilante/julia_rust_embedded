@@ -67,7 +67,6 @@ impl<'a> MenuItemWidget<'a> {
     pub fn new(
         point_a: Point1d,
         text: FlashString,
-        point_b: Point1d,
         point_and_field: Option<(Point1d, Field<'a>)>,
         child: Option<SubMenuHandle>,
     ) -> Self {
@@ -83,7 +82,7 @@ impl<'a> MenuItemWidget<'a> {
         let point1 = Point1d::new(args.point1_);
         let point2 = Point1d::new(args.point2_);
         let field = Field::from_numerical(args.variable, (args.parameters).clone());
-        let mut menu_item = Self::new(point1, args.text, point2, Some((point2, field)), args.child);
+        let mut menu_item = Self::new(point1, args.text, Some((point2, field)), args.child);
         menu_item
     }
 
@@ -94,7 +93,7 @@ impl<'a> MenuItemWidget<'a> {
         let point2 = Point1d::new(args.point2_);
         let initial_selection = Cursor::new(0, 2, 0); //(*args.variable).clone();
         let field = Field::from_optional(args.variable, options_list_cloned);
-        let mut menu_item = Self::new(point1, args.text, point2, Some((point2, field)), args.child);
+        let mut menu_item = Self::new(point1, args.text, Some((point2, field)), args.child);
         menu_item
     }
 
