@@ -133,7 +133,7 @@ impl MenuStorage {
 
 static mut MENU_STORAGE: MenuStorage = MenuStorage::new();
 
-pub trait SubMenuTrait {
+pub trait SubmenuLayout {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget>;
     fn len(&self) -> usize {
         /// TODO: This algoritm may be highly optimized, because the length is obtained instantiating &
@@ -204,7 +204,7 @@ impl MenuArquivoDeEixo {
     }
 }
 
-impl SubMenuTrait for MenuArquivoDeEixo {
+impl SubmenuLayout for MenuArquivoDeEixo {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         let menu_item_args = match index {
             0 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
@@ -270,7 +270,7 @@ impl MenuParametrosDeMovimento {
     }
 }
 
-impl SubMenuTrait for MenuParametrosDeMovimento {
+impl SubmenuLayout for MenuParametrosDeMovimento {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         let menu_item_args = match index {
             0 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
@@ -376,7 +376,7 @@ impl MenuParametrosDeImpressao {
     }
 }
 
-impl SubMenuTrait for MenuParametrosDeImpressao {
+impl SubmenuLayout for MenuParametrosDeImpressao {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         let menu_item_args = match index {
             0 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
@@ -520,7 +520,7 @@ impl MenuParametrosDeCiclo {
     }
 }
 
-impl SubMenuTrait for MenuParametrosDeCiclo {
+impl SubmenuLayout for MenuParametrosDeCiclo {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         let menu_item_args = match index {
             0 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
@@ -610,7 +610,7 @@ impl MenuConfiguracaoDaImpressora {
     }
 }
 
-impl SubMenuTrait for MenuConfiguracaoDaImpressora {
+impl SubmenuLayout for MenuConfiguracaoDaImpressora {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         let menu_item_args = match index {
             0 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
@@ -687,7 +687,7 @@ impl MenuIntertravamentoParaDoisEixos {
     }
 }
 
-impl SubMenuTrait for MenuIntertravamentoParaDoisEixos {
+impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         let menu_item_args = match index {
             0 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
