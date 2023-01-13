@@ -48,6 +48,9 @@ x86_test:
 build:
 	cargo build --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release 
 
+doc:
+	cargo doc --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release --open
+
 # slow because it verifies after write proccess
 upload_slow:
 	#avrdude -v -F -c usbasp -p m328p -Uflash:w:target/avr-atmega328p/release/avr_main:e
