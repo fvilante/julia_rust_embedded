@@ -37,7 +37,7 @@ impl From<u8> for LcdLine {
 
 pub type MenuList<'a> = Vec<MenuItemArgs<'a>, 6>;
 
-/// Controls the state of the navigation on sub menu.
+/// Controls the state of the navigation on sub menu, which is what is the selected line in the list of items.
 ///
 /// TODO: The memory footprint size this struct may be optimized going from 6 bytes to at least 3 bytes if I made a custom Cursor
 /// because `Cursor::Start` is always zero, and `Cursor:End` of `lcd_line_cursor` is always 2 or const statically defined.  

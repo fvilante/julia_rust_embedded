@@ -3,10 +3,15 @@ use core::ops::Range;
 use core::str::FromStr;
 
 use alloc::borrow::ToOwned;
+use avr_progmem::progmem;
 use avr_progmem::wrapper::ProgMem;
 
 use avr_progmem::string::PmString;
 use heapless::String;
+
+progmem! {
+    static progmem string DEFAULT_FLASH_STRING = "";
+}
 
 #[derive(Copy, Clone)]
 pub struct FlashString {
@@ -16,6 +21,12 @@ pub struct FlashString {
     flash_ptr: *const u8,
     /// Number of characters in the flash_ptr. If zero, than the string is considered empty
     length: u8,
+}
+
+impl Default for FlashString {
+    fn default() -> Self {
+        FlashString::new(&DEFAULT_FLASH_STRING)
+    }
 }
 
 /* pub enum FindParam {

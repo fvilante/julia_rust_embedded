@@ -7,8 +7,8 @@ use super::{
     flash::FlashString,
     widget::{
         menu_item::{
-            MenuItemArgs, MenuItemWidget, NumericalParameterArgs, OptionalParameterArgs,
-            SubmenuTitleArgs,
+            MenuItemArgs, MenuItemBuilder, MenuItemWidget, NumericalParameterArgs,
+            OptionalParameterArgs, SubmenuTitleArgs,
         },
         optional::make_options_buffer_from_array,
         unsigned16_widget::Format,
@@ -272,92 +272,42 @@ impl MenuParametrosDeMovimento {
 
 impl SubmenuLayout for MenuParametrosDeMovimento {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
-        let menu_item_args = match index {
-            0 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&POSICAO_INICIAL),
-                parameters: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+        match index {
+            0 => Some(
+                MenuItemBuilder::new_text(&POSICAO_INICIAL)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
-            1 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&POSICAO_FINAL),
-                parameters: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+            1 => Some(
+                MenuItemBuilder::new_text(&POSICAO_FINAL)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
-            2 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&ACELERACAO_DE_AVANCO),
-                parameters: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+            2 => Some(
+                MenuItemBuilder::new_text(&ACELERACAO_DE_AVANCO)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
-            3 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&ACELERACAO_DE_RETORNO),
-                parameters: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
-
-            4 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&VELOCIDADE_DE_AVANCO),
-                parameters: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
-
-            5 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&VELOCIDADE_DE_RETORNO),
-                parameters: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+            3 => Some(
+                MenuItemBuilder::new_text(&ACELERACAO_DE_RETORNO)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
+            4 => Some(
+                MenuItemBuilder::new_text(&VELOCIDADE_DE_AVANCO)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
+            5 => Some(
+                MenuItemBuilder::new_text(&VELOCIDADE_DE_RETORNO)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
             _ => None,
-        };
-
-        if let Some(menu_args) = menu_item_args {
-            Some(MenuItemWidget::from_menu_args(menu_args))
-        } else {
-            None
         }
     }
 }
@@ -383,7 +333,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
                 point1_: 1,
                 point2_: 35,
                 text: FlashString::new(&NUMERO_DE_MENSAGEM_NO_AVANCO),
-                parameters: Format {
+                format: Format {
                     initial_cursor_position: 0,
                     start: 0,
                     end: 99,
@@ -396,7 +346,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
                 point1_: 1,
                 point2_: 35,
                 text: FlashString::new(&NUMERO_DE_MENSAGEM_NO_RETORNO),
-                parameters: Format {
+                format: Format {
                     initial_cursor_position: 0,
                     start: 0,
                     end: 99,
@@ -409,7 +359,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
                 point1_: 1,
                 point2_: 33,
                 text: FlashString::new(&PRIMEIRO_MENSAGEM_NO_AVANCO),
-                parameters: Format {
+                format: Format {
                     initial_cursor_position: 0,
                     start: 0,
                     end: 9999,
@@ -422,7 +372,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
                 point1_: 1,
                 point2_: 33,
                 text: FlashString::new(&PRIMEIRO_MENSAGEM_NO_RETORNO),
-                parameters: Format {
+                format: Format {
                     initial_cursor_position: 0,
                     start: 0,
                     end: 9999,
@@ -435,7 +385,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
                 point1_: 1,
                 point2_: 33,
                 text: FlashString::new(&ULTIMA_MENSAGEM_NO_AVANCO),
-                parameters: Format {
+                format: Format {
                     initial_cursor_position: 0,
                     start: 0,
                     end: 9999,
@@ -448,7 +398,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
                 point1_: 1,
                 point2_: 33,
                 text: FlashString::new(&ULTIMA_MENSAGEM_NO_RETORNO),
-                parameters: Format {
+                format: Format {
                     initial_cursor_position: 0,
                     start: 0,
                     end: 9999,
@@ -473,7 +423,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
                 point1_: 1,
                 point2_: 35,
                 text: FlashString::new(&NUMERO_DE_MULTIPLAS_IMPRESSOES),
-                parameters: Format {
+                format: Format {
                     initial_cursor_position: 0,
                     start: 0,
                     end: 99,
@@ -486,7 +436,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
                 point1_: 1,
                 point2_: 33,
                 text: FlashString::new(&PASSO_DAS_MULTIPLAS_IMPRESSOES),
-                parameters: Format {
+                format: Format {
                     initial_cursor_position: 0,
                     start: 0,
                     end: 9999,
@@ -527,7 +477,7 @@ impl SubmenuLayout for MenuParametrosDeCiclo {
                 point1_: 1,
                 point2_: 33,
                 text: FlashString::new(&RETARDO_NO_START_AUTOMATICO),
-                parameters: Format {
+                format: Format {
                     initial_cursor_position: 0,
                     start: 0,
                     end: 9999,
@@ -540,7 +490,7 @@ impl SubmenuLayout for MenuParametrosDeCiclo {
                 point1_: 1,
                 point2_: 33,
                 text: FlashString::new(&RETARDO_NO_START_EXTERNO),
-                parameters: Format {
+                format: Format {
                     initial_cursor_position: 0,
                     start: 0,
                     end: 9999,
@@ -629,7 +579,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora {
                 point1_: 1,
                 point2_: 33,
                 text: FlashString::new(&LARGURA_DO_SINAL_DE_IMPRESSAO),
-                parameters: Format {
+                format: Format {
                     initial_cursor_position: 0,
                     start: 0,
                     end: 9999,
@@ -694,7 +644,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
                 point1_: 1,
                 point2_: 33,
                 text: FlashString::new(&ANTECIPACAO_DA_SAIDA_DE_START),
-                parameters: Format {
+                format: Format {
                     initial_cursor_position: 0,
                     start: 0,
                     end: 9999,
@@ -743,7 +693,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
                 point1_: 1,
                 point2_: 33,
                 text: FlashString::new(&RETARDO_DO_START_ENTRE_EIXOS),
-                parameters: Format {
+                format: Format {
                     initial_cursor_position: 0,
                     start: 0,
                     end: 9999,
@@ -768,7 +718,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
                 point1_: 1,
                 point2_: 33,
                 text: FlashString::new(&RETARDO_NO_START_PASSO_A_PASSO),
-                parameters: Format {
+                format: Format {
                     initial_cursor_position: 0,
                     start: 0,
                     end: 9999,

@@ -32,7 +32,7 @@ pub struct NumericalParameterArgs<'a> {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
-    pub parameters: Format,
+    pub format: Format,
     pub child: Option<SubMenuHandle>,
     pub variable: &'a Cell<u16>,
 }
@@ -41,7 +41,6 @@ pub struct OptionalParameterArgs<'a> {
     pub point1_: u8,
     pub point2_: u8,
     pub text: FlashString,
-    //pub variable: &'static mut Cursor,
     pub options_list: OptionsBuffer,
     pub child: Option<SubMenuHandle>,
     pub variable: &'a Cell<Cursor>,
@@ -60,6 +59,178 @@ pub enum MenuItemArgs<'a> {
 }
 
 // -----------------------------------
+
+/// Submenu Title and others...
+struct Base {
+    point1: u8,
+    point2: Option<u8>, // only used if has numerical or optional field
+    text: FlashString,
+    child: Option<SubMenuHandle>,
+}
+
+impl Default for Base {
+    fn default() -> Self {
+        Self {
+            point1: Default::default(),
+            point2: None,
+            text: Default::default(),
+            child: None,
+        }
+    }
+}
+
+/// only numerical
+struct Numerical<'a> {
+    format: Format,
+    variable_u16: &'a Cell<u16>,
+}
+
+/// only optional
+struct Optional<'a> {
+    variable_option: &'a Cell<Cursor>,
+    options_list: OptionsBuffer,
+}
+
+/// This is a `builder pattern` to construct MenuItems
+pub struct MenuItemBuilder<'a> {
+    base: Base,
+    numerical: Option<Numerical<'a>>,
+    optional: Option<Optional<'a>>,
+}
+
+impl<'a> MenuItemBuilder<'a> {
+    //
+
+    fn from_numerical(args: NumericalParameterArgs<'a>) -> MenuItemWidget<'a> {
+        let point1 = Point1d::new(args.point1_);
+        let point2 = Point1d::new(args.point2_);
+        let field = Field::from_numerical(args.variable, (args.format).clone());
+        let mut menu_item =
+            MenuItemWidget::new((point1, args.text), Some((point2, field)), args.child);
+        menu_item
+    }
+
+    fn from_optional(args: OptionalParameterArgs<'a>) -> MenuItemWidget<'a> {
+        let mut options_list_cloned = Vec::new();
+        options_list_cloned.clone_from(&args.options_list);
+        let point1 = Point1d::new(args.point1_);
+        let point2 = Point1d::new(args.point2_);
+        let initial_selection = Cursor::new(0, 2, 0); //(*args.variable).clone();
+        let field = Field::from_optional(args.variable, options_list_cloned);
+        let mut menu_item =
+            MenuItemWidget::new((point1, args.text), Some((point2, field)), args.child);
+        menu_item
+    }
+
+    fn from_submenu_title(args: SubmenuTitleArgs) -> MenuItemWidget<'a> {
+        let point1 = Point1d::new(args.point1_);
+        let text = args.text;
+        let mut menu_item = MenuItemWidget::new((point1, text), None, args.child);
+        menu_item
+    }
+
+    fn from_menu_args(args: MenuItemArgs<'a>) -> MenuItemWidget<'a> {
+        match args {
+            MenuItemArgs::Numerical(args) => Self::from_numerical(args),
+            MenuItemArgs::Optional(args) => Self::from_optional(args),
+            MenuItemArgs::SubmenuTitle(args) => Self::from_submenu_title(args),
+        }
+    }
+
+    //
+
+    pub fn new_text<const N: usize>(val: &PmString<N>) -> Self {
+        Self {
+            base: Base {
+                point1: 1,
+                point2: None,
+                text: FlashString::new(val),
+                child: None,
+            },
+            numerical: None,
+            optional: None,
+        }
+    }
+
+    pub fn add_numerical_variable(
+        &mut self,
+        variable: &'a Cell<u16>,
+        valid_range: Option<Range<u16>>,
+        point2: u8,
+    ) -> &mut Self {
+        let valid_range = if let Some(valid_range) = valid_range {
+            valid_range
+        } else {
+            let full_range = 0..0xFFFF;
+            full_range
+        };
+        self.base.point2 = Some(point2);
+        self.numerical = Some(Numerical {
+            format: Format {
+                start: valid_range.start,
+                end: valid_range.end,
+                initial_cursor_position: 0,
+            },
+            variable_u16: variable,
+        });
+        self
+    }
+
+    pub fn add_optional_variable(
+        &mut self,
+        variable: &'a Cell<Cursor>,
+        options_list: OptionsBuffer,
+        point2: u8,
+    ) -> &mut Self {
+        self.base.point2 = Some(point2);
+        self.optional = Some(Optional {
+            variable_option: variable,
+            options_list,
+        });
+        self
+    }
+
+    pub fn add_conection_to_submenu(&mut self, handle: SubMenuHandle) -> &mut Self {
+        self.base.child = Some(handle);
+        self
+    }
+
+    pub fn build(&mut self) -> MenuItemWidget<'a> {
+        ///FIX: If client construct numerical and optional at same time the numerical will be taken and the
+        /// optional will be ignored. It's safe, but it's better to refactor the code so client cannot
+        /// compile this ambiguity.
+        if let Some(numerical) = &mut self.numerical {
+            Self::from_numerical(NumericalParameterArgs {
+                point1_: self.base.point1,
+                point2_: self.base.point2.unwrap_or(30), // point2 defaults to 30
+                text: self.base.text,
+                format: numerical.format,
+                child: self.base.child,
+                variable: numerical.variable_u16,
+            })
+        } else if let Some(optional) = &mut self.optional {
+            let mut options_list_cloned = Vec::new();
+            options_list_cloned.clone_from(&optional.options_list);
+            Self::from_optional(OptionalParameterArgs {
+                point1_: self.base.point1,
+                point2_: self.base.point2.unwrap_or(30), // point2 defaults to 30
+                text: self.base.text,
+                options_list: options_list_cloned,
+                child: self.base.child,
+                variable: optional.variable_option,
+            })
+        } else {
+            // it is submenu caller
+            Self::from_submenu_title(SubmenuTitleArgs {
+                point1_: self.base.point1,
+                text: self.base.text,
+                child: self.base.child,
+            })
+        }
+    }
+}
+
+//
 
 pub struct MenuItemWidget<'a> {
     point_and_caption: (Point1d, Caption),
@@ -86,7 +257,7 @@ impl<'a> MenuItemWidget<'a> {
     pub fn from_numerical(args: NumericalParameterArgs<'a>) -> MenuItemWidget<'a> {
         let point1 = Point1d::new(args.point1_);
         let point2 = Point1d::new(args.point2_);
-        let field = Field::from_numerical(args.variable, (args.parameters).clone());
+        let field = Field::from_numerical(args.variable, (args.format).clone());
         let mut menu_item = Self::new((point1, args.text), Some((point2, field)), args.child);
         menu_item
     }
