@@ -77,6 +77,20 @@ progmem! {
     static progmem string REVERSAO_DE_MENSAGEM_VIA_SERIAL = "Reversao dmensagem via serial";
     static progmem string SELECAO_DE_MENSAGEM_VIA_SERIAL = "Selecao de mensagem via serial";
 
+    // INTERTRAVAMENTO PARA DOIS EIXOS
+
+    static progmem string ANTECIPACAO_DA_SAIDA_DE_START = "Antecipacao da saida de start";
+    static progmem string SAIDA_DE_START_NO_AVANCO = "Saida de Start no avanco";
+    static progmem string SAIDA_DE_START_NO_RETORNO = "Saida de Start no retorno";
+    static progmem string ENTRADA_DE_START_ENTRE_EIXOS = "Entrada de start entre eixos";
+    static progmem string RETARDO_DO_START_ENTRE_EIXOS = "Retardo do start entre eixo";
+    static progmem string START_PELO_TECLADO_E_EXTERNO = "Start pelo teclado e externo";
+    static progmem string RETARDO_NO_SINAL_DE_IMPRESSAO = "Retardo no sinal de impressao";
+    static progmem string RETARDO_NO_START_PASSO_A_PASSO = "Retardo no start passo/passo";
+    static progmem string START_AUTOMATICO_PASSO_A_PASSO = "Start automatico passo/passo";
+    static progmem string SAIDA_START_PASSO_A_PASSO = "Saida de start passo a passo";
+
+    //
 
     static progmem string LIGADO = "Ligado";
     static progmem string DESLIGADO = "Deslig";
@@ -101,6 +115,7 @@ struct MenuStorage {
     pub MenuParametrosDeImpressao: MenuParametrosDeImpressao,
     pub MenuParametrosDeCiclo: MenuParametrosDeCiclo,
     pub MenuConfiguracaoDaImpressora: MenuConfiguracaoDaImpressora,
+    pub MenuIntertravamentoParaDoisEixos: MenuIntertravamentoParaDoisEixos,
 }
 
 impl MenuStorage {
@@ -111,6 +126,7 @@ impl MenuStorage {
             MenuParametrosDeImpressao: MenuParametrosDeImpressao::new(),
             MenuParametrosDeCiclo: MenuParametrosDeCiclo::new(),
             MenuConfiguracaoDaImpressora: MenuConfiguracaoDaImpressora::new(),
+            MenuIntertravamentoParaDoisEixos: MenuIntertravamentoParaDoisEixos::new(),
         }
     }
 }
@@ -139,6 +155,7 @@ pub enum SubMenuHandle {
     MenuParametrosDeImpressao,
     MenuParametrosDeCiclo,
     MenuConfiguracaoDaImpressora,
+    MenuIntertravamentoParaDoisEixos,
 }
 impl SubMenuHandle {
     pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
@@ -157,6 +174,11 @@ impl SubMenuHandle {
             },
             SubMenuHandle::MenuConfiguracaoDaImpressora => unsafe {
                 MENU_STORAGE.MenuConfiguracaoDaImpressora.get_item(index)
+            },
+            SubMenuHandle::MenuIntertravamentoParaDoisEixos => unsafe {
+                MENU_STORAGE
+                    .MenuIntertravamentoParaDoisEixos
+                    .get_item(index)
             },
         }
     }
@@ -212,7 +234,7 @@ impl SubMenuTrait for MenuArquivoDeEixo {
             4 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
                 point1_: 1,
                 text: FlashString::new(&INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO),
-                child: Some(SubMenuHandle::MenuParametrosDeMovimento),
+                child: Some(SubMenuHandle::MenuIntertravamentoParaDoisEixos),
             })),
 
             5 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
@@ -650,6 +672,146 @@ impl SubMenuTrait for MenuConfiguracaoDaImpressora {
         }
     }
 }
+
+pub struct MenuIntertravamentoParaDoisEixos {
+    value0: Cell<Cursor>,
+    value1: Cell<u16>,
+}
+
+impl MenuIntertravamentoParaDoisEixos {
+    pub const fn new() -> Self {
+        Self {
+            value0: Cell::new(Cursor::new(0, 2, 1)),
+            value1: Cell::new(0),
+        }
+    }
+}
+
+impl SubMenuTrait for MenuIntertravamentoParaDoisEixos {
+    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
+        let menu_item_args = match index {
+            0 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&ANTECIPACAO_DA_SAIDA_DE_START),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            1 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                point1_: 1,
+                point2_: 30,
+                text: FlashString::new(&SAIDA_DE_START_NO_AVANCO),
+                options_list: make_options_buffer_from_array([
+                    FlashString::new(&DESLIGADO),
+                    FlashString::new(&LIGADO),
+                ]),
+                child: None,
+                variable: &self.value0,
+            })),
+
+            2 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                point1_: 1,
+                point2_: 30,
+                text: FlashString::new(&SAIDA_DE_START_NO_RETORNO),
+                options_list: make_options_buffer_from_array([
+                    FlashString::new(&DESLIGADO),
+                    FlashString::new(&LIGADO),
+                ]),
+                child: None,
+                variable: &self.value0,
+            })),
+
+            3 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                point1_: 1,
+                point2_: 30,
+                text: FlashString::new(&ENTRADA_DE_START_ENTRE_EIXOS),
+                options_list: make_options_buffer_from_array([
+                    FlashString::new(&DESLIGADO),
+                    FlashString::new(&LIGADO),
+                ]),
+                child: None,
+                variable: &self.value0,
+            })),
+
+            1 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&RETARDO_DO_START_ENTRE_EIXOS),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            3 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                point1_: 1,
+                point2_: 30,
+                text: FlashString::new(&START_PELO_TECLADO_E_EXTERNO),
+                options_list: make_options_buffer_from_array([
+                    FlashString::new(&DESLIGADO),
+                    FlashString::new(&LIGADO),
+                ]),
+                child: None,
+                variable: &self.value0,
+            })),
+
+            1 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
+                point1_: 1,
+                point2_: 33,
+                text: FlashString::new(&RETARDO_NO_START_PASSO_A_PASSO),
+                parameters: Format {
+                    initial_cursor_position: 0,
+                    start: 0,
+                    end: 9999,
+                },
+                child: None,
+                variable: &self.value1,
+            })),
+
+            3 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                point1_: 1,
+                point2_: 30,
+                text: FlashString::new(&START_AUTOMATICO_PASSO_A_PASSO),
+                options_list: make_options_buffer_from_array([
+                    FlashString::new(&DESLIGADO),
+                    FlashString::new(&LIGADO),
+                ]),
+                child: None,
+                variable: &self.value0,
+            })),
+
+            4 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
+                point1_: 1,
+                point2_: 30,
+                text: FlashString::new(&SAIDA_START_PASSO_A_PASSO),
+                options_list: make_options_buffer_from_array([
+                    FlashString::new(&CONTINUO),
+                    FlashString::new(&PASSO_A_PASSO),
+                ]),
+                child: None,
+                variable: &self.value0,
+            })),
+
+            _ => None,
+        };
+
+        if let Some(menu_args) = menu_item_args {
+            Some(MenuItemWidget::from_menu_args(menu_args))
+        } else {
+            None
+        }
+    }
+}
+
 /*
 
 pub struct Teste2 {
