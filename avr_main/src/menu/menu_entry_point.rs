@@ -32,7 +32,6 @@ use crate::menu::accessor::Accessor;
 use crate::menu::flash::FlashSlice;
 use crate::menu::widget::menu_item::make_template_iterator;
 use crate::menu::widget::menu_item::TemplateKind;
-use crate::menu::widget::optional::make_options_buffer_from_array;
 use crate::menu::widget::optional::OptionsBuffer;
 use crate::menu::widget::sub_menu_render::SubMenuRender;
 use crate::menu::widget::unsigned16_widget::Format;

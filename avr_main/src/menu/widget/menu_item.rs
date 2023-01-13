@@ -11,7 +11,7 @@ use crate::{
 
 use super::{
     caption::Caption,
-    optional::OptionsBuffer,
+    optional::{make_options_buffer_from_array, OptionsBuffer},
     sub_menu_render::{LcdLine, SubMenuRender},
     unsigned16_widget::{Content, Field, Format, StringBuffer},
     widget::Editable,
@@ -176,16 +176,16 @@ impl<'a> MenuItemBuilder<'a> {
         self
     }
 
-    pub fn add_optional_variable(
+    pub fn add_optional_variable<const SIZE: usize>(
         &mut self,
         variable: &'a Cell<Cursor>,
-        options_list: OptionsBuffer,
+        options_list: [FlashString; SIZE],
         point2: u8,
     ) -> &mut Self {
         self.base.point2 = Some(point2);
         self.optional = Some(Optional {
             variable_option: variable,
-            options_list,
+            options_list: make_options_buffer_from_array(options_list),
         });
         self
     }

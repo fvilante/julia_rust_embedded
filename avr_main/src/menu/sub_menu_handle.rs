@@ -10,7 +10,6 @@ use super::{
             MenuItemArgs, MenuItemBuilder, MenuItemWidget, NumericalParameterArgs,
             OptionalParameterArgs, SubmenuTitleArgs,
         },
-        optional::make_options_buffer_from_array,
         unsigned16_widget::Format,
     },
 };
@@ -206,50 +205,44 @@ impl MenuArquivoDeEixo {
 
 impl SubmenuLayout for MenuArquivoDeEixo {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
-        let menu_item_args = match index {
-            0 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
-                point1_: 1,
-                text: FlashString::new(&PARAMETROS_DE_MOVIMENTO),
-                child: Some(SubMenuHandle::MenuParametrosDeMovimento),
-            })),
+        match index {
+            0 => Some(
+                MenuItemBuilder::new_text(&PARAMETROS_DE_MOVIMENTO)
+                    .add_conection_to_submenu(SubMenuHandle::MenuParametrosDeMovimento)
+                    .build(),
+            ),
 
-            1 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
-                point1_: 1,
-                text: FlashString::new(&PARAMETROS_DE_IMPRESSAO),
-                child: Some(SubMenuHandle::MenuParametrosDeImpressao),
-            })),
+            1 => Some(
+                MenuItemBuilder::new_text(&PARAMETROS_DE_IMPRESSAO)
+                    .add_conection_to_submenu(SubMenuHandle::MenuParametrosDeImpressao)
+                    .build(),
+            ),
 
-            2 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
-                point1_: 1,
-                text: FlashString::new(&CONFIGURACAO_DO_CICLO),
-                child: Some(SubMenuHandle::MenuParametrosDeCiclo),
-            })),
+            2 => Some(
+                MenuItemBuilder::new_text(&CONFIGURACAO_DO_CICLO)
+                    .add_conection_to_submenu(SubMenuHandle::MenuParametrosDeCiclo)
+                    .build(),
+            ),
 
-            3 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
-                point1_: 1,
-                text: FlashString::new(&CONFIGURACAO_DA_IMPRESSORA),
-                child: Some(SubMenuHandle::MenuConfiguracaoDaImpressora),
-            })),
+            3 => Some(
+                MenuItemBuilder::new_text(&CONFIGURACAO_DA_IMPRESSORA)
+                    .add_conection_to_submenu(SubMenuHandle::MenuConfiguracaoDaImpressora)
+                    .build(),
+            ),
 
-            4 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
-                point1_: 1,
-                text: FlashString::new(&INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO),
-                child: Some(SubMenuHandle::MenuIntertravamentoParaDoisEixos),
-            })),
+            4 => Some(
+                MenuItemBuilder::new_text(&INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO)
+                    .add_conection_to_submenu(SubMenuHandle::MenuIntertravamentoParaDoisEixos)
+                    .build(),
+            ),
 
-            5 => Some(MenuItemArgs::SubmenuTitle(SubmenuTitleArgs {
-                point1_: 1,
-                text: FlashString::new(&PARAMETROS_SELECAO_DE_MENSAGEM),
-                child: Some(SubMenuHandle::MenuParametrosDeMovimento),
-            })),
+            5 => Some(
+                MenuItemBuilder::new_text(&PARAMETROS_SELECAO_DE_MENSAGEM)
+                    .add_conection_to_submenu(SubMenuHandle::MenuParametrosDeMovimento)
+                    .build(),
+            ),
 
             _ => None,
-        };
-
-        if let Some(menu_args) = menu_item_args {
-            Some(MenuItemWidget::from_menu_args(menu_args))
-        } else {
-            None
         }
     }
 }
@@ -328,130 +321,66 @@ impl MenuParametrosDeImpressao {
 
 impl SubmenuLayout for MenuParametrosDeImpressao {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
-        let menu_item_args = match index {
-            0 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 35,
-                text: FlashString::new(&NUMERO_DE_MENSAGEM_NO_AVANCO),
-                format: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 99,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+        match index {
+            0 => Some(
+                MenuItemBuilder::new_text(&NUMERO_DE_MENSAGEM_NO_AVANCO)
+                    .add_numerical_variable(&self.value1, Some(0..99), 33)
+                    .build(),
+            ),
 
-            1 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 35,
-                text: FlashString::new(&NUMERO_DE_MENSAGEM_NO_RETORNO),
-                format: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 99,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+            1 => Some(
+                MenuItemBuilder::new_text(&NUMERO_DE_MENSAGEM_NO_RETORNO)
+                    .add_numerical_variable(&self.value1, Some(0..99), 33)
+                    .build(),
+            ),
 
-            2 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&PRIMEIRO_MENSAGEM_NO_AVANCO),
-                format: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+            2 => Some(
+                MenuItemBuilder::new_text(&PRIMEIRO_MENSAGEM_NO_AVANCO)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
-            3 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&PRIMEIRO_MENSAGEM_NO_RETORNO),
-                format: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+            3 => Some(
+                MenuItemBuilder::new_text(&PRIMEIRO_MENSAGEM_NO_RETORNO)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
-            4 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&ULTIMA_MENSAGEM_NO_AVANCO),
-                format: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+            4 => Some(
+                MenuItemBuilder::new_text(&ULTIMA_MENSAGEM_NO_AVANCO)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
-            5 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&ULTIMA_MENSAGEM_NO_RETORNO),
-                format: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+            5 => Some(
+                MenuItemBuilder::new_text(&ULTIMA_MENSAGEM_NO_RETORNO)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
-            6 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                point1_: 1,
-                point2_: 30,
-                text: FlashString::new(&MENSAGEM_REVERSA_LIGADA),
-                options_list: make_options_buffer_from_array([
-                    FlashString::new(&LIGADO),
-                    FlashString::new(&DESLIGADO),
-                ]),
-                child: None,
-                variable: &self.value0,
-            })),
+            6 => Some(
+                MenuItemBuilder::new_text(&ULTIMA_MENSAGEM_NO_RETORNO)
+                    .add_optional_variable(
+                        &self.value0,
+                        [FlashString::new(&LIGADO), FlashString::new(&DESLIGADO)],
+                        30,
+                    )
+                    .build(),
+            ),
 
-            7 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 35,
-                text: FlashString::new(&NUMERO_DE_MULTIPLAS_IMPRESSOES),
-                format: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 99,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+            7 => Some(
+                MenuItemBuilder::new_text(&NUMERO_DE_MULTIPLAS_IMPRESSOES)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
-            8 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&PASSO_DAS_MULTIPLAS_IMPRESSOES),
-                format: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+            8 => Some(
+                MenuItemBuilder::new_text(&PASSO_DAS_MULTIPLAS_IMPRESSOES)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
             _ => None,
-        };
-
-        if let Some(menu_args) = menu_item_args {
-            Some(MenuItemWidget::from_menu_args(menu_args))
-        } else {
-            None
         }
     }
 }
@@ -472,76 +401,53 @@ impl MenuParametrosDeCiclo {
 
 impl SubmenuLayout for MenuParametrosDeCiclo {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
-        let menu_item_args = match index {
-            0 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&RETARDO_NO_START_AUTOMATICO),
-                format: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+        match index {
+            0 => Some(
+                MenuItemBuilder::new_text(&RETARDO_NO_START_AUTOMATICO)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
-            1 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&RETARDO_NO_START_EXTERNO),
-                format: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+            1 => Some(
+                MenuItemBuilder::new_text(&RETARDO_NO_START_EXTERNO)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
-            2 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                point1_: 1,
-                point2_: 30,
-                text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
-                options_list: make_options_buffer_from_array([
-                    FlashString::new(&DESLIGADO),
-                    FlashString::new(&LIGADO),
-                ]),
-                child: None,
-                variable: &self.value0,
-            })),
+            2 => Some(
+                MenuItemBuilder::new_text(&START_AUTOMATICO_NO_AVANCO)
+                    .add_optional_variable(
+                        &self.value0,
+                        [FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)],
+                        30,
+                    )
+                    .build(),
+            ),
 
-            3 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                point1_: 1,
-                point2_: 30,
-                text: FlashString::new(&START_AUTOMATICO_NO_RETORNO),
-                options_list: make_options_buffer_from_array([
-                    FlashString::new(&DESLIGADO),
-                    FlashString::new(&LIGADO),
-                ]),
-                child: None,
-                variable: &self.value0,
-            })),
+            3 => Some(
+                MenuItemBuilder::new_text(&START_AUTOMATICO_NO_RETORNO)
+                    .add_optional_variable(
+                        &self.value0,
+                        [FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)],
+                        30,
+                    )
+                    .build(),
+            ),
 
-            4 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                point1_: 1,
-                point2_: 30,
-                text: FlashString::new(&MODO_DE_TRABALHO_DO_EIXO),
-                options_list: make_options_buffer_from_array([
-                    FlashString::new(&CONTINUO),
-                    FlashString::new(&PASSO_A_PASSO),
-                ]),
-                child: None,
-                variable: &self.value0,
-            })),
+            4 => Some(
+                MenuItemBuilder::new_text(&MODO_DE_TRABALHO_DO_EIXO)
+                    .add_optional_variable(
+                        &self.value0,
+                        [
+                            FlashString::new(&CONTINUO),
+                            FlashString::new(&PASSO_A_PASSO),
+                        ],
+                        30,
+                    )
+                    .build(),
+            ),
 
             _ => None,
-        };
-
-        if let Some(menu_args) = menu_item_args {
-            Some(MenuItemWidget::from_menu_args(menu_args))
-        } else {
-            None
         }
     }
 }
@@ -562,63 +468,44 @@ impl MenuConfiguracaoDaImpressora {
 
 impl SubmenuLayout for MenuConfiguracaoDaImpressora {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
-        let menu_item_args = match index {
-            0 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                point1_: 1,
-                point2_: 30,
-                text: FlashString::new(&LOGICA_DO_SINAL_DE_IMPRESSAO),
-                options_list: make_options_buffer_from_array([
-                    FlashString::new(&LIGADO),
-                    FlashString::new(&DESLIGADO),
-                ]),
-                child: None,
-                variable: &self.value0,
-            })),
+        match index {
+            0 => Some(
+                MenuItemBuilder::new_text(&LOGICA_DO_SINAL_DE_IMPRESSAO)
+                    .add_optional_variable(
+                        &self.value0,
+                        [FlashString::new(&LIGADO), FlashString::new(&DESLIGADO)],
+                        30,
+                    )
+                    .build(),
+            ),
 
-            1 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&LARGURA_DO_SINAL_DE_IMPRESSAO),
-                format: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+            1 => Some(
+                MenuItemBuilder::new_text(&LARGURA_DO_SINAL_DE_IMPRESSAO)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
-            2 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                point1_: 1,
-                point2_: 30,
-                text: FlashString::new(&REVERSAO_DE_MENSAGEM_VIA_SERIAL),
-                options_list: make_options_buffer_from_array([
-                    FlashString::new(&LIGADO),
-                    FlashString::new(&DESLIGADO),
-                ]),
-                child: None,
-                variable: &self.value0,
-            })),
+            2 => Some(
+                MenuItemBuilder::new_text(&REVERSAO_DE_MENSAGEM_VIA_SERIAL)
+                    .add_optional_variable(
+                        &self.value0,
+                        [FlashString::new(&LIGADO), FlashString::new(&DESLIGADO)],
+                        30,
+                    )
+                    .build(),
+            ),
 
-            3 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                point1_: 1,
-                point2_: 30,
-                text: FlashString::new(&SELECAO_DE_MENSAGEM_VIA_SERIAL),
-                options_list: make_options_buffer_from_array([
-                    FlashString::new(&LIGADO),
-                    FlashString::new(&DESLIGADO),
-                ]),
-                child: None,
-                variable: &self.value0,
-            })),
+            3 => Some(
+                MenuItemBuilder::new_text(&SELECAO_DE_MENSAGEM_VIA_SERIAL)
+                    .add_optional_variable(
+                        &self.value0,
+                        [FlashString::new(&LIGADO), FlashString::new(&DESLIGADO)],
+                        30,
+                    )
+                    .build(),
+            ),
 
             _ => None,
-        };
-
-        if let Some(menu_args) = menu_item_args {
-            Some(MenuItemWidget::from_menu_args(menu_args))
-        } else {
-            None
         }
     }
 }
@@ -639,125 +526,89 @@ impl MenuIntertravamentoParaDoisEixos {
 
 impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
-        let menu_item_args = match index {
-            0 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&ANTECIPACAO_DA_SAIDA_DE_START),
-                format: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+        match index {
+            0 => Some(
+                MenuItemBuilder::new_text(&ANTECIPACAO_DA_SAIDA_DE_START)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
-            1 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                point1_: 1,
-                point2_: 30,
-                text: FlashString::new(&SAIDA_DE_START_NO_AVANCO),
-                options_list: make_options_buffer_from_array([
-                    FlashString::new(&DESLIGADO),
-                    FlashString::new(&LIGADO),
-                ]),
-                child: None,
-                variable: &self.value0,
-            })),
+            1 => Some(
+                MenuItemBuilder::new_text(&SAIDA_DE_START_NO_AVANCO)
+                    .add_optional_variable(
+                        &self.value0,
+                        [FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)],
+                        30,
+                    )
+                    .build(),
+            ),
 
-            2 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                point1_: 1,
-                point2_: 30,
-                text: FlashString::new(&SAIDA_DE_START_NO_RETORNO),
-                options_list: make_options_buffer_from_array([
-                    FlashString::new(&DESLIGADO),
-                    FlashString::new(&LIGADO),
-                ]),
-                child: None,
-                variable: &self.value0,
-            })),
+            2 => Some(
+                MenuItemBuilder::new_text(&SAIDA_DE_START_NO_RETORNO)
+                    .add_optional_variable(
+                        &self.value0,
+                        [FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)],
+                        30,
+                    )
+                    .build(),
+            ),
 
-            3 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                point1_: 1,
-                point2_: 30,
-                text: FlashString::new(&ENTRADA_DE_START_ENTRE_EIXOS),
-                options_list: make_options_buffer_from_array([
-                    FlashString::new(&DESLIGADO),
-                    FlashString::new(&LIGADO),
-                ]),
-                child: None,
-                variable: &self.value0,
-            })),
+            3 => Some(
+                MenuItemBuilder::new_text(&ENTRADA_DE_START_ENTRE_EIXOS)
+                    .add_optional_variable(
+                        &self.value0,
+                        [FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)],
+                        30,
+                    )
+                    .build(),
+            ),
 
-            1 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&RETARDO_DO_START_ENTRE_EIXOS),
-                format: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+            1 => Some(
+                MenuItemBuilder::new_text(&RETARDO_DO_START_ENTRE_EIXOS)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
-            3 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                point1_: 1,
-                point2_: 30,
-                text: FlashString::new(&START_PELO_TECLADO_E_EXTERNO),
-                options_list: make_options_buffer_from_array([
-                    FlashString::new(&DESLIGADO),
-                    FlashString::new(&LIGADO),
-                ]),
-                child: None,
-                variable: &self.value0,
-            })),
+            3 => Some(
+                MenuItemBuilder::new_text(&START_PELO_TECLADO_E_EXTERNO)
+                    .add_optional_variable(
+                        &self.value0,
+                        [FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)],
+                        30,
+                    )
+                    .build(),
+            ),
 
-            1 => Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                point1_: 1,
-                point2_: 33,
-                text: FlashString::new(&RETARDO_NO_START_PASSO_A_PASSO),
-                format: Format {
-                    initial_cursor_position: 0,
-                    start: 0,
-                    end: 9999,
-                },
-                child: None,
-                variable: &self.value1,
-            })),
+            1 => Some(
+                MenuItemBuilder::new_text(&RETARDO_NO_START_PASSO_A_PASSO)
+                    .add_numerical_variable(&self.value1, None, 33)
+                    .build(),
+            ),
 
-            3 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                point1_: 1,
-                point2_: 30,
-                text: FlashString::new(&START_AUTOMATICO_PASSO_A_PASSO),
-                options_list: make_options_buffer_from_array([
-                    FlashString::new(&DESLIGADO),
-                    FlashString::new(&LIGADO),
-                ]),
-                child: None,
-                variable: &self.value0,
-            })),
+            3 => Some(
+                MenuItemBuilder::new_text(&START_AUTOMATICO_PASSO_A_PASSO)
+                    .add_optional_variable(
+                        &self.value0,
+                        [FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)],
+                        30,
+                    )
+                    .build(),
+            ),
 
-            4 => Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                point1_: 1,
-                point2_: 30,
-                text: FlashString::new(&SAIDA_START_PASSO_A_PASSO),
-                options_list: make_options_buffer_from_array([
-                    FlashString::new(&CONTINUO),
-                    FlashString::new(&PASSO_A_PASSO),
-                ]),
-                child: None,
-                variable: &self.value0,
-            })),
+            4 => Some(
+                MenuItemBuilder::new_text(&SAIDA_START_PASSO_A_PASSO)
+                    .add_optional_variable(
+                        &self.value0,
+                        [
+                            FlashString::new(&CONTINUO),
+                            FlashString::new(&PASSO_A_PASSO),
+                        ],
+                        30,
+                    )
+                    .build(),
+            ),
 
             _ => None,
-        };
-
-        if let Some(menu_args) = menu_item_args {
-            Some(MenuItemWidget::from_menu_args(menu_args))
-        } else {
-            None
         }
     }
 }
