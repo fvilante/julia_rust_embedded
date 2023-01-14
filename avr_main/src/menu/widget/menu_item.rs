@@ -91,7 +91,7 @@ struct Optional<'a> {
     options_list: OptionsBuffer,
 }
 
-/// This is a `builder pattern` to construct MenuItems
+/// This is a [builder pattern](https://doc.rust-lang.org/1.0.0/style/ownership/builders.html) to construct MenuItems.
 pub struct MenuItemBuilder<'a> {
     base: Base,
     numerical: Option<Numerical<'a>>,
