@@ -176,16 +176,16 @@ impl<'a> MenuItemBuilder<'a> {
         self
     }
 
-    pub fn add_optional_variable<const SIZE: usize>(
+    pub fn add_optional_variable(
         &mut self,
         variable: &'a Cell<Cursor>,
-        options_list: [FlashString; SIZE],
+        options_list: OptionsBuffer,
         point2: u8,
     ) -> &mut Self {
         self.base.point2 = Some(point2);
         self.optional = Some(Optional {
             variable_option: variable,
-            options_list: make_options_buffer_from_array(options_list),
+            options_list,
         });
         self
     }

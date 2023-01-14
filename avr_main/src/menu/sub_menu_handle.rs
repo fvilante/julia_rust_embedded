@@ -10,6 +10,7 @@ use super::{
             MenuItemArgs, MenuItemBuilder, MenuItemWidget, NumericalParameterArgs,
             OptionalParameterArgs, SubmenuTitleArgs,
         },
+        optional::{make_options_buffer_from_array, OptionsBuffer},
         unsigned16_widget::Format,
     },
 };
@@ -144,6 +145,22 @@ pub trait SubmenuLayout {
             }
         }
         return 0;
+    }
+}
+
+struct Options;
+
+impl Options {
+    fn ligado_desligado() -> OptionsBuffer {
+        let options_list = [FlashString::new(&LIGADO), FlashString::new(&DESLIGADO)];
+        make_options_buffer_from_array(options_list)
+    }
+
+    fn continuo_passo_a_passo() -> OptionsBuffer {
+        make_options_buffer_from_array([
+            FlashString::new(&CONTINUO),
+            FlashString::new(&PASSO_A_PASSO),
+        ])
     }
 }
 
@@ -360,11 +377,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
 
             6 => Some(
                 MenuItemBuilder::new_text(&ULTIMA_MENSAGEM_NO_RETORNO)
-                    .add_optional_variable(
-                        &self.value0,
-                        [FlashString::new(&LIGADO), FlashString::new(&DESLIGADO)],
-                        30,
-                    )
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
@@ -416,34 +429,19 @@ impl SubmenuLayout for MenuParametrosDeCiclo {
 
             2 => Some(
                 MenuItemBuilder::new_text(&START_AUTOMATICO_NO_AVANCO)
-                    .add_optional_variable(
-                        &self.value0,
-                        [FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)],
-                        30,
-                    )
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             3 => Some(
                 MenuItemBuilder::new_text(&START_AUTOMATICO_NO_RETORNO)
-                    .add_optional_variable(
-                        &self.value0,
-                        [FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)],
-                        30,
-                    )
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             4 => Some(
                 MenuItemBuilder::new_text(&MODO_DE_TRABALHO_DO_EIXO)
-                    .add_optional_variable(
-                        &self.value0,
-                        [
-                            FlashString::new(&CONTINUO),
-                            FlashString::new(&PASSO_A_PASSO),
-                        ],
-                        30,
-                    )
+                    .add_optional_variable(&self.value0, Options::continuo_passo_a_passo(), 30)
                     .build(),
             ),
 
@@ -471,11 +469,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora {
         match index {
             0 => Some(
                 MenuItemBuilder::new_text(&LOGICA_DO_SINAL_DE_IMPRESSAO)
-                    .add_optional_variable(
-                        &self.value0,
-                        [FlashString::new(&LIGADO), FlashString::new(&DESLIGADO)],
-                        30,
-                    )
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
@@ -487,21 +481,13 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora {
 
             2 => Some(
                 MenuItemBuilder::new_text(&REVERSAO_DE_MENSAGEM_VIA_SERIAL)
-                    .add_optional_variable(
-                        &self.value0,
-                        [FlashString::new(&LIGADO), FlashString::new(&DESLIGADO)],
-                        30,
-                    )
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             3 => Some(
                 MenuItemBuilder::new_text(&SELECAO_DE_MENSAGEM_VIA_SERIAL)
-                    .add_optional_variable(
-                        &self.value0,
-                        [FlashString::new(&LIGADO), FlashString::new(&DESLIGADO)],
-                        30,
-                    )
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
@@ -535,31 +521,19 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
 
             1 => Some(
                 MenuItemBuilder::new_text(&SAIDA_DE_START_NO_AVANCO)
-                    .add_optional_variable(
-                        &self.value0,
-                        [FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)],
-                        30,
-                    )
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             2 => Some(
                 MenuItemBuilder::new_text(&SAIDA_DE_START_NO_RETORNO)
-                    .add_optional_variable(
-                        &self.value0,
-                        [FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)],
-                        30,
-                    )
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             3 => Some(
                 MenuItemBuilder::new_text(&ENTRADA_DE_START_ENTRE_EIXOS)
-                    .add_optional_variable(
-                        &self.value0,
-                        [FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)],
-                        30,
-                    )
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
@@ -571,11 +545,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
 
             3 => Some(
                 MenuItemBuilder::new_text(&START_PELO_TECLADO_E_EXTERNO)
-                    .add_optional_variable(
-                        &self.value0,
-                        [FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)],
-                        30,
-                    )
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
@@ -587,24 +557,13 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
 
             3 => Some(
                 MenuItemBuilder::new_text(&START_AUTOMATICO_PASSO_A_PASSO)
-                    .add_optional_variable(
-                        &self.value0,
-                        [FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)],
-                        30,
-                    )
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             4 => Some(
                 MenuItemBuilder::new_text(&SAIDA_START_PASSO_A_PASSO)
-                    .add_optional_variable(
-                        &self.value0,
-                        [
-                            FlashString::new(&CONTINUO),
-                            FlashString::new(&PASSO_A_PASSO),
-                        ],
-                        30,
-                    )
+                    .add_optional_variable(&self.value0, Options::continuo_passo_a_passo(), 30)
                     .build(),
             ),
 
