@@ -16,10 +16,8 @@ use super::widget::manual_mode::ManualModeMenu;
 use super::widget::manual_mode::ManualModeState;
 use super::widget::menu_item;
 use super::widget::menu_item::MenuItemWidget;
-
 use super::widget::optional::OptionEditorWidget;
 use super::widget::splash::Splash;
-
 use super::widget::unsigned16_widget::Content;
 use super::widget::unsigned16_widget::Field;
 use super::widget::widget_tests::optional_widget_test;
