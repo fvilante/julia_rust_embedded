@@ -20,3 +20,9 @@ impl<T> Point1d<T> {
         Self { pos }
     }
 }
+
+impl From<u8> for Point1d<u8> {
+    fn from(value: u8) -> Self {
+        Point1d::new(value)
+    }
+}

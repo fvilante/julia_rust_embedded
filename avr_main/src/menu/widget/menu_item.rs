@@ -28,38 +28,6 @@ use lib_1::{
 
 // -----------------------------------
 
-pub struct NumericalParameterArgs<'a> {
-    pub point1_: u8,
-    pub point2_: u8,
-    pub text: FlashString,
-    pub format: Format,
-    pub child: Option<SubMenuHandle>,
-    pub variable: &'a Cell<u16>,
-}
-
-pub struct OptionalParameterArgs<'a> {
-    pub point1_: u8,
-    pub point2_: u8,
-    pub text: FlashString,
-    pub options_list: OptionsBuffer,
-    pub child: Option<SubMenuHandle>,
-    pub variable: &'a Cell<Cursor>,
-}
-
-pub struct SubmenuTitleArgs {
-    pub point1_: u8,
-    pub text: FlashString,
-    pub child: Option<SubMenuHandle>,
-}
-
-pub enum MenuItemArgs<'a> {
-    Numerical(NumericalParameterArgs<'a>),
-    Optional(OptionalParameterArgs<'a>),
-    SubmenuTitle(SubmenuTitleArgs),
-}
-
-// -----------------------------------
-
 /// Submenu Title and others...
 struct Base {
     point1: u8,
@@ -99,44 +67,6 @@ pub struct MenuItemBuilder<'a> {
 }
 
 impl<'a> MenuItemBuilder<'a> {
-    //
-
-    fn from_numerical(args: NumericalParameterArgs<'a>) -> MenuItemWidget<'a> {
-        let point1 = Point1d::new(args.point1_);
-        let point2 = Point1d::new(args.point2_);
-        let field = Field::from_numerical(args.variable, (args.format).clone());
-        let mut menu_item =
-            MenuItemWidget::new((point1, args.text), Some((point2, field)), args.child);
-        menu_item
-    }
-
-    fn from_optional(args: OptionalParameterArgs<'a>) -> MenuItemWidget<'a> {
-        let mut options_list_cloned = Vec::new();
-        options_list_cloned.clone_from(&args.options_list);
-        let point1 = Point1d::new(args.point1_);
-        let point2 = Point1d::new(args.point2_);
-        let initial_selection = Cursor::new(0, 2, 0); //(*args.variable).clone();
-        let field = Field::from_optional(args.variable, options_list_cloned);
-        let mut menu_item =
-            MenuItemWidget::new((point1, args.text), Some((point2, field)), args.child);
-        menu_item
-    }
-
-    fn from_submenu_title(args: SubmenuTitleArgs) -> MenuItemWidget<'a> {
-        let point1 = Point1d::new(args.point1_);
-        let text = args.text;
-        let mut menu_item = MenuItemWidget::new((point1, text), None, args.child);
-        menu_item
-    }
-
-    fn from_menu_args(args: MenuItemArgs<'a>) -> MenuItemWidget<'a> {
-        match args {
-            MenuItemArgs::Numerical(args) => Self::from_numerical(args),
-            MenuItemArgs::Optional(args) => Self::from_optional(args),
-            MenuItemArgs::SubmenuTitle(args) => Self::from_submenu_title(args),
-        }
-    }
-
     //
 
     pub fn new_text<const N: usize>(val: &PmString<N>) -> Self {
@@ -196,36 +126,41 @@ impl<'a> MenuItemBuilder<'a> {
     }
 
     pub fn build(&mut self) -> MenuItemWidget<'a> {
+        const default_position_for_point_2: u8 = 30; // TODO: this value should be improved, to be more reasoned and less arbitrary, or eventually a panic with proper error message should be preferable
         ///FIX: If client construct numerical and optional at same time the numerical will be taken and the
         /// optional will be ignored. It's safe, but it's better to refactor the code so client cannot
         /// compile this ambiguity.
         if let Some(numerical) = &mut self.numerical {
-            Self::from_numerical(NumericalParameterArgs {
-                point1_: self.base.point1,
-                point2_: self.base.point2.unwrap_or(30), // point2 defaults to 30
-                text: self.base.text,
-                format: numerical.format,
-                child: self.base.child,
-                variable: numerical.variable_u16,
-            })
+            let point1 = Point1d::new(self.base.point1);
+            let point2 = Point1d::new(self.base.point2.unwrap_or(default_position_for_point_2));
+            let field = Field::from_numerical(numerical.variable_u16, (numerical.format).clone());
+            let mut menu_item = MenuItemWidget::new(
+                (point1, self.base.text),
+                Some((point2, field)),
+                self.base.child,
+            );
+            menu_item
         } else if let Some(optional) = &mut self.optional {
             let mut options_list_cloned = Vec::new();
             options_list_cloned.clone_from(&optional.options_list);
-            Self::from_optional(OptionalParameterArgs {
-                point1_: self.base.point1,
-                point2_: self.base.point2.unwrap_or(30), // point2 defaults to 30
-                text: self.base.text,
-                options_list: options_list_cloned,
-                child: self.base.child,
-                variable: optional.variable_option,
-            })
+            let point1 = Point1d::new(self.base.point1);
+            let point2 = Point1d::new(self.base.point2.unwrap_or(default_position_for_point_2));
+            const number_of_options_available: u8 = 2; // TODO: This is a simplification and not will be always the case in future. Make this avaliation more dynamic and automatic
+            let initial_selection = Cursor::new(0, number_of_options_available, 0); //(*args.variable).clone();
+            let field = Field::from_optional(optional.variable_option, options_list_cloned);
+            let mut menu_item = MenuItemWidget::new(
+                (point1, self.base.text),
+                Some((point2, field)),
+                self.base.child,
+            );
+            menu_item
         } else {
             // it is submenu caller
-            Self::from_submenu_title(SubmenuTitleArgs {
-                point1_: self.base.point1,
-                text: self.base.text,
-                child: self.base.child,
-            })
+            let point1 = Point1d::new(self.base.point1);
+            let text = self.base.text;
+            let child = self.base.child;
+            let mut menu_item = MenuItemWidget::new((point1, text), None, child);
+            menu_item
         }
     }
 }
@@ -251,40 +186,6 @@ impl<'a> MenuItemWidget<'a> {
             point_and_caption: (point_a, Caption::new(text)),
             point_and_field,
             child,
-        }
-    }
-
-    pub fn from_numerical(args: NumericalParameterArgs<'a>) -> MenuItemWidget<'a> {
-        let point1 = Point1d::new(args.point1_);
-        let point2 = Point1d::new(args.point2_);
-        let field = Field::from_numerical(args.variable, (args.format).clone());
-        let mut menu_item = Self::new((point1, args.text), Some((point2, field)), args.child);
-        menu_item
-    }
-
-    pub fn from_optional(args: OptionalParameterArgs<'a>) -> MenuItemWidget<'a> {
-        let mut options_list_cloned = Vec::new();
-        options_list_cloned.clone_from(&args.options_list);
-        let point1 = Point1d::new(args.point1_);
-        let point2 = Point1d::new(args.point2_);
-        let initial_selection = Cursor::new(0, 2, 0); //(*args.variable).clone();
-        let field = Field::from_optional(args.variable, options_list_cloned);
-        let mut menu_item = Self::new((point1, args.text), Some((point2, field)), args.child);
-        menu_item
-    }
-
-    pub fn from_submenu_title(args: SubmenuTitleArgs) -> MenuItemWidget<'a> {
-        let point1 = Point1d::new(args.point1_);
-        let text = args.text;
-        let mut menu_item = Self::new((point1, text), None, args.child);
-        menu_item
-    }
-
-    pub fn from_menu_args(args: MenuItemArgs<'a>) -> Self {
-        match args {
-            MenuItemArgs::Numerical(args) => Self::from_numerical(args),
-            MenuItemArgs::Optional(args) => Self::from_optional(args),
-            MenuItemArgs::SubmenuTitle(args) => Self::from_submenu_title(args),
         }
     }
 }

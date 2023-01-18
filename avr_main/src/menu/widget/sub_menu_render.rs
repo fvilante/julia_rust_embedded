@@ -1,4 +1,4 @@
-use super::menu_item::{MenuItemArgs, MenuItemWidget};
+use super::menu_item::MenuItemWidget;
 use crate::{
     board::keyboard::KeyCode,
     menu::{canvas::Canvas, point::Point, sub_menu_handle::SubMenuHandle},
@@ -35,7 +35,7 @@ impl From<u8> for LcdLine {
     }
 }
 
-pub type MenuList<'a> = Vec<MenuItemArgs<'a>, 6>;
+//pub type MenuList<'a> = Vec<MenuItemArgs<'a>, 6>;
 
 /// Controls the state of the navigation on sub menu, which is what is the selected line in the list of items.
 ///
