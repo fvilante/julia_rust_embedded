@@ -1,13 +1,17 @@
 use super::menu_item::MenuItemWidget;
 use crate::{
     board::keyboard::KeyCode,
-    menu::{canvas::Canvas, point::Point, sub_menu_handle::SubMenuHandle},
+    menu::{
+        canvas::Canvas,
+        point::Point,
+        sub_menu_handle::{MenuStorage, SubMenuHandle},
+    },
     unwrap_option,
 };
 use core::{cell::Cell, ops::Range, slice::Iter};
 use heapless::Vec;
-use lib_1::arena::arena::Arena;
 use lib_1::utils::cursor::Cursor;
+use lib_1::{arena::arena::Arena, utils::common::usize_to_u8_clamper};
 
 /// Helper type to represent each lines of the 40x2 LCD display.
 ///
@@ -39,6 +43,7 @@ impl From<u8> for LcdLine {
 ///
 /// TODO: The memory footprint size this struct may be optimized going from 6 bytes to at least 3 bytes if I made a custom Cursor
 /// because `Cursor::Start` is always zero, and `Cursor:End` of `lcd_line_cursor` is always 2 or const statically defined.  
+/// TODO: Change name to `SubmenuNavigationCursor`
 #[derive(Copy, Clone)]
 pub struct NavigationState {
     /// Controls the line of menu (see: LcdLine) which is current selected.
@@ -48,7 +53,7 @@ pub struct NavigationState {
 }
 
 impl NavigationState {
-    pub fn new_from_submenu_handle(handle: SubMenuHandle) -> Self {
+    pub fn new_from_submenu_len(number_of_menu_items: u8) -> Self {
         /// This application uses a LCD 40 collumns by 2 Lines in future this may be generalized
         const TOTAL_NUMBER_OF_LINES_IN_LCD: u8 = 2;
         Self {
@@ -63,7 +68,7 @@ impl NavigationState {
             first_line_to_render: {
                 let default_initial_menu_item = 0;
                 Cursor::from_range(
-                    0..handle.len() - (TOTAL_NUMBER_OF_LINES_IN_LCD - 1) as usize,
+                    0..number_of_menu_items as usize - (TOTAL_NUMBER_OF_LINES_IN_LCD - 1) as usize,
                     default_initial_menu_item,
                 )
             },
@@ -111,6 +116,7 @@ impl NavigationState {
 
 pub struct SubMenuRender<'a> {
     /// List of all submenu items.
+    menu_storage: &'a MenuStorage,
     current_menu: SubMenuHandle,
     navigation_state: NavigationState,
     /// State of widgets which are currently mounted on screen.
@@ -118,15 +124,16 @@ pub struct SubMenuRender<'a> {
 }
 
 impl<'a> SubMenuRender<'a> {
-    pub fn new(menu_handle: SubMenuHandle) -> Self {
-        let menu_handle_length = menu_handle.len();
+    pub fn new(menu_handle: SubMenuHandle, menu_storage: &'a MenuStorage) -> Self {
+        let menu_handle_length = usize_to_u8_clamper(menu_storage.len(menu_handle));
 
         Self {
+            menu_storage,
             mounted: [
-                menu_handle.get_item(0).unwrap(),
-                menu_handle.get_item(1).unwrap(),
+                menu_storage.get_item(menu_handle, 0).unwrap(),
+                menu_storage.get_item(menu_handle, 1).unwrap(),
             ],
-            navigation_state: NavigationState::new_from_submenu_handle(menu_handle),
+            navigation_state: NavigationState::new_from_submenu_len(menu_handle_length),
             current_menu: menu_handle,
         }
     }
@@ -135,7 +142,10 @@ impl<'a> SubMenuRender<'a> {
     fn mount(&mut self) {
         for lcd_line in LcdLine::iterator() {
             let index = self.navigation_state.get_current_index_for(lcd_line) as usize;
-            let mut menu_item_widget = self.current_menu.get_item(index).unwrap();
+            let mut menu_item_widget = self
+                .menu_storage
+                .get_item(self.current_menu, index)
+                .unwrap();
             if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
                 // mount item
                 *elem = menu_item_widget;
@@ -205,6 +215,7 @@ impl<'a> SubMenuRender<'a> {
 
 impl SubMenuRender<'_> {
     pub fn clone_from(&mut self, origin: Self) {
+        self.menu_storage = origin.menu_storage;
         self.current_menu = origin.current_menu;
         self.navigation_state = origin.navigation_state;
         self.mounted = origin.mounted;
@@ -232,7 +243,7 @@ impl SubMenuRender<'_> {
                     let current_menu_item = self.get_current_selected_mounted_item();
                     if let Some(child_handle) = current_menu_item.child {
                         // TEMP CODE: if current mitem has a child submenu, opens it.
-                        self.clone_from(Self::new(child_handle));
+                        self.clone_from(Self::new(child_handle, self.menu_storage));
                     } else {
                         // Enters edit mode on sub-widgets.
                         current_menu_item.set_edit_mode(true);

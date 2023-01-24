@@ -8,6 +8,7 @@ use super::{
     widget::{
         menu_item::{MenuItemBuilder, MenuItemWidget},
         optional::{make_options_buffer_from_array, OptionsBuffer},
+        sub_menu_render,
         unsigned16_widget::Format,
     },
 };
@@ -106,7 +107,7 @@ progmem! {
     static progmem string ERRO_01 = "Erro de construcao de string";
 }
 
-struct MenuStorage {
+pub struct MenuStorage {
     pub MenuArquivoDeEixo: MenuArquivoDeEixo,
     pub MenuParametrosDeMovimento: MenuParametrosDeMovimento,
     pub MenuParametrosDeImpressao: MenuParametrosDeImpressao,
@@ -126,9 +127,40 @@ impl MenuStorage {
             MenuIntertravamentoParaDoisEixos: MenuIntertravamentoParaDoisEixos::new(),
         }
     }
-}
 
-static mut MENU_STORAGE: MenuStorage = MenuStorage::new();
+    pub fn get_item(&self, submenu_handle: SubMenuHandle, index: usize) -> Option<MenuItemWidget> {
+        match submenu_handle {
+            SubMenuHandle::MenuArquivoDeEixo => unsafe { self.MenuArquivoDeEixo.get_item(index) },
+            SubMenuHandle::MenuParametrosDeMovimento => unsafe {
+                self.MenuParametrosDeMovimento.get_item(index)
+            },
+            SubMenuHandle::MenuParametrosDeImpressao => unsafe {
+                self.MenuParametrosDeImpressao.get_item(index)
+            },
+            SubMenuHandle::MenuParametrosDeCiclo => unsafe {
+                self.MenuParametrosDeCiclo.get_item(index)
+            },
+            SubMenuHandle::MenuConfiguracaoDaImpressora => unsafe {
+                self.MenuConfiguracaoDaImpressora.get_item(index)
+            },
+            SubMenuHandle::MenuIntertravamentoParaDoisEixos => unsafe {
+                self.MenuIntertravamentoParaDoisEixos.get_item(index)
+            },
+        }
+    }
+
+    pub fn len(&self, submenu_handle: SubMenuHandle) -> usize {
+        /// TODO: This algoritm may be highly optimized, because the length is obtained instantiating &
+        /// throwing away all the menu items in memory. A better option may be to restructure datastructures
+        /// to calculate this size in static time.
+        for index in 0..u8::MAX {
+            if let None = self.get_item(submenu_handle, index as usize) {
+                return index as usize;
+            }
+        }
+        return 0;
+    }
+}
 
 pub trait SubmenuLayout {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget>;
@@ -169,44 +201,6 @@ pub enum SubMenuHandle {
     MenuParametrosDeCiclo,
     MenuConfiguracaoDaImpressora,
     MenuIntertravamentoParaDoisEixos,
-}
-impl SubMenuHandle {
-    pub fn get_item<'a>(&self, index: usize) -> Option<MenuItemWidget<'a>> {
-        match self {
-            SubMenuHandle::MenuArquivoDeEixo => unsafe {
-                MENU_STORAGE.MenuArquivoDeEixo.get_item(index)
-            },
-            SubMenuHandle::MenuParametrosDeMovimento => unsafe {
-                MENU_STORAGE.MenuParametrosDeMovimento.get_item(index)
-            },
-            SubMenuHandle::MenuParametrosDeImpressao => unsafe {
-                MENU_STORAGE.MenuParametrosDeImpressao.get_item(index)
-            },
-            SubMenuHandle::MenuParametrosDeCiclo => unsafe {
-                MENU_STORAGE.MenuParametrosDeCiclo.get_item(index)
-            },
-            SubMenuHandle::MenuConfiguracaoDaImpressora => unsafe {
-                MENU_STORAGE.MenuConfiguracaoDaImpressora.get_item(index)
-            },
-            SubMenuHandle::MenuIntertravamentoParaDoisEixos => unsafe {
-                MENU_STORAGE
-                    .MenuIntertravamentoParaDoisEixos
-                    .get_item(index)
-            },
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        /// TODO: This algoritm may be highly optimized, because the length is obtained instantiating &
-        /// throwing away all the menu items in memory. A better option may be to restructure datastructures
-        /// to calculate this size in static time.
-        for index in 0..u8::MAX {
-            if let None = self.get_item(index as usize) {
-                return index as usize;
-            }
-        }
-        return 0;
-    }
 }
 
 pub struct MenuArquivoDeEixo {}

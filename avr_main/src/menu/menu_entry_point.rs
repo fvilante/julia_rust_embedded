@@ -5,6 +5,7 @@ use super::menu_manager::MenuManager;
 use super::point::Point;
 use super::point::Point1d;
 use super::sub_menu_handle::MenuArquivoDeEixo;
+use super::sub_menu_handle::MenuStorage;
 use super::sub_menu_handle::SubMenuHandle;
 use super::widget::caption::Caption;
 use super::widget::execucao;
@@ -71,9 +72,11 @@ pub fn development_entry_point() -> ! {
 
     canvas.render(); */
 
+    let menu_storage: MenuStorage = MenuStorage::new();
+
     let menu_root = SubMenuHandle::MenuArquivoDeEixo;
 
-    let mut submenu = SubMenuRender::new(menu_root);
+    let mut submenu = SubMenuRender::new(menu_root, &menu_storage);
 
     let fps = 30; // frames_per_second
     let mut next_frame: u64 = now() + (1000 / fps);
