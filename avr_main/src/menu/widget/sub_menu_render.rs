@@ -124,17 +124,17 @@ pub struct SubMenuRender<'a> {
 }
 
 impl<'a> SubMenuRender<'a> {
-    pub fn new(menu_handle: SubMenuHandle, menu_storage: &'a MenuStorage) -> Self {
-        let menu_handle_length = usize_to_u8_clamper(menu_storage.len(menu_handle));
+    pub fn new(submenu_handle: SubMenuHandle, menu_storage: &'a MenuStorage) -> Self {
+        let menu_handle_length = usize_to_u8_clamper(menu_storage.len(submenu_handle));
 
         Self {
             menu_storage,
             mounted: [
-                menu_storage.get_item(menu_handle, 0).unwrap(),
-                menu_storage.get_item(menu_handle, 1).unwrap(),
+                menu_storage.get_item(submenu_handle, 0).unwrap(),
+                menu_storage.get_item(submenu_handle, 1).unwrap(),
             ],
             navigation_state: NavigationState::new_from_submenu_len(menu_handle_length),
-            current_menu: menu_handle,
+            current_menu: submenu_handle,
         }
     }
 
