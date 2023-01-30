@@ -229,8 +229,12 @@ impl NumberInputEditor {
         Self::new(initial_content, format)
     }
 
-    ///TODO: Remove this method or make it unnecessary if possible
-    pub fn set_u16(&mut self, value: u16, format: Format) {
+    /// Sets u16 value. If no format is given, it uses current format to set the value
+    pub fn set_u16(&mut self, value: u16, format: Option<Format>) {
+        let format: Format = match format {
+            Some(format) => format,
+            None => self.format,
+        };
         let content = Content::from_u16_formated(value, format.get_number_of_digits());
         self.content_editor = InputEditor::new(content, format.initial_cursor_position);
     }
@@ -262,6 +266,10 @@ impl NumberInputEditor {
     pub fn char_indices(&self) -> CharIndices {
         self.content_editor.content.char_indices()
     }
+
+    pub fn get_format(&self) -> Format {
+        self.format.clone()
+    }
 }
 
 /// This [`Widget`] manages the edition of an number (unsigned integer) by the user using the keyboard and lcd display
@@ -284,6 +292,18 @@ impl<'a> NumberInputEditorWidget<'a> {
             edit_mode: EditMode::new(is_in_edit_mode),
             variable,
         }
+    }
+}
+
+impl Saveble for NumberInputEditorWidget<'_> {
+    fn restore_value(&mut self) {
+        let initial_value = self.variable.get();
+        self.u16_editor.set_u16(initial_value, None);
+    }
+
+    fn save_value(&mut self) {
+        let edited_value = self.u16_editor.as_u16_clamped();
+        self.variable.set(edited_value);
     }
 }
 
@@ -394,6 +414,20 @@ impl Widget for NumberInputEditorWidget<'_> {
     }
 } */
 
+/// Used for objects that may save or restore some content
+/// TODO: Move this trait to a better place (ie: module, file)
+pub trait Saveble {
+    /// Restores original the value from variable to the widget.
+    ///
+    /// This is used to exit the field edition without saving the edited value
+    fn restore_value(&mut self);
+
+    /// Save the edited value by the user in the widget in the memory variable
+    ///
+    /// This is used to save the edited value in the variable.
+    fn save_value(&mut self);
+}
+
 /// Makes possible to edit a position of memory using Lcd display and keyboard
 /// esc abort edition, and enter confirm edition
 ///
@@ -416,6 +450,22 @@ impl<'a> Field<'a> {
         const initial_editing_mode: bool = false; // does not start in edit mode
         let optional = OptionEditorWidget::new(variable, options, initial_editing_mode);
         Self::Optional(optional)
+    }
+}
+
+impl Saveble for Field<'_> {
+    fn restore_value(&mut self) {
+        match self {
+            Self::Numerical(x) => x.restore_value(),
+            Self::Optional(x) => x.restore_value(),
+        }
+    }
+
+    fn save_value(&mut self) {
+        match self {
+            Self::Numerical(x) => x.save_value(),
+            Self::Optional(x) => x.save_value(),
+        }
     }
 }
 

@@ -3,6 +3,7 @@ use core::cell::Cell;
 use heapless::Vec;
 
 use super::edit_mode::EditMode;
+use super::unsigned16_widget::Saveble;
 use super::widget::Widget;
 use crate::board::keyboard::KeyCode;
 use crate::menu::accessor::Accessor;
@@ -28,7 +29,6 @@ pub fn make_options_buffer_from_array<const ArraySize: usize>(
 pub struct OptionEditorWidget<'a> {
     options: OptionsBuffer,
     editing_selection: Cursor,
-    original_selection: Cursor,
     blink: RectangularWave,
     edit_mode: EditMode,
     variable: &'a Cell<Cursor>,
@@ -42,7 +42,6 @@ impl<'a> OptionEditorWidget<'a> {
         Self {
             options: options.clone(),
             editing_selection: initial_value,
-            original_selection: initial_value,
             blink: RectangularWave::new(T_ON, T_OFF),
             edit_mode: EditMode::new(is_in_edit_mode),
             variable,
@@ -68,6 +67,18 @@ impl<'a> OptionEditorWidget<'a> {
             //do not blink
             canvas.print_char(char);
         }
+    }
+}
+
+impl Saveble for OptionEditorWidget<'_> {
+    fn restore_value(&mut self) {
+        let initial_value = self.variable.get();
+        self.editing_selection = initial_value;
+    }
+
+    fn save_value(&mut self) {
+        let edited_value = self.editing_selection;
+        self.variable.set(edited_value);
     }
 }
 

@@ -13,7 +13,7 @@ use super::{
     caption::Caption,
     optional::{make_options_buffer_from_array, OptionsBuffer},
     sub_menu_render::{LcdLine, SubMenuRender},
-    unsigned16_widget::{Content, Field, Format, StringBuffer},
+    unsigned16_widget::{Content, Field, Format, Saveble, StringBuffer},
     widget::Editable,
     widget::Widget,
 };
@@ -190,22 +190,32 @@ impl<'a> MenuItemWidget<'a> {
     }
 }
 
+impl Saveble for MenuItemWidget<'_> {
+    fn restore_value(&mut self) {
+        self.set_edit_mode(false); // terminate the edition
+        let Some((_, field)) = &mut self.point_and_field else { return();};
+        field.restore_value();
+    }
+
+    fn save_value(&mut self) {
+        self.set_edit_mode(false); // terminate the edition
+        let Some((_, field)) = &mut self.point_and_field else { return(); };
+        field.save_value();
+    }
+}
+
 impl MenuItemWidget<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         if self.is_in_edit_mode() {
             match key {
                 // cancel edition
                 KeyCode::KEY_ESC => {
-                    self.set_edit_mode(false); // terminate edition
-                                               // TODO: Restore the value of the widget from the Cell<T>
-                    todo!(); //abort_edition();
+                    self.restore_value();
                 }
 
                 // saves edition
                 KeyCode::KEY_ENTER => {
-                    self.set_edit_mode(false); // terminate edition
-                                               // TODO: Send original value to the Cell<T>
-                    todo!(); //save_edition();
+                    self.save_value();
                 }
 
                 //delegate everything else
