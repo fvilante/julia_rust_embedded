@@ -274,35 +274,59 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
         match index {
             0 => Some(
                 MenuItemBuilder::new_text(&POSICAO_INICIAL)
-                    .add_numerical_variable(&self.model.arquivo_de_eixo.parametro1, None, 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.parametro1,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             1 => Some(
                 MenuItemBuilder::new_text(&POSICAO_FINAL)
-                    .add_numerical_variable(&self.model.arquivo_de_eixo.parametro1, None, 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.parametro1,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             2 => Some(
                 MenuItemBuilder::new_text(&ACELERACAO_DE_AVANCO)
-                    .add_numerical_variable(&self.model.arquivo_de_eixo.parametro1, None, 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.parametro1,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             3 => Some(
                 MenuItemBuilder::new_text(&ACELERACAO_DE_RETORNO)
-                    .add_numerical_variable(&self.model.arquivo_de_eixo.parametro1, None, 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.parametro1,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
             4 => Some(
                 MenuItemBuilder::new_text(&VELOCIDADE_DE_AVANCO)
-                    .add_numerical_variable(&self.model.arquivo_de_eixo.parametro1, None, 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.parametro1,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
             5 => Some(
                 MenuItemBuilder::new_text(&VELOCIDADE_DE_RETORNO)
-                    .add_numerical_variable(&self.model.arquivo_de_eixo.parametro1, None, 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.parametro1,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
@@ -342,25 +366,25 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
 
             2 => Some(
                 MenuItemBuilder::new_text(&PRIMEIRO_MENSAGEM_NO_AVANCO)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             3 => Some(
                 MenuItemBuilder::new_text(&PRIMEIRO_MENSAGEM_NO_RETORNO)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             4 => Some(
                 MenuItemBuilder::new_text(&ULTIMA_MENSAGEM_NO_AVANCO)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             5 => Some(
                 MenuItemBuilder::new_text(&ULTIMA_MENSAGEM_NO_RETORNO)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
@@ -372,13 +396,13 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
 
             7 => Some(
                 MenuItemBuilder::new_text(&NUMERO_DE_MULTIPLAS_IMPRESSOES)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             8 => Some(
                 MenuItemBuilder::new_text(&PASSO_DAS_MULTIPLAS_IMPRESSOES)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
@@ -406,13 +430,13 @@ impl SubmenuLayout for MenuParametrosDeCiclo {
         match index {
             0 => Some(
                 MenuItemBuilder::new_text(&RETARDO_NO_START_AUTOMATICO)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             1 => Some(
                 MenuItemBuilder::new_text(&RETARDO_NO_START_EXTERNO)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
@@ -464,7 +488,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora {
 
             1 => Some(
                 MenuItemBuilder::new_text(&LARGURA_DO_SINAL_DE_IMPRESSAO)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
@@ -504,7 +528,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
         match index {
             0 => Some(
                 MenuItemBuilder::new_text(&ANTECIPACAO_DA_SAIDA_DE_START)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
@@ -528,7 +552,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
 
             1 => Some(
                 MenuItemBuilder::new_text(&RETARDO_DO_START_ENTRE_EIXOS)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
@@ -540,7 +564,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
 
             1 => Some(
                 MenuItemBuilder::new_text(&RETARDO_NO_START_PASSO_A_PASSO)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
