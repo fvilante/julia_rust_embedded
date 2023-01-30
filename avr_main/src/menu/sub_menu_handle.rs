@@ -5,6 +5,7 @@ use lib_1::utils::cursor::Cursor;
 
 use super::{
     flash::FlashString,
+    model::MachineModel,
     widget::{
         menu_item::{MenuItemBuilder, MenuItemWidget},
         optional::{make_options_buffer_from_array, OptionsBuffer},
@@ -107,20 +108,23 @@ progmem! {
     static progmem string ERRO_01 = "Erro de construcao de string";
 }
 
-pub struct MenuStorage {
+/// TODO: Change name to `MenuDefinition`
+pub struct MenuStorage<'a> {
+    model: &'a MachineModel,
     pub MenuArquivoDeEixo: MenuArquivoDeEixo,
-    pub MenuParametrosDeMovimento: MenuParametrosDeMovimento,
+    pub MenuParametrosDeMovimento: MenuParametrosDeMovimento<'a>,
     pub MenuParametrosDeImpressao: MenuParametrosDeImpressao,
     pub MenuParametrosDeCiclo: MenuParametrosDeCiclo,
     pub MenuConfiguracaoDaImpressora: MenuConfiguracaoDaImpressora,
     pub MenuIntertravamentoParaDoisEixos: MenuIntertravamentoParaDoisEixos,
 }
 
-impl MenuStorage {
-    pub const fn new() -> Self {
+impl<'a> MenuStorage<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
         Self {
+            model,
             MenuArquivoDeEixo: MenuArquivoDeEixo::new(),
-            MenuParametrosDeMovimento: MenuParametrosDeMovimento::new(),
+            MenuParametrosDeMovimento: MenuParametrosDeMovimento::new(model),
             MenuParametrosDeImpressao: MenuParametrosDeImpressao::new(),
             MenuParametrosDeCiclo: MenuParametrosDeCiclo::new(),
             MenuConfiguracaoDaImpressora: MenuConfiguracaoDaImpressora::new(),
@@ -255,56 +259,50 @@ impl SubmenuLayout for MenuArquivoDeEixo {
     }
 }
 
-pub struct MenuParametrosDeMovimento {
-    value0: Cell<Cursor>,
-    value1: Cell<u16>,
-    value2: Cell<u16>,
+pub struct MenuParametrosDeMovimento<'a> {
+    model: &'a MachineModel,
 }
 
-impl MenuParametrosDeMovimento {
-    pub const fn new() -> Self {
-        Self {
-            value0: Cell::new(Cursor::new(0, 2, 1)),
-            value1: Cell::new(0),
-            value2: Cell::new(0),
-        }
+impl<'a> MenuParametrosDeMovimento<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
+        Self { model }
     }
 }
 
-impl SubmenuLayout for MenuParametrosDeMovimento {
+impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
                 MenuItemBuilder::new_text(&POSICAO_INICIAL)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.model.arquivo_de_eixo.parametro1, None, 33)
                     .build(),
             ),
 
             1 => Some(
                 MenuItemBuilder::new_text(&POSICAO_FINAL)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.model.arquivo_de_eixo.parametro1, None, 33)
                     .build(),
             ),
 
             2 => Some(
                 MenuItemBuilder::new_text(&ACELERACAO_DE_AVANCO)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.model.arquivo_de_eixo.parametro1, None, 33)
                     .build(),
             ),
 
             3 => Some(
                 MenuItemBuilder::new_text(&ACELERACAO_DE_RETORNO)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.model.arquivo_de_eixo.parametro1, None, 33)
                     .build(),
             ),
             4 => Some(
                 MenuItemBuilder::new_text(&VELOCIDADE_DE_AVANCO)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.model.arquivo_de_eixo.parametro1, None, 33)
                     .build(),
             ),
             5 => Some(
                 MenuItemBuilder::new_text(&VELOCIDADE_DE_RETORNO)
-                    .add_numerical_variable(&self.value1, None, 33)
+                    .add_numerical_variable(&self.model.arquivo_de_eixo.parametro1, None, 33)
                     .build(),
             ),
 

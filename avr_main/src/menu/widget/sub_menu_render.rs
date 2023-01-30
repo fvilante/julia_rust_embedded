@@ -116,7 +116,7 @@ impl NavigationState {
 
 pub struct SubMenuRender<'a> {
     /// List of all submenu items.
-    menu_storage: &'a MenuStorage,
+    menu_storage: &'a MenuStorage<'a>,
     current_menu: SubMenuHandle,
     navigation_state: NavigationState,
     /// State of widgets which are currently mounted on screen.

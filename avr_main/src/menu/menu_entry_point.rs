@@ -2,6 +2,7 @@ use super::canvas::Canvas;
 use super::flash::FlashString;
 use super::keyboard::Keyboard;
 use super::menu_manager::MenuManager;
+use super::model::MachineModel;
 use super::point::Point;
 use super::point::Point1d;
 use super::sub_menu_handle::MenuArquivoDeEixo;
@@ -72,7 +73,9 @@ pub fn development_entry_point() -> ! {
 
     canvas.render(); */
 
-    let menu_storage: MenuStorage = MenuStorage::new();
+    let machine_model = MachineModel::new();
+
+    let menu_storage: MenuStorage = MenuStorage::new(&machine_model);
 
     let menu_root = SubMenuHandle::MenuArquivoDeEixo;
 
