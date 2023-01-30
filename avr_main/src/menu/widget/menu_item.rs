@@ -197,12 +197,14 @@ impl MenuItemWidget<'_> {
                 // cancel edition
                 KeyCode::KEY_ESC => {
                     self.set_edit_mode(false); // terminate edition
+                                               // TODO: Restore the value of the widget from the Cell<T>
                     todo!(); //abort_edition();
                 }
 
                 // saves edition
                 KeyCode::KEY_ENTER => {
                     self.set_edit_mode(false); // terminate edition
+                                               // TODO: Send original value to the Cell<T>
                     todo!(); //save_edition();
                 }
 
