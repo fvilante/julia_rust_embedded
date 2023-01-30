@@ -13,6 +13,7 @@ use crate::{
 };
 
 use super::optional::{OptionEditorWidget, OptionsBuffer};
+use super::widget::Saveble;
 use super::{edit_mode::EditMode, widget::Editable, widget::Widget};
 use lib_1::utils::cursor::Cursor;
 
@@ -413,20 +414,6 @@ impl Widget for NumberInputEditorWidget<'_> {
         number_editor.reset_cursor(self.format.initial_cursor_position);
     }
 } */
-
-/// Used for objects that may save or restore some content
-/// TODO: Move this trait to a better place (ie: module, file)
-pub trait Saveble {
-    /// Restores original the value from variable to the widget.
-    ///
-    /// This is used to exit the field edition without saving the edited value
-    fn restore_value(&mut self);
-
-    /// Save the edited value by the user in the widget in the memory variable
-    ///
-    /// This is used to save the edited value in the variable.
-    fn save_value(&mut self);
-}
 
 /// Makes possible to edit a position of memory using Lcd display and keyboard
 /// esc abort edition, and enter confirm edition

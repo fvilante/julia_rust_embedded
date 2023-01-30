@@ -13,9 +13,9 @@ use super::{
     caption::Caption,
     optional::{make_options_buffer_from_array, OptionsBuffer},
     sub_menu_render::{LcdLine, SubMenuRender},
-    unsigned16_widget::{Content, Field, Format, Saveble, StringBuffer},
+    unsigned16_widget::{Content, Field, Format, StringBuffer},
     widget::Editable,
-    widget::Widget,
+    widget::{Saveble, Widget},
 };
 use avr_progmem::string::PmString;
 use core::{cell::Cell, ops::Range, str::FromStr};

@@ -52,3 +52,16 @@ pub trait Editable {
         }
     }
 }
+
+/// Used for objects (ie: Widgets) that may save or restore some content
+pub trait Saveble {
+    /// Restores original the value from variable to the widget.
+    ///
+    /// This is used to exit the field edition without saving the edited value
+    fn restore_value(&mut self);
+
+    /// Save the edited value by the user in the widget in the memory variable
+    ///
+    /// This is used to save the edited value in the variable.
+    fn save_value(&mut self);
+}
