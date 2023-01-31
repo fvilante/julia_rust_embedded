@@ -37,12 +37,13 @@ fast: build upload_fast size
 
 full: check test build upload_fast size
 
-# under development (unstable) rule
 check:
 	cargo check --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release 
 
+# Try to automatically correct as many warnings as possible. Note: Assure to have `warning` enabled in your main module. Disabled warnings are not fixed.
+# NOTE: you can also use `--allow-dirty --allow-staged` parameters if you want to overwrite fixed files even if they are uncommited in the repository.
 fix:
-	cargo fix --allow-dirty --allow-staged --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release 
+	cargo fix --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release --bins 
 
 # tests in the platform agnostic lib are performed in x86 host
 x86_test: 
