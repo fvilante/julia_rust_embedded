@@ -6,7 +6,6 @@ use ruduino::Pin;
 use crate::board::lcd;
 use crate::microcontroler::delay::{delay_ms, delay_us};
 
-use super::output_expander;
 use super::shiftout::{write_shiftout, ShiftOutData};
 
 const HIGH: bool = true;

@@ -1,6 +1,5 @@
 use core::mem::size_of;
 use core::ops::Range;
-use core::str::FromStr;
 
 use alloc::borrow::ToOwned;
 use avr_progmem::progmem;

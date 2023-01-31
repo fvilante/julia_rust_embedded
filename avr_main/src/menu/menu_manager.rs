@@ -1,10 +1,7 @@
 use super::{
     canvas::Canvas,
     point::Point,
-    widget::{
-        splash::Splash,
-        widget::{IWidget, Widget, WidgetHelper},
-    },
+    widget::widget::{IWidget, Widget, WidgetHelper},
 };
 use crate::board::keyboard::KeyCode;
 

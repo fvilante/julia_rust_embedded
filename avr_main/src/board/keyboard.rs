@@ -1,15 +1,8 @@
 // low-level driver for keypad
 
-use arduino_hal::pac::AC;
-
 use crate::board::lcd;
 
-use super::{
-    input_expander::InputExpander,
-    output_expander::OutputExpander,
-    shiftin::readShiftIn,
-    shiftout::{write_shiftout, ShiftOutData},
-};
+use super::{input_expander::InputExpander, output_expander::OutputExpander};
 
 use crate::microcontroler::delay::delay_ms;
 

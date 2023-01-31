@@ -1,7 +1,6 @@
 use crate::{
-    board::{keyboard::KeyCode, lcd},
+    board::keyboard::KeyCode,
     menu::{
-        accessor::Accessor,
         canvas::Canvas,
         flash::FlashString,
         point::{Point, Point1d},
@@ -11,20 +10,16 @@ use crate::{
 
 use super::{
     caption::Caption,
-    field::optional::{make_options_buffer_from_array, OptionsBuffer},
-    field::unsigned16_widget::{Content, Field, Format},
-    sub_menu_render::{LcdLine, SubMenuRender},
+    field::optional::OptionsBuffer,
+    field::unsigned16_widget::{Field, Format},
+    sub_menu_render::LcdLine,
     widget::Editable,
     widget::{Saveble, Widget},
 };
 use avr_progmem::string::PmString;
-use core::{cell::Cell, ops::Range, str::FromStr};
-use heapless::{String, Vec};
+use core::{cell::Cell, ops::Range};
+use heapless::Vec;
 use lib_1::utils::{common::usize_to_u8_clamper, cursor::Cursor};
-use lib_1::{
-    arena::arena::{Arena, ArenaId},
-    utils::common::convert_u16_to_string_decimal,
-};
 
 // -----------------------------------
 
@@ -134,7 +129,7 @@ impl<'a> MenuItemBuilder<'a> {
             let point1 = Point1d::new(self.base.point1);
             let point2 = Point1d::new(self.base.point2.unwrap_or(default_position_for_point_2));
             let field = Field::from_numerical(numerical.variable_u16, (numerical.format).clone());
-            let mut menu_item = MenuItemWidget::new(
+            let menu_item = MenuItemWidget::new(
                 (point1, self.base.text),
                 Some((point2, field)),
                 self.base.child,
@@ -146,9 +141,9 @@ impl<'a> MenuItemBuilder<'a> {
             let point1 = Point1d::new(self.base.point1);
             let point2 = Point1d::new(self.base.point2.unwrap_or(default_position_for_point_2));
             const number_of_options_available: u8 = 2; // TODO: This is a simplification and not will be always the case in future. Make this avaliation more dynamic and automatic
-            let initial_selection = Cursor::new(0, number_of_options_available, 0); //(*args.variable).clone();
+            let _initial_selection = Cursor::new(0, number_of_options_available, 0); //(*args.variable).clone();
             let field = Field::from_optional(optional.variable_option, options_list_cloned);
-            let mut menu_item = MenuItemWidget::new(
+            let menu_item = MenuItemWidget::new(
                 (point1, self.base.text),
                 Some((point2, field)),
                 self.base.child,
@@ -159,7 +154,7 @@ impl<'a> MenuItemBuilder<'a> {
             let point1 = Point1d::new(self.base.point1);
             let text = self.base.text;
             let child = self.base.child;
-            let mut menu_item = MenuItemWidget::new((point1, text), None, child);
+            let menu_item = MenuItemWidget::new((point1, text), None, child);
             menu_item
         }
     }

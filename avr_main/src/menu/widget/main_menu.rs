@@ -8,7 +8,7 @@ use crate::{
 use super::{
     execucao::MenuExecucao,
     manual_mode::{ManualModeMenu, ManualModeState},
-    widget::{IWidget, Widget},
+    widget::Widget,
 };
 
 progmem! {

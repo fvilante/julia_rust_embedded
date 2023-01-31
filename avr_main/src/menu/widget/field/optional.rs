@@ -5,7 +5,7 @@ use heapless::Vec;
 use super::super::widget::{Saveble, Widget};
 use super::edit_mode::EditMode;
 use crate::board::keyboard::KeyCode;
-use crate::menu::accessor::Accessor;
+
 use crate::menu::canvas::Canvas;
 use crate::menu::flash::FlashString;
 use crate::menu::point::Point;

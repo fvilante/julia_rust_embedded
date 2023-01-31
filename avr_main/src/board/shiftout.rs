@@ -3,9 +3,7 @@
 use ruduino::cores::atmega328p::port;
 use ruduino::Pin;
 
-use crate::microcontroler::delay::{delay_ms, delay_us};
-
-use super::debug::{blink_led3, set_led3};
+use super::debug::set_led3;
 
 const HIGH: bool = true;
 const LOW: bool = false;

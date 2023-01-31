@@ -1,15 +1,20 @@
-#![allow(non_snake_case)] // remove this line when possible
 #![no_std]
 #![no_main]
 #![feature(abi_avr_interrupt)]
 #![feature(alloc_error_handler)] // necessary to execute file ./custom_alloc/alloc_error_handler.rs
-#![feature(panic_info_message)] // necessary to send error messages to the panic_handler
+#![feature(panic_info_message)]
+// necessary to send error messages to the panic_handler
 #![allow(warnings)] // TODO: remove this on future
-#![allow(unused_imports)]
+//#![allow(unused_imports)]
+#![allow(non_snake_case)] // remove this line when possible
 #![allow(dead_code)]
+#![feature(lang_items)] // Necessary to eh_personality and to run "cargo fix" on the code.
 
 extern crate alloc;
 //extern crate avr_std_stub;
+
+#[lang = "eh_personality"]
+extern "C" fn eh_personality() {}
 
 mod board;
 mod cmpp;
@@ -20,7 +25,6 @@ mod microcontroler;
 mod panic;
 mod utils;
 
-use board::lcd;
 use lib_1;
 use microcontroler::timer::init_timer;
 

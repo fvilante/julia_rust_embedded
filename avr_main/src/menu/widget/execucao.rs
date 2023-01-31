@@ -36,7 +36,7 @@ impl MenuExecucao {
 }
 
 impl Widget for MenuExecucao {
-    fn send_key(&mut self, key: KeyCode) {}
+    fn send_key(&mut self, _key: KeyCode) {}
 
     fn update(&mut self) {}
 

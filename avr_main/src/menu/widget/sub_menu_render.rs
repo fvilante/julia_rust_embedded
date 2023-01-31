@@ -6,12 +6,10 @@ use crate::{
         point::Point,
         sub_menu_handle::{MenuStorage, SubMenuHandle},
     },
-    unwrap_option,
 };
-use core::{cell::Cell, ops::Range, slice::Iter};
-use heapless::Vec;
+
+use lib_1::utils::common::usize_to_u8_clamper;
 use lib_1::utils::cursor::Cursor;
-use lib_1::{arena::arena::Arena, utils::common::usize_to_u8_clamper};
 
 /// Helper type to represent each lines of the 40x2 LCD display.
 ///
@@ -142,7 +140,7 @@ impl<'a> SubMenuRender<'a> {
     fn mount(&mut self) {
         for lcd_line in LcdLine::iterator() {
             let index = self.navigation_state.get_current_index_for(lcd_line) as usize;
-            let mut menu_item_widget = self
+            let menu_item_widget = self
                 .menu_storage
                 .get_item(self.current_menu, index)
                 .unwrap();
@@ -203,7 +201,7 @@ impl<'a> SubMenuRender<'a> {
         canvas.set_cursor(Point::new(0, line as u8));
         // draw selector char
         match self.get_line_being_edited() {
-            Some(line) => {
+            Some(_line) => {
                 canvas.print_char(EDITING_CURSOR);
             }
             None => {

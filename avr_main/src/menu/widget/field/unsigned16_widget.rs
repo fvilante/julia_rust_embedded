@@ -2,14 +2,12 @@ use core::cell::Cell;
 use core::ops::Range;
 use core::str::{CharIndices, Chars, FromStr};
 
-use alloc::borrow::ToOwned;
-use heapless::{String, Vec};
+use heapless::String;
 use lib_1::utils::common::{convert_u16_to_string_decimal, usize_to_u8_clamper};
 
-use crate::board::lcd;
 use crate::{
     board::keyboard::KeyCode,
-    menu::{accessor::Accessor, canvas::Canvas, point::Point, ratangular_wave::RectangularWave},
+    menu::{canvas::Canvas, point::Point, ratangular_wave::RectangularWave},
 };
 
 use super::super::widget::Saveble;
@@ -60,7 +58,7 @@ impl Content {
     fn from_u16_formated(data: u16, number_of_digits: u8) -> Content {
         const blacket_char: char = '0';
         let s = convert_u16_to_string_decimal(data);
-        let mut base = Content::from_str(s.as_str()).unwrap();
+        let base = Content::from_str(s.as_str()).unwrap();
         let mut temp = Content::new();
         //leading zeros
         let len = usize_to_u8_clamper(base.len());
