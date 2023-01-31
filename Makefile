@@ -37,9 +37,12 @@ fast: build upload_fast size
 
 full: check test build upload_fast size
 
+# under development (unstable) rule
 check:
 	cargo check --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release 
 
+fix:
+	cargo fix --allow-dirty --allow-staged --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release 
 
 # tests in the platform agnostic lib are performed in x86 host
 x86_test: 
