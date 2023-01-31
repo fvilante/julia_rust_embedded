@@ -2,8 +2,8 @@ use core::cell::Cell;
 
 use heapless::Vec;
 
+use super::super::widget::{Saveble, Widget};
 use super::edit_mode::EditMode;
-use super::widget::{Saveble, Widget};
 use crate::board::keyboard::KeyCode;
 use crate::menu::accessor::Accessor;
 use crate::menu::canvas::Canvas;

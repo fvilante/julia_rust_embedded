@@ -12,9 +12,10 @@ use crate::{
     menu::{accessor::Accessor, canvas::Canvas, point::Point, ratangular_wave::RectangularWave},
 };
 
+use super::super::widget::Saveble;
+use super::super::{widget::Editable, widget::Widget};
+use super::edit_mode::EditMode;
 use super::optional::{OptionEditorWidget, OptionsBuffer};
-use super::widget::Saveble;
-use super::{edit_mode::EditMode, widget::Editable, widget::Widget};
 use lib_1::utils::cursor::Cursor;
 
 /// Sets the max size of the [`Content`] type

@@ -11,9 +11,9 @@ use crate::{
 
 use super::{
     caption::Caption,
-    optional::{make_options_buffer_from_array, OptionsBuffer},
+    field::optional::{make_options_buffer_from_array, OptionsBuffer},
+    field::unsigned16_widget::{Content, Field, Format},
     sub_menu_render::{LcdLine, SubMenuRender},
-    unsigned16_widget::{Content, Field, Format, StringBuffer},
     widget::Editable,
     widget::{Saveble, Widget},
 };
