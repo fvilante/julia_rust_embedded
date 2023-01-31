@@ -53,7 +53,7 @@ pub trait Editable {
     }
 }
 
-/// Used for objects (ie: Widgets) that may save or restore some content
+/// Used for Widgets that may save or restore some content
 pub trait Saveble {
     /// Restores original the value from variable to the widget.
     ///

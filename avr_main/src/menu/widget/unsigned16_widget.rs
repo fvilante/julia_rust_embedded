@@ -396,25 +396,6 @@ impl Widget for NumberInputEditorWidget<'_> {
     }
 }
 
-/* impl NumberInputEditorWidget<'_> {
-    pub fn save_edition(&mut self) {
-        let edited_value = self.u16_editor.as_u16();
-        *self.variable = edited_value; // saves data.
-                                       //TODO: Make below lines unnecessary
-        let number_editor = &mut self.u16_editor;
-        let format = number_editor.set_u16(edited_value, self.format.clone()); // saves displayed data
-        number_editor.reset_cursor(self.format.initial_cursor_position);
-    }
-
-    pub fn abort_edition(&mut self) {
-        let original_value = (*self.variable).clone();
-        //TODO: Make below lines unnecessary
-        let number_editor = &mut self.u16_editor;
-        number_editor.set_u16(original_value, self.format.clone()); // saves displayed data
-        number_editor.reset_cursor(self.format.initial_cursor_position);
-    }
-} */
-
 /// Makes possible to edit a position of memory using Lcd display and keyboard
 /// esc abort edition, and enter confirm edition
 ///
