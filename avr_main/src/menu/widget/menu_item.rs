@@ -170,7 +170,7 @@ impl<'a> MenuItemBuilder<'a> {
 pub struct MenuItemWidget<'a> {
     point_and_caption: (Point1d, Caption),
     point_and_field: Option<(Point1d, Field<'a>)>,
-    child: Option<SubMenuHandle>,
+    pub child: Option<SubMenuHandle>,
 }
 
 impl<'a> MenuItemWidget<'a> {
@@ -187,10 +187,6 @@ impl<'a> MenuItemWidget<'a> {
             point_and_field,
             child,
         }
-    }
-
-    pub fn get_child(&self) -> Option<SubMenuHandle> {
-        self.child
     }
 }
 
