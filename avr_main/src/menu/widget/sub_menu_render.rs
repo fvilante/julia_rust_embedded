@@ -1,6 +1,6 @@
 use super::menu_item::MenuItemWidget;
 use crate::{
-    board::keyboard::KeyCode,
+    board::{keyboard::KeyCode, lcd},
     menu::{
         canvas::Canvas,
         point::Point,
@@ -114,6 +114,13 @@ impl NavigationState {
     }
 }
 
+const MAX_SUBMENU_PARENT_TO_TRACK: usize = 8;
+
+type ParentState = (SubMenuHandle, NavigationState);
+/// TODO: Move this field to a Controler in a MVC pattern
+/// Tracks parent [`SubMenuHandler`] so we can return back to it
+type Parents = Vec<ParentState, MAX_SUBMENU_PARENT_TO_TRACK>;
+
 pub struct SubMenuRender<'a> {
     /// List of all submenu items.
     menu_storage: &'a MenuStorage<'a>,
@@ -121,6 +128,7 @@ pub struct SubMenuRender<'a> {
     navigation_state: NavigationState,
     /// State of widgets which are currently mounted on screen.
     mounted: [MenuItemWidget<'a>; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
+    parents: Parents,
 }
 
 impl<'a> SubMenuRender<'a> {
@@ -135,6 +143,7 @@ impl<'a> SubMenuRender<'a> {
             ],
             navigation_state: NavigationState::new_from_submenu_len(menu_handle_length),
             current_menu: submenu_handle,
+            parents: Vec::new(),
         }
     }
 
@@ -211,14 +220,66 @@ impl<'a> SubMenuRender<'a> {
             }
         }
     }
+
+    /// Go to given submenu
+    fn go_to_submenu(
+        &mut self,
+        submenu: SubMenuHandle,
+        parents: Parents,
+        navigation_state: NavigationState,
+    ) {
+        //self.parents = self.parents // TODO: This field should be static
+        self.clone_from(
+            Self::new(submenu, self.menu_storage),
+            parents,
+            navigation_state,
+        );
+    }
+
+    /// Go to child submenu
+    fn go_to_child(&mut self, child: SubMenuHandle) {
+        // saves it to pop it in future
+        let parent_state: ParentState = (self.current_menu, self.navigation_state);
+        let Ok(_) = self.parents.push(parent_state) else {
+            panic!("Error: MAX_SUBMENU_PARENT_TO_TRACK is not enough")
+        };
+        let mut parents = {
+            let mut vec = Vec::new();
+            vec.clone_from(&self.parents);
+            vec
+        };
+        self.go_to_submenu(child, parents, self.navigation_state)
+    }
+
+    /// Back to parent submenu
+    fn back_to_parent(&mut self) {
+        let Some((parent, parent_navigation_state)) = self.parents.pop() else {
+            // If has no parent to return does nothing
+            return();
+        };
+        let mut parents = {
+            let mut vec = Vec::new();
+            vec.clone_from(&self.parents);
+            vec
+        };
+
+        self.go_to_submenu(parent, parents, parent_navigation_state)
+    }
 }
 
 impl SubMenuRender<'_> {
-    pub fn clone_from(&mut self, origin: Self) {
+    pub fn clone_from(
+        &mut self,
+        origin: Self,
+        parents: Parents,
+        navigation_state: NavigationState,
+    ) {
         self.menu_storage = origin.menu_storage;
         self.current_menu = origin.current_menu;
-        self.navigation_state = origin.navigation_state;
+        self.navigation_state = navigation_state;
         self.mounted = origin.mounted;
+        self.parents = parents;
+        //self.parents = self.parents // TODO: This field should be static
     }
 }
 
@@ -241,15 +302,18 @@ impl SubMenuRender<'_> {
 
                 KeyCode::KEY_ENTER => {
                     let current_menu_item = self.get_current_selected_mounted_item();
-                    if let Some(child_handle) = current_menu_item.child {
-                        // TEMP CODE: if current mitem has a child submenu, opens it.
-                        self.clone_from(Self::new(child_handle, self.menu_storage));
+                    if let Some(child_handle) = current_menu_item.get_child() {
+                        self.go_to_child(child_handle)
                     } else {
                         // Enters edit mode on sub-widgets.
                         current_menu_item.set_edit_mode(true);
                     }
                 }
 
+                /// returns to parent meny if it exists
+                KeyCode::KEY_ESC => {
+                    self.back_to_parent();
+                }
                 _ => {
                     // ignore other keys
                 }
