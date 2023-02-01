@@ -15,8 +15,8 @@ use lib_1::utils::cursor::Cursor;
 
 pub type OptionsBuffer = Vec<FlashString, 5>;
 
-pub fn make_options_buffer_from_array<const ArraySize: usize>(
-    options_list: [FlashString; ArraySize],
+pub fn make_options_buffer_from_array<const ARRAY_SIZE: usize>(
+    options_list: [FlashString; ARRAY_SIZE],
 ) -> OptionsBuffer {
     let mut options: OptionsBuffer = Vec::new();
     for item in options_list {
