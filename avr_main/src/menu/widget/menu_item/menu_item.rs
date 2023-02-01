@@ -11,16 +11,10 @@ use crate::{
 use super::super::{
     caption::Caption,
     field::field::Field,
-    field::numerical::Format,
-    field::optional::OptionsBuffer,
     sub_menu_render::LcdLine,
     widget::Editable,
     widget::{Saveble, Widget},
 };
-use avr_progmem::string::PmString;
-use core::{cell::Cell, ops::Range};
-use heapless::Vec;
-use lib_1::utils::{common::usize_to_u8_clamper, cursor::Cursor};
 
 //
 

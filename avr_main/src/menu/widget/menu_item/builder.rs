@@ -1,29 +1,13 @@
-use crate::{
-    board::keyboard::KeyCode,
-    menu::{
-        canvas::Canvas,
-        flash::FlashString,
-        point::{Point, Point1d},
-        sub_menu_handle::SubMenuHandle,
-    },
-};
+use crate::menu::{flash::FlashString, point::Point1d, sub_menu_handle::SubMenuHandle};
 
 use super::{
-    super::{
-        caption::Caption,
-        field::field::Field,
-        field::numerical::Format,
-        field::optional::OptionsBuffer,
-        sub_menu_render::LcdLine,
-        widget::Editable,
-        widget::{Saveble, Widget},
-    },
+    super::{field::field::Field, field::numerical::Format, field::optional::OptionsBuffer},
     menu_item::MenuItemWidget,
 };
 use avr_progmem::string::PmString;
 use core::{cell::Cell, ops::Range};
 use heapless::Vec;
-use lib_1::utils::{common::usize_to_u8_clamper, cursor::Cursor};
+use lib_1::utils::cursor::Cursor;
 
 /// Submenu Title and others...
 struct Base {
