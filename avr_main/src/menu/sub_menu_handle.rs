@@ -131,17 +131,16 @@ impl<'a> MenuStorage<'a> {
     }
 
     pub fn get_item(&self, submenu_handle: SubMenuHandle, index: usize) -> Option<MenuItemWidget> {
-        use SubMenuHandle;
         match submenu_handle {
-            MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_item(index),
-            MenuParametrosDeMovimento => self.MenuParametrosDeMovimento.get_item(index),
+            SubMenuHandle::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_item(index),
+            SubMenuHandle::MenuParametrosDeMovimento => self.MenuParametrosDeMovimento.get_item(index),
 
-            MenuParametrosDeImpressao => self.MenuParametrosDeImpressao.get_item(index),
+            SubMenuHandle::MenuParametrosDeImpressao => self.MenuParametrosDeImpressao.get_item(index),
 
-            MenuParametrosDeCiclo => self.MenuParametrosDeCiclo.get_item(index),
-            MenuConfiguracaoDaImpressora => self.MenuConfiguracaoDaImpressora.get_item(index),
+            SubMenuHandle::MenuParametrosDeCiclo => self.MenuParametrosDeCiclo.get_item(index),
+            SubMenuHandle::MenuConfiguracaoDaImpressora => self.MenuConfiguracaoDaImpressora.get_item(index),
 
-            MenuIntertravamentoParaDoisEixos => {
+            SubMenuHandle::MenuIntertravamentoParaDoisEixos => {
                 self.MenuIntertravamentoParaDoisEixos.get_item(index)
             }
         }
