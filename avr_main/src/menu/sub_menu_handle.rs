@@ -8,7 +8,8 @@ use super::{
     model::MachineModel,
     widget::{
         field::optional::{make_options_buffer_from_array, OptionsBuffer},
-        menu_item::{MenuItemBuilder, MenuItemWidget},
+        menu_item::builder::MenuItemBuilder,
+        menu_item::menu_item::MenuItemWidget,
     },
 };
 
