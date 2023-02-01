@@ -9,7 +9,7 @@ use core::{cell::Cell, ops::Range};
 use heapless::Vec;
 use lib_1::utils::cursor::Cursor;
 
-/// Submenu Title and others...
+/// Base struct for menu_item builder. Contains usual building options (ie: `Title`, `Child`, etc)
 struct Base {
     point1: u8,
     point2: Option<u8>, // only used if has numerical or optional field
@@ -50,7 +50,7 @@ pub struct MenuItemBuilder<'a> {
 impl<'a> MenuItemBuilder<'a> {
     //
 
-    pub fn new_text<const N: usize>(val: &PmString<N>) -> Self {
+    pub fn from_text<const N: usize>(val: &PmString<N>) -> Self {
         Self {
             base: Base {
                 point1: 1,
@@ -61,6 +61,11 @@ impl<'a> MenuItemBuilder<'a> {
             numerical: None,
             optional: None,
         }
+    }
+
+    pub fn add_conection_to_submenu(&mut self, handle: SubMenuHandle) -> &mut Self {
+        self.base.child = Some(handle);
+        self
     }
 
     pub fn add_numerical_variable(
@@ -98,11 +103,6 @@ impl<'a> MenuItemBuilder<'a> {
             variable_option: variable,
             options_list,
         });
-        self
-    }
-
-    pub fn add_conection_to_submenu(&mut self, handle: SubMenuHandle) -> &mut Self {
-        self.base.child = Some(handle);
         self
     }
 

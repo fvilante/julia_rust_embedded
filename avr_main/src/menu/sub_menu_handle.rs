@@ -219,37 +219,37 @@ impl SubmenuLayout for MenuArquivoDeEixo {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
-                MenuItemBuilder::new_text(&PARAMETROS_DE_MOVIMENTO)
+                MenuItemBuilder::from_text(&PARAMETROS_DE_MOVIMENTO)
                     .add_conection_to_submenu(SubMenuHandle::MenuParametrosDeMovimento)
                     .build(),
             ),
 
             1 => Some(
-                MenuItemBuilder::new_text(&PARAMETROS_DE_IMPRESSAO)
+                MenuItemBuilder::from_text(&PARAMETROS_DE_IMPRESSAO)
                     .add_conection_to_submenu(SubMenuHandle::MenuParametrosDeImpressao)
                     .build(),
             ),
 
             2 => Some(
-                MenuItemBuilder::new_text(&CONFIGURACAO_DO_CICLO)
+                MenuItemBuilder::from_text(&CONFIGURACAO_DO_CICLO)
                     .add_conection_to_submenu(SubMenuHandle::MenuParametrosDeCiclo)
                     .build(),
             ),
 
             3 => Some(
-                MenuItemBuilder::new_text(&CONFIGURACAO_DA_IMPRESSORA)
+                MenuItemBuilder::from_text(&CONFIGURACAO_DA_IMPRESSORA)
                     .add_conection_to_submenu(SubMenuHandle::MenuConfiguracaoDaImpressora)
                     .build(),
             ),
 
             4 => Some(
-                MenuItemBuilder::new_text(&INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO)
+                MenuItemBuilder::from_text(&INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO)
                     .add_conection_to_submenu(SubMenuHandle::MenuIntertravamentoParaDoisEixos)
                     .build(),
             ),
 
             5 => Some(
-                MenuItemBuilder::new_text(&PARAMETROS_SELECAO_DE_MENSAGEM)
+                MenuItemBuilder::from_text(&PARAMETROS_SELECAO_DE_MENSAGEM)
                     .add_conection_to_submenu(SubMenuHandle::MenuParametrosDeMovimento)
                     .build(),
             ),
@@ -273,7 +273,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
-                MenuItemBuilder::new_text(&POSICAO_INICIAL)
+                MenuItemBuilder::from_text(&POSICAO_INICIAL)
                     .add_numerical_variable(
                         &self.model.arquivo_de_eixo.parametro1,
                         Some(0..9999),
@@ -283,7 +283,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
             ),
 
             1 => Some(
-                MenuItemBuilder::new_text(&POSICAO_FINAL)
+                MenuItemBuilder::from_text(&POSICAO_FINAL)
                     .add_numerical_variable(
                         &self.model.arquivo_de_eixo.parametro1,
                         Some(0..9999),
@@ -293,7 +293,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
             ),
 
             2 => Some(
-                MenuItemBuilder::new_text(&ACELERACAO_DE_AVANCO)
+                MenuItemBuilder::from_text(&ACELERACAO_DE_AVANCO)
                     .add_numerical_variable(
                         &self.model.arquivo_de_eixo.parametro1,
                         Some(0..9999),
@@ -303,7 +303,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
             ),
 
             3 => Some(
-                MenuItemBuilder::new_text(&ACELERACAO_DE_RETORNO)
+                MenuItemBuilder::from_text(&ACELERACAO_DE_RETORNO)
                     .add_numerical_variable(
                         &self.model.arquivo_de_eixo.parametro1,
                         Some(0..9999),
@@ -312,7 +312,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
                     .build(),
             ),
             4 => Some(
-                MenuItemBuilder::new_text(&VELOCIDADE_DE_AVANCO)
+                MenuItemBuilder::from_text(&VELOCIDADE_DE_AVANCO)
                     .add_numerical_variable(
                         &self.model.arquivo_de_eixo.parametro1,
                         Some(0..9999),
@@ -321,7 +321,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
                     .build(),
             ),
             5 => Some(
-                MenuItemBuilder::new_text(&VELOCIDADE_DE_RETORNO)
+                MenuItemBuilder::from_text(&VELOCIDADE_DE_RETORNO)
                     .add_numerical_variable(
                         &self.model.arquivo_de_eixo.parametro1,
                         Some(0..9999),
@@ -353,55 +353,55 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
-                MenuItemBuilder::new_text(&NUMERO_DE_MENSAGEM_NO_AVANCO)
+                MenuItemBuilder::from_text(&NUMERO_DE_MENSAGEM_NO_AVANCO)
                     .add_numerical_variable(&self.value1, Some(0..99), 33)
                     .build(),
             ),
 
             1 => Some(
-                MenuItemBuilder::new_text(&NUMERO_DE_MENSAGEM_NO_RETORNO)
+                MenuItemBuilder::from_text(&NUMERO_DE_MENSAGEM_NO_RETORNO)
                     .add_numerical_variable(&self.value1, Some(0..99), 33)
                     .build(),
             ),
 
             2 => Some(
-                MenuItemBuilder::new_text(&PRIMEIRO_MENSAGEM_NO_AVANCO)
+                MenuItemBuilder::from_text(&PRIMEIRO_MENSAGEM_NO_AVANCO)
                     .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             3 => Some(
-                MenuItemBuilder::new_text(&PRIMEIRO_MENSAGEM_NO_RETORNO)
+                MenuItemBuilder::from_text(&PRIMEIRO_MENSAGEM_NO_RETORNO)
                     .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             4 => Some(
-                MenuItemBuilder::new_text(&ULTIMA_MENSAGEM_NO_AVANCO)
+                MenuItemBuilder::from_text(&ULTIMA_MENSAGEM_NO_AVANCO)
                     .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             5 => Some(
-                MenuItemBuilder::new_text(&ULTIMA_MENSAGEM_NO_RETORNO)
+                MenuItemBuilder::from_text(&ULTIMA_MENSAGEM_NO_RETORNO)
                     .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             6 => Some(
-                MenuItemBuilder::new_text(&ULTIMA_MENSAGEM_NO_RETORNO)
+                MenuItemBuilder::from_text(&ULTIMA_MENSAGEM_NO_RETORNO)
                     .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             7 => Some(
-                MenuItemBuilder::new_text(&NUMERO_DE_MULTIPLAS_IMPRESSOES)
+                MenuItemBuilder::from_text(&NUMERO_DE_MULTIPLAS_IMPRESSOES)
                     .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             8 => Some(
-                MenuItemBuilder::new_text(&PASSO_DAS_MULTIPLAS_IMPRESSOES)
+                MenuItemBuilder::from_text(&PASSO_DAS_MULTIPLAS_IMPRESSOES)
                     .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
@@ -429,31 +429,31 @@ impl SubmenuLayout for MenuParametrosDeCiclo {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
-                MenuItemBuilder::new_text(&RETARDO_NO_START_AUTOMATICO)
+                MenuItemBuilder::from_text(&RETARDO_NO_START_AUTOMATICO)
                     .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             1 => Some(
-                MenuItemBuilder::new_text(&RETARDO_NO_START_EXTERNO)
+                MenuItemBuilder::from_text(&RETARDO_NO_START_EXTERNO)
                     .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             2 => Some(
-                MenuItemBuilder::new_text(&START_AUTOMATICO_NO_AVANCO)
+                MenuItemBuilder::from_text(&START_AUTOMATICO_NO_AVANCO)
                     .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             3 => Some(
-                MenuItemBuilder::new_text(&START_AUTOMATICO_NO_RETORNO)
+                MenuItemBuilder::from_text(&START_AUTOMATICO_NO_RETORNO)
                     .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             4 => Some(
-                MenuItemBuilder::new_text(&MODO_DE_TRABALHO_DO_EIXO)
+                MenuItemBuilder::from_text(&MODO_DE_TRABALHO_DO_EIXO)
                     .add_optional_variable(&self.value0, Options::continuo_passo_a_passo(), 30)
                     .build(),
             ),
@@ -481,25 +481,25 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
-                MenuItemBuilder::new_text(&LOGICA_DO_SINAL_DE_IMPRESSAO)
+                MenuItemBuilder::from_text(&LOGICA_DO_SINAL_DE_IMPRESSAO)
                     .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             1 => Some(
-                MenuItemBuilder::new_text(&LARGURA_DO_SINAL_DE_IMPRESSAO)
+                MenuItemBuilder::from_text(&LARGURA_DO_SINAL_DE_IMPRESSAO)
                     .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             2 => Some(
-                MenuItemBuilder::new_text(&REVERSAO_DE_MENSAGEM_VIA_SERIAL)
+                MenuItemBuilder::from_text(&REVERSAO_DE_MENSAGEM_VIA_SERIAL)
                     .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             3 => Some(
-                MenuItemBuilder::new_text(&SELECAO_DE_MENSAGEM_VIA_SERIAL)
+                MenuItemBuilder::from_text(&SELECAO_DE_MENSAGEM_VIA_SERIAL)
                     .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
@@ -527,55 +527,55 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
-                MenuItemBuilder::new_text(&ANTECIPACAO_DA_SAIDA_DE_START)
+                MenuItemBuilder::from_text(&ANTECIPACAO_DA_SAIDA_DE_START)
                     .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             1 => Some(
-                MenuItemBuilder::new_text(&SAIDA_DE_START_NO_AVANCO)
+                MenuItemBuilder::from_text(&SAIDA_DE_START_NO_AVANCO)
                     .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             2 => Some(
-                MenuItemBuilder::new_text(&SAIDA_DE_START_NO_RETORNO)
+                MenuItemBuilder::from_text(&SAIDA_DE_START_NO_RETORNO)
                     .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             3 => Some(
-                MenuItemBuilder::new_text(&ENTRADA_DE_START_ENTRE_EIXOS)
+                MenuItemBuilder::from_text(&ENTRADA_DE_START_ENTRE_EIXOS)
                     .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             4 => Some(
-                MenuItemBuilder::new_text(&RETARDO_DO_START_ENTRE_EIXOS)
+                MenuItemBuilder::from_text(&RETARDO_DO_START_ENTRE_EIXOS)
                     .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             5 => Some(
-                MenuItemBuilder::new_text(&START_PELO_TECLADO_E_EXTERNO)
+                MenuItemBuilder::from_text(&START_PELO_TECLADO_E_EXTERNO)
                     .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             6 => Some(
-                MenuItemBuilder::new_text(&RETARDO_NO_START_PASSO_A_PASSO)
+                MenuItemBuilder::from_text(&RETARDO_NO_START_PASSO_A_PASSO)
                     .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
             7 => Some(
-                MenuItemBuilder::new_text(&START_AUTOMATICO_PASSO_A_PASSO)
+                MenuItemBuilder::from_text(&START_AUTOMATICO_PASSO_A_PASSO)
                     .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
             8 => Some(
-                MenuItemBuilder::new_text(&SAIDA_START_PASSO_A_PASSO)
+                MenuItemBuilder::from_text(&SAIDA_START_PASSO_A_PASSO)
                     .add_optional_variable(&self.value0, Options::continuo_passo_a_passo(), 30)
                     .build(),
             ),
