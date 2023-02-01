@@ -56,11 +56,11 @@ impl NavigationState {
         const TOTAL_NUMBER_OF_LINES_IN_LCD: u8 = 2;
         Self {
             lcd_line_cursor: {
-                const default_initial_line_selected: u8 = 0;
+                const DEFAULT_INITIAL_LINE_SELECTED: u8 = 0;
                 Cursor::new(
                     0,
                     TOTAL_NUMBER_OF_LINES_IN_LCD,
-                    default_initial_line_selected,
+                    DEFAULT_INITIAL_LINE_SELECTED,
                 )
             },
             first_line_to_render: {
