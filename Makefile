@@ -47,8 +47,9 @@ fix:
 	cargo fix --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release --bins 
 
 # Same as `fix` rule but do not print fix log messages
+# IMPORTANT: if you have uncommited changes this rule may overwrite your files unadivertedly
 fix_silently:
-	cargo fix --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release --bins --quiet
+	cargo fix --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release --bins --quiet --allow-dirty --allow-staged
 
 
 # tests in the platform agnostic lib are performed in x86 host
