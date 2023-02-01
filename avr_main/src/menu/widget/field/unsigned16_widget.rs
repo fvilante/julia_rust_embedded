@@ -407,9 +407,9 @@ pub enum Field<'a> {
 
 impl<'a> Field<'a> {
     pub fn from_numerical(variable: &'a Cell<u16>, parameters: Format) -> Self {
-        const initial_editing_mode: bool = false; // does not start in edit mode
+        const INITIAL_EDITING_MODE: bool = false; // does not start in edit mode
         let numerical_field =
-            NumberInputEditorWidget::new(variable, parameters, initial_editing_mode);
+            NumberInputEditorWidget::new(variable, parameters, INITIAL_EDITING_MODE);
         Self::Numerical(numerical_field)
     }
 

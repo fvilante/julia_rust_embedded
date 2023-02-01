@@ -121,13 +121,13 @@ impl<'a> MenuItemBuilder<'a> {
     }
 
     pub fn build(&mut self) -> MenuItemWidget<'a> {
-        const default_position_for_point_2: u8 = 30; // TODO: this value should be improved, to be more reasoned and less arbitrary, or eventually a panic with proper error message should be preferable
+        const DEFAULT_POSITION_FOR_POINT_2: u8 = 30; // TODO: this value should be improved, to be more reasoned and less arbitrary, or eventually a panic with proper error message should be preferable
         ///FIX: If client construct numerical and optional at same time the numerical will be taken and the
         /// optional will be ignored. It's safe, but it's better to refactor the code so client cannot
         /// compile this ambiguity.
         if let Some(numerical) = &mut self.numerical {
             let point1 = Point1d::new(self.base.point1);
-            let point2 = Point1d::new(self.base.point2.unwrap_or(default_position_for_point_2));
+            let point2 = Point1d::new(self.base.point2.unwrap_or(DEFAULT_POSITION_FOR_POINT_2));
             let field = Field::from_numerical(numerical.variable_u16, (numerical.format).clone());
             let menu_item = MenuItemWidget::new(
                 (point1, self.base.text),
@@ -139,9 +139,9 @@ impl<'a> MenuItemBuilder<'a> {
             let mut options_list_cloned = Vec::new();
             options_list_cloned.clone_from(&optional.options_list);
             let point1 = Point1d::new(self.base.point1);
-            let point2 = Point1d::new(self.base.point2.unwrap_or(default_position_for_point_2));
-            const number_of_options_available: u8 = 2; // TODO: This is a simplification and not will be always the case in future. Make this avaliation more dynamic and automatic
-            let _initial_selection = Cursor::new(0, number_of_options_available, 0); //(*args.variable).clone();
+            let point2 = Point1d::new(self.base.point2.unwrap_or(DEFAULT_POSITION_FOR_POINT_2));
+            const NUMBER_OF_OPTIONS_AVAILABLE: u8 = 2; // TODO: This is a simplification and not will be always the case in future. Make this avaliation more dynamic and automatic
+            let _initial_selection = Cursor::new(0, NUMBER_OF_OPTIONS_AVAILABLE, 0); //(*args.variable).clone();
             let field = Field::from_optional(optional.variable_option, options_list_cloned);
             let menu_item = MenuItemWidget::new(
                 (point1, self.base.text),
