@@ -20,7 +20,9 @@ pub fn make_options_buffer_from_array<const ArraySize: usize>(
 ) -> OptionsBuffer {
     let mut options: OptionsBuffer = Vec::new();
     for item in options_list {
-        options.push(item);
+        if let Err(_) = options.push(item) {
+            panic!("Error: Vector size not enough. Change 'OptionsBuffer' size do a higher value.")
+        }
     }
     options
 }
