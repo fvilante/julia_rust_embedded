@@ -1,12 +1,12 @@
 use core::mem::size_of;
 use core::ops::Range;
 
-use alloc::borrow::ToOwned;
+//use alloc::borrow::ToOwned;
 use avr_progmem::progmem;
 use avr_progmem::wrapper::ProgMem;
 
 use avr_progmem::string::PmString;
-use heapless::String;
+//use heapless::String;
 
 progmem! {
     static progmem string DEFAULT_FLASH_STRING = "";
@@ -60,17 +60,17 @@ impl FlashString {
         self.length
     }
 
-    pub fn to_string<const T: usize>(&self) -> Option<String<T>> {
-        let mut s: String<T> = String::new();
-        if s.capacity() < self.length as usize {
-            return None;
-        } else {
-            for (byte, _index) in self.chars_indices() {
-                s.push(byte as char);
-            }
-            return Some(s.to_owned());
-        };
-    }
+    // pub fn to_string<const T: usize>(&self) -> Option<String<T>> {
+    //     let mut s: String<T> = String::new();
+    //     if s.capacity() < self.length as usize {
+    //         return None;
+    //     } else {
+    //         for (byte, _index) in self.chars_indices() {
+    //             s.push(byte as char);
+    //         }
+    //         return Some(s.to_owned());
+    //     };
+    // }
 
     /// Search for a sliece of bytes in the [`FlashString`] and returns Some(index_position) or None
     pub fn find_index(&self, pattern: &[char]) -> Option<u8> {
