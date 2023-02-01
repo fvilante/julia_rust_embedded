@@ -1,4 +1,4 @@
-use super::menu_item::menu_item::MenuItemWidget;
+use super::menu_item::MenuItemWidget;
 use crate::{
     board::keyboard::KeyCode,
     menu::{
