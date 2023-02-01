@@ -15,6 +15,8 @@ use lib_1::utils::cursor::Cursor;
 
 pub type OptionsBuffer = Vec<FlashString, 5>;
 
+/// TODO: If possible make this function unnecessary and remove it from code. I suppose I'm using
+/// it to avoid spread of some `lifetimes`, but I'm not sure it is the best decision.
 pub fn make_options_buffer_from_array<const ARRAY_SIZE: usize>(
     options_list: [FlashString; ARRAY_SIZE],
 ) -> OptionsBuffer {

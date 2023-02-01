@@ -27,10 +27,9 @@ pub enum Field<'a> {
 }
 
 impl<'a> Field<'a> {
-    pub fn from_numerical(variable: &'a Cell<u16>, parameters: Format) -> Self {
+    pub fn from_numerical(variable: &'a Cell<u16>, format: Format) -> Self {
         const INITIAL_EDITING_MODE: bool = false; // does not start in edit mode
-        let numerical_field =
-            NumberInputEditorWidget::new(variable, parameters, INITIAL_EDITING_MODE);
+        let numerical_field = NumberInputEditorWidget::new(variable, format, INITIAL_EDITING_MODE);
         Self::Numerical(numerical_field)
     }
 
