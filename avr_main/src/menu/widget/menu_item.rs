@@ -10,8 +10,9 @@ use crate::{
 
 use super::{
     caption::Caption,
+    field::field::Field,
     field::optional::OptionsBuffer,
-    field::unsigned16_widget::{Field, Format},
+    field::unsigned16_widget::Format,
     sub_menu_render::LcdLine,
     widget::Editable,
     widget::{Saveble, Widget},
