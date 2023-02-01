@@ -549,31 +549,31 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
                     .build(),
             ),
 
-            1 => Some(
+            4 => Some(
                 MenuItemBuilder::new_text(&RETARDO_DO_START_ENTRE_EIXOS)
                     .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
-            3 => Some(
+            5 => Some(
                 MenuItemBuilder::new_text(&START_PELO_TECLADO_E_EXTERNO)
                     .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
-            1 => Some(
+            6 => Some(
                 MenuItemBuilder::new_text(&RETARDO_NO_START_PASSO_A_PASSO)
                     .add_numerical_variable(&self.value1, Some(0..9999), 33)
                     .build(),
             ),
 
-            3 => Some(
+            7 => Some(
                 MenuItemBuilder::new_text(&START_AUTOMATICO_PASSO_A_PASSO)
                     .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
                     .build(),
             ),
 
-            4 => Some(
+            8 => Some(
                 MenuItemBuilder::new_text(&SAIDA_START_PASSO_A_PASSO)
                     .add_optional_variable(&self.value0, Options::continuo_passo_a_passo(), 30)
                     .build(),
