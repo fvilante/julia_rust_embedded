@@ -54,13 +54,13 @@ impl<'a> OptionEditorWidget<'a> {
         char: char,
         is_in_editing_mode: bool,
     ) {
-        const empty_char: char = ' ';
+        const EMPTY_CHAR: char = ' ';
         if is_in_editing_mode {
             //blinks
             if self.blink.read() {
                 canvas.print_char(char);
             } else {
-                canvas.print_char(empty_char);
+                canvas.print_char(EMPTY_CHAR);
             }
         } else {
             //do not blink
@@ -133,13 +133,13 @@ impl Widget for OptionEditorWidget<'_> {
 
     fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         canvas.set_cursor(start_point);
-        const open_brackets: char = '[';
-        const close_brackets: char = ']';
+        const OPEN_BRACKETS: char = '[';
+        const CLOSE_BRACKETS: char = ']';
         let is_in_editing_mode = self.is_in_edit_mode();
         let current_index = self.editing_selection.get_current();
-        self.blinks_char_if_in_editing_mode(canvas, open_brackets, is_in_editing_mode);
+        self.blinks_char_if_in_editing_mode(canvas, OPEN_BRACKETS, is_in_editing_mode);
         let flash_string = self.options[current_index as usize];
         canvas.print_flash_str(flash_string);
-        self.blinks_char_if_in_editing_mode(canvas, close_brackets, is_in_editing_mode);
+        self.blinks_char_if_in_editing_mode(canvas, CLOSE_BRACKETS, is_in_editing_mode);
     }
 }

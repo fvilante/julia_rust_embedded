@@ -56,14 +56,14 @@ impl Content {
     /// If the `u16` value is greater than max size that `number_of_digits` can contain, than than
     /// the u16 will be clamped silently.
     fn from_u16_formated(data: u16, number_of_digits: u8) -> Content {
-        const blacket_char: char = '0';
+        const BLACKET_CHAR: char = '0';
         let s = convert_u16_to_string_decimal(data);
         let base = Content::from_str(s.as_str()).unwrap();
         let mut temp = Content::new();
         //leading zeros
         let len = usize_to_u8_clamper(base.len());
         for _ in len..number_of_digits {
-            temp.push(blacket_char);
+            temp.push(BLACKET_CHAR);
         }
         //actal number
         for char in base.chars() {
@@ -382,13 +382,13 @@ impl Widget for NumberInputEditorWidget<'_> {
         canvas.set_cursor(start_point);
         let is_in_edit_mode = self.is_in_edit_mode();
         for (position, digit) in self.u16_editor.char_indices() {
-            const blink_char: char = '_';
+            const BLINK_CHAR: char = '_';
             let mut current_char = digit;
             let is_current_char_over_cursor =
                 position == self.u16_editor.get_current_cursor_index() as usize;
             let is_time_to_blink = self.blink.read();
             if is_current_char_over_cursor && is_time_to_blink && is_in_edit_mode {
-                current_char = blink_char;
+                current_char = BLINK_CHAR;
             }
             canvas.print_char(current_char);
         }
@@ -414,8 +414,8 @@ impl<'a> Field<'a> {
     }
 
     pub fn from_optional(variable: &'a Cell<Cursor>, options: OptionsBuffer) -> Self {
-        const initial_editing_mode: bool = false; // does not start in edit mode
-        let optional = OptionEditorWidget::new(variable, options, initial_editing_mode);
+        const INITIAL_EDITING_MODE: bool = false; // does not start in edit mode
+        let optional = OptionEditorWidget::new(variable, options, INITIAL_EDITING_MODE);
         Self::Optional(optional)
     }
 }
