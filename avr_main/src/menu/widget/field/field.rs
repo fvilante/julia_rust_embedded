@@ -12,8 +12,8 @@ use crate::{
 use lib_1::utils::cursor::Cursor;
 
 use super::{
+    numerical::{Format, NumberInputEditorWidget},
     optional::{OptionEditorWidget, OptionsBuffer},
-    unsigned16_widget::{Format, NumberInputEditorWidget},
 };
 
 /// Makes possible to edit a position of memory using Lcd display and keyboard

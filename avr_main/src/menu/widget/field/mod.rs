@@ -1,4 +1,4 @@
 pub mod edit_mode;
 pub mod field;
+pub mod numerical;
 pub mod optional;
-pub mod unsigned16_widget;

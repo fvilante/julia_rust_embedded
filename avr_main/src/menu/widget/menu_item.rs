@@ -11,8 +11,8 @@ use crate::{
 use super::{
     caption::Caption,
     field::field::Field,
+    field::numerical::Format,
     field::optional::OptionsBuffer,
-    field::unsigned16_widget::Format,
     sub_menu_render::LcdLine,
     widget::Editable,
     widget::{Saveble, Widget},
