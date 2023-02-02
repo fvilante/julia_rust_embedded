@@ -4,7 +4,7 @@ use crate::{
     menu::{
         canvas::Canvas,
         point::Point,
-        sub_menu_handle::{MenuStorage, SubMenuHandle},
+        widget::submenu::sub_menu_handle::{MenuStorage, SubMenuHandle},
     },
 };
 

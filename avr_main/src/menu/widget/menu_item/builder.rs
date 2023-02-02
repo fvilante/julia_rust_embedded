@@ -1,4 +1,5 @@
-use crate::menu::{flash::FlashString, point::Point1d, sub_menu_handle::SubMenuHandle};
+use crate::menu::widget::submenu::sub_menu_handle::SubMenuHandle;
+use crate::menu::{flash::FlashString, point::Point1d};
 
 use super::{
     super::{field::field::Field, field::numerical::Format, field::optional::OptionsBuffer},

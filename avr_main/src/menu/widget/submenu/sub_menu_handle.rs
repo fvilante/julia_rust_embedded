@@ -3,7 +3,7 @@ use core::{cell::Cell, u8};
 use avr_progmem::progmem;
 use lib_1::utils::cursor::Cursor;
 
-use super::{
+use super::super::super::{
     flash::FlashString,
     model::MachineModel,
     widget::{

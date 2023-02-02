@@ -6,5 +6,6 @@ pub mod manual_mode;
 pub mod menu_item;
 pub mod splash;
 pub mod sub_menu_render;
+pub mod submenu;
 pub mod widget;
 pub mod widget_tests;
