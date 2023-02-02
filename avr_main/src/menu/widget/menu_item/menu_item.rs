@@ -4,14 +4,13 @@ use crate::{
         canvas::Canvas,
         flash::FlashString,
         point::{Point, Point1d},
-        widget::submenu::sub_menu_render::LcdLine,
+        widget::{caption::caption::Caption, submenu::sub_menu_render::LcdLine},
     },
 };
 
 use crate::menu::widget::submenu::sub_menu_handle::SubMenuHandle;
 
 use super::super::{
-    caption::Caption,
     field::field::Field,
     widget::Editable,
     widget::{Saveble, Widget},
