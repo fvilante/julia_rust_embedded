@@ -107,7 +107,44 @@ progmem! {
     static progmem string ERRO_01 = "Erro de construcao de string";
 }
 
-/// TODO: Change name to `MenuDefinition`
+///////////////////////////////////////////////////
+
+/// A storage for variable Options existent on the menu system
+/// TODO: Eventually move this to a more appropriate place (ie: ".\widget/field/optional.rs")
+struct Options;
+
+impl Options {
+    fn ligado_desligado() -> OptionsBuffer {
+        let options_list = [FlashString::new(&LIGADO), FlashString::new(&DESLIGADO)];
+        make_options_buffer_from_array(options_list)
+    }
+
+    fn continuo_passo_a_passo() -> OptionsBuffer {
+        make_options_buffer_from_array([
+            FlashString::new(&CONTINUO),
+            FlashString::new(&PASSO_A_PASSO),
+        ])
+    }
+}
+
+////////////////////////////////////////////////////
+
+/// Indexes the sub menus in the menu storage, it works like a reference pointer to the concrete menu.
+/// If you create a new sub menu you must put it here.
+///
+/// TODO: Rename to `MenuStorageIndex`
+#[derive(Copy, Clone)]
+pub enum SubMenuHandle {
+    MenuArquivoDeEixo,
+    MenuParametrosDeMovimento,
+    MenuParametrosDeImpressao,
+    MenuParametrosDeCiclo,
+    MenuConfiguracaoDaImpressora,
+    MenuIntertravamentoParaDoisEixos,
+}
+
+/// The storage for all sub menus. If you create a new sub menu you must put it here.
+/// TODO: May change name to `MenuRegister`
 pub struct MenuStorage<'a> {
     model: &'a MachineModel,
     pub MenuArquivoDeEixo: MenuArquivoDeEixo,
@@ -119,6 +156,7 @@ pub struct MenuStorage<'a> {
 }
 
 impl<'a> MenuStorage<'a> {
+    /// Constructs all the menus and initializes its internal state
     pub const fn new(model: &'a MachineModel) -> Self {
         Self {
             model,
@@ -131,6 +169,8 @@ impl<'a> MenuStorage<'a> {
         }
     }
 
+    /// Retrieves an menu item given the sub menu and the index number of the menu item.
+    /// If index is out of range than returns None
     pub fn get_item(&self, submenu_handle: SubMenuHandle, index: usize) -> Option<MenuItemWidget> {
         match submenu_handle {
             SubMenuHandle::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_item(index),
@@ -153,6 +193,8 @@ impl<'a> MenuStorage<'a> {
         }
     }
 
+    /// Given an sub menu index, get the size of menu items inside it.
+    ///
     /// TODO: This algoritm may be highly optimized, because the length currently is obtained instantiating &
     /// throwing away all the menu items in memory. A better option may be to restructure datastructures
     /// to calculate this size in static time.
@@ -166,8 +208,17 @@ impl<'a> MenuStorage<'a> {
     }
 }
 
+////////////////////////////////////////////////////
+
+/// Trait implemented by all sub menus
+///
+/// It make possible to given a sub menu to retrieve its menu items already in the Widget format.
+/// Note that the Widget contains its view state, and it is brand new widget. It's your responsability
+/// to own this object and control its natural lifetime.
 pub trait SubmenuLayout {
+    /// Gets the size of menu items inside the submenu
     fn get_item(&self, index: usize) -> Option<MenuItemWidget>;
+
     /// TODO: This algoritm may be highly optimized, because the length currently is obtained instantiating &
     /// throwing away all the menu items in memory. A better option may be to restructure datastructures
     /// to calculate this size in static time.
@@ -181,33 +232,9 @@ pub trait SubmenuLayout {
     }
 }
 
-struct Options;
+////////////////////////////////////////////////////
 
-impl Options {
-    fn ligado_desligado() -> OptionsBuffer {
-        let options_list = [FlashString::new(&LIGADO), FlashString::new(&DESLIGADO)];
-        make_options_buffer_from_array(options_list)
-    }
-
-    fn continuo_passo_a_passo() -> OptionsBuffer {
-        make_options_buffer_from_array([
-            FlashString::new(&CONTINUO),
-            FlashString::new(&PASSO_A_PASSO),
-        ])
-    }
-}
-
-#[derive(Copy, Clone)]
-pub enum SubMenuHandle {
-    MenuArquivoDeEixo,
-    MenuParametrosDeMovimento,
-    MenuParametrosDeImpressao,
-    MenuParametrosDeCiclo,
-    MenuConfiguracaoDaImpressora,
-    MenuIntertravamentoParaDoisEixos,
-}
-
-pub struct MenuArquivoDeEixo {}
+pub struct MenuArquivoDeEixo;
 
 impl MenuArquivoDeEixo {
     pub const fn new() -> Self {
@@ -258,6 +285,8 @@ impl SubmenuLayout for MenuArquivoDeEixo {
         }
     }
 }
+
+////////////////////////////////////////////////////
 
 pub struct MenuParametrosDeMovimento<'a> {
     model: &'a MachineModel,
@@ -335,6 +364,8 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
     }
 }
 
+////////////////////////////////////////////////////
+
 pub struct MenuParametrosDeImpressao {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
@@ -411,6 +442,8 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
     }
 }
 
+////////////////////////////////////////////////////
+
 pub struct MenuParametrosDeCiclo {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
@@ -463,6 +496,8 @@ impl SubmenuLayout for MenuParametrosDeCiclo {
     }
 }
 
+////////////////////////////////////////////////////
+
 pub struct MenuConfiguracaoDaImpressora {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
@@ -508,6 +543,8 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora {
         }
     }
 }
+
+////////////////////////////////////////////////////
 
 pub struct MenuIntertravamentoParaDoisEixos {
     value0: Cell<Cursor>,
@@ -585,82 +622,4 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
     }
 }
 
-/*
-
-pub struct Teste2 {
-    value0: Cell<Cursor>,
-    value1: Cell<u16>,
-    value2: Cell<u16>,
-}
-
-impl Teste2 {
-    pub const fn new() -> Self {
-        Self {
-            value0: Cell::new(Cursor::new(0, 2, 1)),
-            value1: Cell::new(0),
-            value2: Cell::new(0),
-        }
-    }
-}
-
-impl SubMenuTrait for Teste2 {
-    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
-        let menu_item_args = match index {
-            1 => {
-                Some(MenuItemArgs::Optional(OptionalParameterArgs {
-                    point1_: 1,
-                    point2_: 30,
-                    text: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
-                    options_list: make_options_buffer_from_array([
-                        FlashString::new(&O1),
-                        FlashString::new(&O2),
-                        FlashString::new(&O3),
-                        FlashString::new(&O4),
-                    ]),
-                    child: None,
-                    variable: &self.value0,
-                }))
-            }
-
-            0 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_INICIAL),
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value1,
-                }))
-            }
-
-            2 => {
-                Some(MenuItemArgs::Numerical(NumericalParameterArgs {
-                    point1_: 1,
-                    point2_: 33,
-                    text: FlashString::new(&POSICAO_FINAL),
-                    parameters: Format {
-                        initial_cursor_position: 0,
-                        start: 0,
-                        end: 9999,
-                    },
-                    child: None,
-                    variable: &self.value2,
-                }))
-            }
-
-            _ => None,
-        };
-
-        if let Some(menu_args) = menu_item_args {
-            Some(MenuItemWidget::from_menu_args(menu_args))
-        } else {
-            None
-        }
-    }
-}
-
- */
+////////////////////////////////////////////////////
