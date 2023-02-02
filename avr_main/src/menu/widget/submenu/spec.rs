@@ -2,40 +2,18 @@ use core::{cell::Cell, u8};
 
 use lib_1::utils::cursor::Cursor;
 
-use super::super::super::{
-    flash::FlashString,
-    model::MachineModel,
-    widget::{
-        field::optional::{make_options_buffer_from_array, OptionsBuffer},
-        menu_item::builder::MenuItemBuilder,
-        menu_item::menu_item::MenuItemWidget,
+use super::{
+    super::super::{
+        model::MachineModel,
+        widget::{menu_item::builder::MenuItemBuilder, menu_item::menu_item::MenuItemWidget},
     },
+    spec_options::Options,
 };
 
 ///////////////////////////////////////////////////
 
 /// import flash texts
 use super::flash_text::*;
-
-///////////////////////////////////////////////////
-
-/// A storage for variable Options existent on the menu system
-/// TODO: Eventually move this to a more appropriate place (ie: ".\widget/field/optional.rs")
-struct Options;
-
-impl Options {
-    fn ligado_desligado() -> OptionsBuffer {
-        let options_list = [FlashString::new(&LIGADO), FlashString::new(&DESLIGADO)];
-        make_options_buffer_from_array(options_list)
-    }
-
-    fn continuo_passo_a_passo() -> OptionsBuffer {
-        make_options_buffer_from_array([
-            FlashString::new(&CONTINUO),
-            FlashString::new(&PASSO_A_PASSO),
-        ])
-    }
-}
 
 ////////////////////////////////////////////////////
 
