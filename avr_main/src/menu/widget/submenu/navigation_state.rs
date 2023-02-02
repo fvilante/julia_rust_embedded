@@ -5,6 +5,10 @@ use lib_1::utils::{
     cursor::Cursor,
 };
 
+///////////////////////////////////////////////////////////////////////////
+//
+//  Compression data helper (Not in use yet!)
+
 /// Helper to optimize memory space consuption. The ideia is to store 2 numbers inside a single byte.
 struct DecompressedNumbers(u8, u8);
 const N2_BIT_POSITION: u8 = 7;
@@ -46,6 +50,10 @@ impl From<CompressedNumbers> for DecompressedNumbers {
         DecompressedNumbers(n1, n2)
     }
 }
+
+///////////////////////////////////////////////////////////////////////////
+//
+//  Normal Code
 
 /// Controls the state of the navigation on sub menu, which is what is the selected line in the list of items.
 ///
