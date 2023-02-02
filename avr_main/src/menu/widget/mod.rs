@@ -1,5 +1,4 @@
 pub mod caption;
-pub mod cursor;
 pub mod execucao;
 pub mod field;
 pub mod main_menu;
