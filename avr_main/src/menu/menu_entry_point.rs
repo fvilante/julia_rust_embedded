@@ -1,5 +1,5 @@
 use super::model::MachineModel;
-use super::widget::submenu::sub_menu_render::SubMenuRender;
+use super::widget::submenu::render::SubMenuRender;
 
 use crate::menu::widget::submenu::spec::{MenuStorage, SubMenuHandle};
 
