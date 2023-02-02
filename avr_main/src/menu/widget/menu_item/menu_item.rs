@@ -4,7 +4,7 @@ use crate::{
         canvas::Canvas,
         flash::FlashString,
         point::{Point, Point1d},
-        widget::{caption::caption::Caption, submenu::render::LcdLine},
+        widget::{caption::caption::Caption, submenu::hepers::LcdLine},
     },
 };
 
