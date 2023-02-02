@@ -1,7 +1,7 @@
 use super::model::MachineModel;
 use super::widget::submenu::sub_menu_render::SubMenuRender;
 
-use crate::menu::widget::submenu::sub_menu_handle::{MenuStorage, SubMenuHandle};
+use crate::menu::widget::submenu::spec::{MenuStorage, SubMenuHandle};
 
 use crate::menu::widget::widget_tests::SystemEnviroment;
 

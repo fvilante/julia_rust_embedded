@@ -1,4 +1,4 @@
-use crate::menu::widget::submenu::sub_menu_handle::SubMenuHandle;
+use crate::menu::widget::submenu::spec::SubMenuHandle;
 use crate::menu::{flash::FlashString, point::Point1d};
 
 use super::{
