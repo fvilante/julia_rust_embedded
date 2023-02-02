@@ -3,7 +3,7 @@ use crate::menu::{
     widget::field::optional::{make_options_buffer_from_array, OptionsBuffer},
 };
 
-use super::flash_text::{CONTINUO, DESLIGADO, LIGADO, PASSO_A_PASSO};
+use super::flash_texts::{CONTINUO, DESLIGADO, LIGADO, PASSO_A_PASSO};
 
 /// A storage for variable Options existent on the menu system
 /// TODO: Eventually move this to a more appropriate place (ie: ".\widget/field/optional.rs")
