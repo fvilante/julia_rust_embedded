@@ -1,6 +1,51 @@
 use super::hepers::LcdLine;
 
-use lib_1::utils::cursor::Cursor;
+use lib_1::utils::{
+    common::{configure_bit, get_bit_at, reset_bit_at},
+    cursor::Cursor,
+};
+
+/// Helper to optimize memory space consuption. The ideia is to store 2 numbers inside a single byte.
+struct DecompressedNumbers(u8, u8);
+const N2_BIT_POSITION: u8 = 7;
+
+/// Encode two number using this criteria:
+/// bits 0..6 represents first number, and bit 7 represents the second number
+struct CompressedNumbers(u8);
+
+impl TryFrom<DecompressedNumbers> for CompressedNumbers {
+    type Error = ();
+
+    fn try_from(value: DecompressedNumbers) -> Result<Self, Self::Error> {
+        let DecompressedNumbers(n1, n2) = value;
+
+        match (n1, n2) {
+            // Valid range given `encoding` criteria
+            (0..128, 0..2) => {
+                let n1_compressed = n1;
+                let n2_compressed = if n2 == 0 {
+                    configure_bit(0, N2_BIT_POSITION, false)
+                } else {
+                    configure_bit(0, N2_BIT_POSITION, true)
+                };
+                let compressed = n1_compressed + n2_compressed;
+                Result::Ok(CompressedNumbers(compressed))
+            }
+
+            // Invalid range
+            _ => Result::Err(()),
+        }
+    }
+}
+
+impl From<CompressedNumbers> for DecompressedNumbers {
+    fn from(value: CompressedNumbers) -> Self {
+        let CompressedNumbers(x) = value;
+        let n1 = reset_bit_at(x, N2_BIT_POSITION);
+        let n2 = get_bit_at(x, N2_BIT_POSITION);
+        DecompressedNumbers(n1, n2)
+    }
+}
 
 /// Controls the state of the navigation on sub menu, which is what is the selected line in the list of items.
 ///
@@ -8,9 +53,10 @@ use lib_1::utils::cursor::Cursor;
 /// because `Cursor::Start` is always zero, and `Cursor:End` of `lcd_line_cursor` is always 2 or const statically defined.  
 #[derive(Copy, Clone)]
 pub struct NavigationState {
+    /// Uncompressed representation of NavigationState
     /// Controls the line of menu (see: LcdLine) which is current selected.
     lcd_line_cursor: Cursor,
-    /// First line to render in the lcd screen in relation to the list of menu items
+    // First line to render in the lcd screen in relation to the list of menu items
     first_line_to_render: Cursor,
 }
 
