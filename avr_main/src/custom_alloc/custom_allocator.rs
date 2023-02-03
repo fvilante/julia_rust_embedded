@@ -9,10 +9,6 @@
 
 use alloc::alloc::{GlobalAlloc, Layout};
 
-use core::ptr::null_mut;
-
-use crate::board::lcd;
-
 pub struct Dummy {
     val: u8,
 }

@@ -3,8 +3,6 @@ use crate::{
     menu::{canvas::Canvas, flash::FlashString, point::Point},
 };
 
-use super::widget::Widget;
-
 pub struct Caption {
     text: FlashString,
 }

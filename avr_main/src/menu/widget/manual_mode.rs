@@ -3,7 +3,6 @@ use avr_progmem::progmem;
 use crate::{
     board::keyboard::KeyCode,
     menu::{canvas::Canvas, flash::FlashString, point::Point},
-    microcontroler::timer::now,
 };
 
 use super::widget::Widget;
@@ -59,7 +58,7 @@ impl Widget for ManualModeMenu {
 
     fn update(&mut self) {}
 
-    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
+    fn draw(&self, canvas: &mut Canvas, _start_point: Point) {
         fn helper_get_first_screen(line_number: u8) -> (Point, FlashString) {
             if line_number == 0 {
                 let line0 = FlashString::new(&LINE0);

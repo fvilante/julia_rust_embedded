@@ -5,7 +5,7 @@
 
 use lib_1::utils::common::get_bit_at_as_bool;
 
-use super::shiftin::{self, readShiftIn, ShiftInData};
+use super::shiftin::{readShiftIn, ShiftInData};
 
 use crate::board::lcd::{lcd_initialize, print_u8_in_hex};
 

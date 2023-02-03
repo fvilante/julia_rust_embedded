@@ -1,17 +1,9 @@
 use crate::{
     board::{lcd, output_expander::OutputExpander},
     enviroment::front_panel::FrontPanel,
-    menu::{
-        accessor::Accessor,
-        canvas::Canvas,
-        flash::FlashString,
-        keyboard::Keyboard,
-        point::Point,
-        widget::{cursor::Cursor, optional::OptionEditorWidget},
-    },
+    menu::{canvas::Canvas, keyboard::Keyboard},
 };
 use avr_progmem::progmem;
-use heapless::Vec;
 
 pub struct SystemEnviroment {
     pub output_expander: OutputExpander,
@@ -22,11 +14,11 @@ pub struct SystemEnviroment {
 impl SystemEnviroment {
     pub fn new() -> Self {
         lcd::lcd_initialize();
-        let mut output_expander = OutputExpander::new();
+        let output_expander = OutputExpander::new();
         let beep = |on: bool| {
             OutputExpander::new().BUZZER(on).commit();
         };
-        let mut keyboard = Keyboard::new(beep);
+        let keyboard = Keyboard::new(beep);
         let canvas = Canvas::new();
         Self {
             output_expander,

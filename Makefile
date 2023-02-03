@@ -32,6 +32,7 @@ watch_avr:
 watch_avr_upload:
 	cargo watch -c --why -s "make div fast"
 
+watch_avr_upload_fix: fix_silently watch_avr_upload
 
 fast: build upload_fast size
 
@@ -39,6 +40,16 @@ full: check test build upload_fast size
 
 check:
 	cargo check --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release 
+
+# Try to automatically correct as many warnings as possible. Note: Assure to have `warning` enabled in your main module. Disabled warnings are not fixed.
+# NOTE: you can also use `--allow-dirty --allow-staged` parameters if you want to overwrite fixed files even if they are uncommited in the repository.
+fix:
+	cargo fix --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release --bins 
+
+# Same as `fix` rule but do not print fix log messages
+# IMPORTANT: if you have uncommited changes this rule may overwrite your files unadivertedly
+fix_silently:
+	cargo fix --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release --bins --quiet --allow-dirty --allow-staged
 
 
 # tests in the platform agnostic lib are performed in x86 host

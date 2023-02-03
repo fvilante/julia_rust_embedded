@@ -2,19 +2,18 @@ use core::cell::Cell;
 use core::ops::Range;
 use core::str::{CharIndices, Chars, FromStr};
 
-use alloc::borrow::ToOwned;
-use heapless::{String, Vec};
+use heapless::String;
 use lib_1::utils::common::{convert_u16_to_string_decimal, usize_to_u8_clamper};
 
-use crate::board::lcd;
 use crate::{
     board::keyboard::KeyCode,
-    menu::{accessor::Accessor, canvas::Canvas, point::Point, ratangular_wave::RectangularWave},
+    menu::{canvas::Canvas, point::Point, ratangular_wave::RectangularWave},
 };
 
-use super::optional::{OptionEditorWidget, OptionsBuffer};
-use super::widget::Saveble;
-use super::{edit_mode::EditMode, widget::Editable, widget::Widget};
+use super::super::widget::Saveble;
+use super::super::{widget::Editable, widget::Widget};
+use super::edit_mode::EditMode;
+
 use lib_1::utils::cursor::Cursor;
 
 /// Sets the max size of the [`Content`] type
@@ -57,14 +56,14 @@ impl Content {
     /// If the `u16` value is greater than max size that `number_of_digits` can contain, than than
     /// the u16 will be clamped silently.
     fn from_u16_formated(data: u16, number_of_digits: u8) -> Content {
-        const blacket_char: char = '0';
+        const BLACKET_CHAR: char = '0';
         let s = convert_u16_to_string_decimal(data);
-        let mut base = Content::from_str(s.as_str()).unwrap();
+        let base = Content::from_str(s.as_str()).unwrap();
         let mut temp = Content::new();
         //leading zeros
         let len = usize_to_u8_clamper(base.len());
         for _ in len..number_of_digits {
-            temp.push(blacket_char);
+            temp.push(BLACKET_CHAR);
         }
         //actal number
         for char in base.chars() {
@@ -383,114 +382,15 @@ impl Widget for NumberInputEditorWidget<'_> {
         canvas.set_cursor(start_point);
         let is_in_edit_mode = self.is_in_edit_mode();
         for (position, digit) in self.u16_editor.char_indices() {
-            const blink_char: char = '_';
+            const BLINK_CHAR: char = '_';
             let mut current_char = digit;
             let is_current_char_over_cursor =
                 position == self.u16_editor.get_current_cursor_index() as usize;
             let is_time_to_blink = self.blink.read();
             if is_current_char_over_cursor && is_time_to_blink && is_in_edit_mode {
-                current_char = blink_char;
+                current_char = BLINK_CHAR;
             }
             canvas.print_char(current_char);
-        }
-    }
-}
-
-/* impl NumberInputEditorWidget<'_> {
-    pub fn save_edition(&mut self) {
-        let edited_value = self.u16_editor.as_u16();
-        *self.variable = edited_value; // saves data.
-                                       //TODO: Make below lines unnecessary
-        let number_editor = &mut self.u16_editor;
-        let format = number_editor.set_u16(edited_value, self.format.clone()); // saves displayed data
-        number_editor.reset_cursor(self.format.initial_cursor_position);
-    }
-
-    pub fn abort_edition(&mut self) {
-        let original_value = (*self.variable).clone();
-        //TODO: Make below lines unnecessary
-        let number_editor = &mut self.u16_editor;
-        number_editor.set_u16(original_value, self.format.clone()); // saves displayed data
-        number_editor.reset_cursor(self.format.initial_cursor_position);
-    }
-} */
-
-/// Makes possible to edit a position of memory using Lcd display and keyboard
-/// esc abort edition, and enter confirm edition
-///
-/// Abstracts all kind of fields existent offering an equal interface for all of them (Note: New Fields
-/// may be added in the future)
-pub enum Field<'a> {
-    Numerical(NumberInputEditorWidget<'a>),
-    Optional(OptionEditorWidget<'a>),
-}
-
-impl<'a> Field<'a> {
-    pub fn from_numerical(variable: &'a Cell<u16>, parameters: Format) -> Self {
-        const initial_editing_mode: bool = false; // does not start in edit mode
-        let numerical_field =
-            NumberInputEditorWidget::new(variable, parameters, initial_editing_mode);
-        Self::Numerical(numerical_field)
-    }
-
-    pub fn from_optional(variable: &'a Cell<Cursor>, options: OptionsBuffer) -> Self {
-        const initial_editing_mode: bool = false; // does not start in edit mode
-        let optional = OptionEditorWidget::new(variable, options, initial_editing_mode);
-        Self::Optional(optional)
-    }
-}
-
-impl Saveble for Field<'_> {
-    fn restore_value(&mut self) {
-        match self {
-            Self::Numerical(x) => x.restore_value(),
-            Self::Optional(x) => x.restore_value(),
-        }
-    }
-
-    fn save_value(&mut self) {
-        match self {
-            Self::Numerical(x) => x.save_value(),
-            Self::Optional(x) => x.save_value(),
-        }
-    }
-}
-
-impl Widget for Field<'_> {
-    fn send_key(&mut self, key: KeyCode) {
-        match self {
-            Self::Numerical(x) => x.send_key(key),
-            Self::Optional(x) => x.send_key(key),
-        }
-    }
-
-    fn update(&mut self) {
-        match self {
-            Self::Numerical(x) => x.update(),
-            Self::Optional(x) => x.update(),
-        }
-    }
-
-    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
-        match self {
-            Self::Numerical(x) => x.draw(canvas, start_point),
-            Self::Optional(x) => x.draw(canvas, start_point),
-        }
-    }
-}
-
-impl Editable for Field<'_> {
-    fn set_edit_mode(&mut self, value: bool) {
-        match self {
-            Self::Numerical(x) => x.set_edit_mode(value),
-            Self::Optional(x) => x.set_edit_mode(value),
-        }
-    }
-
-    fn is_in_edit_mode(&self) -> bool {
-        match self {
-            Self::Numerical(x) => x.is_in_edit_mode(),
-            Self::Optional(x) => x.is_in_edit_mode(),
         }
     }
 }

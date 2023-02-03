@@ -1,7 +1,6 @@
 use core::str::Chars;
 
 use avr_progmem::string::PmString;
-use heapless::String;
 
 use crate::menu::flash::{FlashString, FlashStringIterator};
 
@@ -53,7 +52,7 @@ impl<'a> Iterator for WrapperIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(flash_iterator) = &mut self.flash {
-            if let Some((byte, index)) = flash_iterator.next() {
+            if let Some((byte, _index)) = flash_iterator.next() {
                 Some(byte)
             } else {
                 None

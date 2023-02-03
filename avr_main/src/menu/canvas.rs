@@ -126,7 +126,7 @@ impl Canvas {
     /// It swaps two lcd buffers: The output_buffer represents current state of lcd and
     /// input_buffer represent the desired state of lcd
     pub fn render(&mut self) {
-        /// The current implementation of this function is very! very! simplified, it may be improved later    
+        // The current implementation of this function is very! very! simplified, it may be improved later
         lcd::setCursor(0, 0);
         for byte in self.screen_buffer_input {
             lcd::print_u8(byte);

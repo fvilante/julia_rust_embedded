@@ -2,13 +2,12 @@ use avr_progmem::progmem;
 
 use crate::{
     board::keyboard::KeyCode,
-    menu::{canvas::Canvas, flash::FlashString, point::Point},
+    menu::{canvas::Canvas, point::Point},
     microcontroler::timer::now,
     utils::generic_string::GenericString,
 };
 
 use super::widget::{IWidget, Widget};
-use lib_1::utils::cursor::Cursor;
 
 progmem! {
     static progmem string TEXT0 = "Posijet Industria e Comercio Ltda.";

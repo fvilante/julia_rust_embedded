@@ -1,57 +1,11 @@
-use super::canvas::Canvas;
-use super::flash::FlashString;
-use super::keyboard::Keyboard;
-use super::menu_manager::MenuManager;
 use super::model::MachineModel;
-use super::point::Point;
-use super::point::Point1d;
-use super::sub_menu_handle::MenuArquivoDeEixo;
-use super::sub_menu_handle::MenuStorage;
-use super::sub_menu_handle::SubMenuHandle;
-use super::widget::caption::Caption;
-use super::widget::execucao;
-use super::widget::execucao::MenuExecucao;
-use super::widget::main_menu;
-use super::widget::main_menu::MainMenu;
-use super::widget::main_menu::State;
-use super::widget::manual_mode::ManualModeMenu;
-use super::widget::manual_mode::ManualModeState;
-use super::widget::menu_item;
-use super::widget::menu_item::MenuItemWidget;
-use super::widget::optional::OptionEditorWidget;
-use super::widget::splash::Splash;
-use super::widget::unsigned16_widget::Content;
-use super::widget::unsigned16_widget::Field;
-use super::widget::widget_tests::optional_widget_test;
-use crate::board::keyboard::KeyCode;
-use crate::board::output_expander::OutputExpander;
-use crate::board::{lcd, output_expander};
-use crate::enviroment::front_panel::FrontPanel;
-use crate::menu::accessor::Accessor;
-use crate::menu::flash::FlashSlice;
-use crate::menu::widget::menu_item::make_template_iterator;
-use crate::menu::widget::menu_item::TemplateKind;
-use crate::menu::widget::optional::OptionsBuffer;
-use crate::menu::widget::sub_menu_render::SubMenuRender;
-use crate::menu::widget::unsigned16_widget::Format;
-use crate::menu::widget::widget::Widget;
-use crate::menu::widget::widget_tests::SystemEnviroment;
-use crate::microcontroler::delay::delay_ms;
-use crate::microcontroler::timer::now;
-use alloc::string::ToString;
-use avr_progmem::string::PmString;
-use avr_progmem::wrapper::ProgMem;
-use core::cell::Cell;
-use core::ops::Range;
-use core::str::FromStr;
-use heapless::String;
-use heapless::Vec;
-use lib_1::arena::arena::Arena;
-use lib_1::arena::arena::ArenaId;
-use lib_1::utils::common::convert_u16_to_string_decimal;
-use lib_1::utils::cursor::Cursor;
+use super::widget::submenu::render::SubMenuRender;
 
-use avr_progmem::progmem;
+use crate::menu::widget::submenu::spec::{MenuStorage, SubMenuHandle};
+
+use crate::menu::widget::widget_tests::SystemEnviroment;
+
+use crate::microcontroler::timer::now;
 
 ///
 

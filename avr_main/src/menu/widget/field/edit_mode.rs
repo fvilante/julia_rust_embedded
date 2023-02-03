@@ -1,4 +1,4 @@
-use super::widget::Editable;
+use super::super::widget::Editable;
 
 pub struct EditMode {
     is_in_edit_mode: bool,

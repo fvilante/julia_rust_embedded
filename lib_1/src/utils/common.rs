@@ -1,6 +1,8 @@
 use core::{marker::Destruct, str::FromStr};
 use heapless::String;
 
+/// TODO: Extract some of this functions to a `bitwise utilities module`.
+
 // return (byteLow, byteHigh)
 pub const fn word_to_byte(word: u16) -> (u8, u8) {
     let low_ = word & 0x00FF;

@@ -1,7 +1,4 @@
-use crate::{
-    board::output_expander::{self, OutputExpander},
-    microcontroler::delay::delay_ms,
-};
+use crate::{board::output_expander::OutputExpander, microcontroler::delay::delay_ms};
 
 pub struct FrontPanel<'a> {
     output_expander: &'a mut OutputExpander,

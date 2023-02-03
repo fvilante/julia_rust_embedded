@@ -8,7 +8,7 @@ use crate::{
 use super::{
     execucao::MenuExecucao,
     manual_mode::{ManualModeMenu, ManualModeState},
-    widget::{IWidget, Widget},
+    widget::Widget,
 };
 
 progmem! {
@@ -19,10 +19,10 @@ progmem! {
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum State {
-    MAIN_MENU,
-    MANUAL,
-    EXECUCAO,
-    PROGRAMA,
+    MainMenu,
+    Manual,
+    Execucao,
+    Programa,
 }
 
 pub struct MainMenu {
@@ -35,7 +35,7 @@ pub struct MainMenu {
 impl MainMenu {
     pub fn new(menu_manual: ManualModeMenu, menu_execucao: MenuExecucao) -> Self {
         Self {
-            current_state: State::MAIN_MENU,
+            current_state: State::MainMenu,
             menu_manual,
             menu_execucao,
         }
@@ -66,46 +66,46 @@ impl MainMenu {
 impl Widget for MainMenu {
     fn send_key(&mut self, key: KeyCode) {
         match self.current_state {
-            State::MAIN_MENU => match key {
-                KeyCode::KEY_MANUAL => self.current_state = State::MANUAL,
-                KeyCode::KEY_EXECUCAO => self.current_state = State::EXECUCAO,
-                KeyCode::KEY_PROGRAMA => self.current_state = State::PROGRAMA,
+            State::MainMenu => match key {
+                KeyCode::KEY_MANUAL => self.current_state = State::Manual,
+                KeyCode::KEY_EXECUCAO => self.current_state = State::Execucao,
+                KeyCode::KEY_PROGRAMA => self.current_state = State::Programa,
                 _ => {}
             },
-            State::MANUAL => self.menu_manual.send_key(key),
-            State::EXECUCAO => {
+            State::Manual => self.menu_manual.send_key(key),
+            State::Execucao => {
                 if key == KeyCode::KEY_ESC {
-                    self.current_state = State::MAIN_MENU
+                    self.current_state = State::MainMenu
                 } else {
                     // do nothing
                 }
             }
-            State::PROGRAMA => todo!(),
+            State::Programa => todo!(),
         }
     }
 
     fn update(&mut self) {
         match self.current_state {
-            State::MAIN_MENU => {}
-            State::MANUAL => {
+            State::MainMenu => {}
+            State::Manual => {
                 if self.menu_manual.current_state == ManualModeState::Resting {
                     self.menu_manual.current_state = ManualModeState::FirstScreen;
-                    self.current_state = State::MAIN_MENU
+                    self.current_state = State::MainMenu
                 } else {
                     self.menu_manual.update()
                 }
             }
-            State::EXECUCAO => self.menu_execucao.update(),
-            State::PROGRAMA => todo!(),
+            State::Execucao => self.menu_execucao.update(),
+            State::Programa => todo!(),
         }
     }
 
     fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         match self.current_state {
-            State::MAIN_MENU => self.draw_main_menu(canvas),
-            State::MANUAL => self.menu_manual.draw(canvas, start_point),
-            State::EXECUCAO => self.menu_execucao.draw(canvas, start_point),
-            State::PROGRAMA => todo!(),
+            State::MainMenu => self.draw_main_menu(canvas),
+            State::Manual => self.menu_manual.draw(canvas, start_point),
+            State::Execucao => self.menu_execucao.draw(canvas, start_point),
+            State::Programa => todo!(),
         }
     }
 }

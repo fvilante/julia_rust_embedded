@@ -1,12 +1,5 @@
 //abstracts the access to a type in memory
 
-use core::cell::{Cell, RefMut};
-use core::marker::PhantomData;
-
-use heapless::Vec;
-use lib_1::arena::arena::{Arena, ArenaId};
-use lib_1::utils::common::usize_to_u8_clamper;
-
 /// TODO: This type probabbly will be removed in future, avoid to use it and use Cell<T> or RefCell<T> instead, if possible.
 pub struct Accessor<'a, T: Copy + 'a> {
     // size = 4 bytes

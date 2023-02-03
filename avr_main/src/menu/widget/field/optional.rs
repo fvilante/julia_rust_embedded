@@ -2,10 +2,10 @@ use core::cell::Cell;
 
 use heapless::Vec;
 
+use super::super::widget::{Saveble, Widget};
 use super::edit_mode::EditMode;
-use super::widget::{Saveble, Widget};
 use crate::board::keyboard::KeyCode;
-use crate::menu::accessor::Accessor;
+
 use crate::menu::canvas::Canvas;
 use crate::menu::flash::FlashString;
 use crate::menu::point::Point;
@@ -15,12 +15,20 @@ use lib_1::utils::cursor::Cursor;
 
 pub type OptionsBuffer = Vec<FlashString, 5>;
 
-pub fn make_options_buffer_from_array<const ArraySize: usize>(
-    options_list: [FlashString; ArraySize],
+/// TODO: If possible make this function unnecessary and remove it from code. I suppose I'm using
+/// it to avoid spread of some `lifetimes`, but I'm not sure it is the best decision.
+pub fn make_options_buffer_from_array<const ARRAY_SIZE: usize>(
+    options_list: [FlashString; ARRAY_SIZE],
 ) -> OptionsBuffer {
     let mut options: OptionsBuffer = Vec::new();
     for item in options_list {
-        options.push(item);
+        match options.push(item) {
+            Ok(_) => {}
+            Err(_) => {
+                panic!("Err10");
+                // Error: Vector size not enough. Change 'OptionsBuffer' size to a higher value.
+            }
+        }
     }
     options
 }
@@ -54,13 +62,13 @@ impl<'a> OptionEditorWidget<'a> {
         char: char,
         is_in_editing_mode: bool,
     ) {
-        const empty_char: char = ' ';
+        const EMPTY_CHAR: char = ' ';
         if is_in_editing_mode {
             //blinks
             if self.blink.read() {
                 canvas.print_char(char);
             } else {
-                canvas.print_char(empty_char);
+                canvas.print_char(EMPTY_CHAR);
             }
         } else {
             //do not blink
@@ -133,13 +141,13 @@ impl Widget for OptionEditorWidget<'_> {
 
     fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         canvas.set_cursor(start_point);
-        const open_brackets: char = '[';
-        const close_brackets: char = ']';
+        const OPEN_BRACKETS: char = '[';
+        const CLOSE_BRACKETS: char = ']';
         let is_in_editing_mode = self.is_in_edit_mode();
         let current_index = self.editing_selection.get_current();
-        self.blinks_char_if_in_editing_mode(canvas, open_brackets, is_in_editing_mode);
+        self.blinks_char_if_in_editing_mode(canvas, OPEN_BRACKETS, is_in_editing_mode);
         let flash_string = self.options[current_index as usize];
         canvas.print_flash_str(flash_string);
-        self.blinks_char_if_in_editing_mode(canvas, close_brackets, is_in_editing_mode);
+        self.blinks_char_if_in_editing_mode(canvas, CLOSE_BRACKETS, is_in_editing_mode);
     }
 }

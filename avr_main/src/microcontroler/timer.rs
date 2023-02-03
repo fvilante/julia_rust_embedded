@@ -8,8 +8,6 @@ https://github.com/Rahix/avr-hal/issues/75
 and then modernized to account for API drift since 2020
 */
 
-use arduino_hal::port::mode::Output;
-use arduino_hal::port::Pin;
 use avr_device::atmega328p::tc1::tccr1b::CS1_A;
 use avr_device::atmega328p::TC1;
 use core::mem;
