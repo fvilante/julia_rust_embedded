@@ -9,7 +9,7 @@ use crate::{
         widget::submenu::spec::{MenuStorage, SubMenuHandle},
     },
 };
-
+use heapless::Vec;
 use lib_1::utils::common::usize_to_u8_clamper;
 
 /////////////////////////////////
@@ -20,12 +20,12 @@ pub struct SubMenuRender<'a> {
     current_menu: SubMenuHandle,
     /// State of widgets which are currently mounted on screen.
     mounted: [MenuItemWidget<'a>; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
+    /// Stores the path of menu jumps that user perform, so you can go back to previous menu
+    navigation_path: Vec<SubMenuHandle, 7>,
 }
 
 impl<'a> SubMenuRender<'a> {
     pub fn new(submenu_handle: SubMenuHandle, menu_storage: &'a MenuStorage) -> Self {
-        let menu_handle_length = usize_to_u8_clamper(menu_storage.len(submenu_handle));
-
         Self {
             menu_storage,
             mounted: [
@@ -33,6 +33,7 @@ impl<'a> SubMenuRender<'a> {
                 menu_storage.get_item(submenu_handle, 1).unwrap(),
             ],
             current_menu: submenu_handle,
+            navigation_path: Vec::new(),
         }
     }
 
@@ -105,6 +106,34 @@ impl<'a> SubMenuRender<'a> {
         self.mount();
     }
 
+    /// Changes current submenu
+    fn go_to_submenu(&mut self, submenu_handle: SubMenuHandle) {
+        self.current_menu = submenu_handle;
+        self.mount();
+    }
+
+    fn go_to_child(&mut self, child: SubMenuHandle) {
+        // saves parent
+        let parent = self.current_menu;
+        match self.navigation_path.push(parent) {
+            Ok(_) => (),
+            /// ERROR DESCRIPTION: `navigation_path` must be redimensioned to higher capacity.
+            Err(_) => panic!("E14"),
+        }
+        // go to child
+        self.go_to_submenu(child)
+    }
+
+    fn back_to_parent(&mut self) {
+        // pops parent from navigation path
+        let parent = match self.navigation_path.pop() {
+            Some(parent) => parent,
+            None => self.current_menu,
+        };
+        // go to parent
+        self.go_to_submenu(parent)
+    }
+
     /// If is in edit mode for some line returns Some(LcdLine) else None.
     /// TODO: Remove mutability of self when possible
     fn get_line_being_edited(&mut self) -> Option<LcdLine> {
@@ -166,11 +195,15 @@ impl SubMenuRender<'_> {
                     let current_menu_item = self.get_current_selected_mounted_item();
                     if let Some(child_handle) = current_menu_item.child {
                         // TEMP CODE: if current mitem has a child submenu, opens it.
-                        self.clone_from(Self::new(child_handle, self.menu_storage));
+                        self.go_to_child(child_handle);
                     } else {
                         // Enters edit mode on sub-widgets.
                         current_menu_item.set_edit_mode(true);
                     }
+                }
+
+                KeyCode::KEY_ESC => {
+                    self.back_to_parent();
                 }
 
                 _ => {
