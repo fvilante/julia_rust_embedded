@@ -1,6 +1,6 @@
 use core::{cell::Cell, u8};
 
-use lib_1::utils::cursor::Cursor;
+use lib_1::utils::{common::usize_to_u8_clamper, cursor::Cursor};
 
 use super::{
     super::super::{
@@ -8,6 +8,7 @@ use super::{
         widget::{menu_item::builder::MenuItemBuilder, menu_item::menu_item::MenuItemWidget},
     },
     core::SubmenuLayout,
+    navigation_state::NavigationState,
     spec_options::Options,
 };
 
@@ -32,29 +33,61 @@ pub enum SubMenuHandle {
     MenuIntertravamentoParaDoisEixos,
 }
 
+/// Used to store the navigation state of the submenu alongside the submenu itself
+pub struct Register<T: SubmenuLayout> {
+    pub menu: T,
+    pub navigation_state: Cell<NavigationState>,
+}
+
+impl<T: SubmenuLayout> Register<T> {
+    fn from_menu(menu: T) -> Self {
+        let menu_length = usize_to_u8_clamper(menu.len());
+        Self {
+            menu,
+            navigation_state: Cell::new(NavigationState::new_from_submenu_len(menu_length)),
+        }
+    }
+
+    fn get_menu(&self) -> &T {
+        &self.menu
+    }
+
+    fn get_navigation_state(&self) -> &Cell<NavigationState> {
+        &&self.navigation_state
+    }
+}
+
+impl<T: SubmenuLayout> SubmenuLayout for Register<T> {
+    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
+        self.menu.get_item(index)
+    }
+}
+
 /// The storage for all sub menus. If you create a new sub menu you must put it here.
 /// TODO: May change name to `MenuRegister`
 pub struct MenuStorage<'a> {
     model: &'a MachineModel,
-    pub MenuArquivoDeEixo: MenuArquivoDeEixo,
-    pub MenuParametrosDeMovimento: MenuParametrosDeMovimento<'a>,
-    pub MenuParametrosDeImpressao: MenuParametrosDeImpressao,
-    pub MenuParametrosDeCiclo: MenuParametrosDeCiclo,
-    pub MenuConfiguracaoDaImpressora: MenuConfiguracaoDaImpressora,
-    pub MenuIntertravamentoParaDoisEixos: MenuIntertravamentoParaDoisEixos,
+    pub MenuArquivoDeEixo: Register<MenuArquivoDeEixo>,
+    pub MenuParametrosDeMovimento: Register<MenuParametrosDeMovimento<'a>>,
+    pub MenuParametrosDeImpressao: Register<MenuParametrosDeImpressao>,
+    pub MenuParametrosDeCiclo: Register<MenuParametrosDeCiclo>,
+    pub MenuConfiguracaoDaImpressora: Register<MenuConfiguracaoDaImpressora>,
+    pub MenuIntertravamentoParaDoisEixos: Register<MenuIntertravamentoParaDoisEixos>,
 }
 
 impl<'a> MenuStorage<'a> {
     /// Constructs all the menus and initializes its internal state
-    pub const fn new(model: &'a MachineModel) -> Self {
+    pub fn new(model: &'a MachineModel) -> Self {
         Self {
             model,
-            MenuArquivoDeEixo: MenuArquivoDeEixo::new(),
-            MenuParametrosDeMovimento: MenuParametrosDeMovimento::new(model),
-            MenuParametrosDeImpressao: MenuParametrosDeImpressao::new(),
-            MenuParametrosDeCiclo: MenuParametrosDeCiclo::new(),
-            MenuConfiguracaoDaImpressora: MenuConfiguracaoDaImpressora::new(),
-            MenuIntertravamentoParaDoisEixos: MenuIntertravamentoParaDoisEixos::new(),
+            MenuArquivoDeEixo: Register::from_menu(MenuArquivoDeEixo::new()),
+            MenuParametrosDeMovimento: Register::from_menu(MenuParametrosDeMovimento::new(model)),
+            MenuParametrosDeImpressao: Register::from_menu(MenuParametrosDeImpressao::new()),
+            MenuParametrosDeCiclo: Register::from_menu(MenuParametrosDeCiclo::new()),
+            MenuConfiguracaoDaImpressora: Register::from_menu(MenuConfiguracaoDaImpressora::new()),
+            MenuIntertravamentoParaDoisEixos: Register::from_menu(
+                MenuIntertravamentoParaDoisEixos::new(),
+            ),
         }
     }
 
@@ -78,6 +111,32 @@ impl<'a> MenuStorage<'a> {
 
             SubMenuHandle::MenuIntertravamentoParaDoisEixos => {
                 self.MenuIntertravamentoParaDoisEixos.get_item(index)
+            }
+        }
+    }
+
+    /// Gets the navigation state of the submenu
+    /// TODO: Simplify this function implementation reusing self.get_item which has a similar implementation
+    pub fn get_navigation_state(&self, submenu_handle: SubMenuHandle) -> &Cell<NavigationState> {
+        match submenu_handle {
+            SubMenuHandle::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_navigation_state(),
+            SubMenuHandle::MenuParametrosDeMovimento => {
+                self.MenuParametrosDeMovimento.get_navigation_state()
+            }
+
+            SubMenuHandle::MenuParametrosDeImpressao => {
+                self.MenuParametrosDeImpressao.get_navigation_state()
+            }
+
+            SubMenuHandle::MenuParametrosDeCiclo => {
+                self.MenuParametrosDeCiclo.get_navigation_state()
+            }
+            SubMenuHandle::MenuConfiguracaoDaImpressora => {
+                self.MenuConfiguracaoDaImpressora.get_navigation_state()
+            }
+
+            SubMenuHandle::MenuIntertravamentoParaDoisEixos => {
+                self.MenuIntertravamentoParaDoisEixos.get_navigation_state()
             }
         }
     }
