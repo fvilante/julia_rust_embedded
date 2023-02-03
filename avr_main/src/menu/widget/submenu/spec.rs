@@ -313,7 +313,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
             0 => Some(
                 MenuItemBuilder::from_text(&POSICAO_INICIAL)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.parametro1,
+                        &self.model.arquivo_de_eixo.posicao_inicial,
                         Some(0..9999),
                         33,
                     )
@@ -323,7 +323,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
             1 => Some(
                 MenuItemBuilder::from_text(&POSICAO_FINAL)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.parametro1,
+                        &self.model.arquivo_de_eixo.posicao_inicial,
                         Some(0..9999),
                         33,
                     )
@@ -333,7 +333,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
             2 => Some(
                 MenuItemBuilder::from_text(&ACELERACAO_DE_AVANCO)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.parametro1,
+                        &self.model.arquivo_de_eixo.posicao_inicial,
                         Some(0..9999),
                         33,
                     )
@@ -343,7 +343,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
             3 => Some(
                 MenuItemBuilder::from_text(&ACELERACAO_DE_RETORNO)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.parametro1,
+                        &self.model.arquivo_de_eixo.posicao_inicial,
                         Some(0..9999),
                         33,
                     )
@@ -352,7 +352,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
             4 => Some(
                 MenuItemBuilder::from_text(&VELOCIDADE_DE_AVANCO)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.parametro1,
+                        &self.model.arquivo_de_eixo.posicao_inicial,
                         Some(0..9999),
                         33,
                     )
@@ -361,7 +361,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
             5 => Some(
                 MenuItemBuilder::from_text(&VELOCIDADE_DE_RETORNO)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.parametro1,
+                        &self.model.arquivo_de_eixo.posicao_inicial,
                         Some(0..9999),
                         33,
                     )
