@@ -10,7 +10,6 @@ use crate::{
     },
 };
 use heapless::Vec;
-use lib_1::utils::common::usize_to_u8_clamper;
 
 /////////////////////////////////
 
@@ -113,15 +112,18 @@ impl<'a> SubMenuRender<'a> {
     }
 
     fn go_to_child(&mut self, child: SubMenuHandle) {
-        // saves parent
-        let parent = self.current_menu;
-        match self.navigation_path.push(parent) {
-            Ok(_) => (),
-            /// ERROR DESCRIPTION: `navigation_path` must be redimensioned to higher capacity.
-            Err(_) => panic!("E14"),
+        // do nothing if child is pointing to itself
+        if self.current_menu != child {
+            // saves parent
+            let parent = self.current_menu;
+            match self.navigation_path.push(parent) {
+                Ok(_) => (),
+                // ERROR DESCRIPTION: `navigation_path` must be redimensioned to higher capacity.
+                Err(_) => panic!("E14"),
+            }
+            // go to child
+            self.go_to_submenu(child)
         }
-        // go to child
-        self.go_to_submenu(child)
     }
 
     fn back_to_parent(&mut self) {

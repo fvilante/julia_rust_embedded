@@ -31,7 +31,7 @@ pub fn development_entry_point() -> ! {
 
     let menu_storage: MenuStorage = MenuStorage::new(&machine_model);
 
-    let menu_root = SubMenuHandle::MenuArquivoDeEixo;
+    let menu_root = SubMenuHandle::MenuPrograma;
 
     let mut submenu = SubMenuRender::new(menu_root, &menu_storage);
 

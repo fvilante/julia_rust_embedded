@@ -2,20 +2,18 @@ use avr_progmem::progmem;
 
 progmem! {
 
-    //                          123456789012345678901234567890123456789 -> 39 characters
-    pub static progmem string T0 = "Posicao inicial             ${nnnnn} mm";
-    pub static progmem string T1 = "Posicao final               ${nnnnn} mm";
-    pub static progmem string T2 = "Velocidade de avanco      ${nnnnn} mm/s";
-    pub static progmem string T3 = "Velocidade de retorno     ${nnnnn} mm/s";
-    pub static progmem string T4 = "Aceleracao de avanco     ${nnnnn} mm/s2";
-    pub static progmem string T5 = "Aceleracao de reto       ${nnnnn} mm/s2";
-    pub static progmem string T6 = "Numero de mensagens no avanco     ${nn}";
-    pub static progmem string T7 = "Numero de mensagens no retorno    ${nn}";
-    pub static progmem string T8 = "Modo continuo ou passo-a-passo [${alt1}]";
-    pub static progmem string T9 = "Logica do start externo        [${alt2}]";
+    // MENU PROGRAMA
 
+    pub static progmem string NUMERO_DO_PROGRAMA_PARA_EDICAO =  "Numero do programa para edicao  : ##";
+    pub static progmem string NUMERO_DO_PROGRAMA_DO_EIXO_X =    "Numero do programa do eixo X    : ##";
+    pub static progmem string NUMERO_DO_PROGRAMA_DO_EIXO_Y =    "Numero do programa do eixo Y    : ##";
+    pub static progmem string COPIAR_O_PROGRAMA_NUMERO =        "Copiar o programa numero : ## para: ##";
+    pub static progmem string TROCA_DE_NIVEL_DE_ACCESSO =       "Troca do nivel de acesso     [******** ";
+    pub static progmem string CONFIGURACAO_DO_EIXO_X =          "Configuracao do eixo X :      [******* ";
+    pub static progmem string CONFIGURACAO_DO_EIXO_Y =          "Configuracao do eixo Y :      [******* ";
+    pub static progmem string CONFIGURACAO_DO_EQUIPAMENTO =     "Configuracao do equipamento ...";
+    pub static progmem string ROTINAS_DE_TESTES_E_VERIFICACAO = "Rotinas de testes e verificacao ...";
 
-    pub static progmem string E0 = "Erro de carga de parametro";
 
     //ARQUIVO DE EIXO
 
@@ -24,7 +22,8 @@ progmem! {
     pub static progmem string CONFIGURACAO_DO_CICLO = "Configuracao do Ciclo...";
     pub static progmem string CONFIGURACAO_DA_IMPRESSORA = "Configuracao da impressora...";
     pub static progmem string INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO = "Intertravamento: dois eixos e pas/pas..";
-    pub static progmem string PARAMETROS_SELECAO_DE_MENSAGEM = "Parametros de Selecao de mensagem...";
+    // NAO ACHEI A LINHA ABAIXO NO CODIGO FONTE DO CPU-Z80, VOU DEIXAR PARA VERIFICAR ISTO NO TESTE EM LAB
+    //pub static progmem string PARAMETROS_SELECAO_DE_MENSAGEM = "Parametros de Selecao de mensagem...";
 
     // PARAMETROS DE MOVIMENTO
 
@@ -75,7 +74,24 @@ progmem! {
     pub static progmem string START_AUTOMATICO_PASSO_A_PASSO = "Start automatico passo/passo";
     pub static progmem string SAIDA_START_PASSO_A_PASSO = "Saida de start passo a passo";
 
-    //
+    // MENU CONFIGURACAO DE EIXO
+
+    pub static progmem string NUMERO_DO_CANAL_X = "Numero do canal X               ##     ";
+    pub static progmem string NUMERO_DE_PULSO_DO_GIRO_X = "Numero de pulso do giro X       ####   ";
+    pub static progmem string JANELA_DE_PROTECAO_DO_GITO_X = "Janela de protecao do giro X    ####   ";
+    pub static progmem string DESLOCAMENTO_GIRO_DO_MOTOR_X = "Deslocamento/Giro do Motor X  [******* ";
+    pub static progmem string GIRO_COM_FUNCAO_DE_PROTECAO = "Giro X com funcao de protecao [******* ";
+    pub static progmem string GIRO_COM_FUNCAO_DE_CORRECAO = "Giro X com funcao de correcao [******* ";
+    pub static progmem string LOGICA_DO_START_EXTERNO = "Logica do start externo X     [******* ";
+    pub static progmem string VALOR_DA_POSICAO_DA_REFERENCIA = "Valor da posicao da referencia  ####   ";
+    pub static progmem string VELOCIDADE_PARA_REFERENCIA_X = "Velocidade para referencia X    ####   ";
+    pub static progmem string ACELERACAO_PARA_REFERENCIA_X = "Aceleracao para referencia X    ####   ";
+    pub static progmem string REDUCAO_DA_CORRENTE_EM_REPOUSO = "Reducao da corrente em repouso[******* ";
+    pub static progmem string REFERENCIA_PELO_START_EXTERNO = "Referencia pelo start externo [******* ";
+    pub static progmem string MODO_TURBO_X = "Modo Turbo X                  [******* ";
+
+
+    // OPTIONAL PARAMETER'S TEXT
 
     pub static progmem string LIGADO = "Ligado";
     pub static progmem string DESLIGADO = "Deslig";
@@ -83,8 +99,7 @@ progmem! {
     pub static progmem string PASSO_A_PASSO = "PasPas";
     pub static progmem string ABERTO = "Aberto";
     pub static progmem string FECHADO = "fechado";
-    pub static progmem string O3 = "Juca  ";
-    pub static progmem string O4 = "Nego  ";
+
 
     //NOTE: it is possible to load any type in progmem not only strings
     pub static progmem TABLE_01: [u8; 6] = [0,1,2,3,4,5];
