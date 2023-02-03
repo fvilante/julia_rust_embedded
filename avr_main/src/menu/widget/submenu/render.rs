@@ -18,7 +18,6 @@ pub struct SubMenuRender<'a> {
     /// List of all submenu items.
     menu_storage: &'a MenuStorage<'a>,
     current_menu: SubMenuHandle,
-    navigation_state: NavigationState,
     /// State of widgets which are currently mounted on screen.
     mounted: [MenuItemWidget<'a>; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
 }
@@ -33,15 +32,32 @@ impl<'a> SubMenuRender<'a> {
                 menu_storage.get_item(submenu_handle, 0).unwrap(),
                 menu_storage.get_item(submenu_handle, 1).unwrap(),
             ],
-            navigation_state: NavigationState::new_from_submenu_len(menu_handle_length),
             current_menu: submenu_handle,
         }
+    }
+
+    /// Gets a copy of the Navigation State.
+    /// NOTE: Any modification on the copy will not reflect in the official state.
+    /// TODO: Refactor this concept when possible.
+    fn get_navigation_state(&self) -> NavigationState {
+        self.menu_storage
+            .get_navigation_state(self.current_menu)
+            .get()
+    }
+
+    /// Updates the navigation state of current sub_menu by applying update_fn on it
+    fn update_navigation_state(&self, update_fn: fn(NavigationState) -> NavigationState) {
+        let current_ns = self.get_navigation_state();
+        let updated_ns = update_fn(current_ns);
+        self.menu_storage
+            .get_navigation_state(self.current_menu)
+            .set(updated_ns)
     }
 
     /// Mount widgets that are being renderized
     fn mount(&mut self) {
         for lcd_line in LcdLine::iterator() {
-            let index = self.navigation_state.get_current_index_for(lcd_line) as usize;
+            let index = self.get_navigation_state().get_current_index_for(lcd_line) as usize;
             let menu_item_widget = self
                 .menu_storage
                 .get_item(self.current_menu, index)
@@ -50,7 +66,8 @@ impl<'a> SubMenuRender<'a> {
                 // mount item
                 *elem = menu_item_widget;
             } else {
-                panic!("Menu error 02");
+                // Mounting error
+                panic!("E2");
             }
         }
     }
@@ -60,24 +77,31 @@ impl<'a> SubMenuRender<'a> {
         if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
             return elem;
         } else {
-            panic!("Menu error 01");
+            // Mounting error
+            panic!("E1");
         }
     }
 
     /// Get mounted item in the current line which is selected by user
     fn get_current_selected_mounted_item(&mut self) -> &mut MenuItemWidget<'a> {
-        let line = self.navigation_state.get_current_lcd_line();
+        let line = self.get_navigation_state().get_current_lcd_line();
         let current_menu_item = self.get_mounted_item_for_line(line);
         current_menu_item
     }
 
     fn key_down(&mut self) {
-        self.navigation_state.key_down();
+        self.update_navigation_state(|mut nav_state| {
+            nav_state.key_down();
+            nav_state
+        });
         self.mount();
     }
 
     fn key_up(&mut self) {
-        self.navigation_state.key_up();
+        self.update_navigation_state(|mut nav_state| {
+            nav_state.key_up();
+            nav_state
+        });
         self.mount();
     }
 
@@ -117,7 +141,6 @@ impl SubMenuRender<'_> {
     pub fn clone_from(&mut self, origin: Self) {
         self.menu_storage = origin.menu_storage;
         self.current_menu = origin.current_menu;
-        self.navigation_state = origin.navigation_state;
         self.mounted = origin.mounted;
     }
 }
@@ -168,7 +191,7 @@ impl SubMenuRender<'_> {
         // clear screen
         canvas.clear();
         // draw menu item selector
-        let line = self.navigation_state.get_current_lcd_line();
+        let line = self.get_navigation_state().get_current_lcd_line();
         self.draw_menu_item_selector(line, canvas);
         // draw menu items
         for line in LcdLine::iterator() {
