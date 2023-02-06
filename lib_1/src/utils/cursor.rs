@@ -103,15 +103,3 @@ impl Cursor {
         self.current = self.start;
     }
 }
-/// ATTENTION: unsafe code node marked
-/// TODO: if `start`>0 then this is unsafe because is not garanteed to have at least two objects to point, but i'm
-/// for short to develop menu system. When possible improve this code
-impl Default for Cursor {
-    fn default() -> Self {
-        Self {
-            current: 0,
-            start: 0,
-            end: 0,
-        }
-    }
-}

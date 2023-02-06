@@ -1,7 +1,5 @@
 use core::cell::Cell;
 
-use lib_1::utils::cursor::Cursor;
-
 pub struct ArquivoDeEixo {
     // PARAMETROS DE MOVIMENTO
     pub posicao_inicial: Cell<u16>,
