@@ -274,7 +274,7 @@ pub fn development_entry_point() -> ! {
 
     loop {
         let keycode = keypad.scan();
-        lcd::setCursor(0, 1);
+        lcd::set_cursor(0, 1);
         lcd::print_u8_in_hex(keycode as u8);
         delay_ms(100);
     }

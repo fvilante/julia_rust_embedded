@@ -183,13 +183,13 @@ pub fn clear() -> () {
     delay_us(2000); // this command takes a long time!
 }
 
-pub fn setCursor(col: u8, row: u8) {
-    const line0_offset: u8 = 0x00;
-    const line1_offset: u8 = 0x00 + NUMBER_OF_COLS;
+pub fn set_cursor(col: u8, row: u8) {
+    const LINE_0_OFFSET: u8 = 0x00;
+    const LINE1_OFFSET: u8 = 0x00 + NUMBER_OF_COLS;
 
     let line_offset = match row {
-        0 => line0_offset,
-        _ => line1_offset,
+        0 => LINE_0_OFFSET,
+        _ => LINE1_OFFSET,
     };
 
     command(LCD_SETDDRAMADDR | (col + line_offset));
@@ -307,16 +307,16 @@ pub fn example_01() -> ! {
 
     loop {
         clear();
-        setCursor(10, 0);
+        set_cursor(10, 0);
         print("Julia AVR Rust");
-        setCursor(10, 1);
+        set_cursor(10, 1);
         print("@FlavioVilante");
         for row in 0..2 {
             for col in 0..40 {
-                setCursor(col, row);
+                set_cursor(col, row);
                 print_char(icon);
                 delay_ms(100);
-                setCursor(col, row);
+                set_cursor(col, row);
                 print_char(' ');
             }
         }
