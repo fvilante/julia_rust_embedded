@@ -23,14 +23,16 @@ use super::flash_texts::*;
 /// If you create a new sub menu you must put it here.
 ///
 /// TODO: Rename to `MenuStorageIndex`
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum SubMenuHandle {
+    MenuPrograma,
     MenuArquivoDeEixo,
     MenuParametrosDeMovimento,
     MenuParametrosDeImpressao,
     MenuParametrosDeCiclo,
     MenuConfiguracaoDaImpressora,
     MenuIntertravamentoParaDoisEixos,
+    MenuConfiguracaoDeEixo,
 }
 
 /// Used to store the navigation state of the submenu alongside the submenu itself
@@ -67,12 +69,18 @@ impl<T: SubmenuLayout> SubmenuLayout for Register<T> {
 /// TODO: May change name to `MenuRegister`
 pub struct MenuStorage<'a> {
     model: &'a MachineModel,
-    pub MenuArquivoDeEixo: Register<MenuArquivoDeEixo>,
+
+    pub MenuPrograma: Register<MenuPrograma<'a>>,
+
+    // ARQUIVO DE EIXO
+    pub MenuArquivoDeEixo: Register<MenuArquivoDeEixo<'a>>,
     pub MenuParametrosDeMovimento: Register<MenuParametrosDeMovimento<'a>>,
-    pub MenuParametrosDeImpressao: Register<MenuParametrosDeImpressao>,
-    pub MenuParametrosDeCiclo: Register<MenuParametrosDeCiclo>,
-    pub MenuConfiguracaoDaImpressora: Register<MenuConfiguracaoDaImpressora>,
-    pub MenuIntertravamentoParaDoisEixos: Register<MenuIntertravamentoParaDoisEixos>,
+    pub MenuParametrosDeImpressao: Register<MenuParametrosDeImpressao<'a>>,
+    pub MenuParametrosDeCiclo: Register<MenuParametrosDeCiclo<'a>>,
+    pub MenuConfiguracaoDaImpressora: Register<MenuConfiguracaoDaImpressora<'a>>,
+    pub MenuIntertravamentoParaDoisEixos: Register<MenuIntertravamentoParaDoisEixos<'a>>,
+    //pub MenuParametrosDeSelecaoDeMensagem: Register<MenuParametrosDeSelecaoDeMensagem>,
+    pub MenuConfiguracaoDoEixo: Register<MenuConfiguracaoDeEixo<'a>>,
 }
 
 impl<'a> MenuStorage<'a> {
@@ -80,14 +88,18 @@ impl<'a> MenuStorage<'a> {
     pub fn new(model: &'a MachineModel) -> Self {
         Self {
             model,
-            MenuArquivoDeEixo: Register::from_menu(MenuArquivoDeEixo::new()),
+            MenuPrograma: Register::from_menu(MenuPrograma::new(model)),
+            MenuArquivoDeEixo: Register::from_menu(MenuArquivoDeEixo::new(model)),
             MenuParametrosDeMovimento: Register::from_menu(MenuParametrosDeMovimento::new(model)),
-            MenuParametrosDeImpressao: Register::from_menu(MenuParametrosDeImpressao::new()),
-            MenuParametrosDeCiclo: Register::from_menu(MenuParametrosDeCiclo::new()),
-            MenuConfiguracaoDaImpressora: Register::from_menu(MenuConfiguracaoDaImpressora::new()),
+            MenuParametrosDeImpressao: Register::from_menu(MenuParametrosDeImpressao::new(model)),
+            MenuParametrosDeCiclo: Register::from_menu(MenuParametrosDeCiclo::new(model)),
+            MenuConfiguracaoDaImpressora: Register::from_menu(MenuConfiguracaoDaImpressora::new(
+                model,
+            )),
             MenuIntertravamentoParaDoisEixos: Register::from_menu(
-                MenuIntertravamentoParaDoisEixos::new(),
+                MenuIntertravamentoParaDoisEixos::new(model),
             ),
+            MenuConfiguracaoDoEixo: Register::from_menu(MenuConfiguracaoDeEixo::new(model)),
         }
     }
 
@@ -95,6 +107,7 @@ impl<'a> MenuStorage<'a> {
     /// If index is out of range than returns None
     pub fn get_item(&self, submenu_handle: SubMenuHandle, index: usize) -> Option<MenuItemWidget> {
         match submenu_handle {
+            SubMenuHandle::MenuPrograma => self.MenuPrograma.get_item(index),
             SubMenuHandle::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_item(index),
             SubMenuHandle::MenuParametrosDeMovimento => {
                 self.MenuParametrosDeMovimento.get_item(index)
@@ -112,6 +125,7 @@ impl<'a> MenuStorage<'a> {
             SubMenuHandle::MenuIntertravamentoParaDoisEixos => {
                 self.MenuIntertravamentoParaDoisEixos.get_item(index)
             }
+            SubMenuHandle::MenuConfiguracaoDeEixo => self.MenuConfiguracaoDoEixo.get_item(index),
         }
     }
 
@@ -119,6 +133,7 @@ impl<'a> MenuStorage<'a> {
     /// TODO: Simplify this function implementation reusing self.get_item which has a similar implementation
     pub fn get_navigation_state(&self, submenu_handle: SubMenuHandle) -> &Cell<NavigationState> {
         match submenu_handle {
+            SubMenuHandle::MenuPrograma => self.MenuPrograma.get_navigation_state(),
             SubMenuHandle::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_navigation_state(),
             SubMenuHandle::MenuParametrosDeMovimento => {
                 self.MenuParametrosDeMovimento.get_navigation_state()
@@ -137,6 +152,10 @@ impl<'a> MenuStorage<'a> {
 
             SubMenuHandle::MenuIntertravamentoParaDoisEixos => {
                 self.MenuIntertravamentoParaDoisEixos.get_navigation_state()
+            }
+
+            SubMenuHandle::MenuConfiguracaoDeEixo => {
+                self.MenuConfiguracaoDoEixo.get_navigation_state()
             }
         }
     }
@@ -158,15 +177,93 @@ impl<'a> MenuStorage<'a> {
 
 ////////////////////////////////////////////////////
 
-pub struct MenuArquivoDeEixo;
+pub struct MenuPrograma<'a> {
+    model: &'a MachineModel,
+}
 
-impl MenuArquivoDeEixo {
-    pub const fn new() -> Self {
-        Self {}
+impl<'a> MenuPrograma<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
+        Self { model }
     }
 }
 
-impl SubmenuLayout for MenuArquivoDeEixo {
+impl SubmenuLayout for MenuPrograma<'_> {
+    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
+        match index {
+            0 => Some(
+                MenuItemBuilder::from_text(&NUMERO_DO_PROGRAMA_PARA_EDICAO)
+                    .add_conection_to_submenu(SubMenuHandle::MenuArquivoDeEixo)
+                    .build(),
+            ),
+
+            1 => Some(
+                MenuItemBuilder::from_text(&NUMERO_DO_PROGRAMA_DO_EIXO_X)
+                    .add_conection_to_submenu(SubMenuHandle::MenuArquivoDeEixo)
+                    .build(),
+            ),
+
+            2 => Some(
+                MenuItemBuilder::from_text(&NUMERO_DO_PROGRAMA_DO_EIXO_Y)
+                    .add_conection_to_submenu(SubMenuHandle::MenuArquivoDeEixo)
+                    .build(),
+            ),
+
+            3 => Some(
+                MenuItemBuilder::from_text(&COPIAR_O_PROGRAMA_NUMERO)
+                    .add_conection_to_submenu(SubMenuHandle::MenuPrograma)
+                    .build(),
+            ),
+
+            4 => Some(
+                MenuItemBuilder::from_text(&TROCA_DE_NIVEL_DE_ACCESSO)
+                    .add_conection_to_submenu(SubMenuHandle::MenuPrograma)
+                    .build(),
+            ),
+
+            5 => Some(
+                MenuItemBuilder::from_text(&CONFIGURACAO_DO_EIXO_X)
+                    .add_conection_to_submenu(SubMenuHandle::MenuConfiguracaoDeEixo)
+                    .build(),
+            ),
+
+            6 => Some(
+                MenuItemBuilder::from_text(&CONFIGURACAO_DO_EIXO_Y)
+                    .add_conection_to_submenu(SubMenuHandle::MenuConfiguracaoDeEixo)
+                    .build(),
+            ),
+
+            7 => Some(
+                MenuItemBuilder::from_text(&CONFIGURACAO_DO_EQUIPAMENTO)
+                    .add_conection_to_submenu(SubMenuHandle::MenuPrograma)
+                    .build(),
+            ),
+
+            8 => Some(
+                MenuItemBuilder::from_text(&ROTINAS_DE_TESTES_E_VERIFICACAO)
+                    .add_conection_to_submenu(SubMenuHandle::MenuPrograma)
+                    .build(),
+            ),
+
+            _ => None,
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//          MENU ARQUIVO DE EIXO
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+pub struct MenuArquivoDeEixo<'a> {
+    model: &'a MachineModel,
+}
+
+impl<'a> MenuArquivoDeEixo<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
+        Self { model }
+    }
+}
+
+impl SubmenuLayout for MenuArquivoDeEixo<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
@@ -199,12 +296,6 @@ impl SubmenuLayout for MenuArquivoDeEixo {
                     .build(),
             ),
 
-            5 => Some(
-                MenuItemBuilder::from_text(&PARAMETROS_SELECAO_DE_MENSAGEM)
-                    .add_conection_to_submenu(SubMenuHandle::MenuParametrosDeMovimento)
-                    .build(),
-            ),
-
             _ => None,
         }
     }
@@ -222,13 +313,13 @@ impl<'a> MenuParametrosDeMovimento<'a> {
     }
 }
 
-impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
+impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
                 MenuItemBuilder::from_text(&POSICAO_INICIAL)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.parametro1,
+                        &self.model.arquivo_de_eixo.posicao_inicial,
                         Some(0..9999),
                         33,
                     )
@@ -238,7 +329,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
             1 => Some(
                 MenuItemBuilder::from_text(&POSICAO_FINAL)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.parametro1,
+                        &self.model.arquivo_de_eixo.posicao_inicial,
                         Some(0..9999),
                         33,
                     )
@@ -248,7 +339,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
             2 => Some(
                 MenuItemBuilder::from_text(&ACELERACAO_DE_AVANCO)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.parametro1,
+                        &self.model.arquivo_de_eixo.posicao_inicial,
                         Some(0..9999),
                         33,
                     )
@@ -258,7 +349,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
             3 => Some(
                 MenuItemBuilder::from_text(&ACELERACAO_DE_RETORNO)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.parametro1,
+                        &self.model.arquivo_de_eixo.posicao_inicial,
                         Some(0..9999),
                         33,
                     )
@@ -267,7 +358,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
             4 => Some(
                 MenuItemBuilder::from_text(&VELOCIDADE_DE_AVANCO)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.parametro1,
+                        &self.model.arquivo_de_eixo.posicao_inicial,
                         Some(0..9999),
                         33,
                     )
@@ -276,7 +367,7 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
             5 => Some(
                 MenuItemBuilder::from_text(&VELOCIDADE_DE_RETORNO)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.parametro1,
+                        &self.model.arquivo_de_eixo.posicao_inicial,
                         Some(0..9999),
                         33,
                     )
@@ -290,21 +381,23 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
 
 ////////////////////////////////////////////////////
 
-pub struct MenuParametrosDeImpressao {
+pub struct MenuParametrosDeImpressao<'a> {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
+    model: &'a MachineModel,
 }
 
-impl MenuParametrosDeImpressao {
-    pub const fn new() -> Self {
+impl<'a> MenuParametrosDeImpressao<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
         Self {
             value0: Cell::new(Cursor::new(0, 2, 1)),
             value1: Cell::new(0),
+            model,
         }
     }
 }
 
-impl SubmenuLayout for MenuParametrosDeImpressao {
+impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
@@ -368,21 +461,23 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
 
 ////////////////////////////////////////////////////
 
-pub struct MenuParametrosDeCiclo {
+pub struct MenuParametrosDeCiclo<'a> {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
+    model: &'a MachineModel,
 }
 
-impl MenuParametrosDeCiclo {
-    pub const fn new() -> Self {
+impl<'a> MenuParametrosDeCiclo<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
         Self {
             value0: Cell::new(Cursor::new(0, 2, 1)),
             value1: Cell::new(0),
+            model,
         }
     }
 }
 
-impl SubmenuLayout for MenuParametrosDeCiclo {
+impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
@@ -422,21 +517,23 @@ impl SubmenuLayout for MenuParametrosDeCiclo {
 
 ////////////////////////////////////////////////////
 
-pub struct MenuConfiguracaoDaImpressora {
+pub struct MenuConfiguracaoDaImpressora<'a> {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
+    model: &'a MachineModel,
 }
 
-impl MenuConfiguracaoDaImpressora {
-    pub const fn new() -> Self {
+impl<'a> MenuConfiguracaoDaImpressora<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
         Self {
             value0: Cell::new(Cursor::new(0, 2, 1)),
             value1: Cell::new(0),
+            model,
         }
     }
 }
 
-impl SubmenuLayout for MenuConfiguracaoDaImpressora {
+impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
@@ -470,21 +567,23 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora {
 
 ////////////////////////////////////////////////////
 
-pub struct MenuIntertravamentoParaDoisEixos {
+pub struct MenuIntertravamentoParaDoisEixos<'a> {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
+    model: &'a MachineModel,
 }
 
-impl MenuIntertravamentoParaDoisEixos {
-    pub const fn new() -> Self {
+impl<'a> MenuIntertravamentoParaDoisEixos<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
         Self {
             value0: Cell::new(Cursor::new(0, 2, 1)),
             value1: Cell::new(0),
+            model,
         }
     }
 }
 
-impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
+impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
@@ -546,4 +645,108 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
     }
 }
 
-////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//          MENU CONFIGURACAO DE EIXO
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+pub struct MenuConfiguracaoDeEixo<'a> {
+    value0: Cell<Cursor>,
+    value1: Cell<u16>,
+    model: &'a MachineModel,
+}
+
+impl<'a> MenuConfiguracaoDeEixo<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
+        Self {
+            value0: Cell::new(Cursor::new(0, 2, 1)),
+            value1: Cell::new(0),
+            model,
+        }
+    }
+}
+
+impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
+    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
+        match index {
+            0 => Some(
+                MenuItemBuilder::from_text(&NUMERO_DO_CANAL_X)
+                    .add_numerical_variable(&self.value1, Some(0..99), 33)
+                    .build(),
+            ),
+
+            1 => Some(
+                MenuItemBuilder::from_text(&NUMERO_DE_PULSO_DO_GIRO_X)
+                    .add_numerical_variable(&self.value1, Some(0..0xFFFF), 33)
+                    .build(),
+            ),
+
+            2 => Some(
+                MenuItemBuilder::from_text(&JANELA_DE_PROTECAO_DO_GITO_X)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .build(),
+            ),
+
+            3 => Some(
+                MenuItemBuilder::from_text(&DESLOCAMENTO_GIRO_DO_MOTOR_X)
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .build(),
+            ),
+
+            4 => Some(
+                MenuItemBuilder::from_text(&GIRO_COM_FUNCAO_DE_PROTECAO)
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .build(),
+            ),
+
+            5 => Some(
+                MenuItemBuilder::from_text(&GIRO_COM_FUNCAO_DE_CORRECAO)
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .build(),
+            ),
+
+            6 => Some(
+                MenuItemBuilder::from_text(&LOGICA_DO_START_EXTERNO)
+                    .add_optional_variable(&self.value0, Options::aberto_fechado(), 30)
+                    .build(),
+            ),
+
+            7 => Some(
+                MenuItemBuilder::from_text(&VALOR_DA_POSICAO_DA_REFERENCIA)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .build(),
+            ),
+
+            8 => Some(
+                MenuItemBuilder::from_text(&VELOCIDADE_PARA_REFERENCIA_X)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .build(),
+            ),
+
+            9 => Some(
+                MenuItemBuilder::from_text(&ACELERACAO_PARA_REFERENCIA_X)
+                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .build(),
+            ),
+
+            10 => Some(
+                MenuItemBuilder::from_text(&REDUCAO_DA_CORRENTE_EM_REPOUSO)
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .build(),
+            ),
+
+            11 => Some(
+                MenuItemBuilder::from_text(&REFERENCIA_PELO_START_EXTERNO)
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .build(),
+            ),
+
+            12 => Some(
+                MenuItemBuilder::from_text(&MODO_TURBO_X)
+                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .build(),
+            ),
+
+            _ => None,
+        }
+    }
+}

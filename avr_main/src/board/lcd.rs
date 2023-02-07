@@ -10,14 +10,9 @@ use lib_1::utils::common::{convert_u16_to_str_hex, convert_u8_to_str_hex, get_bi
 const HIGH: bool = true;
 const LOW: bool = false;
 
-const MAX_LINES: u8 = 4;
-
-// lcd internal state
-static mut _DISPLAYFUNCTION: u8 = 0x00;
-static mut _DISPLAYCONTROL: u8 = 0x00;
-static mut _DISPLAYMODE: u8 = 0x00;
-static mut _ROW_OFFSETS: [u8; 4] = [0; 4];
-static mut _NUMLINES: u8 = 0x00;
+// LCD CONFIGURATION: in this case 40x2
+const NUMBER_OF_COLS: u8 = 40;
+const NUMBER_OF_LINES: u8 = 2;
 
 fn init_lcd_pins() -> () {
     port::B4::set_output(); // lcd_rs = PB4
@@ -27,14 +22,6 @@ fn init_lcd_pins() -> () {
     port::C1::set_output(); // lcd_db6 = PC1
     port::C2::set_output(); // lcd_db5 = PC2
     port::C3::set_output(); // lcd_db4 = PC3
-
-    //
-    //lcd_rs(?);
-    //lcd_enable(?);
-    //lcd_db7(?);
-    //lcd_db6(?);
-    //lcd_db5(?);
-    //lcd_db4(?);
 }
 
 fn lcd_rs(value: bool) -> () {
@@ -88,28 +75,31 @@ fn lcd_db4(value: bool) -> () {
 // ---------------------------------------------------------------------------
 /************ low level data pushing commands **********/
 
-fn pulse_enable() -> () {
-    lcd_enable(LOW);
-    delay_us(1);
-    lcd_enable(HIGH);
-    delay_us(1); // enable pulse must be >450ns
-    lcd_enable(LOW);
-    delay_us(100); // commands need > 37us to settle
-}
-
 // write low four bits of data in the lcd data output channel
 fn write4bits(data: u8) -> () {
+    /// Pulses the enable pin
+    fn pulse_enable() -> () {
+        lcd_enable(LOW);
+        delay_us(1);
+        lcd_enable(HIGH);
+        delay_us(1); // enable pulse must be >450ns
+        lcd_enable(LOW);
+        delay_us(100); // commands need > 37us to settle
+    }
+
+    // push data
     lcd_db4(get_bit_at_as_bool(data, 0));
     lcd_db5(get_bit_at_as_bool(data, 1));
     lcd_db6(get_bit_at_as_bool(data, 2));
     lcd_db7(get_bit_at_as_bool(data, 3));
-    //
+    // pulse enable
     pulse_enable();
 }
 
-// write either command or data
+/// Writes either command or data, base in the value of parameter `rs_mode`.
+///
+/// If `rs_mode` is false then writes a command, otherwise data
 fn send(value: u8, rs_mode: bool) -> () {
-    // @@ or "mode:u8" ?? (Please check and remove this line if possible)
     lcd_rs(rs_mode);
     write4bits(value >> 4); // most significant bits
     write4bits(value); // least significant bits
@@ -118,18 +108,21 @@ fn send(value: u8, rs_mode: bool) -> () {
 // ---------------------------------------------------------------------------
 /*********** mid level commands, for sending data/cmds */
 
+/// Sends commands
 fn command(value: u8) -> () {
     send(value, LOW);
 }
 
-// print just one byte
+/// Sends data
+/// prints just one byte
 fn write_u8(value: u8) -> () {
     send(value, HIGH);
-    //return 1; // assume sucess // @@ line removed by considered unecessary. (Please check and remove this line if possible)
 }
 
 // --------------------------------------------------------------------------
 // Very high level user functions
+
+// TODO: Improve these `high level user functions` to be something more generic.
 
 // print just one byte
 pub fn print_bit(bit: bool) -> () {
@@ -190,105 +183,16 @@ pub fn clear() -> () {
     delay_us(2000); // this command takes a long time!
 }
 
-fn home() -> () {
-    command(LCD_RETURNHOME); // set cursor position to zero
-    delay_us(2000); // this command takes a long time!
-}
+pub fn set_cursor(col: u8, row: u8) {
+    const LINE_0_OFFSET: u8 = 0x00;
+    const LINE1_OFFSET: u8 = 0x00 + NUMBER_OF_COLS;
 
-pub fn setCursor(col: u8, row: u8) {
-    //bugfix: I don't discoved why but row 1 is mapped to number 2 instead of number 1.
-    //        I'm implementing this simple workaround. This will not become an issue if
-    //        display stays with just 2 lines.
-    let row_bugfixed: u8 = match row {
-        0 => 0,
-        1 => 2,
-        2.. => 2,
+    let line_offset = match row {
+        0 => LINE_0_OFFSET,
+        _ => LINE1_OFFSET,
     };
 
-    let max_lines: u8 = MAX_LINES; // @@ original code: "const size_t max_lines = sizeof(_row_offsets) / sizeof(*_row_offsets)"";
-    let mut row_temp: usize = 0x00;
-    // safe guard
-    if row_bugfixed >= max_lines {
-        row_temp = (max_lines - 1) as usize; // we count rows starting w/0
-    }
-    if row_bugfixed >= unsafe { _NUMLINES } {
-        row_temp = (unsafe { _NUMLINES } - 1) as usize; // we count rows starting w/0
-    }
-
-    command(LCD_SETDDRAMADDR | (col + unsafe { _ROW_OFFSETS[row_temp] }));
-}
-
-// Turn the display on/off (quickly)
-fn noDisplay() {
-    unsafe {
-        _DISPLAYCONTROL &= !LCD_DISPLAYON;
-    }; // @@ check if in rust the equivalent of clang negation symbol '~' is '!' (Please check and remove this line if possible)
-    command(LCD_DISPLAYCONTROL | unsafe { _DISPLAYCONTROL });
-}
-
-fn display() -> () {
-    unsafe {
-        _DISPLAYCONTROL |= LCD_DISPLAYON;
-    }
-    command(LCD_DISPLAYCONTROL | unsafe { _DISPLAYCONTROL });
-}
-
-// Turns the underline cursor on/off
-fn noCursor() -> () {
-    unsafe {
-        _DISPLAYCONTROL &= !LCD_CURSORON;
-    }; // @@ check if in rust the equivalent of clang negation symbol '~' is '!' (Please check and remove this line if possible)
-    command(LCD_DISPLAYCONTROL | unsafe { _DISPLAYCONTROL });
-}
-
-fn cursor() -> () {
-    unsafe {
-        _DISPLAYCONTROL |= LCD_CURSORON;
-    };
-    command(LCD_DISPLAYCONTROL | unsafe { _DISPLAYCONTROL });
-}
-
-// Turn on and off the blinking cursor
-fn noBlink() -> () {
-    unsafe {
-        _DISPLAYCONTROL &= !LCD_BLINKON;
-    }; // @@ check if in rust the equivalent of clang negation symbol '~' is '!' (Please check and remove this line if possible)
-    command(LCD_DISPLAYCONTROL | unsafe { _DISPLAYCONTROL });
-}
-
-fn blink() -> () {
-    unsafe {
-        _DISPLAYCONTROL |= LCD_BLINKON;
-    };
-    command(LCD_DISPLAYCONTROL | unsafe { _DISPLAYCONTROL });
-}
-
-// These commands scroll the display without changing the RAM
-fn scrollDisplayLeft() -> () {
-    command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT);
-}
-
-fn scrollDisplayRight() -> () {
-    command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT);
-}
-
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-/*
-in some 16x4 LCD when line 3 and 4 are not placed correctly you may try:
-    setRowOffsets(0x00, 0x40, 0x14, 0x54)
-or
-    setRowOffsets(0x00, 0x40, 0x10, 0x50)
- */
-fn setRowOffsets(row0: u8, row1: u8, row2: u8, row3: u8) -> () {
-    //setRowOffsets(0x00, 0x40, 0x00 + cols, 0x40 + cols); <-- call example
-    unsafe {
-        _ROW_OFFSETS[0] = row0;
-        _ROW_OFFSETS[1] = row1;
-        _ROW_OFFSETS[2] = row2;
-        _ROW_OFFSETS[3] = row3;
-    }
+    command(LCD_SETDDRAMADDR | (col + line_offset));
 }
 
 // commands
@@ -329,29 +233,10 @@ const LCD_1LINE: u8 = 0x00;
 const LCD_5X10DOTS: u8 = 0x04;
 const LCD_5X8DOTS: u8 = 0x00;
 
-fn lcd_init() {
-    init_lcd_pins();
-
-    unsafe {
-        _DISPLAYFUNCTION = LCD_4BITMODE | LCD_1LINE | LCD_5X8DOTS;
-    }
-
-    //lcd_begin(16,1);
-}
-
-fn lcd_begin(cols: u8, lines: u8) {
-    if lines > 1 {
-        unsafe {
-            _DISPLAYFUNCTION |= LCD_2LINE;
-        };
-    }
-    unsafe {
-        _NUMLINES = lines;
-    };
-
-    setRowOffsets(0x00, 0x40, 0x00 + cols, 0x40 + cols);
-
-    // SEE PAGE 45/46 FOR INITIALIZATION SPECIFICATION!
+/// Executes part of the initialization protocol for LCD according to its datasheet specification.
+///
+/// SEE PAGE 45/46 FOR INITIALIZATION SPECIFICATION!
+fn initialization_protocol() {
     // according to datasheet, we need at least 40ms after power rises above 2.7V
     // before sending commands. Arduino can turn on way before 4.5V so we'll wait 50
     delay_us(50000); // line 104
@@ -378,30 +263,37 @@ fn lcd_begin(cols: u8, lines: u8) {
 
     // finally, set to 4-bit interface
     write4bits(0x02);
-
-    // ==========================
-
-    // finally, set # lines, font size, etc.
-    command(LCD_FUNCTIONSET | unsafe { _DISPLAYFUNCTION });
-
-    // turn the display on with no cursor or blinking default
-    unsafe { _DISPLAYCONTROL = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF };
-    display();
-
-    // clear it off
-    clear();
-
-    // Initialize to default text direction (for romance languages)
-    unsafe { _DISPLAYMODE = LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT };
-    // set the entry mode
-    command(LCD_ENTRYMODESET | unsafe { _DISPLAYMODE });
 }
 
 // API ---------------------------------------
 
+/// Initializes LCD given the number of collumns and lines
+///
+/// NOTE: This function was just tested in LCD 40x2, but my work with little or no
+/// modification in other LCD sizes.
+/// NOTE: I made this function still more specialized in LCD 40x2 display, to try to
+/// save some bytes of memory state. But the more generic function can be acessed
+/// in the repository. See commit: 1cf9c0efe402afa2cfe61b67e3fff476cf1b9f01
 pub fn lcd_initialize() -> () {
-    lcd_init();
-    lcd_begin(40, 2);
+    init_lcd_pins();
+    initialization_protocol();
+
+    const _DISPLAYFUNCTION: u8 = LCD_4BITMODE | LCD_2LINE | LCD_5X8DOTS;
+
+    // finally, set # lines, font size, etc.
+    command(LCD_FUNCTIONSET | _DISPLAYFUNCTION);
+
+    // turn the display on with no cursor or blinking default
+    const _DISPLAYCONTROL: u8 = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF;
+    command(LCD_DISPLAYCONTROL | _DISPLAYCONTROL);
+
+    // Initialize to default text direction (for romance languages)
+    const _DISPLAYMODE: u8 = LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT;
+    // set the entry mode
+    command(LCD_ENTRYMODESET | _DISPLAYMODE);
+
+    // clear it off
+    clear();
 }
 
 // ------------------------------------------
@@ -415,16 +307,16 @@ pub fn example_01() -> ! {
 
     loop {
         clear();
-        setCursor(10, 0);
+        set_cursor(10, 0);
         print("Julia AVR Rust");
-        setCursor(10, 1);
+        set_cursor(10, 1);
         print("@FlavioVilante");
         for row in 0..2 {
             for col in 0..40 {
-                setCursor(col, row);
+                set_cursor(col, row);
                 print_char(icon);
                 delay_ms(100);
-                setCursor(col, row);
+                set_cursor(col, row);
                 print_char(' ');
             }
         }

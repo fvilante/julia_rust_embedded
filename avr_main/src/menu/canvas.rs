@@ -52,11 +52,15 @@ impl CursorPosition {
 /// screen flackering. You decide how many frames per second you want to send this to screen through the method [`render`]
 ///
 /// For more see: [double buffer](https://en.wikipedia.org/wiki/Multiple_buffering#Double_buffering_in_computer_graphics)
+///
+/// UPDATE:
+/// For memory footprint space conditions we have downgrade this canvas from "double buffer" to "single buffer".
+/// Expected flickering performance is good.
 pub struct Canvas {
     is_initialized: bool,
     cursor_position: CursorPosition, // for screen_buffer_input
     screen_buffer_input: [u8; 80],
-    screen_buffer_output: [u8; 80],
+    //screen_buffer_output: [u8; 80],
 }
 
 impl Canvas {
@@ -66,8 +70,32 @@ impl Canvas {
             is_initialized: true,
             cursor_position: CursorPosition::new_from_point(Point::new(0, 0)),
             screen_buffer_input: [' ' as u8; 80],
-            screen_buffer_output: ['x' as u8; 80],
+            //screen_buffer_output: ['x' as u8; 80],
         }
+    }
+
+    // Base input part (These functions are actually what are producing the printing effect on buffer)
+
+    pub fn print_char(&mut self, char: char) {
+        let index = self.cursor_position.get_index();
+        self.screen_buffer_input[index as usize] = char as u8; //TODO: check if this convertion is safe
+        self.cursor_position.increment();
+        //lcd::print_char(char);
+    }
+
+    pub fn set_cursor(&mut self, point: Point) {
+        self.cursor_position.set_point(point);
+        //let Point { x: col, y: row } = point;
+        //lcd::setCursor(col, row);
+    }
+
+    pub fn clear(&mut self) {
+        const CLEARING_CHAR: u8 = ' ' as u8;
+        for x in &mut self.screen_buffer_input {
+            *x = CLEARING_CHAR;
+        }
+        self.cursor_position.set_point(Point::new(0, 0));
+        //lcd::clear();
     }
 
     // input part
@@ -78,28 +106,10 @@ impl Canvas {
         }
     }
 
-    pub fn print_char(&mut self, char: char) {
-        let index = self.cursor_position.get_index();
-        self.screen_buffer_input[index as usize] = char as u8; //TODO: check if this convertion is safe
-        self.cursor_position.increment();
-        //lcd::print_char(char);
-    }
-
     pub fn print_flash_str(&mut self, flash_string: FlashString) {
         for (char, _index) in flash_string.chars_indices() {
             self.print_char(char as char);
         }
-    }
-
-    pub fn set_cursor(&mut self, point: Point) {
-        self.cursor_position.set_point(point);
-        //lcd::setCursor(col, row);
-    }
-
-    pub fn clear(&mut self) {
-        self.screen_buffer_input = [' ' as u8; 80];
-        self.cursor_position.set_point(Point::new(0, 0));
-        //lcd::clear();
     }
 
     // Attention: this function is designed to be used with 'String' from the 'heapless' library
@@ -127,7 +137,7 @@ impl Canvas {
     /// input_buffer represent the desired state of lcd
     pub fn render(&mut self) {
         // The current implementation of this function is very! very! simplified, it may be improved later
-        lcd::setCursor(0, 0);
+        lcd::set_cursor(0, 0);
         for byte in self.screen_buffer_input {
             lcd::print_u8(byte);
         }
