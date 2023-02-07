@@ -70,17 +70,17 @@ impl<T: SubmenuLayout> SubmenuLayout for Register<T> {
 pub struct MenuStorage<'a> {
     model: &'a MachineModel,
 
-    pub MenuPrograma: Register<MenuPrograma>,
+    pub MenuPrograma: Register<MenuPrograma<'a>>,
 
     // ARQUIVO DE EIXO
-    pub MenuArquivoDeEixo: Register<MenuArquivoDeEixo>,
+    pub MenuArquivoDeEixo: Register<MenuArquivoDeEixo<'a>>,
     pub MenuParametrosDeMovimento: Register<MenuParametrosDeMovimento<'a>>,
-    pub MenuParametrosDeImpressao: Register<MenuParametrosDeImpressao>,
-    pub MenuParametrosDeCiclo: Register<MenuParametrosDeCiclo>,
-    pub MenuConfiguracaoDaImpressora: Register<MenuConfiguracaoDaImpressora>,
-    pub MenuIntertravamentoParaDoisEixos: Register<MenuIntertravamentoParaDoisEixos>,
+    pub MenuParametrosDeImpressao: Register<MenuParametrosDeImpressao<'a>>,
+    pub MenuParametrosDeCiclo: Register<MenuParametrosDeCiclo<'a>>,
+    pub MenuConfiguracaoDaImpressora: Register<MenuConfiguracaoDaImpressora<'a>>,
+    pub MenuIntertravamentoParaDoisEixos: Register<MenuIntertravamentoParaDoisEixos<'a>>,
     //pub MenuParametrosDeSelecaoDeMensagem: Register<MenuParametrosDeSelecaoDeMensagem>,
-    pub MenuConfiguracaoDoEixo: Register<MenuConfiguracaoDeEixo>,
+    pub MenuConfiguracaoDoEixo: Register<MenuConfiguracaoDeEixo<'a>>,
 }
 
 impl<'a> MenuStorage<'a> {
@@ -88,16 +88,18 @@ impl<'a> MenuStorage<'a> {
     pub fn new(model: &'a MachineModel) -> Self {
         Self {
             model,
-            MenuPrograma: Register::from_menu(MenuPrograma::new()),
-            MenuArquivoDeEixo: Register::from_menu(MenuArquivoDeEixo::new()),
+            MenuPrograma: Register::from_menu(MenuPrograma::new(model)),
+            MenuArquivoDeEixo: Register::from_menu(MenuArquivoDeEixo::new(model)),
             MenuParametrosDeMovimento: Register::from_menu(MenuParametrosDeMovimento::new(model)),
-            MenuParametrosDeImpressao: Register::from_menu(MenuParametrosDeImpressao::new()),
-            MenuParametrosDeCiclo: Register::from_menu(MenuParametrosDeCiclo::new()),
-            MenuConfiguracaoDaImpressora: Register::from_menu(MenuConfiguracaoDaImpressora::new()),
+            MenuParametrosDeImpressao: Register::from_menu(MenuParametrosDeImpressao::new(model)),
+            MenuParametrosDeCiclo: Register::from_menu(MenuParametrosDeCiclo::new(model)),
+            MenuConfiguracaoDaImpressora: Register::from_menu(MenuConfiguracaoDaImpressora::new(
+                model,
+            )),
             MenuIntertravamentoParaDoisEixos: Register::from_menu(
-                MenuIntertravamentoParaDoisEixos::new(),
+                MenuIntertravamentoParaDoisEixos::new(model),
             ),
-            MenuConfiguracaoDoEixo: Register::from_menu(MenuConfiguracaoDeEixo::new()),
+            MenuConfiguracaoDoEixo: Register::from_menu(MenuConfiguracaoDeEixo::new(model)),
         }
     }
 
@@ -175,15 +177,17 @@ impl<'a> MenuStorage<'a> {
 
 ////////////////////////////////////////////////////
 
-pub struct MenuPrograma;
+pub struct MenuPrograma<'a> {
+    model: &'a MachineModel,
+}
 
-impl MenuPrograma {
-    pub const fn new() -> Self {
-        Self {}
+impl<'a> MenuPrograma<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
+        Self { model }
     }
 }
 
-impl SubmenuLayout for MenuPrograma {
+impl SubmenuLayout for MenuPrograma<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
@@ -249,15 +253,17 @@ impl SubmenuLayout for MenuPrograma {
 //          MENU ARQUIVO DE EIXO
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-pub struct MenuArquivoDeEixo;
+pub struct MenuArquivoDeEixo<'a> {
+    model: &'a MachineModel,
+}
 
-impl MenuArquivoDeEixo {
-    pub const fn new() -> Self {
-        Self {}
+impl<'a> MenuArquivoDeEixo<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
+        Self { model }
     }
 }
 
-impl SubmenuLayout for MenuArquivoDeEixo {
+impl SubmenuLayout for MenuArquivoDeEixo<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
@@ -307,7 +313,7 @@ impl<'a> MenuParametrosDeMovimento<'a> {
     }
 }
 
-impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
+impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
@@ -375,21 +381,23 @@ impl<'a> SubmenuLayout for MenuParametrosDeMovimento<'a> {
 
 ////////////////////////////////////////////////////
 
-pub struct MenuParametrosDeImpressao {
+pub struct MenuParametrosDeImpressao<'a> {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
+    model: &'a MachineModel,
 }
 
-impl MenuParametrosDeImpressao {
-    pub const fn new() -> Self {
+impl<'a> MenuParametrosDeImpressao<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
         Self {
             value0: Cell::new(Cursor::new(0, 2, 1)),
             value1: Cell::new(0),
+            model,
         }
     }
 }
 
-impl SubmenuLayout for MenuParametrosDeImpressao {
+impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
@@ -453,21 +461,23 @@ impl SubmenuLayout for MenuParametrosDeImpressao {
 
 ////////////////////////////////////////////////////
 
-pub struct MenuParametrosDeCiclo {
+pub struct MenuParametrosDeCiclo<'a> {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
+    model: &'a MachineModel,
 }
 
-impl MenuParametrosDeCiclo {
-    pub const fn new() -> Self {
+impl<'a> MenuParametrosDeCiclo<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
         Self {
             value0: Cell::new(Cursor::new(0, 2, 1)),
             value1: Cell::new(0),
+            model,
         }
     }
 }
 
-impl SubmenuLayout for MenuParametrosDeCiclo {
+impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
@@ -507,21 +517,23 @@ impl SubmenuLayout for MenuParametrosDeCiclo {
 
 ////////////////////////////////////////////////////
 
-pub struct MenuConfiguracaoDaImpressora {
+pub struct MenuConfiguracaoDaImpressora<'a> {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
+    model: &'a MachineModel,
 }
 
-impl MenuConfiguracaoDaImpressora {
-    pub const fn new() -> Self {
+impl<'a> MenuConfiguracaoDaImpressora<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
         Self {
             value0: Cell::new(Cursor::new(0, 2, 1)),
             value1: Cell::new(0),
+            model,
         }
     }
 }
 
-impl SubmenuLayout for MenuConfiguracaoDaImpressora {
+impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
@@ -555,21 +567,23 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora {
 
 ////////////////////////////////////////////////////
 
-pub struct MenuIntertravamentoParaDoisEixos {
+pub struct MenuIntertravamentoParaDoisEixos<'a> {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
+    model: &'a MachineModel,
 }
 
-impl MenuIntertravamentoParaDoisEixos {
-    pub const fn new() -> Self {
+impl<'a> MenuIntertravamentoParaDoisEixos<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
         Self {
             value0: Cell::new(Cursor::new(0, 2, 1)),
             value1: Cell::new(0),
+            model,
         }
     }
 }
 
-impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
+impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
@@ -635,21 +649,23 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos {
 //          MENU CONFIGURACAO DE EIXO
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-pub struct MenuConfiguracaoDeEixo {
+pub struct MenuConfiguracaoDeEixo<'a> {
     value0: Cell<Cursor>,
     value1: Cell<u16>,
+    model: &'a MachineModel,
 }
 
-impl MenuConfiguracaoDeEixo {
-    pub const fn new() -> Self {
+impl<'a> MenuConfiguracaoDeEixo<'a> {
+    pub const fn new(model: &'a MachineModel) -> Self {
         Self {
             value0: Cell::new(Cursor::new(0, 2, 1)),
             value1: Cell::new(0),
+            model,
         }
     }
 }
 
-impl SubmenuLayout for MenuConfiguracaoDeEixo {
+impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
