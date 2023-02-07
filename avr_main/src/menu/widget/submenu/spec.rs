@@ -382,18 +382,12 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
 ////////////////////////////////////////////////////
 
 pub struct MenuParametrosDeImpressao<'a> {
-    value0: Cell<Cursor>,
-    value1: Cell<u16>,
     model: &'a MachineModel,
 }
 
 impl<'a> MenuParametrosDeImpressao<'a> {
     pub const fn new(model: &'a MachineModel) -> Self {
-        Self {
-            value0: Cell::new(Cursor::new(0, 2, 1)),
-            value1: Cell::new(0),
-            model,
-        }
+        Self { model }
     }
 }
 
@@ -468,18 +462,12 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
 ////////////////////////////////////////////////////
 
 pub struct MenuParametrosDeCiclo<'a> {
-    value0: Cell<Cursor>,
-    value1: Cell<u16>,
     model: &'a MachineModel,
 }
 
 impl<'a> MenuParametrosDeCiclo<'a> {
     pub const fn new(model: &'a MachineModel) -> Self {
-        Self {
-            value0: Cell::new(Cursor::new(0, 2, 1)),
-            value1: Cell::new(0),
-            model,
-        }
+        Self { model }
     }
 }
 
@@ -544,18 +532,12 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
 ////////////////////////////////////////////////////
 
 pub struct MenuConfiguracaoDaImpressora<'a> {
-    value0: Cell<Cursor>,
-    value1: Cell<u16>,
     model: &'a MachineModel,
 }
 
 impl<'a> MenuConfiguracaoDaImpressora<'a> {
     pub const fn new(model: &'a MachineModel) -> Self {
-        Self {
-            value0: Cell::new(Cursor::new(0, 2, 1)),
-            value1: Cell::new(0),
-            model,
-        }
+        Self { model }
     }
 }
 
@@ -610,18 +592,12 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
 ////////////////////////////////////////////////////
 
 pub struct MenuIntertravamentoParaDoisEixos<'a> {
-    value0: Cell<Cursor>,
-    value1: Cell<u16>,
     model: &'a MachineModel,
 }
 
 impl<'a> MenuIntertravamentoParaDoisEixos<'a> {
     pub const fn new(model: &'a MachineModel) -> Self {
-        Self {
-            value0: Cell::new(Cursor::new(0, 2, 1)),
-            value1: Cell::new(0),
-            model,
-        }
+        Self { model }
     }
 }
 
@@ -728,18 +704,12 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 pub struct MenuConfiguracaoDeEixo<'a> {
-    value0: Cell<Cursor>,
-    value1: Cell<u16>,
     model: &'a MachineModel,
 }
 
 impl<'a> MenuConfiguracaoDeEixo<'a> {
     pub const fn new(model: &'a MachineModel) -> Self {
-        Self {
-            value0: Cell::new(Cursor::new(0, 2, 1)),
-            value1: Cell::new(0),
-            model,
-        }
+        Self { model }
     }
 }
 
