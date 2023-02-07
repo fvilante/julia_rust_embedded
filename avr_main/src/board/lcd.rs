@@ -184,12 +184,12 @@ pub fn clear() -> () {
 }
 
 pub fn setCursor(col: u8, row: u8) {
-    const line0_offset: u8 = 0x00;
-    const line1_offset: u8 = 0x00 + NUMBER_OF_COLS;
+    const LINE_0_OFFSET: u8 = 0x00;
+    const LINE1_OFFSET: u8 = 0x00 + NUMBER_OF_COLS;
 
     let line_offset = match row {
-        0 => line0_offset,
-        _ => line1_offset,
+        0 => LINE_0_OFFSET,
+        _ => LINE1_OFFSET,
     };
 
     command(LCD_SETDDRAMADDR | (col + line_offset));
