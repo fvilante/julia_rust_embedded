@@ -329,7 +329,7 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
             1 => Some(
                 MenuItemBuilder::from_text(&POSICAO_FINAL)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.posicao_inicial,
+                        &self.model.arquivo_de_eixo.posicao_final,
                         Some(0..9999),
                         33,
                     )
@@ -339,7 +339,7 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
             2 => Some(
                 MenuItemBuilder::from_text(&ACELERACAO_DE_AVANCO)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.posicao_inicial,
+                        &self.model.arquivo_de_eixo.aceleracao_de_avanco,
                         Some(0..9999),
                         33,
                     )
@@ -349,7 +349,7 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
             3 => Some(
                 MenuItemBuilder::from_text(&ACELERACAO_DE_RETORNO)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.posicao_inicial,
+                        &self.model.arquivo_de_eixo.aceleracao_de_retorno,
                         Some(0..9999),
                         33,
                     )
@@ -358,7 +358,7 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
             4 => Some(
                 MenuItemBuilder::from_text(&VELOCIDADE_DE_AVANCO)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.posicao_inicial,
+                        &self.model.arquivo_de_eixo.velocidade_de_avanco,
                         Some(0..9999),
                         33,
                     )
@@ -367,7 +367,7 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
             5 => Some(
                 MenuItemBuilder::from_text(&VELOCIDADE_DE_RETORNO)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.posicao_inicial,
+                        &self.model.arquivo_de_eixo.velocidade_de_retorno,
                         Some(0..9999),
                         33,
                     )
@@ -402,55 +402,61 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
         match index {
             0 => Some(
                 MenuItemBuilder::from_text(&NUMERO_DE_MENSAGEM_NO_AVANCO)
-                    .add_numerical_variable(&self.value1, Some(0..99), 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.numero_de_mensagem_no_avanco,
+                        Some(0..99),
+                        33,
+                    )
                     .build(),
             ),
 
             1 => Some(
                 MenuItemBuilder::from_text(&NUMERO_DE_MENSAGEM_NO_RETORNO)
-                    .add_numerical_variable(&self.value1, Some(0..99), 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.numero_de_mensagem_no_retorno,
+                        Some(0..99),
+                        33,
+                    )
                     .build(),
             ),
 
             2 => Some(
-                MenuItemBuilder::from_text(&PRIMEIRO_MENSAGEM_NO_AVANCO)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                MenuItemBuilder::from_text(&PRIMEIRA_MENSAGEM_NO_AVANCO)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.primeira_mensagem_no_avanco,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             3 => Some(
-                MenuItemBuilder::from_text(&PRIMEIRO_MENSAGEM_NO_RETORNO)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                MenuItemBuilder::from_text(&PRIMEIRA_MENSAGEM_NO_RETORNO)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.primeira_mensagem_no_avanco,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             4 => Some(
                 MenuItemBuilder::from_text(&ULTIMA_MENSAGEM_NO_AVANCO)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.ultima_mensagem_no_avanco,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             5 => Some(
                 MenuItemBuilder::from_text(&ULTIMA_MENSAGEM_NO_RETORNO)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
-                    .build(),
-            ),
-
-            6 => Some(
-                MenuItemBuilder::from_text(&ULTIMA_MENSAGEM_NO_RETORNO)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
-                    .build(),
-            ),
-
-            7 => Some(
-                MenuItemBuilder::from_text(&NUMERO_DE_MULTIPLAS_IMPRESSOES)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
-                    .build(),
-            ),
-
-            8 => Some(
-                MenuItemBuilder::from_text(&PASSO_DAS_MULTIPLAS_IMPRESSOES)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.ultima_mensagem_no_retorno,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
@@ -482,31 +488,51 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
         match index {
             0 => Some(
                 MenuItemBuilder::from_text(&RETARDO_NO_START_AUTOMATICO)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.retardo_no_start_automatico,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             1 => Some(
                 MenuItemBuilder::from_text(&RETARDO_NO_START_EXTERNO)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.retardo_no_start_externo,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             2 => Some(
                 MenuItemBuilder::from_text(&START_AUTOMATICO_NO_AVANCO)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self.model.arquivo_de_eixo.start_automatico_no_avanco,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
             3 => Some(
                 MenuItemBuilder::from_text(&START_AUTOMATICO_NO_RETORNO)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self.model.arquivo_de_eixo.start_automatico_no_retorno,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
             4 => Some(
                 MenuItemBuilder::from_text(&MODO_DE_TRABALHO_DO_EIXO)
-                    .add_optional_variable(&self.value0, Options::continuo_passo_a_passo(), 30)
+                    .add_optional_variable(
+                        &self.model.arquivo_de_eixo.modo_de_trabalho_do_eixo,
+                        Options::continuo_passo_a_passo(),
+                        30,
+                    )
                     .build(),
             ),
 
@@ -538,25 +564,41 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
         match index {
             0 => Some(
                 MenuItemBuilder::from_text(&LOGICA_DO_SINAL_DE_IMPRESSAO)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self.model.arquivo_de_eixo.logica_do_sinal_de_impressao,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
             1 => Some(
                 MenuItemBuilder::from_text(&LARGURA_DO_SINAL_DE_IMPRESSAO)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.largura_do_sinal_de_impressao,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             2 => Some(
                 MenuItemBuilder::from_text(&REVERSAO_DE_MENSAGEM_VIA_SERIAL)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self.model.arquivo_de_eixo.reversao_de_mensagem_via_serial,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
             3 => Some(
                 MenuItemBuilder::from_text(&SELECAO_DE_MENSAGEM_VIA_SERIAL)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self.model.arquivo_de_eixo.selecao_de_mensagem_via_serial,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
@@ -588,55 +630,91 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
         match index {
             0 => Some(
                 MenuItemBuilder::from_text(&ANTECIPACAO_DA_SAIDA_DE_START)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.antecipacao_da_saida_de_start,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             1 => Some(
                 MenuItemBuilder::from_text(&SAIDA_DE_START_NO_AVANCO)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self.model.arquivo_de_eixo.saida_de_start_no_avaco,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
             2 => Some(
                 MenuItemBuilder::from_text(&SAIDA_DE_START_NO_RETORNO)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self.model.arquivo_de_eixo.saida_de_start_no_retorno,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
             3 => Some(
                 MenuItemBuilder::from_text(&ENTRADA_DE_START_ENTRE_EIXOS)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self.model.arquivo_de_eixo.entrada_de_start_entre_eixos,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
             4 => Some(
                 MenuItemBuilder::from_text(&RETARDO_DO_START_ENTRE_EIXOS)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.retardo_do_start_entre_eixos,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             5 => Some(
                 MenuItemBuilder::from_text(&START_PELO_TECLADO_E_EXTERNO)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self.model.arquivo_de_eixo.start_pelo_teclado_e_externo,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
             6 => Some(
                 MenuItemBuilder::from_text(&RETARDO_NO_START_PASSO_A_PASSO)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .add_numerical_variable(
+                        &self.model.arquivo_de_eixo.retardo_no_start_passo_a_passo,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             7 => Some(
                 MenuItemBuilder::from_text(&START_AUTOMATICO_PASSO_A_PASSO)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self.model.arquivo_de_eixo.start_automatico_passo_a_passo,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
             8 => Some(
                 MenuItemBuilder::from_text(&SAIDA_START_PASSO_A_PASSO)
-                    .add_optional_variable(&self.value0, Options::continuo_passo_a_passo(), 30)
+                    .add_optional_variable(
+                        &self.model.arquivo_de_eixo.saida_de_start_passo_a_passo,
+                        Options::continuo_passo_a_passo(),
+                        30,
+                    )
                     .build(),
             ),
 
@@ -670,79 +748,140 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
         match index {
             0 => Some(
                 MenuItemBuilder::from_text(&NUMERO_DO_CANAL_X)
-                    .add_numerical_variable(&self.value1, Some(0..99), 33)
+                    .add_numerical_variable(
+                        &self.model.configuracao_do_eixo.numero_do_canal,
+                        Some(0..99),
+                        33,
+                    )
                     .build(),
             ),
 
             1 => Some(
                 MenuItemBuilder::from_text(&NUMERO_DE_PULSO_DO_GIRO_X)
-                    .add_numerical_variable(&self.value1, Some(0..0xFFFF), 33)
+                    .add_numerical_variable(
+                        &self.model.configuracao_do_eixo.numero_de_pulso_do_giro,
+                        Some(0..0xFFFF),
+                        33,
+                    )
                     .build(),
             ),
 
             2 => Some(
                 MenuItemBuilder::from_text(&JANELA_DE_PROTECAO_DO_GITO_X)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .add_numerical_variable(
+                        &self.model.configuracao_do_eixo.janela_de_protecao_do_giro,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             3 => Some(
                 MenuItemBuilder::from_text(&DESLOCAMENTO_GIRO_DO_MOTOR_X)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self.model.configuracao_do_eixo.deslocamento_giro_do_motor,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
             4 => Some(
                 MenuItemBuilder::from_text(&GIRO_COM_FUNCAO_DE_PROTECAO)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self.model.configuracao_do_eixo.giro_com_funcao_de_protecao,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
             5 => Some(
                 MenuItemBuilder::from_text(&GIRO_COM_FUNCAO_DE_CORRECAO)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self.model.configuracao_do_eixo.giro_com_funcao_de_correcao,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
             6 => Some(
                 MenuItemBuilder::from_text(&LOGICA_DO_START_EXTERNO)
-                    .add_optional_variable(&self.value0, Options::aberto_fechado(), 30)
+                    .add_optional_variable(
+                        &self.model.configuracao_do_eixo.logica_do_start_externo,
+                        Options::aberto_fechado(),
+                        30,
+                    )
                     .build(),
             ),
 
             7 => Some(
                 MenuItemBuilder::from_text(&VALOR_DA_POSICAO_DA_REFERENCIA)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .add_numerical_variable(
+                        &self
+                            .model
+                            .configuracao_do_eixo
+                            .valor_da_posicao_de_referencia,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             8 => Some(
                 MenuItemBuilder::from_text(&VELOCIDADE_PARA_REFERENCIA_X)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .add_numerical_variable(
+                        &self.model.configuracao_do_eixo.velocidade_para_referencia,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             9 => Some(
                 MenuItemBuilder::from_text(&ACELERACAO_PARA_REFERENCIA_X)
-                    .add_numerical_variable(&self.value1, Some(0..9999), 33)
+                    .add_numerical_variable(
+                        &self.model.configuracao_do_eixo.aceleracao_para_referencia,
+                        Some(0..9999),
+                        33,
+                    )
                     .build(),
             ),
 
             10 => Some(
                 MenuItemBuilder::from_text(&REDUCAO_DA_CORRENTE_EM_REPOUSO)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self
+                            .model
+                            .configuracao_do_eixo
+                            .reducao_da_corrente_em_repouso,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
             11 => Some(
                 MenuItemBuilder::from_text(&REFERENCIA_PELO_START_EXTERNO)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self
+                            .model
+                            .configuracao_do_eixo
+                            .referencia_pelo_start_externo,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 
             12 => Some(
                 MenuItemBuilder::from_text(&MODO_TURBO_X)
-                    .add_optional_variable(&self.value0, Options::ligado_desligado(), 30)
+                    .add_optional_variable(
+                        &self.model.configuracao_do_eixo.modo_turbo,
+                        Options::ligado_desligado(),
+                        30,
+                    )
                     .build(),
             ),
 

@@ -38,8 +38,8 @@ progmem! {
 
     pub static progmem string NUMERO_DE_MENSAGEM_NO_AVANCO = "Numero de mensagem no avanco";
     pub static progmem string NUMERO_DE_MENSAGEM_NO_RETORNO= "Numero de mensagem no retorno";
-    pub static progmem string PRIMEIRO_MENSAGEM_NO_AVANCO= "Primeira mensagem no avanco";
-    pub static progmem string PRIMEIRO_MENSAGEM_NO_RETORNO= "Primeira mensagem no retorno";
+    pub static progmem string PRIMEIRA_MENSAGEM_NO_AVANCO= "Primeira mensagem no avanco";
+    pub static progmem string PRIMEIRA_MENSAGEM_NO_RETORNO= "Primeira mensagem no retorno";
     pub static progmem string ULTIMA_MENSAGEM_NO_AVANCO = "Ultima mensagem no avanco";
     pub static progmem string ULTIMA_MENSAGEM_NO_RETORNO = "Ultima mensagem no retorno";
     pub static progmem string MENSAGEM_REVERSA_LIGADA = "Mensagem reversa ligada";

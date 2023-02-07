@@ -80,14 +80,14 @@ impl Default for ArquivoDeEixo {
 }
 
 pub struct ConfiguracaoDoEixo {
-    pub numero_do_canal: Cell<u8>,
+    pub numero_do_canal: Cell<u16>,
     pub numero_de_pulso_do_giro: Cell<u16>,
     pub janela_de_protecao_do_giro: Cell<u16>,
     pub deslocamento_giro_do_motor: Cell<Cursor>,
     pub giro_com_funcao_de_protecao: Cell<Cursor>,
     pub giro_com_funcao_de_correcao: Cell<Cursor>,
     pub logica_do_start_externo: Cell<Cursor>,
-    pub valor_da_posicao_de_referencia: Cell<Cursor>,
+    pub valor_da_posicao_de_referencia: Cell<u16>,
     pub velocidade_para_referencia: Cell<u16>,
     pub aceleracao_para_referencia: Cell<u16>,
     pub reducao_da_corrente_em_repouso: Cell<Cursor>,
