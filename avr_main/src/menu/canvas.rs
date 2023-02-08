@@ -56,6 +56,7 @@ impl CursorPosition {
 /// UPDATE:
 /// For memory footprint space conditions we have downgrade this canvas from "double buffer" to "single buffer".
 /// Expected flickering performance is good.
+/// TODO: Rename to ScreenBuffer
 pub struct Canvas {
     is_initialized: bool,
     cursor_position: CursorPosition, // for screen_buffer_input
