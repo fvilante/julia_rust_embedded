@@ -61,23 +61,17 @@ impl Cursor {
 
     /// returns true if has reached the upper bound
     pub fn next(&mut self) -> bool {
-        let last_index = self.end - 1;
-        let current_index = self.current;
-        let has_reached_upper_bound = current_index >= last_index;
-        if has_reached_upper_bound == false {
-            self.current += 1;
-        }
+        let (has_reached_upper_bound, updated_index) =
+            StatelessCursor::next(self.end, self.current);
+        self.current = updated_index;
         has_reached_upper_bound
     }
 
     /// returns true if has reached the lower bound
     pub fn previous(&mut self) -> bool {
-        let first_index = self.start;
-        let current_index = self.current;
-        let has_reached_lower_bound = current_index <= first_index;
-        if has_reached_lower_bound == false {
-            self.current -= 1;
-        }
+        let (has_reached_lower_bound, current_index) =
+            StatelessCursor::previous(self.start, self.current);
+        self.current = current_index;
         has_reached_lower_bound
     }
 
@@ -114,5 +108,37 @@ impl Default for Cursor {
             start: 0,
             end: 0,
         }
+    }
+}
+
+/////////////////////////////////////////////////
+
+/// Stateless Cursor for low memory consumption strategies.
+///
+/// TODO: In future check if this type or the type [`Cursor`] cannot be substituted for a bidirectional iterator trait
+/// or a Indexable (Array-like) trait.
+pub struct StatelessCursor;
+
+impl StatelessCursor {
+    /// `end` is equal the last index plus one, in other words: it is exclusive
+    pub fn next(end: u8, current_index: u8) -> (bool, u8) {
+        let last_index = end - 1;
+        let mut updated_index = current_index;
+        let has_reached_upper_bound = current_index >= last_index;
+        if has_reached_upper_bound == false {
+            updated_index += 1;
+        }
+        (has_reached_upper_bound, updated_index)
+    }
+
+    /// `start` is inclusive
+    pub fn previous(start: u8, current_index: u8) -> (bool, u8) {
+        let first_index = start;
+        let mut updated_index = current_index;
+        let has_reached_lower_bound = current_index <= first_index;
+        if has_reached_lower_bound == false {
+            updated_index -= 1;
+        }
+        (has_reached_lower_bound, updated_index)
     }
 }
