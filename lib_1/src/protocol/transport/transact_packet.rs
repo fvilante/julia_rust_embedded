@@ -28,8 +28,8 @@ pub fn transact_packet(
 mod tests {
     use super::*;
     use crate::mock::serial_connection_mock::MockedSerialConnection;
-    use crate::protocol::common::StartByte;
     use crate::protocol::frame::Frame;
+    use crate::protocol::prelude::StartByte;
     use crate::protocol::transact::DatalinkResult;
     use crate::protocol::transport::channel::Channel;
     use crate::protocol::transport::master_packet::CmppMessage;

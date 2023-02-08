@@ -83,7 +83,7 @@ pub fn transact(
 #[cfg(test)]
 mod tests {
     use crate::{
-        mock::serial_connection_mock::MockedSerialConnection, protocol::common::StartByte,
+        mock::serial_connection_mock::MockedSerialConnection, protocol::prelude::StartByte,
         types::delay::delay_us,
     };
 

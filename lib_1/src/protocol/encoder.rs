@@ -1,7 +1,7 @@
 use super::checksum::calc_checksum;
 use super::frame::Frame;
 
-use super::common::{ESC, /*STX, ACK, NACK,*/ ETX};
+use super::prelude::{ESC, /*STX, ACK, NACK,*/ ETX};
 
 pub enum State {
     WaitingFirstEsc,
@@ -112,7 +112,7 @@ impl Iterator for Encoder {
 
 #[cfg(test)]
 mod tests {
-    use crate::protocol::common::StartByte;
+    use crate::protocol::prelude::StartByte;
 
     use super::*;
 

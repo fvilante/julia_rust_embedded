@@ -1,14 +1,15 @@
-use super::common::ETX;
 use super::frame::Frame;
+use super::prelude::ETX;
 
-// NOTE:
-//
-//      This checksum calculation is agnostic of the data length. It can calculate checksum
-//      for any arbitrary length of data, and not only just cmpp payloads.
-//      It depends only on a "[StartbyteNum, obj, ETX]" protocol
-//
-
-// NOTE: frame payload should not contain duplicated ESCs
+/// Calculates checksum of the given [`Frame`].
+///
+/// NOTE:
+///
+///      This checksum calculation is agnostic of the data length. It can calculate checksum
+///      for any arbitrary length of data, and not only just cmpp payloads.
+///      It depends only on a "[StartbyteNum, obj, ETX]" protocol
+///
+/// NOTE: frame payload should not contain duplicated ESCs
 pub fn calc_checksum(frame: Frame) -> u8 {
     let Frame {
         start_byte,
@@ -24,7 +25,7 @@ pub fn calc_checksum(frame: Frame) -> u8 {
 
 #[cfg(test)]
 mod tests {
-    use crate::protocol::{common::StartByte, frame::Payload};
+    use crate::protocol::{frame::Payload, prelude::StartByte};
 
     use super::*;
 

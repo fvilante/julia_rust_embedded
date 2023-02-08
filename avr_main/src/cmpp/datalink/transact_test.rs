@@ -1,8 +1,8 @@
 use super::concrete_serial::ConcreteSerialPort;
 use crate::board::lcd;
 use crate::microcontroler::delay::delay_us;
-use lib_1::protocol::common::StartByte;
 use lib_1::protocol::frame::Frame;
+use lib_1::protocol::prelude::StartByte;
 use lib_1::protocol::transact::{transact, DatalinkError};
 use lib_1::types::serial_connection::SerialConnection;
 

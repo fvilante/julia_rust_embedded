@@ -4,11 +4,13 @@ pub const ACK: u8 = 0x06;
 pub const NACK: u8 = 0x15;
 pub const ETX: u8 = 0x03;
 
+/// Indicates what variations are allowed to the StartByte
 #[derive(Debug, PartialEq, Copy, Clone)]
+#[repr(u8)]
 pub enum StartByte {
-    STX = 0x02,
-    ACK = 0x06,
-    NACK = 0x15,
+    STX = STX,
+    ACK = ACK,
+    NACK = NACK,
 }
 
 #[cfg(test)]

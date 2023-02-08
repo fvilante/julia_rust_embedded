@@ -1,7 +1,7 @@
 use super::frame::Frame;
 use super::{
     checksum::calc_checksum,
-    common::{StartByte, ACK, ESC, ETX, NACK, STX},
+    prelude::{StartByte, ACK, ESC, ETX, NACK, STX},
 };
 
 const MAX_BUFFER_LEN: usize = 4; // max data length buffer

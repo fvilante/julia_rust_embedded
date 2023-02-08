@@ -1,4 +1,4 @@
-use super::common::StartByte;
+use super::prelude::StartByte;
 
 const PAYLOAD_SIZE: usize = 4;
 
