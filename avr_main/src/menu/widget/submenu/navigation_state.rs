@@ -89,33 +89,28 @@ impl NavigationState {
     /// Scrolls menu down, return true if it the scroll has already been exausted
     pub fn scroll_down(&mut self) -> bool {
         let end = self.number_of_menu_items - (Self::TOTAL_NUMBER_OF_LINES_IN_LCD - 1);
-        let (has_exhausted, updated_index) = StatelessCursor::next(end, self.first_line_to_render);
-        self.first_line_to_render = updated_index;
+        let has_exhausted = StatelessCursor::next(end, &mut self.first_line_to_render);
         has_exhausted
     }
 
     /// Scrolls menu up, return true if it the scrooll has already been exausted
     pub fn scroll_up(&mut self) -> bool {
         let start = Self::DEFAULT_INITIAL_LINE_SELECTED;
-        let (has_exhausted, updated_index) =
-            StatelessCursor::previous(start, self.first_line_to_render);
-        self.first_line_to_render = updated_index;
+        let has_exhausted = StatelessCursor::previous(start, &mut self.first_line_to_render);
         has_exhausted
     }
 
     pub fn key_down(&mut self) {
         let end = Self::TOTAL_NUMBER_OF_LINES_IN_LCD;
-        let (is_exhasted, updated_index) = StatelessCursor::next(end, self.lcd_line_cursor);
-        self.lcd_line_cursor = updated_index;
-        if is_exhasted {
+        let has_exausted = StatelessCursor::next(end, &mut self.lcd_line_cursor);
+        if has_exausted {
             self.scroll_down();
         };
     }
 
     pub fn key_up(&mut self) {
         let start = Self::DEFAULT_INITIAL_LINE_SELECTED;
-        let (is_exhasted, updated_index) = StatelessCursor::previous(start, self.lcd_line_cursor);
-        self.lcd_line_cursor = updated_index;
+        let is_exhasted = StatelessCursor::previous(start, &mut self.lcd_line_cursor);
         if is_exhasted {
             self.scroll_up();
         };
