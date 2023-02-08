@@ -100,7 +100,7 @@ impl Default for Cursor {
         Self {
             current: 0,
             start: 0,
-            end: 0,
+            end: 2,
         }
     }
 }
