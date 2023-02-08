@@ -1,7 +1,5 @@
 use core::{cell::Cell, u8};
 
-use lib_1::utils::common::usize_to_u8_clamper;
-
 use super::{
     super::super::{
         model::MachineModel,
@@ -43,10 +41,9 @@ pub struct Register<T: SubmenuLayout> {
 
 impl<T: SubmenuLayout> Register<T> {
     fn from_menu(menu: T) -> Self {
-        let menu_length = usize_to_u8_clamper(menu.len());
         Self {
             menu,
-            navigation_state: Cell::new(NavigationState::new_from_submenu_len(menu_length)),
+            navigation_state: Cell::new(NavigationState::new()),
         }
     }
 

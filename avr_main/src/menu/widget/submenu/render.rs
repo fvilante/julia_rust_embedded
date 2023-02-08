@@ -10,6 +10,7 @@ use crate::{
     },
 };
 use heapless::Vec;
+use lib_1::utils::common::usize_to_u8_clamper;
 
 /////////////////////////////////
 
@@ -46,12 +47,16 @@ impl<'a> SubMenuRender<'a> {
     }
 
     /// Updates the navigation state of current sub_menu by applying update_fn on it
-    fn update_navigation_state(&self, update_fn: fn(NavigationState) -> NavigationState) {
-        let current_ns = self.get_navigation_state();
-        let updated_ns = update_fn(current_ns);
+    fn update_navigation_state(
+        &self,
+        update_fn: fn(NavigationState, menu_length: u8) -> NavigationState,
+    ) {
+        let menu_length = usize_to_u8_clamper(self.menu_storage.len(self.current_menu));
+        let current_nav_state = self.get_navigation_state();
+        let updated_nav_state = update_fn(current_nav_state, menu_length);
         self.menu_storage
             .get_navigation_state(self.current_menu)
-            .set(updated_ns)
+            .set(updated_nav_state)
     }
 
     /// Mount widgets that are being renderized
@@ -90,15 +95,15 @@ impl<'a> SubMenuRender<'a> {
     }
 
     fn key_down(&mut self) {
-        self.update_navigation_state(|mut nav_state| {
-            nav_state.key_down();
+        self.update_navigation_state(|mut nav_state, menu_length| {
+            nav_state.key_down(menu_length);
             nav_state
         });
         self.mount();
     }
 
     fn key_up(&mut self) {
-        self.update_navigation_state(|mut nav_state| {
+        self.update_navigation_state(|mut nav_state, _menu_length| {
             nav_state.key_up();
             nav_state
         });

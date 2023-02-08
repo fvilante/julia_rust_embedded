@@ -59,17 +59,15 @@ impl From<CompressedNumbers> for DecompressedNumbers {
 
 /// Controls the state of the navigation on sub menu, which is what is the selected line in the list of items.
 ///
-/// TODO: The memory footprint size this struct may be optimized going from 6 bytes to at least 3 bytes if I made a custom Cursor
-/// because `Cursor::Start` is always zero, and `Cursor:End` of `lcd_line_cursor` is always 2 or const statically defined.  
-#[derive(Copy, Clone)]
+/// TODO: The memory footprint size this struct may be optimized going from 2 bytes to 1 bytes if you join
+/// the two states. Because `lcd_line_cursor` needs just in bit, while `first_line_to_render` may exists with just 7 bits.
+#[derive(Clone, Copy)]
 pub struct NavigationState {
-    /// Uncompressed representation of NavigationState
     /// Tracks the item on the LCD that is currently selected.
     lcd_line_cursor: u8,
     /// Tracks the first line of menu to be rendered in the lcd screen. Note that the index is represented in relation to the list of menu items
     /// of the respective submenu.
     first_line_to_render: u8,
-    number_of_menu_items: u8,
 }
 
 impl NavigationState {
@@ -77,34 +75,32 @@ impl NavigationState {
     const DEFAULT_INITIAL_LINE_SELECTED: u8 = 0;
     const DEFAULT_INITIAL_MENU_ITEM: u8 = 0;
 
-    pub fn new_from_submenu_len(number_of_menu_items: u8) -> Self {
-        /// This application uses a LCD 40 collumns by 2 Lines in future this may be generalized
+    pub fn new() -> Self {
         Self {
             lcd_line_cursor: Self::DEFAULT_INITIAL_LINE_SELECTED,
             first_line_to_render: Self::DEFAULT_INITIAL_MENU_ITEM,
-            number_of_menu_items,
         }
     }
 
     /// Scrolls menu down, return true if it the scroll has already been exausted
-    pub fn scroll_down(&mut self) -> bool {
-        let end = self.number_of_menu_items - (Self::TOTAL_NUMBER_OF_LINES_IN_LCD - 1);
+    fn scroll_down(&mut self, number_of_menu_items: u8) -> bool {
+        let end = number_of_menu_items - (Self::TOTAL_NUMBER_OF_LINES_IN_LCD - 1);
         let has_exhausted = StatelessCursor::next(end, &mut self.first_line_to_render);
         has_exhausted
     }
 
     /// Scrolls menu up, return true if it the scrooll has already been exausted
-    pub fn scroll_up(&mut self) -> bool {
+    fn scroll_up(&mut self) -> bool {
         let start = Self::DEFAULT_INITIAL_LINE_SELECTED;
         let has_exhausted = StatelessCursor::previous(start, &mut self.first_line_to_render);
         has_exhausted
     }
 
-    pub fn key_down(&mut self) {
+    pub fn key_down(&mut self, number_of_menu_items: u8) {
         let end = Self::TOTAL_NUMBER_OF_LINES_IN_LCD;
         let has_exausted = StatelessCursor::next(end, &mut self.lcd_line_cursor);
         if has_exausted {
-            self.scroll_down();
+            self.scroll_down(number_of_menu_items);
         };
     }
 
