@@ -1,3 +1,5 @@
+use crate::board::lcd;
+
 use super::hepers::LcdLine;
 
 use lib_1::utils::{
@@ -69,23 +71,25 @@ pub struct NavigationState {
 }
 
 impl NavigationState {
+    const TOTAL_NUMBER_OF_LINES_IN_LCD: u8 = lcd::NUMBER_OF_LINES;
+    const DEFAULT_INITIAL_LINE_SELECTED: u8 = 0;
+    const DEFAULT_INITIAL_MENU_ITEM: u8 = 0;
+
     pub fn new_from_submenu_len(number_of_menu_items: u8) -> Self {
         /// This application uses a LCD 40 collumns by 2 Lines in future this may be generalized
-        const TOTAL_NUMBER_OF_LINES_IN_LCD: u8 = 2;
         Self {
             lcd_line_cursor: {
-                const DEFAULT_INITIAL_LINE_SELECTED: u8 = 0;
                 Cursor::new(
                     0,
-                    TOTAL_NUMBER_OF_LINES_IN_LCD,
-                    DEFAULT_INITIAL_LINE_SELECTED,
+                    Self::TOTAL_NUMBER_OF_LINES_IN_LCD,
+                    Self::DEFAULT_INITIAL_LINE_SELECTED,
                 )
             },
             first_line_to_render: {
-                let default_initial_menu_item = 0;
                 Cursor::from_range(
-                    0..number_of_menu_items as usize - (TOTAL_NUMBER_OF_LINES_IN_LCD - 1) as usize,
-                    default_initial_menu_item,
+                    0..number_of_menu_items as usize
+                        - (Self::TOTAL_NUMBER_OF_LINES_IN_LCD - 1) as usize,
+                    Self::DEFAULT_INITIAL_MENU_ITEM,
                 )
             },
         }

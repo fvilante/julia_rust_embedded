@@ -12,7 +12,7 @@ const LOW: bool = false;
 
 // LCD CONFIGURATION: in this case 40x2
 const NUMBER_OF_COLS: u8 = 40;
-const NUMBER_OF_LINES: u8 = 2;
+pub const NUMBER_OF_LINES: u8 = 2;
 
 fn init_lcd_pins() -> () {
     port::B4::set_output(); // lcd_rs = PB4
