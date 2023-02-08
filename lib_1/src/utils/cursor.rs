@@ -61,18 +61,12 @@ impl Cursor {
 
     /// returns true if has reached the upper bound
     pub fn next(&mut self) -> bool {
-        let (has_reached_upper_bound, updated_index) =
-            StatelessCursor::next(self.end, self.current);
-        self.current = updated_index;
-        has_reached_upper_bound
+        StatelessCursor::next(self.end, &mut self.current)
     }
 
     /// returns true if has reached the lower bound
     pub fn previous(&mut self) -> bool {
-        let (has_reached_lower_bound, current_index) =
-            StatelessCursor::previous(self.start, self.current);
-        self.current = current_index;
-        has_reached_lower_bound
+        StatelessCursor::previous(self.start, &mut self.current)
     }
 
     pub fn next_wrap_around(&mut self) {
@@ -120,25 +114,24 @@ impl Default for Cursor {
 pub struct StatelessCursor;
 
 impl StatelessCursor {
+    /// if current_index is updated, then returns bool.
     /// `end` is equal the last index plus one, in other words: it is exclusive
-    pub fn next(end: u8, current_index: u8) -> (bool, u8) {
+    pub fn next(end: u8, current_index: &mut u8) -> bool {
         let last_index = end - 1;
-        let mut updated_index = current_index;
-        let has_reached_upper_bound = current_index >= last_index;
+        let has_reached_upper_bound = *current_index >= last_index;
         if has_reached_upper_bound == false {
-            updated_index += 1;
+            *current_index += 1;
         }
-        (has_reached_upper_bound, updated_index)
+        has_reached_upper_bound
     }
 
     /// `start` is inclusive
-    pub fn previous(start: u8, current_index: u8) -> (bool, u8) {
+    pub fn previous(start: u8, current_index: &mut u8) -> bool {
         let first_index = start;
-        let mut updated_index = current_index;
-        let has_reached_lower_bound = current_index <= first_index;
+        let has_reached_lower_bound = *current_index <= first_index;
         if has_reached_lower_bound == false {
-            updated_index -= 1;
+            *current_index -= 1;
         }
-        (has_reached_lower_bound, updated_index)
+        has_reached_lower_bound
     }
 }
