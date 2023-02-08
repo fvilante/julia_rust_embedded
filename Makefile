@@ -5,6 +5,7 @@
 AVR_SIZE=C:\avr\avr8-gnu-toolchain-win32_x86/bin/avr-size
 MCU=atmega328p
 BUILD_DIR=target/avr-atmega328p/release
+BASE=-Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release
 
 all: fast
 
@@ -38,18 +39,21 @@ fast: build upload_fast size
 
 full: check test build upload_fast size
 
+clippy:
+	cargo clippy --package avr_main $(BASE)  
+
 check:
-	cargo check --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release 
+	cargo check --package avr_main $(BASE) 
 
 # Try to automatically correct as many warnings as possible. Note: Assure to have `warning` enabled in your main module. Disabled warnings are not fixed.
 # NOTE: you can also use `--allow-dirty --allow-staged` parameters if you want to overwrite fixed files even if they are uncommited in the repository.
 fix:
-	cargo fix --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release --bins 
+	cargo fix --package avr_main $(BASE) --bins 
 
 # Same as `fix` rule but do not print fix log messages
 # IMPORTANT: if you have uncommited changes this rule may overwrite your files unadivertedly
 fix_silently:
-	cargo fix --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release --bins --quiet --allow-dirty --allow-staged
+	cargo fix --package avr_main $(BASE) --bins --quiet --allow-dirty --allow-staged
 
 
 # tests in the platform agnostic lib are performed in x86 host
@@ -57,10 +61,10 @@ x86_test:
 	cargo test --package lib_1 --release
 
 build:
-	cargo build --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release 
+	cargo build --package avr_main $(BASE) 
 
 doc:
-	cargo doc --package avr_main -Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release --open
+	cargo doc --package avr_main $(BASE) --open
 
 # slow because it verifies after write proccess
 upload_slow:
