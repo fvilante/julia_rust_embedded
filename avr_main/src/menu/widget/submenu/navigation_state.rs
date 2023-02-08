@@ -4,7 +4,7 @@ use super::hepers::LcdLine;
 
 use lib_1::utils::{
     common::{configure_bit, get_bit_at, reset_bit_at},
-    cursor::Cursor,
+    cursor::StatelessCursor,
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -64,10 +64,12 @@ impl From<CompressedNumbers> for DecompressedNumbers {
 #[derive(Copy, Clone)]
 pub struct NavigationState {
     /// Uncompressed representation of NavigationState
-    /// Controls the line of menu (see: LcdLine) which is current selected.
-    lcd_line_cursor: Cursor,
-    // First line to render in the lcd screen in relation to the list of menu items
-    first_line_to_render: Cursor,
+    /// Tracks the item on the LCD that is currently selected.
+    lcd_line_cursor: u8,
+    /// Tracks the first line of menu to be rendered in the lcd screen. Note that the index is represented in relation to the list of menu items
+    /// of the respective submenu.
+    first_line_to_render: u8,
+    number_of_menu_items: u8,
 }
 
 impl NavigationState {
@@ -78,57 +80,55 @@ impl NavigationState {
     pub fn new_from_submenu_len(number_of_menu_items: u8) -> Self {
         /// This application uses a LCD 40 collumns by 2 Lines in future this may be generalized
         Self {
-            lcd_line_cursor: {
-                Cursor::new(
-                    0,
-                    Self::TOTAL_NUMBER_OF_LINES_IN_LCD,
-                    Self::DEFAULT_INITIAL_LINE_SELECTED,
-                )
-            },
-            first_line_to_render: {
-                Cursor::from_range(
-                    0..number_of_menu_items as usize
-                        - (Self::TOTAL_NUMBER_OF_LINES_IN_LCD - 1) as usize,
-                    Self::DEFAULT_INITIAL_MENU_ITEM,
-                )
-            },
+            lcd_line_cursor: Self::DEFAULT_INITIAL_LINE_SELECTED,
+            first_line_to_render: Self::DEFAULT_INITIAL_MENU_ITEM,
+            number_of_menu_items,
         }
     }
 
-    /// Scrolls menu down, return true if it the scrooll has already been exausted
+    /// Scrolls menu down, return true if it the scroll has already been exausted
     pub fn scroll_down(&mut self) -> bool {
-        let has_exhausted = self.first_line_to_render.next();
+        let end = self.number_of_menu_items - (Self::TOTAL_NUMBER_OF_LINES_IN_LCD - 1);
+        let (has_exhausted, updated_index) = StatelessCursor::next(end, self.first_line_to_render);
+        self.first_line_to_render = updated_index;
         has_exhausted
     }
 
     /// Scrolls menu up, return true if it the scrooll has already been exausted
     pub fn scroll_up(&mut self) -> bool {
-        let has_exhausted = self.first_line_to_render.previous();
+        let start = Self::DEFAULT_INITIAL_LINE_SELECTED;
+        let (has_exhausted, updated_index) =
+            StatelessCursor::previous(start, self.first_line_to_render);
+        self.first_line_to_render = updated_index;
         has_exhausted
     }
 
     pub fn key_down(&mut self) {
-        let is_exhasted = self.lcd_line_cursor.next();
+        let end = Self::TOTAL_NUMBER_OF_LINES_IN_LCD;
+        let (is_exhasted, updated_index) = StatelessCursor::next(end, self.lcd_line_cursor);
+        self.lcd_line_cursor = updated_index;
         if is_exhasted {
             self.scroll_down();
         };
     }
 
     pub fn key_up(&mut self) {
-        let is_exhasted = self.lcd_line_cursor.previous();
+        let start = Self::DEFAULT_INITIAL_LINE_SELECTED;
+        let (is_exhasted, updated_index) = StatelessCursor::previous(start, self.lcd_line_cursor);
+        self.lcd_line_cursor = updated_index;
         if is_exhasted {
             self.scroll_up();
         };
     }
 
     pub fn get_current_lcd_line(&self) -> LcdLine {
-        LcdLine::from(self.lcd_line_cursor.get_current())
+        LcdLine::from(self.lcd_line_cursor)
     }
 
     /// Finds for a given LcdLine the index of the item currently selected (in respect to menu list)
     pub fn get_current_index_for(&self, line: LcdLine) -> u8 {
         let lcd_line = line as u8;
-        let first_line_to_render = self.first_line_to_render.get_current();
+        let first_line_to_render = self.first_line_to_render;
         let item_index = lcd_line + first_line_to_render;
         item_index
     }
