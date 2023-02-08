@@ -1,4 +1,4 @@
-// Wrapper over third-party hardware microcontroller's serial driver
+/// Wrapper over third-party hardware microcontroller's serial driver
 use ruduino::legacy::serial;
 
 use crate::board::lcd;
@@ -15,7 +15,7 @@ pub fn init(baud_rate: u32) {
         .configure();
 }
 
-// non-blocking checking if there exists a byte to be transmit
+/// non-blocking checking if there exists a byte to be transmit
 pub fn ready_to_transmit() -> bool {
     serial::ready_to_transmit()
 }
@@ -25,12 +25,12 @@ pub fn transmit(byte: u8) {
     serial::transmit(byte)
 }
 
-// Non-blocking transmission of one byte and OK, or if not ready to transmit yet return Err
+/// Non-blocking transmission of one byte and OK, or if not ready to transmit yet return Err
 pub fn try_transmit(byte: u8) -> Result<(), ()> {
     serial::try_transmit(byte)
 }
 
-// non-blocking checking if there exists a byte to be received
+/// non-blocking checking if there exists a byte to be received
 pub fn ready_to_receive() -> bool {
     serial::ready_to_receive()
 }
@@ -45,8 +45,7 @@ pub fn try_receive() -> Option<u8> {
     serial::try_receive()
 }
 
-//
-
+/// Example of use
 pub fn development_entry_point() -> ! {
     lcd::lcd_initialize();
     lcd::print("Inicializado serial");
