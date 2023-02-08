@@ -730,7 +730,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                 MenuItemBuilder::from_text(&NUMERO_DE_PULSO_DO_GIRO_X)
                     .add_numerical_variable(
                         &self.model.configuracao_do_eixo.numero_de_pulso_do_giro,
-                        Some(0..0xFFFF),
+                        Some(0..9999),
                         33,
                     )
                     .build(),
