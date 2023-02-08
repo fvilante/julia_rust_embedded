@@ -116,15 +116,19 @@ impl Default for ConfiguracaoDoEixo {
 }
 
 pub struct MachineModel {
-    pub arquivo_de_eixo: ArquivoDeEixo,
-    pub configuracao_do_eixo: ConfiguracaoDoEixo,
+    pub arquivo_de_eixo_x: ArquivoDeEixo,
+    pub arquivo_de_eixo_y: ArquivoDeEixo,
+    pub configuracao_do_eixo_x: ConfiguracaoDoEixo,
+    pub configuracao_do_eixo_y: ConfiguracaoDoEixo,
 }
 
 impl MachineModel {
     pub fn new() -> Self {
         Self {
-            arquivo_de_eixo: ArquivoDeEixo::default(),
-            configuracao_do_eixo: ConfiguracaoDoEixo::default(),
+            arquivo_de_eixo_x: ArquivoDeEixo::default(),
+            arquivo_de_eixo_y: ArquivoDeEixo::default(),
+            configuracao_do_eixo_x: ConfiguracaoDoEixo::default(),
+            configuracao_do_eixo_y: ConfiguracaoDoEixo::default(),
         }
     }
 }
