@@ -424,7 +424,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
             3 => Some(
                 MenuItemBuilder::from_text(&PRIMEIRA_MENSAGEM_NO_RETORNO)
                     .add_numerical_variable(
-                        &self.model.arquivo_de_eixo.primeira_mensagem_no_avanco,
+                        &self.model.arquivo_de_eixo.primeira_mensagem_no_retorno,
                         Some(0..9999),
                         33,
                     )
