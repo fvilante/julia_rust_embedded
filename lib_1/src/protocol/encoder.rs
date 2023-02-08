@@ -17,14 +17,14 @@ pub enum State {
 }
 
 pub struct Encoder {
-    frame: Frame<4>,
+    frame: Frame,
     state: State,
     buffer_index: usize,
     last_was_esc: bool,
 }
 
 impl Encoder {
-    pub fn new(frame: Frame<4>) -> Self {
+    pub fn new(frame: Frame) -> Self {
         Self {
             frame,
             state: State::WaitingFirstEsc,

@@ -9,7 +9,7 @@ use super::frame::Frame;
 //
 
 // NOTE: frame payload should not contain duplicated ESCs
-pub fn calc_checksum<const SIZE: usize>(frame: Frame<SIZE>) -> u8 {
+pub fn calc_checksum(frame: Frame) -> u8 {
     let Frame {
         start_byte,
         payload,
@@ -24,7 +24,7 @@ pub fn calc_checksum<const SIZE: usize>(frame: Frame<SIZE>) -> u8 {
 
 #[cfg(test)]
 mod tests {
-    use crate::protocol::common::StartByte;
+    use crate::protocol::{common::StartByte, frame::Payload};
 
     use super::*;
 
@@ -43,7 +43,7 @@ mod tests {
 
     #[test]
     fn it_scan_checksum_range() {
-        fn make_package(i: u8) -> [u8; 4] {
+        fn make_package(i: u8) -> Payload {
             //expects:
             //  - checksum = 0 if i = 0
             //  - higher i, higher checksum; 1 to 1 relationship

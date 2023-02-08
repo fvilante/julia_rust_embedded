@@ -15,11 +15,11 @@ pub enum DatalinkError {
 
 #[derive(Debug, PartialEq)]
 pub struct DatalinkResult {
-    pub frame: Frame<4>,
+    pub frame: Frame,
     pub response_time_us: u64, // microseconds (aprox)
 }
 
-fn send(frame: Frame<4>, connection: &impl SerialConnection) {
+fn send(frame: Frame, connection: &impl SerialConnection) {
     let encoder = Encoder::new(frame);
     // transmit
     for byte in encoder {
@@ -71,7 +71,7 @@ fn receive(
 }
 
 pub fn transact(
-    frame: Frame<4>,
+    frame: Frame,
     connection: impl SerialConnection,
     timeout_us: u64,
     delay_us: DelayFn,

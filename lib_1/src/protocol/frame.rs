@@ -1,13 +1,17 @@
 use super::common::StartByte;
 
+const PAYLOAD_SIZE: usize = 4;
+
+pub type Payload = [u8; PAYLOAD_SIZE]; // [ Direcao+canal; Cmd; dada_low, data_high]
+
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub struct Frame<const SIZE: usize> {
+pub struct Frame {
     pub start_byte: StartByte,
-    pub payload: [u8; SIZE],
+    pub payload: Payload,
 }
 
-impl<const SIZE: usize> Frame<SIZE> {
-    pub const fn new(start_byte: StartByte, payload: [u8; SIZE]) -> Self {
+impl Frame {
+    pub const fn new(start_byte: StartByte, payload: Payload) -> Self {
         Self {
             start_byte,
             payload,

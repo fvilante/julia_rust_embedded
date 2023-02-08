@@ -1,3 +1,4 @@
+use crate::protocol::frame::Payload;
 use crate::protocol::{common::StartByte, frame::Frame};
 
 use super::transport_error::TransportError;
@@ -33,7 +34,7 @@ pub enum CmppMessage {
     },
 }
 
-fn make_payload(channel: Channel, message: CmppMessage) -> Result<[u8; 4], TransportError> {
+fn make_payload(channel: Channel, message: CmppMessage) -> Result<Payload, TransportError> {
     let [direction, waddr, byte_low, byte_high] = match message {
         CmppMessage::GetWord { waddr } => [Direction::GetWord as u8, waddr, 0x00, 0x00],
 
@@ -68,7 +69,7 @@ fn make_payload(channel: Channel, message: CmppMessage) -> Result<[u8; 4], Trans
         .ok_or_else(|| TransportError::InvalidChannel(channel))
 }
 
-pub fn make_frame(channel: Channel, message: CmppMessage) -> Result<Frame<4>, TransportError> {
+pub fn make_frame(channel: Channel, message: CmppMessage) -> Result<Frame, TransportError> {
     let start_byte = StartByte::STX;
     let payload = make_payload(channel, message);
     payload.map(|payload| Frame {

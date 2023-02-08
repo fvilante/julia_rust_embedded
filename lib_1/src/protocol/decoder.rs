@@ -68,7 +68,7 @@ impl Decoder {
         }
     }
 
-    fn success(&self, checksum: u8) -> Result<Option<Frame<4>>, SegmentError> {
+    fn success(&self, checksum: u8) -> Result<Option<Frame>, SegmentError> {
         let frame = Frame {
             start_byte: self.start_byte,
             payload: self.buffer,
@@ -84,7 +84,7 @@ impl Decoder {
         }
     }
 
-    pub fn parse_next(&mut self, byte: u8) -> Result<Option<Frame<4>>, SegmentError> {
+    pub fn parse_next(&mut self, byte: u8) -> Result<Option<Frame>, SegmentError> {
         match self.state {
             State::WaitingFirstEsc => {
                 self.state = State::WaitingStartByte;
@@ -169,9 +169,11 @@ impl Decoder {
 #[cfg(test)]
 mod tests {
 
+    use crate::protocol::frame::Payload;
+
     use super::*;
 
-    fn run_decoder<const SIZE: usize>(input: [u8; SIZE]) -> Result<Frame<4>, SegmentError> {
+    fn run_decoder(input: Payload) -> Result<Frame, SegmentError> {
         let mut decoder = Decoder::new();
         for byte in input {
             match decoder.parse_next(byte) {
