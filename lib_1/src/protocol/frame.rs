@@ -1,8 +1,6 @@
 use super::prelude::StartByte;
 
-const PAYLOAD_SIZE: usize = 4;
-
-pub type Payload = [u8; PAYLOAD_SIZE]; // [ Direcao+canal; Cmd; dada_low, data_high]
+pub type Payload = [u8; 4]; // [ Direcao+canal; Cmd; dada_low, data_high]
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Frame {
