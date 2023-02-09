@@ -11,10 +11,18 @@ and then modernized to account for API drift since 2020
 use avr_device::atmega328p::tc1::tccr1b::CS1_A;
 use avr_device::atmega328p::TC1;
 use core::mem;
+use heapless::Deque;
+use ruduino::prelude::without_interrupts;
+
+use crate::board::lcd;
+
+use super::serial;
+
 //use panic_halt as _;
 
 struct InterruptState {
     clock_counter: ClockCounter, // increments on each tick of the clock
+    rx_buffer: RxBuffer,
 }
 
 static mut INTERRUPT_STATE: mem::MaybeUninit<InterruptState> = mem::MaybeUninit::uninit();
@@ -45,7 +53,7 @@ fn rig_timer(tmr1: &TC1) {
         CS1_A::NO_CLOCK | CS1_A::EXT_FALLING | CS1_A::EXT_RISING => 1,
     };
 
-    let ticks = calc_overflow(ARDUINO_UNO_CLOCK_FREQUENCY_HZ, 1000, clock_divisor) as u16;
+    let ticks = calc_overflow(ARDUINO_UNO_CLOCK_FREQUENCY_HZ, 1, clock_divisor) as u16;
 
     tmr1.tccr1a.write(|w| w.wgm1().bits(0b00));
     tmr1.tccr1b.write(|w| {
@@ -86,9 +94,13 @@ pub fn init_timer() -> () {
     }
 
     let clock_counter = ClockCounter::new();
+    let rx_buffer = RxBuffer::new();
 
     //Do all
-    set_initial_state(InterruptState { clock_counter });
+    set_initial_state(InterruptState {
+        clock_counter,
+        rx_buffer,
+    });
     configure_timer();
     enable_interrupts_globally();
 }
@@ -103,6 +115,10 @@ fn TIMER1_COMPA() {
     };
 
     state.clock_counter.increment();
+
+    without_interrupts(|| {
+        state.rx_buffer.update();
+    });
 
     //lcd::clear();
     //lcd::print_u16_in_hex(state.clock_counter.read().try_into().unwrap());
@@ -135,4 +151,36 @@ pub fn now() -> u64 {
 
     let value = state.clock_counter.read();
     value
+}
+
+////////////////////////////////////////////////
+
+struct RxBuffer {
+    received_bytes: u16,
+    //pub data: Deque<u8, 10>,
+}
+
+impl RxBuffer {
+    pub fn new() -> Self {
+        serial::init(2400);
+        lcd::lcd_initialize();
+        Self {
+            //data: Deque::new(),
+            received_bytes: 0,
+        }
+    }
+
+    /// Updates rx buffer bringing any data received from hardware to the buffer
+    pub fn update(&mut self) {
+        if serial::ready_to_receive() {
+            let byte = serial::receive();
+            //self.data.push_back(byte);
+            self.received_bytes = self.received_bytes.wrapping_add(1);
+            //lcd::print_u8_in_hex(byte);
+            lcd::clear();
+            lcd::print("R=");
+            lcd::print_u16_in_hex(self.received_bytes);
+            lcd::print_u8_in_hex(byte);
+        }
+    }
 }
