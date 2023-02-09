@@ -16,6 +16,7 @@ pub enum State {
     Finish,
 }
 
+/// Given a Cmpp Frame, it encodes asynchronously it using the v1.00 Protocol
 pub struct Encoder {
     frame: Frame,
     state: State,
