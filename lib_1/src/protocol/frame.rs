@@ -15,6 +15,10 @@ impl Frame {
             payload,
         }
     }
+
+    pub const fn make_master_block(payload: Payload) -> Self {
+        Self::new(StartByte::STX, payload)
+    }
 }
 
 #[cfg(test)]
