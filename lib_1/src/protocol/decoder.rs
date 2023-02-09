@@ -15,10 +15,16 @@ pub enum SegmentError {
     InvalidChecksum { expected: u8, received: u8 },
 }
 
+// =================================================================
+/* CODE BELOW IS PLATFORM SPECIFIC AND MUST BE PLATFORM AGNOSTIC,
+BECAUSE STRINGS LIKE &'static str is not memory efficient in avr
+platform
+
+
 impl SegmentError {
     pub fn to_string(&self) -> &'static str {
         match *self {
-            SegmentError::InvalidStartByte(_u8) => "InvalidStartByte",
+            SegmentError::InvalidStartByte(_u8) => "InvalidStart",
             SegmentError::BufferOverFlow => "BufferOverFlow",
             SegmentError::ExpectedEtxOrEscDupButFoundOtherThing(_u8) => {
                 "ExpectedEtxOrEscDupButFoundOtherThing"
@@ -30,7 +36,8 @@ impl SegmentError {
             } => "InvalidChecksum",
         }
     }
-}
+}*/
+// =================================================================
 
 pub enum State {
     WaitingFirstEsc,
