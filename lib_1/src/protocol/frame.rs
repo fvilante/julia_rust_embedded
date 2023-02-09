@@ -1,4 +1,4 @@
-use super::prelude::StartByte;
+use super::{encoder::Encoder, prelude::StartByte};
 
 pub type Payload = [u8; 4]; // [ Direcao+canal; Cmd; dada_low, data_high]
 
@@ -18,6 +18,10 @@ impl Frame {
 
     pub const fn make_master_block(payload: Payload) -> Self {
         Self::new(StartByte::STX, payload)
+    }
+
+    pub fn encode(&self) -> Encoder {
+        Encoder::new(self.clone())
     }
 }
 

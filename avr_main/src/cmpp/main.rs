@@ -1,12 +1,15 @@
 use heapless::Deque;
 use lib_1::protocol::{
-    decoder::SegmentError,
+    decoder::{Decoder, SegmentError},
     frame::Frame,
     prelude::StartByte,
     transact::{transact, DatalinkError},
 };
 
-use crate::{board::lcd, microcontroler::delay::delay_us};
+use crate::{
+    board::lcd,
+    microcontroler::{delay::delay_us, serial},
+};
 
 use super::datalink::concrete_serial::ConcreteSerialPort;
 use lib_1::types::serial_connection::SerialConnection;
@@ -78,6 +81,46 @@ pub fn teste_dequeue() {
 pub fn development_entry_point() -> ! {
     lcd::lcd_initialize();
     lcd::print("Juca kifuri");
+
+    let frame = Frame::new(StartByte::STX, [0, 0x50, 0, 0]);
+
+    serial::init(9600);
+
+    lcd::print("(A);");
+    for byte in frame.encode() {
+        loop {
+            if let Ok(_) = serial::try_transmit(byte) {
+                break;
+            }
+        }
+    }
+    lcd::print("(B);");
+
+    let mut count: u16 = 0;
+
+    let mut decoder = Decoder::new();
+
+    loop {
+        if let Some(byte) = serial::try_receive() {
+            match decoder.parse_next(byte) {
+                Ok(res) => {
+                    match res {
+                        Some(frame) => {
+                            lcd::print("Success");
+                        }
+                        None => {
+                            // processing input
+                        }
+                    }
+                }
+                Err(error) => {
+                    lcd::print("Error");
+                }
+            }
+        }
+    }
+
+    //crate::microcontroler::serial::development_entry_point();
 
     //test_cmpp();
 
