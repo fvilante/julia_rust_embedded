@@ -13,6 +13,43 @@ pub enum StartByte {
     NACK = NACK,
 }
 
+#[derive(Debug, PartialEq, Copy, Clone)]
+#[repr(u8)]
+pub enum SlaveStartByte {
+    ACK = ACK,
+    NACK = NACK,
+}
+
+impl TryFrom<StartByte> for SlaveStartByte {
+    type Error = ();
+
+    fn try_from(start_byte: StartByte) -> Result<Self, Self::Error> {
+        match start_byte {
+            StartByte::STX => Err(()),
+            StartByte::ACK => Ok(SlaveStartByte::ACK),
+            StartByte::NACK => Ok(SlaveStartByte::NACK),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Copy, Clone)]
+#[repr(u8)]
+pub enum MasterStartByte {
+    STX = STX,
+}
+
+impl TryFrom<StartByte> for MasterStartByte {
+    type Error = ();
+
+    fn try_from(start_byte: StartByte) -> Result<Self, Self::Error> {
+        match start_byte {
+            StartByte::STX => Ok(MasterStartByte::STX),
+            StartByte::ACK => Err(()),
+            StartByte::NACK => Err(()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

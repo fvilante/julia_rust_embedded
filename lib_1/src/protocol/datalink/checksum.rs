@@ -3,12 +3,6 @@ use super::prelude::ETX;
 
 /// Calculates checksum of the given [`Frame`].
 ///
-/// NOTE:
-///
-///      This checksum calculation is agnostic of the data length. It can calculate checksum
-///      for any arbitrary length of data, and not only just cmpp payloads.
-///      It depends only on a "[StartbyteNum, obj, ETX]" protocol
-///
 /// NOTE: frame payload should not contain duplicated ESCs
 pub fn calc_checksum(frame: Frame) -> u8 {
     let Frame {
@@ -25,7 +19,7 @@ pub fn calc_checksum(frame: Frame) -> u8 {
 
 #[cfg(test)]
 mod tests {
-    use crate::protocol::{frame::Payload, prelude::StartByte};
+    use crate::protocol::datalink::{frame::Payload, prelude::StartByte};
 
     use super::*;
 

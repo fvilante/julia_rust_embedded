@@ -113,7 +113,7 @@ impl Iterator for Encoder {
 
 #[cfg(test)]
 mod tests {
-    use crate::protocol::prelude::StartByte;
+    use crate::protocol::datalink::prelude::StartByte;
 
     use super::*;
 

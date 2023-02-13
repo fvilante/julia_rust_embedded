@@ -7,6 +7,7 @@ use super::{
 const MAX_BUFFER_LEN: usize = 4; // max data length buffer
 
 #[derive(Debug)]
+/// TODO: Rename to "DecodingError"
 pub enum SegmentError {
     InvalidStartByte(u8),
     BufferOverFlow,
@@ -91,6 +92,9 @@ impl Decoder {
         }
     }
 
+    /// Parses asynchronously each byte according to cmpp protocol v1.
+    ///
+    /// Returns Ok(None) if still decoding, Ok(Some(frame)) if a frame has been parsed and Err if some decidubg error hapenned.
     pub fn parse_next(&mut self, byte: u8) -> Result<Option<Frame>, SegmentError> {
         match self.state {
             State::WaitingFirstEsc => {
@@ -176,14 +180,14 @@ impl Decoder {
 #[cfg(test)]
 mod tests {
 
-    use crate::protocol::frame::Payload;
+    use crate::protocol::datalink::frame::Payload;
 
     use super::*;
 
-    fn run_decoder(input: Payload) -> Result<Frame, SegmentError> {
+    fn run_decoder(input: &[u8]) -> Result<Frame, SegmentError> {
         let mut decoder = Decoder::new();
         for byte in input {
-            match decoder.parse_next(byte) {
+            match decoder.parse_next(*byte) {
                 Ok(val) => {
                     match val {
                         Some(frame) => return Ok(frame),
@@ -207,7 +211,7 @@ mod tests {
             start_byte,
             payload: [0xC1, 0x50, 0x61, 0x02],
         };
-        let actual = run_decoder(probe).unwrap();
+        let actual = run_decoder(&probe).unwrap();
         assert_eq!(expected, actual);
     }
 
@@ -232,7 +236,7 @@ mod tests {
             start_byte,
             payload: [0x01, 0x86, 0x03, 0x1B],
         };
-        let actual = run_decoder(probe).unwrap();
+        let actual = run_decoder(&probe).unwrap();
         assert_eq!(expected, actual);
     }
 }
