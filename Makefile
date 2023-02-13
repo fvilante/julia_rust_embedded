@@ -24,7 +24,7 @@ format:
 
 # watch executes the tests if any file on the project change (note: ignore files in target and .git folder)
 # if you do not have cargo-watch instaled type "cargo install cargo-watch" to install from source.
-watch_x86: 
+watch_x86_test: 
 	cargo watch -c --why -s "make div x86_test"
 
 watch_avr: 
