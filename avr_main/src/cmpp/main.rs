@@ -47,7 +47,10 @@ fn test_cmpp() {
                         SegmentError::ChecksumIsEscButNotDuplicated(_) => {
                             lcd::print("ChecksumIsEscButNotDuplicated");
                         }
-                        SegmentError::InvalidChecksum { expected, received } => {
+                        SegmentError::InvalidChecksum {
+                            expected: _,
+                            received: _,
+                        } => {
                             lcd::print("InvalidChecksum");
                         }
                     }
@@ -61,7 +64,7 @@ fn test_cmpp() {
     }
 }
 
-pub fn teste_dequeue() {
+fn teste_dequeue() {
     let mut queue: Deque<u8, 3> = Deque::new();
 
     //queue.push_back(1);
@@ -96,7 +99,7 @@ pub fn development_entry_point() -> ! {
     }
     lcd::print("(B);");
 
-    let mut count: u16 = 0;
+    let _count: u16 = 0;
 
     let mut decoder = Decoder::new();
 
@@ -105,7 +108,7 @@ pub fn development_entry_point() -> ! {
             match decoder.parse_next(byte) {
                 Ok(res) => {
                     match res {
-                        Some(frame) => {
+                        Some(_frame) => {
                             lcd::print("Success");
                         }
                         None => {
@@ -113,7 +116,7 @@ pub fn development_entry_point() -> ! {
                         }
                     }
                 }
-                Err(error) => {
+                Err(_error) => {
                     lcd::print("Error");
                 }
             }
