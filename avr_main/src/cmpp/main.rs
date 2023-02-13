@@ -1,5 +1,5 @@
 use heapless::Deque;
-use lib_1::protocol::{
+use lib_1::protocol::datalink::{
     decoder::{Decoder, SegmentError},
     frame::Frame,
     prelude::StartByte,

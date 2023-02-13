@@ -1,7 +1,7 @@
-use super::frame::Frame;
 use super::{
     decoder::{Decoder, SegmentError},
     encoder::Encoder,
+    frame::Frame,
 };
 use crate::types::serial_connection::SerialConnection;
 

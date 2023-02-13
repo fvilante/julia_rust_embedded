@@ -1,9 +1,9 @@
 use super::concrete_serial::ConcreteSerialPort;
 use crate::board::lcd;
 use crate::microcontroler::delay::delay_us;
-use lib_1::protocol::frame::Frame;
-use lib_1::protocol::prelude::StartByte;
-use lib_1::protocol::transact::{transact, DatalinkError};
+use lib_1::protocol::datalink::frame::Frame;
+use lib_1::protocol::datalink::prelude::StartByte;
+use lib_1::protocol::datalink::transact::{transact, DatalinkError};
 use lib_1::types::serial_connection::SerialConnection;
 
 pub fn development_entry_point() -> ! {

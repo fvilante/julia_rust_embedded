@@ -2,9 +2,9 @@ use super::channel::Channel;
 use super::master_packet::make_frame;
 use super::master_packet::CmppMessage;
 use super::transport_error::TransportError;
-use crate::protocol::transact::transact;
-use crate::protocol::transact::DatalinkResult;
-use crate::protocol::transact::DelayFn;
+use crate::protocol::datalink::transact::transact;
+use crate::protocol::datalink::transact::DatalinkResult;
+use crate::protocol::datalink::transact::DelayFn;
 use crate::types::serial_connection::SerialConnection;
 
 pub fn transact_packet(

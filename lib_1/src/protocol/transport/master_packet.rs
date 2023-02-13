@@ -1,5 +1,5 @@
-use crate::protocol::frame::Payload;
-use crate::protocol::{frame::Frame, prelude::StartByte};
+use crate::protocol::datalink::frame::Payload;
+use crate::protocol::datalink::{frame::Frame, prelude::StartByte};
 
 use super::transport_error::TransportError;
 use super::word_16::{BitMask16, Word16};
