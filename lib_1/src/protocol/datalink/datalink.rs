@@ -365,7 +365,9 @@ impl Datalink {
 
     /// Synchronously reads RX waiting for stream of bytes to decode, considering the
     /// specified timeout time.
-    fn receive(&self) -> Result<SlaveFrame, DLError> {
+    /// I reads a response Frame but does not checks if the Frame is an SlaveFrame
+    /// (start_byte equals 'ACK' or 'NACK'). Alternatively use [`Self::receive`].
+    fn receive_frame(&self) -> Result<Frame, DLError> {
         let now = (self.now);
         let start_time = now();
         let timeout = self.timeout_ms;
@@ -382,13 +384,7 @@ impl Datalink {
 
                         // Complete frame Successfully received.
                         Ok(Some(frame)) => {
-                            // check if it is an slave frame and return it
-                            if let Ok(slave_frame) = frame.try_into() {
-                                return Ok(slave_frame);
-                            } else {
-                                // It will not be an slave frame if it has a STX start byte
-                                return Err(DLError::SlaveHasReturnedStartByteEqualsToSTX);
-                            }
+                            return Ok(frame);
                         }
 
                         // An Error has happned while decoding incomming stream, return the error.
@@ -410,18 +406,36 @@ impl Datalink {
         }
     }
 
+    /// Perform all reception check plus check if the response is not a MasterFrame (start_byte equals STX)
+    fn receive(&self) -> Result<SlaveFrame, DLError> {
+        match self.receive_frame() {
+            Ok(frame) => {
+                // check if it is an slave frame and return it
+                if let Ok(slave_frame) = frame.try_into() {
+                    return Ok(slave_frame);
+                } else {
+                    // It will not be an slave frame if it has a STX start byte
+                    return Err(DLError::SlaveHasReturnedStartByteEqualsToSTX);
+                }
+            }
+
+            // Forwards
+            Err(error) => Err(error),
+        }
+    }
+
     fn transact(
         &self,
         direction: Direction,
         word_address: u8,
         word_value: u16,
     ) -> Result<SlaveFrame, DLError> {
-        // send
+        // Send
         let encoded = Self::encode_data(self.channel, direction, word_address, word_value);
         if let Err(error) = self.transmit(encoded) {
             return Err(error);
         }
-        //receive
+        // Receive
         self.receive()
     }
 
@@ -486,4 +500,251 @@ impl Datalink {
         self.transact(direction, word_address, word_value)
             .map(|slave_frame| Self::cast_to_pacote_de_retorno_envio(slave_frame))
     }
+}
+
+//////////////////////////////////////////////////////
+// TESTS
+/////////////////////////////////////////////////////////
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    mod emulated {
+        use heapless::Deque;
+
+        use crate::protocol::datalink::{decoder::Decoder, encoder::Encoder, prelude::StartByte};
+
+        /// Does never timeout ;)! Because time does not pass :D !
+        pub fn lazy_now() -> u64 {
+            0
+        }
+
+        /// emulated server's buffer
+        static mut server: Deque<u8, 20> = Deque::new();
+        pub fn try_tx(byte: u8) -> Option<()> {
+            unsafe { server.push_back(byte).ok() }
+        }
+
+        //
+        static mut decoder: Decoder = Decoder::new();
+
+        /// This Rx function will receive any encoded master frame, but change
+        /// the start_byte from STX to ACK.
+        pub fn smart_try_tx(byte: u8) -> Option<()> {
+            //decode master data
+            match unsafe { decoder.parse_next(byte) } {
+                Ok(Some(mut frame)) => {
+                    frame.start_byte = StartByte::ACK;
+                    let encoder = Encoder::new(frame);
+                    for byte in encoder {
+                        // reinject data into buffer
+                        match try_tx(byte) {
+                            Some(_) => {
+                                // sending to server's buffer
+                            }
+                            None => unreachable!(),
+                        }
+                    }
+                }
+                Ok(None) => {
+                    // still parsing
+                }
+                Err(error) => {
+                    unreachable!("Master is expected to always be an well-formed frame")
+                }
+            };
+
+            Some(())
+        }
+
+        /// if master sends a master slave, receives exactly a master slave.
+        pub fn loopback_try_rx() -> Result<Option<u8>, ()> {
+            unsafe { Ok(server.pop_front()) }
+        }
+
+        /// it decode what it received from master then give it back, but it
+        /// changes the start_byte from 'STX' to 'ACK'
+        pub fn convert_ok_master_into_ok_slave() {}
+    }
+
+    #[test]
+    fn it_can_mock_the_serial_for_one_byte_transaction() {
+        // setup
+        let probe = 0x10;
+
+        //send
+        if let Some(_) = emulated::try_tx(probe) {
+            assert!(true)
+        } else {
+            assert!(false)
+        }
+
+        //receive
+        if let Ok(Some(byte)) = emulated::loopback_try_rx() {
+            assert_eq!(byte, probe)
+        }
+    }
+
+    #[test]
+    fn it_can_mock_the_serial_for_an_entire_frame() {
+        // setup
+        let payload: Payload = [0, 1, 2, 3];
+        let frame = Frame::make_master_block(payload);
+        let encoder = Encoder::new(frame);
+        let mut decoder = Decoder::new();
+        use emulated::{loopback_try_rx, try_tx};
+        let mut check: u8 = 0;
+
+        //send
+        for byte in encoder {
+            if let None = try_tx(byte) {
+                assert!(false, "TX mocked should never fail")
+            }
+        }
+
+        // receive
+        loop {
+            if let Ok(Some(byte)) = loopback_try_rx() {
+                if let Ok(Some(frame)) = decoder.parse_next(byte) {
+                    let expected = frame.payload;
+                    assert_eq!(payload, expected, "Correctly decoded the sent payload");
+                    check += 1;
+                    break;
+                }
+            }
+        }
+
+        assert_eq!(check, 1, "All important steps performed (checked)!");
+    }
+
+    #[test]
+    fn it_can_send_data_through_datalink() {
+        // setup
+        let payload: Payload = [0, 1, 2, 3];
+        let frame = Frame::make_master_block(payload);
+        let encoder = Encoder::new(frame);
+        let mut decoder = Decoder::new();
+        use emulated::{lazy_now, loopback_try_rx, smart_try_tx};
+        let mut check: u8 = 0;
+
+        let datalink = Datalink {
+            channel: Channel { number: 1 },
+            timeout_ms: 1000,
+            try_tx: smart_try_tx,
+            try_rx: loopback_try_rx,
+            now: lazy_now,
+        };
+
+        // run
+        let word_address = 0x12;
+        let word_value = 0x34;
+        match datalink.set_word16(word_address, word_value) {
+            Ok(Ok(pacote_de_retorno)) => {
+                let PacoteDeRetornoDeEnvio { status } = pacote_de_retorno;
+                assert!(true);
+                check += 1;
+            }
+
+            Ok(Err(pacote_de_erro)) => {
+                let PacoteDeRetornoComErro {
+                    byte_de_erro,
+                    status,
+                } = pacote_de_erro;
+                match byte_de_erro {
+                    Ok(byte_de_erro_conhecido) => match byte_de_erro_conhecido {
+                        ByteDeErro::StartByteInvalidSTX => {
+                            assert!(false, "StartByteInvalidSTX");
+                        }
+                        ByteDeErro::EstruturaDePacoteDeComunicacaoInvalido02 => {
+                            assert!(false, "EstruturaDePacoteDeComunicacaoInvalido02");
+                        }
+                        ByteDeErro::EstruturaDePacoteDeComunicacaoInvalido03 => {
+                            assert!(false, "EstruturaDePacoteDeComunicacaoInvalido03");
+                        }
+                        ByteDeErro::EstruturaDePacoteDeComunicacaoInvalido04 => {
+                            assert!(false, "EstruturaDePacoteDeComunicacaoInvalido04");
+                        }
+                        ByteDeErro::EstruturaDePacoteDeComunicacaoInvalido05 => {
+                            assert!(false, "EstruturaDePacoteDeComunicacaoInvalido05");
+                        }
+                        ByteDeErro::EstruturaDePacoteDeComunicacaoInvalido06 => {
+                            assert!(false, "EstruturaDePacoteDeComunicacaoInvalido06");
+                        }
+                        ByteDeErro::EstruturaDePacoteDeComunicacaoInvalido07 => {
+                            assert!(false, "EstruturaDePacoteDeComunicacaoInvalido07");
+                        }
+                        ByteDeErro::EstruturaDePacoteDeComunicacaoInvalido08 => {
+                            assert!(false, "EstruturaDePacoteDeComunicacaoInvalido08");
+                        }
+                        ByteDeErro::EstruturaDePacoteDeComunicacaoInvalido09 => {
+                            assert!(false, "EstruturaDePacoteDeComunicacaoInvalido09");
+                        }
+                        ByteDeErro::NaoUsado10 => {
+                            assert!(false, "NaoUsado10");
+                        }
+                        ByteDeErro::EndByteInvalidETX => {
+                            assert!(false, "EndByteInvalidETX");
+                        }
+                        ByteDeErro::TimerIn => {
+                            assert!(false, "TimerIn");
+                        }
+                        ByteDeErro::NaoUsado13 => {
+                            assert!(false, "NaoUsado13");
+                        }
+                        ByteDeErro::Framming => {
+                            assert!(false, "Framming");
+                        }
+                        ByteDeErro::OverRun => {
+                            assert!(false, "OverRun");
+                        }
+                        ByteDeErro::BufferDeRecepcaoCheio => {
+                            assert!(false, "BufferDeRecepcaoCheio");
+                        }
+                        ByteDeErro::CheckSum => {
+                            assert!(false, "CheckSum");
+                        }
+                        ByteDeErro::BufferAuxiliarOcupado => {
+                            assert!(false, "BufferAuxiliarOcupado");
+                        }
+                        ByteDeErro::SequenciaDeByteEnviadaMuitoGrande => {
+                            assert!(false, "SequenciaDeByteEnviadaMuitoGrande");
+                        }
+                    },
+                    Err(byte_de_erro_desconhecido) => {
+                        assert!(false, "Byte de erro desconhecido")
+                    }
+                };
+
+                assert!(false, "status");
+            }
+
+            Err(datalink_error) => match datalink_error {
+                DLError::InvalidChannel(channel) => {
+                    assert!(false, "InvalidChannel");
+                }
+                DLError::SerialTransmissionError => {
+                    assert!(false, "SerialTransmissionError");
+                }
+                DLError::DecodingError(segment_error) => {
+                    assert!(false, "DecodingError");
+                }
+                DLError::Timeout(timeout) => {
+                    assert!(false, "timeout");
+                }
+                DLError::SerialReceptionError => {
+                    assert!(false, "SerialReceptionError");
+                }
+                DLError::SlaveHasReturnedStartByteEqualsToSTX => {
+                    assert!(false, "SlaveHasReturnedStartByteEqualsToSTX");
+                }
+            },
+        };
+        assert_eq!(check, 1, "Everything is checked")
+    }
+
+    // /////////////////////////////////////
+    // TODO: Test for check each error condition (ie: timeout, checksum wrong, etc)
+    // ////////////////////
 }

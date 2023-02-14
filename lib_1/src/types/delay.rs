@@ -10,3 +10,8 @@ pub fn delay_us(us: u64) {
         delay_one_us();
     }
 }
+
+pub fn delay_ms(ms: u64) {
+    let us = ms * 1000;
+    delay_us(us);
+}

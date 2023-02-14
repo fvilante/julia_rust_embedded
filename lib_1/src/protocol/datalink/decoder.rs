@@ -56,7 +56,7 @@ pub struct Decoder {
 }
 
 impl Decoder {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             start_byte: StartByte::STX,
             state: State::WaitingFirstEsc,
