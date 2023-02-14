@@ -9,6 +9,14 @@ BASE=-Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json -
 
 all: fast
 
+# To make cargo compiler to show verbose information when error happens (specially useful when
+# runing tests), its necesssary to set enviroment variable "RUST_BACKTRACE=full". The line below
+# works when typed direct into powershell.
+# TODO: Make rule below to also work as a make file rule 
+verbose:
+	$env:RUST_BACKTRACE="full"
+
+
 # just a division marker
 div: format
 	@echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
