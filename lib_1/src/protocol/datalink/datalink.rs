@@ -271,7 +271,7 @@ impl TryFrom<u8> for ByteDeErro {
 /// When master sends an Direction::{ Set, SetBitMask, ResetBitMask} MasterFrame this is what is expected the slave to respond if
 /// no error happens and slave responds with ACK.
 pub struct PacoteDeRetornoDeEnvio {
-    status: Status,
+    pub status: Status,
 }
 
 impl PacoteDeRetornoDeEnvio {
@@ -286,7 +286,7 @@ impl PacoteDeRetornoDeEnvio {
 /// When master sends an Direction::get MasterFrame this is what is expected the slave to respond if
 /// no error happens and slave responds with ACK.
 pub struct PacodeDeRetornoDeSolicitacao {
-    data: Word16,
+    pub data: Word16,
 }
 
 impl PacodeDeRetornoDeSolicitacao {
