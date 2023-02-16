@@ -65,22 +65,22 @@ impl Encoder {
             }
 
             State::WaitingData0 => {
-                let byte = self.frame.payload[0];
+                let byte = self.frame.payload.as_array()[0];
                 self.duplicate_esc_if_necessary(byte, State::WaitingData1)
             }
 
             State::WaitingData1 => {
-                let byte = self.frame.payload[1];
+                let byte = self.frame.payload.as_array()[1];
                 self.duplicate_esc_if_necessary(byte, State::WaitingData2)
             }
 
             State::WaitingData2 => {
-                let byte = self.frame.payload[2];
+                let byte = self.frame.payload.as_array()[2];
                 self.duplicate_esc_if_necessary(byte, State::WaitingData3)
             }
 
             State::WaitingData3 => {
-                let byte = self.frame.payload[3];
+                let byte = self.frame.payload.as_array()[3];
                 self.duplicate_esc_if_necessary(byte, State::WaitingFinalEsc)
             }
 
@@ -122,7 +122,7 @@ mod tests {
         // 1B 02 C1 50 61 02 1B 03 87
         let frame = Frame {
             start_byte: StartByte::STX,
-            payload: [0xC1, 0x50, 0x61, 0x02],
+            payload: [0xC1, 0x50, 0x61, 0x02].into(),
         };
         let mut encoder = Encoder::new(frame);
         let expected = [0x1B, 0x02, 0xC1, 0x50, 0x61, 0x02, 0x1B, 0x03, 0x87];
@@ -136,7 +136,7 @@ mod tests {
         // 1B 06 01 86 03 1B 1B 03 52
         let frame = Frame {
             start_byte: StartByte::ACK,
-            payload: [0x01, 0x86, 0x03, 0x1B],
+            payload: [0x01, 0x86, 0x03, 0x1B].into(),
         };
         let mut encoder = Encoder::new(frame);
         let expected = [0x1B, 0x06, 0x01, 0x86, 0x03, 0x1B, 0x1B, 0x1B, 0x03, 0x52];

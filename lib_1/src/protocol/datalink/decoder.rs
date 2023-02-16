@@ -79,7 +79,7 @@ impl Decoder {
     fn success(&self, checksum: u8) -> Result<Option<Frame>, SegmentError> {
         let frame = Frame {
             start_byte: self.start_byte,
-            payload: self.buffer,
+            payload: self.buffer.into(),
         };
         let expected = calc_checksum(frame);
         if checksum == expected {
@@ -209,7 +209,7 @@ mod tests {
         let probe = [0x1B, start_byte_, 0xC1, 0x50, 0x61, 0x02, 0x1B, 0x03, 0x87];
         let expected = Frame {
             start_byte,
-            payload: [0xC1, 0x50, 0x61, 0x02],
+            payload: [0xC1, 0x50, 0x61, 0x02].into(),
         };
         let actual = run_decoder(&probe).unwrap();
         assert_eq!(expected, actual);
@@ -234,7 +234,7 @@ mod tests {
         ];
         let expected = Frame {
             start_byte,
-            payload: [0x01, 0x86, 0x03, 0x1B],
+            payload: [0x01, 0x86, 0x03, 0x1B].into(),
         };
         let actual = run_decoder(&probe).unwrap();
         assert_eq!(expected, actual);

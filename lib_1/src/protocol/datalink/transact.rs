@@ -93,7 +93,7 @@ mod tests {
     fn it_transact_one_frame() {
         // prepare
         let start_byte = StartByte::STX;
-        let payload = [1, 2, 3, 4];
+        let payload = [1, 2, 3, 4].into();
         let timeout_us: u64 = 500;
         let frame = Frame {
             start_byte,

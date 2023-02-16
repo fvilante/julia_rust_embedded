@@ -28,7 +28,7 @@ pub fn transact_packet(
 mod tests {
     use super::*;
     use crate::mock::serial_connection_mock::MockedSerialConnection;
-    use crate::protocol::datalink::frame::Frame;
+    use crate::protocol::datalink::frame::{Frame, Payload};
     use crate::protocol::datalink::prelude::StartByte;
     use crate::protocol::datalink::transact::DatalinkResult;
     use crate::protocol::transport::channel::Channel;
@@ -39,7 +39,7 @@ mod tests {
     fn it_transact_one_packet() {
         // prepare
         let start_byte = StartByte::STX;
-        let payload = [0, 0, 0, 0];
+        let payload = Payload::from_array([0, 0, 0, 0]);
         let timeout_us: u64 = 500;
         let connection = MockedSerialConnection::new(9600);
         let channel = Channel::new(0x00);

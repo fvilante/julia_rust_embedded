@@ -5,14 +5,12 @@ use super::prelude::ETX;
 ///
 /// NOTE: frame payload should not contain duplicated ESCs
 pub fn calc_checksum(frame: Frame) -> u8 {
-    let Frame {
-        start_byte,
-        payload,
-    } = frame;
-    payload
+    frame
+        .payload
+        .as_array()
         .iter()
         .fold(0, |sum, a| sum + a)
-        .wrapping_add(start_byte as u8)
+        .wrapping_add(frame.start_byte as u8)
         .wrapping_add(ETX)
         .wrapping_neg()
 }
@@ -26,7 +24,7 @@ mod tests {
     #[test]
     fn it_calc_checksum_once() {
         // 1B 02 C1 50 61 02 1B 03 87
-        let data = [0xC1, 0x50, 0x61, 0x02];
+        let data = [0xC1, 0x50, 0x61, 0x02].into();
         let frame = Frame {
             start_byte: StartByte::STX,
             payload: data,
@@ -42,7 +40,7 @@ mod tests {
             //expects:
             //  - checksum = 0 if i = 0
             //  - higher i, higher checksum; 1 to 1 relationship
-            [0xC1, 0x50, 0x61, 0x02 + 0x87 - i]
+            [0xC1, 0x50, 0x61, 0x02 + 0x87 - i].into()
         }
         for i in 0..255 as u8 {
             let result = calc_checksum(Frame {

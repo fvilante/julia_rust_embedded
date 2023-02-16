@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////
 
-use crate::utils::common::{get_bit_at_as_bool, word_to_byte};
+use crate::utils::common::{get_bit_at, get_bit_at_as_bool, reset_bit_at, word_to_byte};
 
 use super::{
     decoder::{Decoder, SegmentError},
@@ -40,14 +40,38 @@ impl From<SlaveFrameNack> for DLError {
 ///////////////////////////////////////////////////////////
 
 /// For more details about how Channel concept works see the cmpp v1 protocol specification
+/// TODO: There are other Channel type, use this one as the official and deprecate the other
 #[derive(Copy, Clone)]
 pub struct Channel {
     number: u8,
 }
 
 impl Channel {
+    const MAX_CHANNELS: u8 = 64;
+
+    pub fn from_u8(number: u8) -> Result<Channel, ()> {
+        match number {
+            0..Self::MAX_CHANNELS => Ok(Self { number }),
+
+            _ => Err(()),
+        }
+    }
+
+    /// If a number equal or greater then Self::MAX_CHANNELS is given,
+    /// it will be clamped to the range 0..Self::MAX_CHANNELS (inclusive, exclusive)
+    pub fn from_u8_unchecked(number: u8) -> Self {
+        Self {
+            number: number.clamp(0, Self::MAX_CHANNELS - 1),
+        }
+    }
+
     pub fn to_u8(&self) -> u8 {
         self.number
+    }
+
+    /// Check if channel is zero or not
+    pub fn is_zero_channel(&self) -> bool {
+        self.number == 0
     }
 }
 
@@ -68,6 +92,11 @@ impl Into<u8> for Channel {
     fn into(self) -> u8 {
         self.number
     }
+}
+
+fn test() {
+    let c = Channel { number: 0 };
+    let x: u8 = c.into();
 }
 
 ///////////////////////////////////////////////////////////
@@ -139,25 +168,74 @@ impl Status {
 
 ///////////////////////////////////////////////////////////
 
+const DIR_GET: u8 = (0 << BIT_7) + (0 << BIT_6);
+const DIR_RESET_BIT_MASK: u8 = (0 << BIT_7) + (1 << BIT_6);
+const DIR_SET_BIT_MASK: u8 = (1 << BIT_7) + (0 << BIT_6);
+const DIR_SET: u8 = (1 << BIT_7) + (1 << BIT_6);
+
 /// Direction to be used in the MasterFrame which is sent to cmpp. For more details see the cmpp v1 protocol specification.
 #[derive(Debug, PartialEq, Copy, Clone)]
 #[repr(u8)]
 pub enum Direction {
-    Get = (0 << BIT_7) + (0 << BIT_6),
-    ResetBitmask = (0 << BIT_7) + (1 << BIT_6),
-    SetBitmask = (1 << BIT_7) + (0 << BIT_6),
-    Set = (1 << BIT_7) + (1 << BIT_6),
+    Get = DIR_GET,
+    ResetBitmask = DIR_RESET_BIT_MASK,
+    SetBitmask = DIR_SET_BIT_MASK,
+    Set = DIR_SET,
 }
 
 impl Direction {
-    pub fn to_u8(&self) -> u8 {
-        /// TODO: Reduce code surface when possible, eliminate redundance.
-        match self {
-            Direction::Get => 0,
-            Direction::ResetBitmask => 64,
-            Direction::SetBitmask => 128,
-            Direction::Set => 192,
+    pub fn from_u8(value: u8) -> Result<Direction, ()> {
+        match value {
+            DIR_GET => Ok(Self::Get),
+            DIR_RESET_BIT_MASK => Ok(Self::ResetBitmask),
+            DIR_SET_BIT_MASK => Ok(Self::SetBitmask),
+            DIR_SET => Ok(Self::Set),
+            _ => Err(()),
         }
+    }
+
+    /// Only considers bit 7 and 6 of the u8 value
+    pub fn from_u8_unchecked(value: u8) -> Direction {
+        let bit_7 = get_bit_at(value, BIT_7);
+        let bit_6 = get_bit_at(value, BIT_6);
+        let direction_number = (bit_7 << 7) + (bit_6 << 6);
+        Direction::from_u8(direction_number).unwrap_or_else(|_| {
+            // Should never happen
+            panic!("E448")
+        })
+    }
+}
+
+impl TryFrom<u8> for Direction {
+    type Error = ();
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        Self::from_u8(value)
+    }
+}
+
+pub struct DirectionAndChannel {
+    /// Acording protocol:
+    /// Bits 6 and 7 are for direction
+    /// Bits 0 to 5 are for represent the channel number
+    direction_and_number: u8,
+}
+
+impl DirectionAndChannel {
+    pub fn from_raw(direction_and_channel: u8) -> Self {
+        Self {
+            direction_and_number: direction_and_channel,
+        }
+    }
+
+    pub fn get_channel(&self) -> Channel {
+        let temp = reset_bit_at(self.direction_and_number, BIT_7);
+        let number = reset_bit_at(temp, BIT_6);
+        Channel::from_u8_unchecked(number)
+    }
+
+    pub fn get_direction(&self) -> Direction {
+        Direction::from_u8_unchecked(self.direction_and_number)
     }
 }
 
@@ -311,8 +389,7 @@ impl PacoteDeRetorno_<RespostaDeSolicitacao> {
 
 impl From<SlaveFrame> for PacoteDeRetorno_<RespostaDeSolicitacao> {
     fn from(slave_frame: SlaveFrame) -> Self {
-        let [_, _, byte_low, byte_high] = slave_frame.payload;
-        let word = Word16::from_bytes(byte_low, byte_high);
+        let word = slave_frame.payload.get_word();
         Self {
             content: RespostaDeSolicitacao { data: word },
         }
@@ -327,7 +404,7 @@ impl PacoteDeRetorno_<RespostaDeEnvio> {
 
 impl From<SlaveFrame> for PacoteDeRetorno_<RespostaDeEnvio> {
     fn from(slave_frame: SlaveFrame) -> Self {
-        let [_, _, byte_low, _] = slave_frame.payload;
+        let byte_low = slave_frame.payload.byte_low;
         let status = Status::new_from_raw(byte_low);
         Self {
             content: RespostaDeEnvio { status },
@@ -349,7 +426,7 @@ pub struct PacoteDeRetornoDeEnvio {
 
 impl PacoteDeRetornoDeEnvio {
     pub fn from_slave_frame(slave_frame: SlaveFrame) -> Self {
-        let [_, _, byte_low, _] = slave_frame.payload;
+        let [_, _, byte_low, _] = slave_frame.payload.as_array();
         Self {
             status: Status::new_from_raw(byte_low),
         }
@@ -364,7 +441,7 @@ pub struct PacodeDeRetornoDeSolicitacao {
 
 impl PacodeDeRetornoDeSolicitacao {
     pub fn from_slave_frame(slave_frame: SlaveFrame) -> Self {
-        let [_, _, byte_low, byte_high] = slave_frame.payload;
+        let [_, _, byte_low, byte_high] = slave_frame.payload.as_array();
         let word = Word16::from_bytes(byte_low, byte_high);
         Self { data: word }
     }
@@ -379,7 +456,7 @@ pub struct PacoteDeRetornoComErro {
 
 impl PacoteDeRetornoComErro {
     pub fn from_slave_frame(slave_frame: SlaveFrame) -> Self {
-        let [_, _, byte_low, byte_high] = slave_frame.payload;
+        let [_, _, byte_low, byte_high] = slave_frame.payload.as_array();
         let byte_de_erro = byte_low.try_into();
         let status = Status::new_from_raw(byte_high);
         Self {
@@ -419,8 +496,8 @@ impl Datalink {
     ) -> Encoder {
         let start_byte = StartByte::STX;
         let (byte_low, byte_high) = Word16::from_u16(word_value).split_bytes();
-        let direction_and_channel: u8 = channel.to_u8() + direction.to_u8();
-        let payload: Payload = [direction_and_channel, word_address, byte_low, byte_high];
+        let direction_and_channel: u8 = channel.to_u8() + direction as u8;
+        let payload: Payload = [direction_and_channel, word_address, byte_low, byte_high].into();
         let frame = Frame::new(start_byte, payload);
         let encoded = Encoder::new(frame);
         encoded
@@ -707,7 +784,7 @@ mod tests {
     #[test]
     fn it_can_mock_the_serial_for_an_entire_frame() {
         // setup
-        let payload: Payload = [0, 1, 2, 3];
+        let payload: Payload = [0, 1, 2, 3].into();
         let frame = Frame::make_master_block(payload);
         let encoder = Encoder::new(frame);
         let mut decoder = Decoder::new();
@@ -739,7 +816,7 @@ mod tests {
     #[test]
     fn it_can_send_data_through_datalink() {
         // setup
-        let payload: Payload = [0, 1, 2, 3];
+        let payload: Payload = [0, 1, 2, 3].into();
         let frame = Frame::make_master_block(payload);
         let encoder = Encoder::new(frame);
         let mut decoder = Decoder::new();

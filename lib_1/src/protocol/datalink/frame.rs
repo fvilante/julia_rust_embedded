@@ -1,11 +1,48 @@
 use super::{
+    datalink::Word16,
     encoder::Encoder,
     prelude::{MasterStartByte, SlaveStartByte, StartByte},
 };
 
-/// TODO: When possible convert this to a struct with helper functions to extract content
-/// and propagate changes
-pub type Payload = [u8; 4]; // [ Direcao+canal; Cmd; dada_low, data_high]
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct Payload {
+    pub direction_and_channel: u8,
+    pub command: u8,
+    pub byte_low: u8,
+    pub byte_high: u8,
+} // [ Direcao+canal; Cmd; dada_low, data_high]
+
+impl Payload {
+    pub fn from_array(array: [u8; 4]) -> Self {
+        let [direction_and_channel, command, byte_low, byte_high] = array;
+        Self {
+            direction_and_channel,
+            command,
+            byte_low,
+            byte_high,
+        }
+    }
+
+    pub fn as_array(&self) -> [u8; 4] {
+        [
+            self.direction_and_channel,
+            self.command,
+            self.byte_low,
+            self.byte_high,
+        ]
+    }
+
+    /// Returns (byte_low, byte_high)
+    pub fn get_word(&self) -> Word16 {
+        Word16::from_bytes(self.byte_low, self.byte_high)
+    }
+}
+
+impl From<[u8; 4]> for Payload {
+    fn from(value: [u8; 4]) -> Self {
+        Self::from_array(value)
+    }
+}
 
 //////////////////////////////////////////////////
 
@@ -106,7 +143,7 @@ mod tests {
     #[test]
     fn it_frame_works() {
         //prepare
-        let expected: [u8; 4] = [1, 2, 3, 4];
+        let expected = [1, 2, 3, 4].into();
         let start_byte = StartByte::STX;
         //act
         let frame = Frame::new(start_byte, expected);
