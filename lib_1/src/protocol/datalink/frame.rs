@@ -3,6 +3,8 @@ use super::{
     prelude::{MasterStartByte, SlaveStartByte, StartByte},
 };
 
+/// TODO: When possible convert this to a struct with helper functions to extract content
+/// and propagate changes
 pub type Payload = [u8; 4]; // [ Direcao+canal; Cmd; dada_low, data_high]
 
 //////////////////////////////////////////////////
@@ -29,10 +31,26 @@ impl TryFrom<Frame> for MasterFrame {
     }
 }
 
+#[derive(Clone)]
+pub struct SlaveFrameAck(pub SlaveFrame);
+
+#[derive(Clone)]
+pub struct SlaveFrameNack(pub SlaveFrame);
+
 /// Represents a frame created by Slave (That means start byte MUST NOT be STX)
+#[derive(Clone)]
 pub struct SlaveFrame {
     pub start_byte: SlaveStartByte,
     pub payload: Payload,
+}
+
+impl SlaveFrame {
+    pub fn kind(&self) -> Result<SlaveFrameAck, SlaveFrameNack> {
+        match self.start_byte {
+            SlaveStartByte::ACK => Ok(SlaveFrameAck(self.clone())),
+            SlaveStartByte::NACK => Err(SlaveFrameNack(self.clone())),
+        }
+    }
 }
 
 /// Fails if frame.start_byte IS equals to STX

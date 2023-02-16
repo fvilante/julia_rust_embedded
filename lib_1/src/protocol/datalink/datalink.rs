@@ -5,12 +5,13 @@ use crate::utils::common::{get_bit_at_as_bool, word_to_byte};
 use super::{
     decoder::{Decoder, SegmentError},
     encoder::Encoder,
-    frame::{Frame, Payload, SlaveFrame},
+    frame::{Frame, Payload, SlaveFrame, SlaveFrameNack},
     prelude::{SlaveStartByte, StartByte},
 };
 
-/// DatalinkError
-/// TODO: Resolve conflict naming with other struct named 'DataLinkError', this below
+/// DatalinkError.
+///
+/// TODO: Resolve conflict naming with other struct named 'DataLinkError', this here
 /// is intended to be more generic
 pub enum DLError {
     /// Channel number must be between range 0..64 (inclusive, exclusive)
@@ -26,6 +27,14 @@ pub enum DLError {
     /// If slave returns STX (which according to protocol v1 spec is not allowed, just
     /// Masters may use STX as start byte)
     SlaveHasReturnedStartByteEqualsToSTX,
+    SlaveHasReturnedNack(SlaveFrame),
+}
+
+impl From<SlaveFrameNack> for DLError {
+    fn from(frame: SlaveFrameNack) -> Self {
+        let slave_frame = frame.0;
+        DLError::SlaveHasReturnedNack(slave_frame)
+    }
 }
 
 ///////////////////////////////////////////////////////////
@@ -76,6 +85,7 @@ const BIT_7: u8 = 7;
 ///
 /// NOTE: Byte High is not present because according to spec it is "Reserved
 /// for special applications".
+#[derive(Copy, Clone)]
 pub struct Status {
     low: u8,
     //high: None,
@@ -154,6 +164,7 @@ impl Direction {
 ///////////////////////////////////////////////////////////
 
 /// Represents a 16 bits word
+#[derive(Copy, Clone)]
 pub struct Word16 {
     data: u16,
 }
@@ -231,6 +242,7 @@ pub enum ByteDeErro {
 }
 
 /// Is it possible to slave send an `specification undefined` value, in this case it will be casted to type UnknownByteDeErro
+#[derive(Copy, Clone)]
 pub struct UnknownByteDeErro {
     data: u8,
 }
@@ -267,6 +279,67 @@ impl TryFrom<u8> for ByteDeErro {
 }
 
 ///////////////////////////////////////////////////////////
+
+pub struct PacoteDeRetorno_<T> {
+    content: T,
+}
+
+impl<T> PacoteDeRetorno_<T> {}
+
+/// TODO: Consider to change this to just `Word16` in all dependencies
+pub struct RespostaDeSolicitacao {
+    data: Word16,
+}
+
+/// TODO: Consider to change this to just `Status` in all dependencies
+#[derive(Copy, Clone)]
+pub struct RespostaDeEnvio {
+    status: Status,
+}
+
+#[derive(Copy, Clone)]
+pub struct RespostaComErro {
+    byte_de_erro: Result<ByteDeErro, UnknownByteDeErro>,
+    status: Status,
+}
+
+impl PacoteDeRetorno_<RespostaDeSolicitacao> {
+    fn get_word(&self) -> Word16 {
+        self.content.data
+    }
+}
+
+impl From<SlaveFrame> for PacoteDeRetorno_<RespostaDeSolicitacao> {
+    fn from(slave_frame: SlaveFrame) -> Self {
+        let [_, _, byte_low, byte_high] = slave_frame.payload;
+        let word = Word16::from_bytes(byte_low, byte_high);
+        Self {
+            content: RespostaDeSolicitacao { data: word },
+        }
+    }
+}
+
+impl PacoteDeRetorno_<RespostaDeEnvio> {
+    fn get_status(&self) -> Status {
+        self.content.status
+    }
+}
+
+impl From<SlaveFrame> for PacoteDeRetorno_<RespostaDeEnvio> {
+    fn from(slave_frame: SlaveFrame) -> Self {
+        let [_, _, byte_low, _] = slave_frame.payload;
+        let status = Status::new_from_raw(byte_low);
+        Self {
+            content: RespostaDeEnvio { status },
+        }
+    }
+}
+
+impl PacoteDeRetorno_<RespostaComErro> {
+    fn get_error(&self) -> RespostaComErro {
+        self.content
+    }
+}
 
 /// When master sends an Direction::{ Set, SetBitMask, ResetBitMask} MasterFrame this is what is expected the slave to respond if
 /// no error happens and slave responds with ACK.
@@ -432,9 +505,7 @@ impl Datalink {
     ) -> Result<SlaveFrame, DLError> {
         // Send
         let encoded = Self::encode_data(self.channel, direction, word_address, word_value);
-        if let Err(error) = self.transmit(encoded) {
-            return Err(error);
-        }
+        self.transmit(encoded)?;
         // Receive
         self.receive()
     }
@@ -499,6 +570,52 @@ impl Datalink {
         let direction = Direction::Set;
         self.transact(direction, word_address, word_value)
             .map(|slave_frame| Self::cast_to_pacote_de_retorno_envio(slave_frame))
+    }
+
+    // Testing new api
+
+    fn request<U: From<SlaveFrame>>(
+        &self,
+        direction: Direction,
+        word_address: u8,
+        word_value: u16,
+    ) -> Result<U, DLError> {
+        let response = self.transact(direction, word_address, word_value)?;
+        let response_ack = response.kind()?;
+        let pacote: U = response.into();
+        Ok(pacote)
+    }
+
+    pub fn get_word16_(
+        &self,
+        word_address: u8,
+    ) -> Result<PacoteDeRetorno_<RespostaDeSolicitacao>, DLError> {
+        let word_value = 0x00; // according spec this value does not matter
+        self.request(Direction::Get, word_address, word_value)
+    }
+
+    fn set_word16_(
+        &self,
+        word_address: u8,
+        word_value: u16,
+    ) -> Result<PacoteDeRetorno_<RespostaDeEnvio>, DLError> {
+        self.request(Direction::Set, word_address, word_value)
+    }
+
+    pub fn reset_bit_mask_(
+        &self,
+        word_address: u8,
+        bit_mask: u16,
+    ) -> Result<PacoteDeRetorno_<RespostaDeEnvio>, DLError> {
+        self.request(Direction::ResetBitmask, word_address, bit_mask)
+    }
+
+    pub fn set_bit_mask_(
+        &self,
+        word_address: u8,
+        bit_mask: u16,
+    ) -> Result<PacoteDeRetorno_<RespostaDeEnvio>, DLError> {
+        self.request(Direction::SetBitmask, word_address, bit_mask)
     }
 }
 
@@ -738,6 +855,9 @@ mod tests {
                 }
                 DLError::SlaveHasReturnedStartByteEqualsToSTX => {
                     assert!(false, "SlaveHasReturnedStartByteEqualsToSTX");
+                }
+                DLError::SlaveHasReturnedNack(nack_frame) => {
+                    assert!(false, "SlaveHasReturnedNack");
                 }
             },
         };
