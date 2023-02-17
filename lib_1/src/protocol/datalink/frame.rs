@@ -1,4 +1,5 @@
 use super::{
+    checksum::calc_checksum,
     datalink::Word16,
     encoder::Encoder,
     prelude::{MasterStartByte, SlaveStartByte, StartByte},
@@ -133,6 +134,10 @@ impl Frame {
 
     pub fn encode(&self) -> Encoder {
         Encoder::new(self.clone())
+    }
+
+    pub fn checksum(&self) -> u8 {
+        calc_checksum(self)
     }
 }
 

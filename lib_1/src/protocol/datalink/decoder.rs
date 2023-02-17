@@ -81,7 +81,7 @@ impl Decoder {
             start_byte: self.start_byte,
             payload: self.buffer.into(),
         };
-        let expected = calc_checksum(frame);
+        let expected = frame.checksum();
         if checksum == expected {
             Ok(Some(frame))
         } else {

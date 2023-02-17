@@ -4,7 +4,7 @@ use super::prelude::ETX;
 /// Calculates checksum of the given [`Frame`].
 ///
 /// NOTE: frame payload should not contain duplicated ESCs
-pub fn calc_checksum(frame: Frame) -> u8 {
+pub fn calc_checksum(frame: &Frame) -> u8 {
     frame
         .payload
         .as_array()
@@ -30,7 +30,7 @@ mod tests {
             payload: data,
         };
         let expected = 0x87;
-        let result = calc_checksum(frame);
+        let result = calc_checksum(&frame);
         assert_eq!(expected, result);
     }
 
@@ -43,7 +43,7 @@ mod tests {
             [0xC1, 0x50, 0x61, 0x02 + 0x87 - i].into()
         }
         for i in 0..255 as u8 {
-            let result = calc_checksum(Frame {
+            let result = calc_checksum(&Frame {
                 start_byte: StartByte::STX,
                 payload: make_package(i),
             });

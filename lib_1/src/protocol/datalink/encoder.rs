@@ -95,7 +95,7 @@ impl Encoder {
             }
 
             State::WaitingChecksum => {
-                let checksum = calc_checksum(self.frame);
+                let checksum = self.frame.checksum();
                 self.duplicate_esc_if_necessary(checksum, State::Finish)
             }
 
