@@ -7,38 +7,13 @@ use super::{
 const MAX_BUFFER_LEN: usize = 4; // max data length buffer
 
 #[derive(Debug)]
-/// TODO: Rename to "DecodingError"
-pub enum SegmentError {
+pub enum DecodingError {
     InvalidStartByte(u8),
     BufferOverFlow,
     ExpectedEtxOrEscDupButFoundOtherThing(u8),
     ChecksumIsEscButNotDuplicated(u8),
     InvalidChecksum { expected: u8, received: u8 },
 }
-
-// =================================================================
-/* CODE BELOW IS PLATFORM SPECIFIC AND MUST BE PLATFORM AGNOSTIC,
-BECAUSE STRINGS LIKE &'static str is not memory efficient in avr
-platform
-
-
-impl SegmentError {
-    pub fn to_string(&self) -> &'static str {
-        match *self {
-            SegmentError::InvalidStartByte(_u8) => "InvalidStart",
-            SegmentError::BufferOverFlow => "BufferOverFlow",
-            SegmentError::ExpectedEtxOrEscDupButFoundOtherThing(_u8) => {
-                "ExpectedEtxOrEscDupButFoundOtherThing"
-            }
-            SegmentError::ChecksumIsEscButNotDuplicated(_u8) => "ChecksumIsEscButNotDuplicated",
-            SegmentError::InvalidChecksum {
-                expected: _a,
-                received: _b,
-            } => "InvalidChecksum",
-        }
-    }
-}*/
-// =================================================================
 
 pub enum State {
     WaitingFirstEsc,
@@ -66,17 +41,17 @@ impl Decoder {
         }
     }
 
-    fn save_data(&mut self, data: u8) -> Result<(), SegmentError> {
+    fn save_data(&mut self, data: u8) -> Result<(), DecodingError> {
         if self.buffer_index < self.buffer.len() {
             self.buffer[self.buffer_index] = data;
             self.buffer_index += 1;
             Ok(())
         } else {
-            Err(SegmentError::BufferOverFlow)
+            Err(DecodingError::BufferOverFlow)
         }
     }
 
-    fn success(&self, checksum: u8) -> Result<Option<Frame>, SegmentError> {
+    fn success(&self, checksum: u8) -> Result<Option<Frame>, DecodingError> {
         let frame = Frame {
             start_byte: self.start_byte,
             payload: self.buffer.into(),
@@ -85,7 +60,7 @@ impl Decoder {
         if checksum == expected {
             Ok(Some(frame))
         } else {
-            Err(SegmentError::InvalidChecksum {
+            Err(DecodingError::InvalidChecksum {
                 expected,
                 received: (checksum),
             })
@@ -95,7 +70,7 @@ impl Decoder {
     /// Parses asynchronously each byte according to cmpp protocol v1.
     ///
     /// Returns Ok(None) if still decoding, Ok(Some(frame)) if a frame has been parsed and Err if some decidubg error hapenned.
-    pub fn parse_next(&mut self, byte: u8) -> Result<Option<Frame>, SegmentError> {
+    pub fn parse_next(&mut self, byte: u8) -> Result<Option<Frame>, DecodingError> {
         match self.state {
             State::WaitingFirstEsc => {
                 self.state = State::WaitingStartByte;
@@ -103,11 +78,11 @@ impl Decoder {
             }
 
             State::WaitingStartByte => {
-                let start_byte: Result<StartByte, SegmentError> = match byte {
+                let start_byte: Result<StartByte, DecodingError> = match byte {
                     STX => Ok(StartByte::STX),
                     ACK => Ok(StartByte::ACK),
                     NACK => Ok(StartByte::NACK),
-                    _ => Err(SegmentError::InvalidStartByte(byte)),
+                    _ => Err(DecodingError::InvalidStartByte(byte)),
                 };
                 match start_byte {
                     Ok(valid) => {
@@ -135,7 +110,7 @@ impl Decoder {
                         self.state = State::WaitingChecksum;
                         Ok(None)
                     } else {
-                        Err(SegmentError::ExpectedEtxOrEscDupButFoundOtherThing(byte))
+                        Err(DecodingError::ExpectedEtxOrEscDupButFoundOtherThing(byte))
                     }
                 } else {
                     if byte == ESC {
@@ -159,7 +134,7 @@ impl Decoder {
                         let checksum = ESC;
                         self.success(checksum)
                     } else {
-                        Err(SegmentError::ChecksumIsEscButNotDuplicated(byte))
+                        Err(DecodingError::ChecksumIsEscButNotDuplicated(byte))
                     }
                 } else {
                     if byte == ESC {
@@ -184,7 +159,7 @@ mod tests {
 
     use super::*;
 
-    fn run_decoder(input: &[u8]) -> Result<Frame, SegmentError> {
+    fn run_decoder(input: &[u8]) -> Result<Frame, DecodingError> {
         let mut decoder = Decoder::new();
         for byte in input {
             match decoder.parse_next(*byte) {

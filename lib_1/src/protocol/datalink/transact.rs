@@ -1,5 +1,5 @@
 use super::{
-    decoder::{Decoder, SegmentError},
+    decoder::{Decoder, DecodingError},
     encoder::Encoder,
     frame::Frame,
 };
@@ -9,7 +9,7 @@ pub type DelayFn = fn(u64) -> ();
 
 #[derive(Debug)]
 pub enum DatalinkError {
-    SegmentError(SegmentError),
+    DecodingError(DecodingError),
     ReceptionTimeout { elapsed_time: u64 },
 }
 
@@ -57,7 +57,7 @@ fn receive(
                 }
 
                 Err(e) => {
-                    return Err(DatalinkError::SegmentError(e));
+                    return Err(DatalinkError::DecodingError(e));
                 }
             }
         }

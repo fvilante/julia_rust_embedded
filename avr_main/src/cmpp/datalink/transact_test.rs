@@ -20,8 +20,8 @@ pub fn development_entry_point() -> ! {
         Err(e) => {
             lcd::print("Datalink Error: ");
             match e {
-                DatalinkError::SegmentError(_e0) => {
-                    lcd::print("SegmentError");
+                DatalinkError::DecodingError(_e0) => {
+                    lcd::print("DecodingError");
                     //lcd::print(e0.to_string());
                 }
                 DatalinkError::ReceptionTimeout { elapsed_time } => {

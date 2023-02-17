@@ -3,7 +3,7 @@
 use crate::utils::common::{get_bit_at, get_bit_at_as_bool, reset_bit_at, word_to_byte};
 
 use super::{
-    decoder::{Decoder, SegmentError},
+    decoder::{Decoder, DecodingError},
     encoder::Encoder,
     frame::{Frame, Payload, SlaveFrame, SlaveFrameNack},
     prelude::{SlaveStartByte, StartByte},
@@ -19,7 +19,7 @@ pub enum DLError {
     /// Low level (byte-level), serial TX function failed
     SerialTransmissionError,
     /// The incomming byte stream from slave does not obey the right syntax of the protocol or the checksum is wrong
-    DecodingError(SegmentError),
+    DecodingError(DecodingError),
     /// Timeout error (cannot wait response forever!)
     Timeout(u16),
     /// Low level (byte-level), serial RX function failed

@@ -1,6 +1,6 @@
 use heapless::Deque;
 use lib_1::protocol::datalink::{
-    decoder::{Decoder, SegmentError},
+    decoder::{Decoder, DecodingError},
     frame::Frame,
     prelude::StartByte,
     transact::{transact, DatalinkError},
@@ -30,24 +30,24 @@ fn test_cmpp() {
         Err(error) => {
             lcd::print("Response Err");
             match error {
-                DatalinkError::SegmentError(error) => {
-                    lcd::print("SegmentError");
+                DatalinkError::DecodingError(error) => {
+                    lcd::print("DecodingError");
 
                     match error {
-                        SegmentError::InvalidStartByte(start_byte) => {
+                        DecodingError::InvalidStartByte(start_byte) => {
                             lcd::print("InvalidStartByte=");
                             lcd::print_u8_in_hex(start_byte)
                         }
-                        SegmentError::BufferOverFlow => {
+                        DecodingError::BufferOverFlow => {
                             lcd::print("BufferOverFlow");
                         }
-                        SegmentError::ExpectedEtxOrEscDupButFoundOtherThing(_) => {
+                        DecodingError::ExpectedEtxOrEscDupButFoundOtherThing(_) => {
                             lcd::print("ExpectedEtxOrEscDupButFoundOtherThing");
                         }
-                        SegmentError::ChecksumIsEscButNotDuplicated(_) => {
+                        DecodingError::ChecksumIsEscButNotDuplicated(_) => {
                             lcd::print("ChecksumIsEscButNotDuplicated");
                         }
-                        SegmentError::InvalidChecksum {
+                        DecodingError::InvalidChecksum {
                             expected: _,
                             received: _,
                         } => {
