@@ -10,7 +10,7 @@ pub fn development_entry_point() -> ! {
     lcd::lcd_initialize();
     let frame = Frame {
         start_byte: StartByte::STX,
-        payload: [0, 0x50, 0, 0],
+        payload: [0, 0x50, 0, 0].into(),
     };
     let baud_rate = 2400;
     let connection = ConcreteSerialPort::new(baud_rate);

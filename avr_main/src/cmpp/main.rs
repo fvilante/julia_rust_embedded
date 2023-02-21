@@ -21,7 +21,7 @@ fn delay_us_helper(time_us: u64) {
 }
 
 fn test_cmpp() {
-    let frame = Frame::make_master_block([0, 0x50, 0, 0]);
+    let frame = Frame::make_master_block([0, 0x50, 0, 0].into());
     let connection = ConcreteSerialPort::new(2400);
     const timeout_us: u64 = 200 * 1000;
     let response = transact(frame, connection, timeout_us, delay_us_helper);
@@ -85,7 +85,7 @@ pub fn development_entry_point() -> ! {
     lcd::lcd_initialize();
     lcd::print("Juca kifuri");
 
-    let frame = Frame::new(StartByte::STX, [0, 0x50, 0, 0]);
+    let frame = Frame::new(StartByte::STX, [0, 0x50, 0, 0].into());
 
     serial::init(9600);
 
