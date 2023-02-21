@@ -2,9 +2,9 @@ use super::channel::Channel;
 use super::master_packet::make_frame;
 use super::master_packet::CmppMessage;
 use super::transport_error::TransportError;
-use crate::protocol::transact::transact;
-use crate::protocol::transact::DatalinkResult;
-use crate::protocol::transact::DelayFn;
+use crate::protocol::datalink::transact::transact;
+use crate::protocol::datalink::transact::DatalinkResult;
+use crate::protocol::datalink::transact::DelayFn;
 use crate::types::serial_connection::SerialConnection;
 
 pub fn transact_packet(
@@ -28,9 +28,9 @@ pub fn transact_packet(
 mod tests {
     use super::*;
     use crate::mock::serial_connection_mock::MockedSerialConnection;
-    use crate::protocol::frame::Frame;
-    use crate::protocol::prelude::StartByte;
-    use crate::protocol::transact::DatalinkResult;
+    use crate::protocol::datalink::frame::{Frame, Payload};
+    use crate::protocol::datalink::prelude::StartByte;
+    use crate::protocol::datalink::transact::DatalinkResult;
     use crate::protocol::transport::channel::Channel;
     use crate::protocol::transport::master_packet::CmppMessage;
     use crate::types::delay::delay_us;
@@ -39,7 +39,7 @@ mod tests {
     fn it_transact_one_packet() {
         // prepare
         let start_byte = StartByte::STX;
-        let payload = [0, 0, 0, 0];
+        let payload = Payload::from_array([0, 0, 0, 0]);
         let timeout_us: u64 = 500;
         let connection = MockedSerialConnection::new(9600);
         let channel = Channel::new(0x00);

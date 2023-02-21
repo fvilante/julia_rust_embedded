@@ -1,16 +1,16 @@
 use super::concrete_serial::ConcreteSerialPort;
 use crate::board::lcd;
 use crate::microcontroler::delay::delay_us;
-use lib_1::protocol::frame::Frame;
-use lib_1::protocol::prelude::StartByte;
-use lib_1::protocol::transact::{transact, DatalinkError};
+use lib_1::protocol::datalink::frame::Frame;
+use lib_1::protocol::datalink::prelude::StartByte;
+use lib_1::protocol::datalink::transact::{transact, DatalinkError};
 use lib_1::types::serial_connection::SerialConnection;
 
 pub fn development_entry_point() -> ! {
     lcd::lcd_initialize();
     let frame = Frame {
         start_byte: StartByte::STX,
-        payload: [0, 0x50, 0, 0],
+        payload: [0, 0x50, 0, 0].into(),
     };
     let baud_rate = 2400;
     let connection = ConcreteSerialPort::new(baud_rate);
@@ -20,8 +20,8 @@ pub fn development_entry_point() -> ! {
         Err(e) => {
             lcd::print("Datalink Error: ");
             match e {
-                DatalinkError::SegmentError(_e0) => {
-                    lcd::print("SegmentError");
+                DatalinkError::DecodingError(_e0) => {
+                    lcd::print("DecodingError");
                     //lcd::print(e0.to_string());
                 }
                 DatalinkError::ReceptionTimeout { elapsed_time } => {

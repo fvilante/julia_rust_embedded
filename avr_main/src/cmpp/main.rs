@@ -1,6 +1,6 @@
 use heapless::Deque;
-use lib_1::protocol::{
-    decoder::{Decoder, SegmentError},
+use lib_1::protocol::datalink::{
+    decoder::{Decoder, DecodingError},
     frame::Frame,
     prelude::StartByte,
     transact::{transact, DatalinkError},
@@ -21,7 +21,7 @@ fn delay_us_helper(time_us: u64) {
 }
 
 fn test_cmpp() {
-    let frame = Frame::make_master_block([0, 0x50, 0, 0]);
+    let frame = Frame::make_master_block([0, 0x50, 0, 0].into());
     let connection = ConcreteSerialPort::new(2400);
     const timeout_us: u64 = 200 * 1000;
     let response = transact(frame, connection, timeout_us, delay_us_helper);
@@ -30,24 +30,24 @@ fn test_cmpp() {
         Err(error) => {
             lcd::print("Response Err");
             match error {
-                DatalinkError::SegmentError(error) => {
-                    lcd::print("SegmentError");
+                DatalinkError::DecodingError(error) => {
+                    lcd::print("DecodingError");
 
                     match error {
-                        SegmentError::InvalidStartByte(start_byte) => {
+                        DecodingError::InvalidStartByte(start_byte) => {
                             lcd::print("InvalidStartByte=");
                             lcd::print_u8_in_hex(start_byte)
                         }
-                        SegmentError::BufferOverFlow => {
+                        DecodingError::BufferOverFlow => {
                             lcd::print("BufferOverFlow");
                         }
-                        SegmentError::ExpectedEtxOrEscDupButFoundOtherThing(_) => {
+                        DecodingError::ExpectedEtxOrEscDupButFoundOtherThing(_) => {
                             lcd::print("ExpectedEtxOrEscDupButFoundOtherThing");
                         }
-                        SegmentError::ChecksumIsEscButNotDuplicated(_) => {
+                        DecodingError::ChecksumIsEscButNotDuplicated(_) => {
                             lcd::print("ChecksumIsEscButNotDuplicated");
                         }
-                        SegmentError::InvalidChecksum {
+                        DecodingError::InvalidChecksum {
                             expected: _,
                             received: _,
                         } => {
@@ -85,7 +85,7 @@ pub fn development_entry_point() -> ! {
     lcd::lcd_initialize();
     lcd::print("Juca kifuri");
 
-    let frame = Frame::new(StartByte::STX, [0, 0x50, 0, 0]);
+    let frame = Frame::new(StartByte::STX, [0, 0x50, 0, 0].into());
 
     serial::init(9600);
 

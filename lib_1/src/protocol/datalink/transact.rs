@@ -1,7 +1,7 @@
-use super::frame::Frame;
 use super::{
-    decoder::{Decoder, SegmentError},
+    decoder::{Decoder, DecodingError},
     encoder::Encoder,
+    frame::Frame,
 };
 use crate::types::serial_connection::SerialConnection;
 
@@ -9,7 +9,7 @@ pub type DelayFn = fn(u64) -> ();
 
 #[derive(Debug)]
 pub enum DatalinkError {
-    SegmentError(SegmentError),
+    DecodingError(DecodingError),
     ReceptionTimeout { elapsed_time: u64 },
 }
 
@@ -57,7 +57,7 @@ fn receive(
                 }
 
                 Err(e) => {
-                    return Err(DatalinkError::SegmentError(e));
+                    return Err(DatalinkError::DecodingError(e));
                 }
             }
         }
@@ -83,8 +83,8 @@ pub fn transact(
 #[cfg(test)]
 mod tests {
     use crate::{
-        mock::serial_connection_mock::MockedSerialConnection, protocol::prelude::StartByte,
-        types::delay::delay_us,
+        mock::serial_connection_mock::MockedSerialConnection,
+        protocol::datalink::prelude::StartByte, types::delay::delay_us,
     };
 
     use super::*;
@@ -93,7 +93,7 @@ mod tests {
     fn it_transact_one_frame() {
         // prepare
         let start_byte = StartByte::STX;
-        let payload = [1, 2, 3, 4];
+        let payload = [1, 2, 3, 4].into();
         let timeout_us: u64 = 500;
         let frame = Frame {
             start_byte,

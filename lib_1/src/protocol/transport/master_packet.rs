@@ -1,5 +1,5 @@
-use crate::protocol::frame::Payload;
-use crate::protocol::{frame::Frame, prelude::StartByte};
+use crate::protocol::datalink::frame::Payload;
+use crate::protocol::datalink::{frame::Frame, prelude::StartByte};
 
 use super::transport_error::TransportError;
 use super::word_16::{BitMask16, Word16};
@@ -65,7 +65,7 @@ fn make_payload(channel: Channel, message: CmppMessage) -> Result<Payload, Trans
 
     channel
         .as_u8()
-        .map(|channel| [channel + direction, waddr, byte_low, byte_high])
+        .map(|channel| [channel + direction, waddr, byte_low, byte_high].into())
         .ok_or_else(|| TransportError::InvalidChannel(channel))
 }
 
@@ -94,7 +94,8 @@ mod tests {
                 waddr,
                 0x00,
                 0x00,
-            ],
+            ]
+            .into(),
         };
         let frame = make_frame(channel, CmppMessage::GetWord { waddr });
         assert_eq!(expected, frame.unwrap());

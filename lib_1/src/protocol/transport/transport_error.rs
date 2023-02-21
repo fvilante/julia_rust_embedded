@@ -1,4 +1,4 @@
-use crate::protocol::transact::DatalinkError;
+use crate::protocol::datalink::transact::DatalinkError;
 
 use super::channel::Channel;
 

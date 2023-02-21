@@ -3,6 +3,7 @@ use crate::utils::common::{get_bit_at_as_bool, word_to_byte};
 //NOTE: In future this type may be extended
 pub type BitMask16 = u16;
 
+/// TODO: Make this type obsolete and use the other Word16 instead of this one
 pub struct Word16 {
     pub data_high: u8,
     pub data_low: u8,

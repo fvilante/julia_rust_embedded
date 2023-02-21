@@ -9,6 +9,14 @@ BASE=-Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json -
 
 all: fast
 
+# To make cargo compiler to show verbose information when error happens (specially useful when
+# runing tests), its necesssary to set enviroment variable "RUST_BACKTRACE=full". The line below
+# works when typed direct into powershell.
+# TODO: Make rule below to also work as a make file rule 
+verbose:
+	$env:RUST_BACKTRACE="full"
+
+
 # just a division marker
 div: format
 	@echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
@@ -24,7 +32,7 @@ format:
 
 # watch executes the tests if any file on the project change (note: ignore files in target and .git folder)
 # if you do not have cargo-watch instaled type "cargo install cargo-watch" to install from source.
-watch_x86: 
+watch_x86_test: 
 	cargo watch -c --why -s "make div x86_test"
 
 watch_avr: 
