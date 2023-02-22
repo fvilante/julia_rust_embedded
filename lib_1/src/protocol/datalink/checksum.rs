@@ -5,12 +5,13 @@ use super::prelude::ETX;
 ///
 /// NOTE: frame payload should not contain duplicated ESCs
 pub fn calc_checksum(frame: &Frame) -> u8 {
+    let start_byte = frame.start_byte as u8;
     frame
         .payload
         .as_array()
         .iter()
         .fold(0, |sum, a| sum + a)
-        .wrapping_add(frame.start_byte as u8)
+        .wrapping_add(start_byte)
         .wrapping_add(ETX)
         .wrapping_neg()
 }

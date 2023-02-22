@@ -76,7 +76,7 @@ pub struct SlaveFrameAck(pub SlaveFrame);
 pub struct SlaveFrameNack(pub SlaveFrame);
 
 /// Represents a frame created by Slave (That means start byte MUST NOT be STX)
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct SlaveFrame {
     pub start_byte: SlaveStartByte,
     pub payload: Payload,

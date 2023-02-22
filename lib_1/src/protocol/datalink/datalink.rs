@@ -13,6 +13,7 @@ use super::{
 ///
 /// TODO: Resolve conflict naming with other struct named 'DataLinkError', this here
 /// is intended to be more generic
+#[derive(Debug)]
 pub enum DLError {
     /// Channel number must be between range 0..64 (inclusive, exclusive)
     InvalidChannel(u8),
@@ -114,7 +115,7 @@ const BIT_7: u8 = 7;
 ///
 /// NOTE: Byte High is not present because according to spec it is "Reserved
 /// for special applications".
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Status {
     low: u8,
     //high: None,
@@ -320,7 +321,7 @@ pub enum ByteDeErro {
 }
 
 /// Is it possible to slave send an `specification undefined` value, in this case it will be casted to type UnknownByteDeErro
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct UnknownByteDeErro {
     data: u8,
 }
@@ -449,6 +450,7 @@ impl PacodeDeRetornoDeSolicitacao {
 
 /// When master sends any Direction MasterFrame this is what is expected the slave to respond if it did
 /// not accepeted or understood the master request
+#[derive(Debug)]
 pub struct PacoteDeRetornoComErro {
     byte_de_erro: Result<ByteDeErro, UnknownByteDeErro>,
     status: Status,
@@ -471,19 +473,19 @@ impl PacoteDeRetornoComErro {
 /// A cmpp Datalink is capable to send and receive data frames. It basically implements the cmpp protocol v1 specification.
 /// See official specification for more details.
 pub struct Datalink {
-    channel: Channel,
+    pub channel: Channel,
     ///timeout in miliseconds
     /// TODO: Study to change this to u8 to reduce memory footprint
-    timeout_ms: u16,
+    pub timeout_ms: u16,
     /// None if some error happened
-    try_tx: fn(u8) -> Option<()>,
+    pub try_tx: fn(u8) -> Option<()>,
     /// Ok_None if nothing to receive, Err if some error happened, Ok_Some if a byte has been received
-    try_rx: fn() -> Result<Option<u8>, ()>,
+    pub try_rx: fn() -> Result<Option<u8>, ()>,
     /// Returns miliseconds elapsed since `Epoch` (when machine was turned on)
     /// TODO: Make this function more memory eficient, because I think it's not necessary
     /// two u64 to calculate elapsed time like: `let time_elapsed = now() - start_time;`
     /// eventually something with the size statically defined by user should be better
-    now: fn() -> u64,
+    pub now: fn() -> u64,
 }
 
 impl Datalink {
@@ -697,6 +699,86 @@ impl Datalink {
 }
 
 //////////////////////////////////////////////////////
+// Emulation Mock (useful for tests)
+/////////////////////////////////////////////////////////
+
+pub mod emulated {
+    use heapless::Deque;
+
+    use crate::protocol::datalink::{
+        decoder::{Decoder, DecodingError},
+        encoder::Encoder,
+        prelude::StartByte,
+    };
+
+    /// Does never timeout ;)! Because time does not pass :D !
+    pub fn lazy_now() -> u64 {
+        0
+    }
+
+    /// emulated server's buffer
+    static mut server: Deque<u8, 20> = Deque::new();
+    pub fn try_tx(byte: u8) -> Option<()> {
+        unsafe { server.push_back(byte).ok() }
+    }
+
+    //
+    static mut decoder: Decoder = Decoder::new();
+
+    /// This Rx function will receive any encoded master frame, but change
+    /// the start_byte from STX to ACK.
+    pub fn smart_try_tx(byte: u8) -> Option<()> {
+        let parsed = unsafe { decoder.parse_next(byte) };
+        //decode master data
+        match parsed {
+            Ok(Some(mut frame)) => {
+                frame.start_byte = StartByte::ACK;
+                let encoder = Encoder::new(frame);
+                for byte in encoder {
+                    // reinject data into buffer
+                    match try_tx(byte) {
+                        Some(_) => {
+                            // sending to server's buffer
+                        }
+                        None => unreachable!(),
+                    }
+                }
+            }
+            Ok(None) => {
+                // still parsing
+            }
+            Err(error) => {
+                match error {
+                    DecodingError::InvalidStartByte(_) => assert!(false, "InvalidStartByte"),
+                    DecodingError::BufferOverFlow => assert!(false, "BufferOverFlow"),
+                    DecodingError::ExpectedEtxOrEscDupButFoundOtherThing(_) => {
+                        assert!(false, "ExpectedEtxOrEscDupButFoundOtherThing")
+                    }
+                    DecodingError::ChecksumIsEscButNotDuplicated(_) => {
+                        assert!(false, "ChecksumIsEscButNotDuplicated")
+                    }
+                    DecodingError::InvalidChecksum { expected, received } => {
+                        assert!(false, "InvalidChecksum")
+                    }
+                }
+                //unreachable!("Master is expected to always be an well-formed frame")
+            }
+        };
+
+        Some(())
+    }
+
+    /// if master sends a master slave, receives exactly a master slave.
+    pub fn loopback_try_rx() -> Result<Option<u8>, ()> {
+        unsafe { Ok(server.pop_front()) }
+    }
+
+    /// it decode what it received from master then give it back, but it
+    /// changes the start_byte from 'STX' to 'ACK'
+    pub fn convert_ok_master_into_ok_slave() {}
+}
+
+//////////////////////////////////////////////////////
 // TESTS
 /////////////////////////////////////////////////////////
 
@@ -704,64 +786,6 @@ impl Datalink {
 mod tests {
 
     use super::*;
-
-    mod emulated {
-        use heapless::Deque;
-
-        use crate::protocol::datalink::{decoder::Decoder, encoder::Encoder, prelude::StartByte};
-
-        /// Does never timeout ;)! Because time does not pass :D !
-        pub fn lazy_now() -> u64 {
-            0
-        }
-
-        /// emulated server's buffer
-        static mut server: Deque<u8, 20> = Deque::new();
-        pub fn try_tx(byte: u8) -> Option<()> {
-            unsafe { server.push_back(byte).ok() }
-        }
-
-        //
-        static mut decoder: Decoder = Decoder::new();
-
-        /// This Rx function will receive any encoded master frame, but change
-        /// the start_byte from STX to ACK.
-        pub fn smart_try_tx(byte: u8) -> Option<()> {
-            //decode master data
-            match unsafe { decoder.parse_next(byte) } {
-                Ok(Some(mut frame)) => {
-                    frame.start_byte = StartByte::ACK;
-                    let encoder = Encoder::new(frame);
-                    for byte in encoder {
-                        // reinject data into buffer
-                        match try_tx(byte) {
-                            Some(_) => {
-                                // sending to server's buffer
-                            }
-                            None => unreachable!(),
-                        }
-                    }
-                }
-                Ok(None) => {
-                    // still parsing
-                }
-                Err(error) => {
-                    unreachable!("Master is expected to always be an well-formed frame")
-                }
-            };
-
-            Some(())
-        }
-
-        /// if master sends a master slave, receives exactly a master slave.
-        pub fn loopback_try_rx() -> Result<Option<u8>, ()> {
-            unsafe { Ok(server.pop_front()) }
-        }
-
-        /// it decode what it received from master then give it back, but it
-        /// changes the start_byte from 'STX' to 'ACK'
-        pub fn convert_ok_master_into_ok_slave() {}
-    }
 
     #[test]
     fn it_can_mock_the_serial_for_one_byte_transaction() {
