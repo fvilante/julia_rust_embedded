@@ -3,6 +3,11 @@ use crate::protocol::datalink::datalink::{
     PacoteDeRetornoDeEnvio, Status,
 };
 
+use self::{
+    cmpp_value::{Bit, Word16},
+    memory_map::{BitAddress, WordAddress},
+};
+
 mod cmpp_value {
     use super::memory_map;
 
@@ -42,34 +47,33 @@ mod memory_map {
 
     #[derive(Copy, Clone)]
     /// Also known as `cmpp command`
-    /// TODO: Change name to WordAddress
-    pub struct Word16 {
+    pub struct WordAddress {
         pub word_address: u8,
     }
 
-    impl Word16 {
+    impl WordAddress {
         pub fn new(word_address: u8) -> Self {
             Self { word_address }
         }
     }
 
-    impl From<u8> for Word16 {
+    impl From<u8> for WordAddress {
         fn from(value: u8) -> Self {
             Self::new(value)
         }
     }
 
-    impl Into<u8> for Word16 {
+    impl Into<u8> for WordAddress {
         fn into(self) -> u8 {
             self.word_address
         }
     }
 
     #[derive(Copy, Clone)]
-    /// TODO: Change name to BitPosition, place it in lib1::Utils (there are other places where this similar
+    /// TODO: Place it in lib1::Utils (there are other places where this similar
     /// kind of construction is used (search for 'Bit' like in IOExpander::Bit, etc). Put every application of
     /// this concept in a unique place and reuse it)
-    pub enum BitAddress {
+    pub enum BitPosition {
         D0 = 0,
         D1 = 1,
         D2 = 2,
@@ -89,13 +93,11 @@ mod memory_map {
     }
 
     #[derive(Copy, Clone)]
-    ///TODO: Change Bit to `BitAddress` and bit_address to `BitPosition`. And then avoid name colision and the
-    /// need to qualify namespaces `memory_map` and `cmpp_value`.
-    pub struct Bit {
+    pub struct BitAddress {
         /// TODO: Change to WordAddress type
         pub word_address: u8,
         /// value between 0..16 (inclusive, exclusive)
-        pub bit_address: BitAddress,
+        pub bit_position: BitPosition,
     }
 }
 
@@ -109,17 +111,21 @@ mod manipulator {
     use crate::protocol::datalink::datalink::Status;
 
     use super::{
-        cmpp_value::{self, ToCmpp},
-        memory_map, TLError, TransportLayer,
+        cmpp_value::{self, Bit, ToCmpp, Word16},
+        memory_map::{self, BitAddress, WordAddress},
+        TLError, TransportLayer,
     };
 
     struct WordSetter<'a> {
         transport_layer: &'a TransportLayer,
-        memory_map: memory_map::Word16,
+        memory_map: WordAddress,
     }
 
     impl<'a> WordSetter<'a> {
-        pub fn set<T: ToCmpp<cmpp_value::Word16>>(&self, value: T) -> Result<Status, TLError> {
+        pub fn set<T>(&self, value: T) -> Result<Status, TLError>
+        where
+            T: ToCmpp<Word16>,
+        {
             let cmpp_value = value.to_cmpp_value();
             let word_address = self.memory_map;
             self.transport_layer
@@ -130,11 +136,14 @@ mod manipulator {
 
     struct BitSetter<'a> {
         transport_layer: &'a TransportLayer,
-        memory_map: memory_map::Bit,
+        memory_map: BitAddress,
     }
 
     impl<'a> BitSetter<'a> {
-        pub fn set<T: ToCmpp<cmpp_value::Bit>>(&self, value: T) -> Result<Status, TLError> {
+        pub fn set<T>(&self, value: T) -> Result<Status, TLError>
+        where
+            T: ToCmpp<Bit>,
+        {
             let cmpp_value = value.to_cmpp_value();
             let word_address = self.memory_map;
             self.transport_layer
@@ -170,8 +179,8 @@ impl<'a> SafeDatalink<'a> {
         }
     }
 
-    pub fn send_bit(&self, bit: cmpp_value::Bit, map: memory_map::Bit) -> Result<Status, TLError> {
-        let bit_mask = 1 << (map.bit_address as u16);
+    pub fn send_bit(&self, bit: Bit, map: BitAddress) -> Result<Status, TLError> {
+        let bit_mask = 1 << (map.bit_position as u16);
         let response = match bit.into() {
             true => self.datalink.set_bit_mask(map.word_address, bit_mask),
             false => self.datalink.reset_bit_mask(map.word_address, bit_mask),
@@ -181,8 +190,8 @@ impl<'a> SafeDatalink<'a> {
 
     pub fn set_word16(
         &self,
-        word_value: cmpp_value::Word16,
-        word_address: memory_map::Word16,
+        word_value: Word16,
+        word_address: WordAddress,
     ) -> Result<Status, TLError> {
         let response = self
             .datalink
@@ -190,10 +199,7 @@ impl<'a> SafeDatalink<'a> {
         Self::cast_map(response, |pacote_de_retorno| pacote_de_retorno.status)
     }
 
-    pub fn get_word16(
-        &self,
-        word_address: memory_map::Word16,
-    ) -> Result<cmpp_value::Word16, TLError> {
+    pub fn get_word16(&self, word_address: WordAddress) -> Result<Word16, TLError> {
         let response = self.datalink.get_word16(word_address.into());
         Self::cast_map(response, |pacote_de_retorno| {
             cmpp_value::Word16(pacote_de_retorno.data.to_u16())
@@ -225,7 +231,7 @@ mod tests {
         Channel,
     };
 
-    use super::{memory_map::Word16, *};
+    use super::{memory_map::WordAddress, *};
 
     #[test]
     fn it_can_transact_something() {
