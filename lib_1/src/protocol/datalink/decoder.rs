@@ -214,4 +214,29 @@ mod tests {
         let actual = run_decoder(&probe).unwrap();
         assert_eq!(expected, actual);
     }
+
+    #[test]
+    fn it_parse_a_segment_with_esc_dup_in_checksum_position() {
+        // 1B 06 01 86 03 1B 1B 03 52
+        let start_byte = StartByte::ACK;
+        let start_byte_ = start_byte as u8;
+        let probe = [
+            0x1B,
+            start_byte_,
+            0x00,
+            0x00,
+            0x00,
+            0x00 + (247 - 0x1B),
+            0x1B,
+            0x03,
+            0x1B,
+            0x1B,
+        ];
+        let expected = Frame {
+            start_byte,
+            payload: [0x00, 0x00, 0x00, 0x00 + (247 - 0x1B)].into(),
+        };
+        let actual = run_decoder(&probe).unwrap();
+        assert_eq!(expected, actual);
+    }
 }

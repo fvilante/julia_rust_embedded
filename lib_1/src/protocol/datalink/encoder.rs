@@ -144,4 +144,29 @@ mod tests {
         let actual = buffer.map(|_| encoder.next().unwrap());
         assert_eq!(expected, actual);
     }
+
+    #[test]
+    fn it_can_parse_a_simple_frame_with_esc_dup_in_the_checksum_position() {
+        // 1B 06 01 86 03 1B 1B 03 52
+        let frame = Frame {
+            start_byte: StartByte::ACK,
+            payload: [0x00, 0x00, 0x00, 0x00 + (247 - 0x1B)].into(),
+        };
+        let mut encoder = Encoder::new(frame);
+        let expected = [
+            0x1B,
+            0x06,
+            0x00,
+            0x00,
+            0x00,
+            0x00 + (247 - 0x1B),
+            0x1B,
+            0x03,
+            0x1B,
+            0x1B,
+        ];
+        let buffer = [0x00; 10];
+        let actual = buffer.map(|_| encoder.next().unwrap());
+        assert_eq!(expected, actual);
+    }
 }
