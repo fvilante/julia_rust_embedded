@@ -27,7 +27,7 @@ pub enum DLError {
     SerialReceptionError,
     /// If slave returns STX (which according to protocol v1 spec is not allowed, just
     /// Masters may use STX as start byte)
-    SlaveHasReturnedStartByteEqualsToSTX,
+    SlaveHasReturnedStartByteAsNeitherAckNorNack,
     SlaveHasReturnedNack(SlaveFrame),
 }
 
@@ -560,20 +560,11 @@ impl Datalink {
 
     /// Perform all reception check plus check if the response is not a MasterFrame (start_byte equals STX)
     fn receive(&self) -> Result<SlaveFrame, DLError> {
-        match self.receive_frame() {
-            Ok(frame) => {
-                // check if it is an slave frame and return it
-                if let Ok(slave_frame) = frame.try_into() {
-                    return Ok(slave_frame);
-                } else {
-                    // It will not be an slave frame if it has a STX start byte
-                    return Err(DLError::SlaveHasReturnedStartByteEqualsToSTX);
-                }
-            }
-
-            // Forwards
-            Err(error) => Err(error),
-        }
+        let received_frame = self.receive_frame()?;
+        // check if it is an slave frame and return it
+        received_frame
+            .try_into()
+            .map_err(|_| DLError::SlaveHasReturnedStartByteAsNeitherAckNorNack)
     }
 
     fn transact(
@@ -954,7 +945,7 @@ mod tests {
                 DLError::SerialReceptionError => {
                     assert!(false, "SerialReceptionError");
                 }
-                DLError::SlaveHasReturnedStartByteEqualsToSTX => {
+                DLError::SlaveHasReturnedStartByteAsNeitherAckNorNack => {
                     assert!(false, "SlaveHasReturnedStartByteEqualsToSTX");
                 }
                 DLError::SlaveHasReturnedNack(nack_frame) => {

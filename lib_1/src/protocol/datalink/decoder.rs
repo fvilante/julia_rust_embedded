@@ -15,6 +15,7 @@ pub enum DecodingError {
     InvalidChecksum { expected: u8, received: u8 },
 }
 
+#[derive(PartialEq)]
 pub enum State {
     WaitingFirstEsc,
     WaitingStartByte,
@@ -25,8 +26,8 @@ pub enum State {
 pub struct Decoder {
     start_byte: StartByte,
     state: State,
-    buffer_index: usize,
-    buffer: [u8; MAX_BUFFER_LEN],
+    payload_index: usize,
+    payload_buffer: [u8; MAX_BUFFER_LEN],
     last_was_esc: bool,
 }
 
@@ -35,36 +36,43 @@ impl Decoder {
         Self {
             start_byte: StartByte::STX,
             state: State::WaitingFirstEsc,
-            buffer_index: 0,
-            buffer: [0x00; MAX_BUFFER_LEN],
+            payload_index: 0,
+            payload_buffer: [0x00; MAX_BUFFER_LEN],
             last_was_esc: false,
         }
     }
 
-    fn save_data(&mut self, data: u8) -> Result<(), DecodingError> {
-        if self.buffer_index < self.buffer.len() {
-            self.buffer[self.buffer_index] = data;
-            self.buffer_index += 1;
-            Ok(())
-        } else {
-            Err(DecodingError::BufferOverFlow)
-        }
+    pub fn reset(&mut self) {
+        self.start_byte = StartByte::STX;
+        self.state = State::WaitingFirstEsc;
+        self.payload_index = 0;
+        self.payload_buffer = [0x00; MAX_BUFFER_LEN];
+        self.last_was_esc = false;
     }
 
-    fn success(&self, checksum: u8) -> Result<Option<Frame>, DecodingError> {
-        let frame = Frame {
-            start_byte: self.start_byte,
-            payload: self.buffer.into(),
-        };
-        let expected = frame.checksum();
-        if checksum == expected {
-            Ok(Some(frame))
-        } else {
-            Err(DecodingError::InvalidChecksum {
-                expected,
-                received: (checksum),
-            })
-        }
+    /// Signals the client that more information must be provided and that the parsing is not finished yet.
+    fn exit_but_not_done_yet(&self) -> Result<Option<Frame>, DecodingError> {
+        Ok(None)
+    }
+
+    fn exit_with_error(&mut self, error: DecodingError) -> Result<Option<Frame>, DecodingError> {
+        self.reset();
+        Err(error)
+    }
+
+    fn exit_with_success(&mut self, frame: Frame) -> Result<Option<Frame>, DecodingError> {
+        self.reset();
+        Ok(Some(frame))
+    }
+
+    fn save_data(&mut self, data: u8) -> Result<Option<Frame>, DecodingError> {
+        let payload_reference = self
+            .payload_buffer
+            .get_mut(self.payload_index)
+            .ok_or(DecodingError::BufferOverFlow)?;
+        *payload_reference = data;
+        self.payload_index += 1;
+        self.exit_but_not_done_yet()
     }
 
     /// Parses asynchronously each byte according to cmpp protocol v1.
@@ -78,21 +86,14 @@ impl Decoder {
             }
 
             State::WaitingStartByte => {
-                let start_byte: Result<StartByte, DecodingError> = match byte {
+                self.start_byte = match byte {
                     STX => Ok(StartByte::STX),
                     ACK => Ok(StartByte::ACK),
                     NACK => Ok(StartByte::NACK),
                     _ => Err(DecodingError::InvalidStartByte(byte)),
-                };
-                match start_byte {
-                    Ok(valid) => {
-                        self.state = State::ReceivingData;
-                        self.start_byte = valid;
-                        Ok(None)
-                    }
-
-                    Err(e) => Err(e),
-                }
+                }?;
+                self.state = State::ReceivingData;
+                self.exit_but_not_done_yet()
             }
 
             State::ReceivingData => {
@@ -100,51 +101,98 @@ impl Decoder {
                     if byte == ESC {
                         //escdup
                         self.last_was_esc = false;
-                        match self.save_data(ESC) {
-                            Ok(_) => Ok(None),
-                            Err(e) => Err(e),
-                        }
+                        self.save_data(ESC)
                     } else if byte == ETX {
                         //etx
                         self.last_was_esc = false;
                         self.state = State::WaitingChecksum;
-                        Ok(None)
+                        self.exit_but_not_done_yet()
                     } else {
-                        Err(DecodingError::ExpectedEtxOrEscDupButFoundOtherThing(byte))
+                        let err = DecodingError::ExpectedEtxOrEscDupButFoundOtherThing(byte);
+                        self.exit_with_error(err)
                     }
                 } else {
                     if byte == ESC {
                         self.last_was_esc = true;
-                        Ok(None)
+                        self.exit_but_not_done_yet()
                     } else {
                         //normal data
-                        match self.save_data(byte) {
-                            Ok(_) => Ok(None),
-                            Err(e) => Err(e),
-                        }
+                        self.save_data(byte)
                     }
                 }
             }
 
             State::WaitingChecksum => {
+                fn try_get_frame(self_: &Decoder) -> Option<Frame> {
+                    /// For safety asserts current state is safe to try get frame
+                    if self_.state == State::WaitingChecksum {
+                        let frame = Frame {
+                            start_byte: self_.start_byte,
+                            payload: self_.payload_buffer.into(),
+                        };
+                        Some(frame)
+                    } else {
+                        None
+                    }
+                }
+
+                /// SAFETY: This function and all its dependent functions are called from inside the State::WaitingChecksum
+                fn get_frame(self_: &Decoder) -> Frame {
+                    try_get_frame(self_).unwrap_or_else(|| {
+                        // NOTE: This is considered unreachable code because its condition never happens
+                        // Error: "Cannot get frame because current state is not "WaitingChecksum"
+                        unreachable!("E231");
+                    })
+                }
+
+                fn validate_checksum(
+                    self_: &mut Decoder,
+                    incomming_checksum: u8,
+                ) -> Result<Frame, DecodingError> {
+                    let frame = get_frame(self_);
+                    let expected_checksum = frame.checksum();
+                    if incomming_checksum == expected_checksum {
+                        Ok(frame)
+                    } else {
+                        Err(DecodingError::InvalidChecksum {
+                            expected: expected_checksum,
+                            received: expected_checksum,
+                        })
+                    }
+                }
+
                 if self.last_was_esc {
                     if byte == ESC {
                         //Escdup
                         self.last_was_esc = false;
                         let checksum = ESC;
-                        self.success(checksum)
+                        let frame = validate_checksum(self, checksum)?;
+                        self.exit_with_success(frame)
                     } else {
-                        Err(DecodingError::ChecksumIsEscButNotDuplicated(byte))
+                        self.exit_with_error(DecodingError::ChecksumIsEscButNotDuplicated(byte))
                     }
                 } else {
                     if byte == ESC {
                         self.last_was_esc = true;
-                        Ok(None)
+                        // check if it is expected that the already received frame should be ESC,
+                        // if not early return with an error, else confirm if we will received
+                        // an ESC_DUP
+                        let frame = get_frame(&self);
+                        let expected_checksum = frame.checksum();
+                        if expected_checksum == ESC {
+                            self.exit_but_not_done_yet()
+                        } else {
+                            /// We received ESC as checksum but checksum cannot be ESC in this case
+                            self.exit_with_error(DecodingError::InvalidChecksum {
+                                expected: expected_checksum,
+                                received: ESC,
+                            })
+                        }
                     } else {
                         // non-esc checksum
-                        self.last_was_esc = false;
                         let checksum = byte;
-                        self.success(checksum)
+                        let frame = validate_checksum(self, checksum)?;
+                        self.exit_with_success(frame)
                     }
                 }
             }
@@ -162,18 +210,11 @@ mod tests {
     fn run_decoder(input: &[u8]) -> Result<Frame, DecodingError> {
         let mut decoder = Decoder::new();
         for byte in input {
-            match decoder.parse_next(*byte) {
-                Ok(val) => {
-                    match val {
-                        Some(frame) => return Ok(frame),
-                        None => { /* nop */ }
-                    }
-                }
-
-                Err(e) => return Err(e),
+            if let Some(frame) = decoder.parse_next(*byte)? {
+                return Ok(frame);
             }
         }
-        unreachable!()
+        panic!("Input is fully proccessed but no frame result was generated")
     }
 
     #[test]
