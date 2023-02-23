@@ -4,24 +4,22 @@ use crate::protocol::datalink::datalink::{
 };
 
 use self::{
-    cmpp_value::{Bit, Word16},
+    cmpp_value::{Bit, MechanicalProperties, Word16},
+    manipulator::WordSetter,
     memory_map::{BitAddress, WordAddress},
 };
 
 mod cmpp_value {
     use super::memory_map;
 
-    pub trait ToCmpp<N> {
-        fn to_cmpp_value(&self) -> N;
+    #[derive(Clone, Copy)]
+    pub struct MechanicalProperties {
+        pub pulses_per_motor_revolution: u16,
+        pub linear_displacement_per_tooth_belt: u16,
     }
 
-    pub trait FromCmpp {
-        fn from_cmpp_value(&self, cmpp_value: AnyCmppValue) -> Self;
-    }
-
-    pub enum AnyCmppValue {
-        Bit(Bit),
-        Word16(Word16),
+    pub trait IntoCmppValue<T> {
+        fn to_cmpp_value(&self, properties: MechanicalProperties) -> T;
     }
 
     #[derive(Copy, Clone)]
@@ -41,6 +39,8 @@ mod cmpp_value {
             self.0
         }
     }
+
+    pub struct Byte(pub u8);
 }
 
 mod memory_map {
@@ -67,6 +67,16 @@ mod memory_map {
         fn into(self) -> u8 {
             self.word_address
         }
+    }
+
+    pub enum BytePosition {
+        ByteLow,
+        ByteHigh,
+    }
+
+    pub struct ByteAddress {
+        pub word_address: u8,
+        pub byte_position: BytePosition,
     }
 
     #[derive(Copy, Clone)]
@@ -107,26 +117,27 @@ pub enum TLError {
     DLError(DLError),
 }
 
-mod manipulator {
+pub mod manipulator {
     use crate::protocol::datalink::datalink::Status;
 
     use super::{
-        cmpp_value::{self, Bit, ToCmpp, Word16},
+        cmpp_value::{self, Bit, IntoCmppValue, Word16},
         memory_map::{self, BitAddress, WordAddress},
         TLError, TransportLayer,
     };
 
-    struct WordSetter<'a> {
-        transport_layer: &'a TransportLayer,
-        memory_map: WordAddress,
+    pub struct WordSetter<'a> {
+        pub transport_layer: &'a TransportLayer,
+        pub memory_map: WordAddress,
     }
 
     impl<'a> WordSetter<'a> {
         pub fn set<T>(&self, value: T) -> Result<Status, TLError>
         where
-            T: ToCmpp<Word16>,
+            T: IntoCmppValue<Word16>,
         {
-            let cmpp_value = value.to_cmpp_value();
+            let properties = self.transport_layer.get_mechanical_properties();
+            let cmpp_value = value.to_cmpp_value(properties);
             let word_address = self.memory_map;
             self.transport_layer
                 .safe_datalink()
@@ -134,7 +145,7 @@ mod manipulator {
         }
     }
 
-    struct BitSetter<'a> {
+    pub struct BitSetter<'a> {
         transport_layer: &'a TransportLayer,
         memory_map: BitAddress,
     }
@@ -142,9 +153,10 @@ mod manipulator {
     impl<'a> BitSetter<'a> {
         pub fn set<T>(&self, value: T) -> Result<Status, TLError>
         where
-            T: ToCmpp<Bit>,
+            T: IntoCmppValue<Bit>,
         {
-            let cmpp_value = value.to_cmpp_value();
+            let properties = self.transport_layer.get_mechanical_properties();
+            let cmpp_value = value.to_cmpp_value(properties);
             let word_address = self.memory_map;
             self.transport_layer
                 .safe_datalink()
@@ -207,15 +219,27 @@ impl<'a> SafeDatalink<'a> {
     }
 }
 
-struct TransportLayer {
+pub struct TransportLayer {
     datalink: Datalink,
+    mechanical_properties: MechanicalProperties,
 }
 
 impl TransportLayer {
+    fn get_mechanical_properties(&self) -> MechanicalProperties {
+        self.mechanical_properties
+    }
+
     // Primitives in relation to datalink
 
     fn safe_datalink<'a>(&'a self) -> SafeDatalink<'a> {
         SafeDatalink::new(&self.datalink)
+    }
+
+    fn velocidade_de_avanco<'a>(&'a self) -> WordSetter<'a> {
+        WordSetter {
+            transport_layer: &self,
+            memory_map: WordAddress { word_address: 0x50 },
+        }
     }
 }
 
@@ -226,12 +250,20 @@ impl TransportLayer {
 #[cfg(test)]
 mod tests {
 
-    use crate::protocol::datalink::datalink::{
-        emulated::{lazy_now, loopback_try_rx, smart_try_tx},
-        Channel,
+    use crate::protocol::{
+        datalink::datalink::{
+            emulated::{lazy_now, loopback_try_rx, smart_try_tx},
+            Channel,
+        },
+        transport::transport_layer::cmpp_value::{IntoCmppValue, MechanicalProperties},
     };
 
     use super::{memory_map::WordAddress, *};
+
+    const MECHANICAL_PROPERTIES: MechanicalProperties = MechanicalProperties {
+        linear_displacement_per_tooth_belt: 1234,
+        pulses_per_motor_revolution: 2345,
+    };
 
     #[test]
     fn it_can_transact_something() {
@@ -244,7 +276,10 @@ mod tests {
             now: lazy_now,
         };
 
-        let transport = TransportLayer { datalink };
+        let transport = TransportLayer {
+            datalink,
+            mechanical_properties: MECHANICAL_PROPERTIES,
+        };
 
         //send
 
@@ -255,6 +290,40 @@ mod tests {
         let value = data.0;
 
         assert_eq!(value, 0)
+
+        //receive
+    }
+
+    #[test]
+    fn it_can_transact_something_using_manipulator() {
+        // setup
+        let datalink = Datalink {
+            channel: Channel::from_u8(1).unwrap(),
+            timeout_ms: 1000,
+            try_tx: smart_try_tx,
+            try_rx: loopback_try_rx,
+            now: lazy_now,
+        };
+
+        let transport = TransportLayer {
+            datalink,
+            mechanical_properties: MECHANICAL_PROPERTIES,
+        };
+
+        struct Milimeter(pub u16);
+
+        impl IntoCmppValue<Word16> for Milimeter {
+            fn to_cmpp_value(&self, mechanical_properties: MechanicalProperties) -> Word16 {
+                let some_factor = mechanical_properties.pulses_per_motor_revolution;
+                Word16(self.0 * some_factor)
+            }
+        }
+
+        //send
+
+        let response = transport.velocidade_de_avanco().set(Milimeter(10));
+
+        let status = response.unwrap();
 
         //receive
     }
