@@ -82,8 +82,186 @@ fn teste_dequeue() {
 }
 
 pub fn development_entry_point() -> ! {
+    /// Here is how to use enum_dispatch
+    ///
+    /// reference: https://crates.io/crates/enum_dispatch
+    use enum_dispatch::enum_dispatch;
+
+    #[enum_dispatch]
+    trait MyBehaviour {
+        fn get_age(&self) -> u8;
+    }
+
+    #[enum_dispatch]
+    trait Widget {
+        fn get_widget(&self) -> u8;
+    }
+
+    #[derive(Clone, Copy)]
+    struct Foo {}
+
+    impl Foo {
+        fn new() -> Self {
+            Self {}
+        }
+
+        fn non_trait_method(&self) -> u8 {
+            222
+        }
+    }
+
+    impl MyBehaviour for Foo {
+        fn get_age(&self) -> u8 {
+            8
+        }
+    }
+
+    impl Widget for Foo {
+        fn get_widget(&self) -> u8 {
+            0
+        }
+    }
+
+    #[derive(Clone, Copy)]
+    struct Bar;
+
+    impl MyBehaviour for Bar {
+        fn get_age(&self) -> u8 {
+            77
+        }
+    }
+
+    impl Widget for Bar {
+        fn get_widget(&self) -> u8 {
+            1
+        }
+    }
+
+    #[derive(Clone, Copy)]
+    struct Juca;
+
+    impl Juca {
+        fn non_trait_method(&self) -> u8 {
+            222
+        }
+    }
+
+    impl MyBehaviour for Juca {
+        fn get_age(&self) -> u8 {
+            166
+        }
+    }
+
+    impl Widget for Juca {
+        fn get_widget(&self) -> u8 {
+            2
+        }
+    }
+
+    #[enum_dispatch(OthersEnum, MyBehaviourEnum)]
+    trait Common {
+        fn do_some_work_and_return_number(&self) -> u16;
+    }
+
+    struct Nego;
+
+    impl Nego {
+        fn get_behaviour(&self) -> MyBehaviourEnum {
+            Juca.into()
+        }
+    }
+
+    struct Kiss;
+
+    impl Common for Foo {
+        fn do_some_work_and_return_number(&self) -> u16 {
+            100
+        }
+    }
+
+    impl Common for Bar {
+        fn do_some_work_and_return_number(&self) -> u16 {
+            101
+        }
+    }
+
+    impl Common for Juca {
+        fn do_some_work_and_return_number(&self) -> u16 {
+            102
+        }
+    }
+
+    impl Common for Kiss {
+        fn do_some_work_and_return_number(&self) -> u16 {
+            103
+        }
+    }
+
+    impl Common for Nego {
+        fn do_some_work_and_return_number(&self) -> u16 {
+            104
+        }
+    }
+
+    #[derive(Clone, Copy)]
+    #[enum_dispatch(MyBehaviour, Widget)]
+    enum MyBehaviourEnum {
+        Foo,  //8
+        Bar,  //77
+        Juca, //166
+    }
+
+    enum OthersEnum {
+        Kiss,
+        Nego,
+    }
+
+    pub fn main() {
+        lcd::lcd_initialize();
+        lcd::print("Pensando o que?");
+
+        let foo = Foo {};
+        let bar = Bar;
+        let juca = Juca;
+        let array: [(MyBehaviourEnum, u8, u8); 10] = [
+            (foo.into(), 8, 0),
+            (bar.into(), 77, 1),
+            (foo.into(), 8, 0),
+            (bar.into(), 77, 1),
+            (juca.into(), 166, 2),
+            (bar.into(), 77, 1),
+            (foo.into(), 8, 0),
+            (juca.into(), 166, 2),
+            (bar.into(), 77, 1),
+            (bar.into(), 77, 1),
+        ];
+        for (each, expected_age, expected_widget) in array {
+            assert_eq!(each.get_age(), expected_age);
+            assert_eq!(each.get_widget(), expected_widget);
+        }
+
+        // explicit cast necessary to get the enum
+        let p: MyBehaviourEnum = juca.into();
+        let a = p.get_age();
+        assert_eq!(a, 166);
+
+        // uncast (use try_into)
+        let u: Result<Juca, _> = p.try_into();
+        assert_eq!(u.unwrap().non_trait_method(), 222);
+
+        // common trait
+
+        let u: MyBehaviourEnum = foo.into();
+        lcd::print("-------------------------->");
+        lcd::print_u16_in_hex(u.do_some_work_and_return_number());
+
+        assert_eq!(u.do_some_work_and_return_number(), 100);
+    }
+
     lcd::lcd_initialize();
     lcd::print("Juca kifuri");
+
+    main();
 
     let frame = Frame::new(StartByte::STX, [0, 0x50, 0, 0].into());
 
