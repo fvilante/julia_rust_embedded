@@ -86,8 +86,6 @@ pub fn development_entry_point() -> ! {
     lcd::lcd_initialize();
     lcd::print("Juca kifuri");
 
-    main();
-
     let frame = Frame::new(StartByte::STX, [0, 0x50, 0, 0].into());
 
     serial::init(9600);
