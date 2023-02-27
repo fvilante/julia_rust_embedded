@@ -64,6 +64,7 @@ fn test_cmpp() {
     }
 }
 
+/// TODO: I think this code can be removed safely.
 fn teste_dequeue() {
     let mut queue: Deque<u8, 3> = Deque::new();
 
