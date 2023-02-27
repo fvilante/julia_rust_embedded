@@ -4,4 +4,3 @@ pub mod master_packet;
 pub mod transact_packet;
 pub mod transport_error;
 pub mod transport_layer;
-pub mod word_16;

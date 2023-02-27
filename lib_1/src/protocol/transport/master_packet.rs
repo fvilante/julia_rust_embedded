@@ -1,8 +1,8 @@
+use crate::protocol::datalink::datalink::Word16;
 use crate::protocol::datalink::frame::Payload;
 use crate::protocol::datalink::{frame::Frame, prelude::StartByte};
 
 use super::transport_error::TransportError;
-use super::word_16::{BitMask16, Word16};
 
 use crate::protocol::transport::channel::Channel;
 
@@ -17,21 +17,10 @@ enum Direction {
 }
 
 pub enum CmppMessage {
-    GetWord {
-        waddr: WordAddress,
-    },
-    SetWord {
-        waddr: WordAddress,
-        data: Word16,
-    },
-    SetBitmask {
-        waddr: WordAddress,
-        bitmask: BitMask16,
-    },
-    ResetBitmask {
-        waddr: WordAddress,
-        bitmask: BitMask16,
-    },
+    GetWord { waddr: WordAddress },
+    SetWord { waddr: WordAddress, data: Word16 },
+    SetBitmask { waddr: WordAddress, bitmask: u16 },
+    ResetBitmask { waddr: WordAddress, bitmask: u16 },
 }
 
 fn make_payload(channel: Channel, message: CmppMessage) -> Result<Payload, TransportError> {
@@ -39,26 +28,17 @@ fn make_payload(channel: Channel, message: CmppMessage) -> Result<Payload, Trans
         CmppMessage::GetWord { waddr } => [Direction::GetWord as u8, waddr, 0x00, 0x00],
 
         CmppMessage::SetWord { waddr, data } => {
-            let Word16 {
-                data_high,
-                data_low,
-            } = data;
+            let (data_high, data_low) = data.split_bytes();
             [Direction::SetWord as u8, waddr, data_low, data_high]
         }
 
         CmppMessage::ResetBitmask { waddr, bitmask } => {
-            let Word16 {
-                data_high,
-                data_low,
-            } = Word16::from_bitmask(bitmask);
+            let (data_high, data_low) = Word16::from_u16(bitmask).split_bytes();
             [Direction::ResetBitmask as u8, waddr, data_low, data_high]
         }
 
         CmppMessage::SetBitmask { waddr, bitmask } => {
-            let Word16 {
-                data_high,
-                data_low,
-            } = Word16::from_bitmask(bitmask);
+            let (data_high, data_low) = Word16::from_u16(bitmask).split_bytes();
             [Direction::SetBitmask as u8, waddr, data_low, data_high]
         }
     };
