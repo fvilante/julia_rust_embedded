@@ -1,10 +1,10 @@
 use crate::protocol::datalink::datalink::{
     DLError, Datalink, PacodeDeRetornoDeSolicitacao, PacoteDeRetornoComErro,
-    PacoteDeRetornoDeEnvio, Status,
+    PacoteDeRetornoDeEnvio, Status, Word16,
 };
 
 use self::{
-    cmpp_value::{Bit, MechanicalProperties, Word16},
+    cmpp_value::{Bit, MechanicalProperties},
     manipulator::WordSetter,
     memory_map::{BitAddress, WordAddress},
 };
@@ -27,15 +27,6 @@ mod cmpp_value {
 
     impl Into<bool> for Bit {
         fn into(self) -> bool {
-            self.0
-        }
-    }
-
-    #[derive(Copy, Clone)]
-    pub struct Word16(pub u16);
-
-    impl Into<u16> for Word16 {
-        fn into(self) -> u16 {
             self.0
         }
     }
@@ -118,10 +109,10 @@ pub enum TLError {
 }
 
 pub mod manipulator {
-    use crate::protocol::datalink::datalink::Status;
+    use crate::protocol::datalink::datalink::{Status, Word16};
 
     use super::{
-        cmpp_value::{self, Bit, IntoCmppValue, Word16},
+        cmpp_value::{self, Bit, IntoCmppValue},
         memory_map::{self, BitAddress, WordAddress},
         TLError, TransportLayer,
     };
@@ -213,9 +204,7 @@ impl<'a> SafeDatalink<'a> {
 
     pub fn get_word16(&self, word_address: WordAddress) -> Result<Word16, TLError> {
         let response = self.datalink.get_word16(word_address.into());
-        Self::cast_map(response, |pacote_de_retorno| {
-            cmpp_value::Word16(pacote_de_retorno.data.to_u16())
-        })
+        Self::cast_map(response, |pacote_de_retorno| pacote_de_retorno.data)
     }
 }
 
@@ -257,7 +246,7 @@ mod tests {
     use crate::protocol::{
         datalink::datalink::{
             emulated::{lazy_now, loopback_try_rx, smart_try_tx},
-            Channel,
+            Channel, Word16,
         },
         transport::transport_layer::cmpp_value::{IntoCmppValue, MechanicalProperties},
     };
@@ -291,7 +280,7 @@ mod tests {
 
         let data = response.unwrap();
 
-        let value = data.0;
+        let value = data.to_u16();
 
         assert_eq!(value, 0)
 
@@ -319,7 +308,7 @@ mod tests {
         impl IntoCmppValue<Word16> for Milimeter {
             fn to_cmpp_value(&self, mechanical_properties: MechanicalProperties) -> Word16 {
                 let some_factor = mechanical_properties.pulses_per_motor_revolution;
-                Word16(self.0 * some_factor)
+                Word16::from_u16(self.0 * some_factor)
             }
         }
 
