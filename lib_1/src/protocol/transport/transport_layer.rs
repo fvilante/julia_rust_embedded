@@ -7,7 +7,7 @@ use self::{
     cmpp_value::{Bit, MechanicalProperties},
     manipulator::WordSetter,
     memory_map::{BitAddress, WordAddress},
-    new_proposal::{DisplacementManipulator, VelocityManipulator},
+    new_proposal::{AccelerationManipulator, DisplacementManipulator, VelocityManipulator},
 };
 
 pub mod cmpp_value {
@@ -256,6 +256,52 @@ pub mod new_proposal {
             response
         }
     }
+
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //      ACCELERATION
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
+
+    pub struct Acceleration(pub u16);
+
+    pub struct AccelerationManipulator<'a> {
+        pub transport: &'a TransportLayer,
+        pub address: WordAddress,
+    }
+
+    impl<'a> AccelerationManipulator<'a> {
+        // TODO: Not implemented yet, just a fake implementation
+        fn convert_acceleration_to_word(d: Acceleration, _p: MechanicalProperties) -> u16 {
+            let value = d.0;
+            let new_value = d.0 * 1;
+            new_value
+        }
+
+        // TODO: Not implemented yet, just a fake implementation
+        fn convert_word_to_acceleration(word: Word16, _p: MechanicalProperties) -> Acceleration {
+            let new_value = Acceleration(word.into());
+            new_value
+        }
+
+        pub fn set(&self, value: Acceleration) -> Result<Status, TLError> {
+            let properties = self.transport.mechanical_properties;
+            let word_value = Self::convert_acceleration_to_word(value, properties);
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            datalink.set_word16(word_value.into(), word_address.into())
+        }
+
+        pub fn get(&self) -> Result<Acceleration, TLError> {
+            let properties = self.transport.mechanical_properties;
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            let response = datalink
+                .get_word16(word_address.into())
+                .map(|word| Self::convert_word_to_acceleration(word, properties));
+            response
+        }
+    }
 }
 
 pub struct SafeDatalink<'a> {
@@ -342,6 +388,13 @@ impl TransportLayer {
 
     pub fn velocidade_de_avanco<'a>(&'a self) -> VelocityManipulator<'a> {
         VelocityManipulator {
+            transport: self,
+            address: 0x50.into(),
+        }
+    }
+
+    pub fn aceleracao_de_avanco<'a>(&'a self) -> AccelerationManipulator<'a> {
+        AccelerationManipulator {
             transport: self,
             address: 0x50.into(),
         }
