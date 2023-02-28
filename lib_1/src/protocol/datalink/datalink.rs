@@ -175,7 +175,7 @@ impl DirectionAndChannel {
         // SAFETY: It's safe to call this function because is garanteed that a 6 bits
         // unsigned integer is inside current 0..Channel::MAX_CHANNELS (inclusive, exclusive)
         // range.
-        unsafe { Channel::from_u8_unchecked(number) }
+        Channel::from_u8(number).unwrap()
     }
 
     pub fn get_direction(&self) -> Direction {
