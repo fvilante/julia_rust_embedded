@@ -40,8 +40,12 @@ fn main() -> ! {
     //
 
     //crate::enviroment::front_panel::development_entry_point();
-    cmpp::main::development_entry_point()
-    //menu::menu_entry_point::development_entry_point()
+
+    // Entry point for TL and DL
+    //cmpp::main::development_entry_point()
+
+    // Entry point for menu system
+    menu::menu_entry_point::development_entry_point()
 
     //loop {
 
