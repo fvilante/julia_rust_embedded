@@ -1,6 +1,5 @@
-use crate::protocol::datalink::transact::DatalinkError;
-
 use super::channel::Channel;
+use crate::protocol::datalink::transact::DatalinkError;
 
 #[derive(Debug)]
 pub enum TransportError {

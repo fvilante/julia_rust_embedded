@@ -9,6 +9,8 @@ use super::{
     prelude::{SlaveStartByte, StartByte},
 };
 
+use super::super::transport::channel::Channel;
+
 /// DatalinkError.
 ///
 /// TODO: Resolve conflict naming with other struct named 'DataLinkError', this here
@@ -36,68 +38,6 @@ impl From<SlaveFrameNack> for DLError {
         let slave_frame = frame.0;
         DLError::SlaveHasReturnedNack(slave_frame)
     }
-}
-
-///////////////////////////////////////////////////////////
-
-/// For more details about how Channel concept works see the cmpp v1 protocol specification
-/// TODO: There are other Channel type, use this one as the official and deprecate the other
-#[derive(Copy, Clone)]
-pub struct Channel {
-    number: u8,
-}
-
-impl Channel {
-    const MAX_CHANNELS: u8 = 64;
-
-    pub fn from_u8(number: u8) -> Result<Channel, ()> {
-        match number {
-            0..Self::MAX_CHANNELS => Ok(Self { number }),
-
-            _ => Err(()),
-        }
-    }
-
-    /// If a number equal or greater then Self::MAX_CHANNELS is given,
-    /// it will be clamped to the range 0..Self::MAX_CHANNELS (inclusive, exclusive)
-    pub fn from_u8_unchecked(number: u8) -> Self {
-        Self {
-            number: number.clamp(0, Self::MAX_CHANNELS - 1),
-        }
-    }
-
-    pub fn to_u8(&self) -> u8 {
-        self.number
-    }
-
-    /// Check if channel is zero or not
-    pub fn is_zero_channel(&self) -> bool {
-        self.number == 0
-    }
-}
-
-impl TryFrom<u8> for Channel {
-    type Error = DLError;
-
-    fn try_from(channel: u8) -> Result<Self, Self::Error> {
-        const MAX_CHANNELS: u8 = 64;
-        if channel < MAX_CHANNELS {
-            Ok(Self { number: channel })
-        } else {
-            Err(DLError::InvalidChannel(channel))
-        }
-    }
-}
-
-impl Into<u8> for Channel {
-    fn into(self) -> u8 {
-        self.number
-    }
-}
-
-fn test() {
-    let c = Channel { number: 0 };
-    let x: u8 = c.into();
 }
 
 ///////////////////////////////////////////////////////////
@@ -845,7 +785,7 @@ mod tests {
         let mut check: u8 = 0;
 
         let datalink = Datalink {
-            channel: Channel { number: 1 },
+            channel: Channel::from_u8_unchecked(1),
             timeout_ms: 1000,
             try_tx: smart_try_tx,
             try_rx: loopback_try_rx,

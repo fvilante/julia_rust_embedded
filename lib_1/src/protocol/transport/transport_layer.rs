@@ -246,9 +246,12 @@ mod tests {
     use crate::protocol::{
         datalink::datalink::{
             emulated::{lazy_now, loopback_try_rx, smart_try_tx},
-            Channel, Word16,
+            Word16,
         },
-        transport::transport_layer::cmpp_value::{IntoCmppValue, MechanicalProperties},
+        transport::{
+            channel::Channel,
+            transport_layer::cmpp_value::{IntoCmppValue, MechanicalProperties},
+        },
     };
 
     use super::{memory_map::WordAddress, *};

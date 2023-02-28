@@ -2,9 +2,8 @@ use crate::protocol::datalink::datalink::Word16;
 use crate::protocol::datalink::frame::Payload;
 use crate::protocol::datalink::{frame::Frame, prelude::StartByte};
 
+use super::channel::Channel;
 use super::transport_error::TransportError;
-
-use crate::protocol::transport::channel::Channel;
 
 type WordAddress = u8;
 
@@ -43,10 +42,9 @@ fn make_payload(channel: Channel, message: CmppMessage) -> Result<Payload, Trans
         }
     };
 
-    channel
-        .as_u8()
-        .map(|channel| [channel + direction, waddr, byte_low, byte_high].into())
-        .ok_or_else(|| TransportError::InvalidChannel(channel))
+    let payload = [channel.to_u8() + direction, waddr, byte_low, byte_high].into();
+
+    Ok(payload)
 }
 
 pub fn make_frame(channel: Channel, message: CmppMessage) -> Result<Frame, TransportError> {
@@ -61,16 +59,18 @@ pub fn make_frame(channel: Channel, message: CmppMessage) -> Result<Frame, Trans
 #[cfg(test)]
 mod tests {
 
+    use crate::protocol::transport::channel::Channel;
+
     use super::*;
 
     #[test]
     fn it_create_get_word_frame() {
-        let channel = Channel::new(0x01);
+        let channel = Channel::from_u8_unchecked(0x01);
         let waddr = 0x50;
         let expected = Frame {
             start_byte: StartByte::STX,
             payload: [
-                channel.as_u8().unwrap() + Direction::GetWord as u8,
+                channel.to_u8() + Direction::GetWord as u8,
                 waddr,
                 0x00,
                 0x00,

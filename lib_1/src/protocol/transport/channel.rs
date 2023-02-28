@@ -1,36 +1,62 @@
-//use super::transact_packet::TransportError;
+use crate::protocol::datalink::datalink::DLError;
 
-const LAST_CHANNEL: u8 = 63;
-
-#[derive(Debug, PartialEq)]
-pub struct Channel(u8);
+#[derive(Copy, Clone, Debug)]
+pub struct Channel {
+    number: u8,
+}
 
 impl Channel {
-    pub fn new(channel: u8) -> Self {
-        Self(channel)
+    const MAX_CHANNELS: u8 = 64;
+
+    /// Creates a cmpp Channel from an 8 bits byte
+    pub fn from_u8(number: u8) -> Result<Channel, ()> {
+        match number {
+            0..Self::MAX_CHANNELS => Ok(Self { number }),
+
+            _ => Err(()),
+        }
     }
 
-    pub fn as_u8(&self) -> Option<u8> {
-        match self.0 {
-            0..=LAST_CHANNEL => Some(self.0),
-            _ => None,
+    /// If a number equal or greater then Self::MAX_CHANNELS is given,
+    /// it will be clamped to the range 0..Self::MAX_CHANNELS (inclusive, exclusive)
+    pub fn from_u8_unchecked(number: u8) -> Self {
+        Self {
+            number: number.clamp(0, Self::MAX_CHANNELS - 1),
+        }
+    }
+
+    pub fn to_u8(&self) -> u8 {
+        self.number
+    }
+
+    /// Check if channel is zero or not
+    pub fn is_zero_channel(&self) -> bool {
+        self.number == 0
+    }
+}
+
+impl TryFrom<u8> for Channel {
+    type Error = DLError;
+
+    fn try_from(channel: u8) -> Result<Self, Self::Error> {
+        const MAX_CHANNELS: u8 = 64;
+        if channel < MAX_CHANNELS {
+            Ok(Self { number: channel })
+        } else {
+            Err(DLError::InvalidChannel(channel))
         }
     }
 }
 
-impl From<u8> for Channel {
-    fn from(value: u8) -> Self {
-        Self(value)
+impl Into<u8> for Channel {
+    fn into(self) -> u8 {
+        self.number
     }
 }
 
-impl TryFrom<Channel> for u8 {
-    type Error = ();
+///////////////////////////////////////////////////////////
 
-    fn try_from(value: Channel) -> Result<Self, Self::Error> {
-        value.as_u8().ok_or_else(|| ())
-    }
-}
+/*
 
 #[cfg(test)]
 mod tests {
@@ -70,3 +96,4 @@ mod tests {
         run(LAST_CHANNEL + 1); // upper bound
     }
 }
+*/
