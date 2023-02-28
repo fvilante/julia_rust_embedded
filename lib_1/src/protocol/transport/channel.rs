@@ -7,6 +7,7 @@ pub struct Channel {
 
 impl Channel {
     const MAX_CHANNELS: u8 = 64;
+    const LAST_CHANNEL: u8 = Channel::MAX_CHANNELS - 1;
 
     /// Creates a cmpp Channel from an 8 bits byte
     pub fn from_u8(number: u8) -> Result<Channel, DLError> {
@@ -56,8 +57,6 @@ impl Into<u8> for Channel {
 
 ///////////////////////////////////////////////////////////
 
-/*
-
 #[cfg(test)]
 mod tests {
 
@@ -65,18 +64,18 @@ mod tests {
 
     #[test]
     fn it_creates_channel_from_u8() {
-        let expected = Channel(10_u8);
-        let actual_1 = Channel::new(10_u8);
-        let actual_2 = Channel::from(10_u8); // alternative form
+        let expected = Channel::from_u8_unchecked(10_u8);
+        let actual_1 = Channel::from_u8_unchecked(10_u8);
+        let actual_2 = Channel::from_u8(10_u8).unwrap(); // alternative form
         assert_eq!(expected, actual_1);
         assert_eq!(expected, actual_2);
     }
 
     #[test]
     fn it_extracts_channel_to_u8_without_error() {
-        let expected: u8 = 10;
-        let channel = Channel::from(expected);
-        let actual_1 = channel.as_u8().unwrap();
+        let expected: u8 = Channel::LAST_CHANNEL;
+        let channel = Channel::from_u8(expected).unwrap();
+        let actual_1 = channel.to_u8();
         let actual_2 = channel.try_into().unwrap(); // alternative form
         assert_eq!(expected, actual_1);
         assert_eq!(expected, actual_2);
@@ -84,16 +83,12 @@ mod tests {
 
     #[test]
     fn it_extracts_error_when_channel_out_of_range() {
-        fn run(expected: u8) {
-            let channel = Channel::from(expected);
-            let actual_1: Option<u8> = channel.as_u8(); // shorter-form
-            let actual_2: () = <Channel as TryInto<u8>>::try_into(channel).unwrap_err(); // long-form
-            assert_eq!(actual_1, None);
-            assert_eq!(actual_2, ());
+        fn try_create_invalid_channel(expected: u8) {
+            let channel = Channel::from_u8(expected);
+            assert_eq!(true, channel.is_err());
         }
         #[allow(arithmetic_overflow)]
-        run(0 - 1); // lower bound
-        run(LAST_CHANNEL + 1); // upper bound
+        try_create_invalid_channel(0 - 1); // outside lower bound
+        try_create_invalid_channel(Channel::LAST_CHANNEL + 1); // outside upper bound
     }
 }
-*/
