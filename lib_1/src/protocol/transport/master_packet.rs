@@ -64,7 +64,7 @@ mod tests {
 
     #[test]
     fn it_create_get_word_frame() {
-        let channel = Channel::from_u8_unchecked(0x01);
+        let channel = Channel::from_u8(0x01).unwrap();
         let waddr = 0x50;
         let expected = Frame {
             start_byte: StartByte::STX,
@@ -77,6 +77,6 @@ mod tests {
             .into(),
         };
         let frame = make_frame(channel, CmppMessage::GetWord { waddr });
-        assert_eq!(expected, frame.unwrap());
+        assert_eq!(expected, frame);
     }
 }

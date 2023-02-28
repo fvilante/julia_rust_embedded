@@ -172,7 +172,10 @@ impl DirectionAndChannel {
     pub fn get_channel(&self) -> Channel {
         let temp = reset_bit_at(self.direction_and_number, BIT_7);
         let number = reset_bit_at(temp, BIT_6);
-        Channel::from_u8_unchecked(number)
+        // SAFETY: It's safe to call this function because is garanteed that a 6 bits
+        // unsigned integer is inside current 0..Channel::MAX_CHANNELS (inclusive, exclusive)
+        // range.
+        unsafe { Channel::from_u8_unchecked(number) }
     }
 
     pub fn get_direction(&self) -> Direction {
@@ -785,7 +788,7 @@ mod tests {
         let mut check: u8 = 0;
 
         let datalink = Datalink {
-            channel: Channel::from_u8_unchecked(1),
+            channel: Channel::from_u8(1).unwrap(),
             timeout_ms: 1000,
             try_tx: smart_try_tx,
             try_rx: loopback_try_rx,

@@ -1,6 +1,6 @@
 use crate::protocol::datalink::datalink::DLError;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Channel {
     number: u8,
 }
@@ -18,9 +18,15 @@ impl Channel {
         }
     }
 
+    /// This function creates an Channel but do not perform validation on the given number.
+    ///
     /// If a number equal or greater then Self::MAX_CHANNELS is given,
     /// it will be clamped to the range 0..Self::MAX_CHANNELS (inclusive, exclusive)
-    pub fn from_u8_unchecked(number: u8) -> Self {
+    ///
+    /// SAFETY: If given number is betweeen 0 and Self::MAX_Channels (inclusive, exclusivve) then
+    /// it is safe to call this function. Always when possible prefer to call Self::from_u8 instead
+    /// of this function
+    pub unsafe fn from_u8_unchecked(number: u8) -> Self {
         Self {
             number: number.clamp(0, Self::MAX_CHANNELS - 1),
         }
@@ -64,9 +70,9 @@ mod tests {
 
     #[test]
     fn it_creates_channel_from_u8() {
-        let expected = Channel::from_u8_unchecked(10_u8);
-        let actual_1 = Channel::from_u8_unchecked(10_u8);
-        let actual_2 = Channel::from_u8(10_u8).unwrap(); // alternative form
+        let expected = unsafe { Channel::from_u8_unchecked(10_u8) };
+        let actual_1 = unsafe { Channel::from_u8_unchecked(10_u8) }; // unsafe form (prefer the safe form!)
+        let actual_2 = Channel::from_u8(10_u8).unwrap(); // safe alternative form
         assert_eq!(expected, actual_1);
         assert_eq!(expected, actual_2);
     }

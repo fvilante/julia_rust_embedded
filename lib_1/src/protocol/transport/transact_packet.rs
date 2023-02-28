@@ -37,7 +37,7 @@ mod tests {
         let payload = Payload::from_array([0, 0, 0, 0]);
         let timeout_us: u64 = 500;
         let connection = MockedSerialConnection::new(9600);
-        let channel = Channel::from_u8_unchecked(0x00);
+        let channel = Channel::from_u8(0x00).unwrap();
         let waddr = 0x00;
         let cmpp_message = CmppMessage::GetWord { waddr };
         let frame = Frame {
