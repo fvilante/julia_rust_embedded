@@ -162,7 +162,9 @@ pub mod new_proposal {
     use crate::protocol::datalink::datalink::{Status, Word16};
 
     use super::{
-        cmpp_value::MechanicalProperties, memory_map::WordAddress, TLError, TransportLayer,
+        cmpp_value::MechanicalProperties,
+        memory_map::{BitAddress, WordAddress},
+        TLError, TransportLayer,
     };
 
     //  ///////////////////////////////////////////////////////////////////////////////////
@@ -180,10 +182,10 @@ pub mod new_proposal {
 
     impl<'a> DisplacementManipulator<'a> {
         // TODO: Not implemented yet, just a fake implementation
-        fn convert_displacement_to_word(d: Displacement, _p: MechanicalProperties) -> u16 {
+        fn convert_displacement_to_word(d: Displacement, _p: MechanicalProperties) -> Word16 {
             let value = d.0;
             let new_value = d.0 * 1;
-            new_value
+            new_value.into()
         }
 
         // TODO: Not implemented yet, just a fake implementation
@@ -197,7 +199,7 @@ pub mod new_proposal {
             let word_value = Self::convert_displacement_to_word(value, properties);
             let datalink = self.transport.safe_datalink();
             let word_address = self.address.word_address;
-            datalink.set_word16(word_value.into(), word_address.into())
+            datalink.set_word16(word_value, word_address.into())
         }
 
         pub fn get(&self) -> Result<Displacement, TLError> {
@@ -226,10 +228,10 @@ pub mod new_proposal {
 
     impl<'a> VelocityManipulator<'a> {
         // TODO: Not implemented yet, just a fake implementation
-        fn convert_velocity_to_word(d: Velocity, _p: MechanicalProperties) -> u16 {
+        fn convert_velocity_to_word(d: Velocity, _p: MechanicalProperties) -> Word16 {
             let value = d.0;
             let new_value = d.0 * 1;
-            new_value
+            new_value.into()
         }
 
         // TODO: Not implemented yet, just a fake implementation
@@ -272,10 +274,10 @@ pub mod new_proposal {
 
     impl<'a> AccelerationManipulator<'a> {
         // TODO: Not implemented yet, just a fake implementation
-        fn convert_acceleration_to_word(d: Acceleration, _p: MechanicalProperties) -> u16 {
+        fn convert_acceleration_to_word(d: Acceleration, _p: MechanicalProperties) -> Word16 {
             let value = d.0;
             let new_value = d.0 * 1;
-            new_value
+            new_value.into()
         }
 
         // TODO: Not implemented yet, just a fake implementation
@@ -302,6 +304,54 @@ pub mod new_proposal {
             response
         }
     }
+
+    /*
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //      ActivationState
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
+
+    pub enum ActivationState {
+        Activated,
+        Deactivated,
+    };
+
+    pub struct ActivationStateManipulator<'a> {
+        pub transport: &'a TransportLayer,
+        pub address: BitAddress,
+    }
+
+    impl<'a> ActivationStateManipulator<'a> {
+        // TODO: Not implemented yet, just a fake implementation
+        fn convert_acceleration_to_word(d: ActivationState) -> u16 {
+            d
+        }
+
+        // TODO: Not implemented yet, just a fake implementation
+        fn convert_word_to_acceleration(word: Word16, _p: MechanicalProperties) -> Acceleration {
+            let new_value = Acceleration(word.into());
+            new_value
+        }
+
+        pub fn set(&self, value: Acceleration) -> Result<Status, TLError> {
+            let properties = self.transport.mechanical_properties;
+            let word_value = Self::convert_acceleration_to_word(value, properties);
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            datalink.set_word16(word_value.into(), word_address.into())
+        }
+
+        pub fn get(&self) -> Result<Acceleration, TLError> {
+            let properties = self.transport.mechanical_properties;
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            let response = datalink
+                .get_word16(word_address.into())
+                .map(|word| Self::convert_word_to_acceleration(word, properties));
+            response
+        }
+    }*/
 }
 
 pub struct SafeDatalink<'a> {
