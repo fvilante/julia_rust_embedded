@@ -1,7 +1,7 @@
 use heapless::Deque;
 use lib_1::protocol::{
     datalink::{
-        datalink::{DLError, Datalink},
+        datalink::{DLError, Datalink, Word16},
         decoder::{Decoder, DecodingError},
         frame::Frame,
         prelude::StartByte,
@@ -12,6 +12,7 @@ use lib_1::protocol::{
         transport_layer::{
             self,
             cmpp_value::{self, MechanicalProperties},
+            new_proposal::Displacement,
             TLError, TransportLayer,
         },
     },
@@ -79,6 +80,27 @@ fn test_cmpp() {
     }
 }
 
+fn panic_error_message(error: TLError) -> () {
+    match error {
+        TLError::PacoteDeRetornoComErro(_) => {
+            panic!("Pacote recebido com NACK")
+        }
+        TLError::DLError(datalink_error) => match datalink_error {
+            DLError::InvalidChannel(_) => panic!("InvalidChannel"),
+            DLError::SerialTransmissionTimeedOut(_) => {
+                panic!("SerialTransmissionError")
+            }
+            DLError::DecodingError(_) => panic!("DecodingError"),
+            DLError::Timeout(_) => panic!("Timeout"),
+            DLError::SerialReceptionError => panic!("SerialReceptionError"),
+            DLError::SlaveHasReturnedStartByteAsNeitherAckNorNack => {
+                panic!("SlaveHasReturnedStartByteAsNeitherAckNorNack")
+            }
+            DLError::SlaveHasReturnedNack(_) => panic!("SlaveHasReturnedNack"),
+        },
+    }
+}
+
 pub fn development_entry_point() -> ! {
     lcd::lcd_initialize();
     lcd::print("Juca kifuri");
@@ -113,43 +135,38 @@ pub fn development_entry_point() -> ! {
 
     let transport = TransportLayer::new(datalink, mechanical_properties);
 
-    let wadds = 0..0xFF;
-
-    let mut buffer: [u16; 0xFF] = [0; 0xFF];
-
     lcd::clear();
-    lcd::print("Lendo. ");
+    lcd::print("Lendo posicao inicial. ");
 
-    for wadd in wadds {
-        let response = transport.safe_datalink().get_word16(wadd.into());
+    let _status = transport
+        .posicao_inicial()
+        .set(Displacement(0x200))
+        .map_err(panic_error_message)
+        .unwrap();
 
-        match response {
-            Ok(word) => {
-                let index = wadd as usize;
-                buffer[index] = word.to_u16();
-            }
-            Err(transport_error) => match transport_error {
-                transport_layer::TLError::PacoteDeRetornoComErro(_) => {
-                    lcd::print("Pacote recebido com NACK")
-                }
-                transport_layer::TLError::DLError(datalink_error) => match datalink_error {
-                    DLError::InvalidChannel(_) => lcd::print("InvalidChannel"),
-                    DLError::SerialTransmissionTimeedOut(_) => {
-                        lcd::print("SerialTransmissionError")
-                    }
-                    DLError::DecodingError(_) => lcd::print("DecodingError"),
-                    DLError::Timeout(_) => lcd::print("Timeout"),
-                    DLError::SerialReceptionError => lcd::print("SerialReceptionError"),
-                    DLError::SlaveHasReturnedStartByteAsNeitherAckNorNack => {
-                        lcd::print("SlaveHasReturnedStartByteAsNeitherAckNorNack")
-                    }
-                    DLError::SlaveHasReturnedNack(_) => lcd::print("SlaveHasReturnedNack"),
-                },
-            },
-        }
+    let value = transport
+        .posicao_inicial()
+        .get()
+        .map_err(panic_error_message)
+        .unwrap();
 
-        //delay_ms(300);
-    }
+    lcd::print_u16_in_hex(value.0);
+
+    //
+
+    let _status = transport
+        .posicao_inicial()
+        .set(Displacement(0x100))
+        .map_err(panic_error_message)
+        .unwrap();
+
+    let value = transport
+        .posicao_inicial()
+        .get()
+        .map_err(panic_error_message)
+        .unwrap();
+
+    lcd::print_u16_in_hex(value.0);
 
     lcd::print("Feito.");
     loop {}

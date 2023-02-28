@@ -7,6 +7,7 @@ use self::{
     cmpp_value::{Bit, MechanicalProperties},
     manipulator::WordSetter,
     memory_map::{BitAddress, WordAddress},
+    new_proposal::{DisplacementManipulator, VelocityManipulator},
 };
 
 pub mod cmpp_value {
@@ -102,6 +103,7 @@ mod memory_map {
     }
 }
 
+/// Transport Layer Error
 #[derive(Debug)]
 pub enum TLError {
     PacoteDeRetornoComErro(PacoteDeRetornoComErro),
@@ -152,6 +154,106 @@ pub mod manipulator {
             self.transport_layer
                 .safe_datalink()
                 .send_bit(cmpp_value, word_address)
+        }
+    }
+}
+
+pub mod new_proposal {
+    use crate::protocol::datalink::datalink::{Status, Word16};
+
+    use super::{
+        cmpp_value::MechanicalProperties, memory_map::WordAddress, TLError, TransportLayer,
+    };
+
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //      DISPLACEMENT
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
+
+    pub struct Displacement(pub u16);
+
+    pub struct DisplacementManipulator<'a> {
+        pub transport: &'a TransportLayer,
+        pub address: WordAddress,
+    }
+
+    impl<'a> DisplacementManipulator<'a> {
+        // TODO: Not implemented yet, just a fake implementation
+        fn convert_displacement_to_word(d: Displacement, _p: MechanicalProperties) -> u16 {
+            let value = d.0;
+            let new_value = d.0 * 1;
+            new_value
+        }
+
+        // TODO: Not implemented yet, just a fake implementation
+        fn convert_word_to_displacement(word: Word16, _p: MechanicalProperties) -> Displacement {
+            let new_value = Displacement(word.into());
+            new_value
+        }
+
+        pub fn set(&self, value: Displacement) -> Result<Status, TLError> {
+            let properties = self.transport.mechanical_properties;
+            let word_value = Self::convert_displacement_to_word(value, properties);
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            datalink.set_word16(word_value.into(), word_address.into())
+        }
+
+        pub fn get(&self) -> Result<Displacement, TLError> {
+            let properties = self.transport.mechanical_properties;
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            let response = datalink
+                .get_word16(word_address.into())
+                .map(|word| Self::convert_word_to_displacement(word, properties));
+            response
+        }
+    }
+
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //      VELOCITY
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
+
+    pub struct Velocity(pub u16);
+
+    pub struct VelocityManipulator<'a> {
+        pub transport: &'a TransportLayer,
+        pub address: WordAddress,
+    }
+
+    impl<'a> VelocityManipulator<'a> {
+        // TODO: Not implemented yet, just a fake implementation
+        fn convert_velocity_to_word(d: Velocity, _p: MechanicalProperties) -> u16 {
+            let value = d.0;
+            let new_value = d.0 * 1;
+            new_value
+        }
+
+        // TODO: Not implemented yet, just a fake implementation
+        fn convert_word_to_velocity(word: Word16, _p: MechanicalProperties) -> Velocity {
+            let new_value = Velocity(word.into());
+            new_value
+        }
+
+        pub fn set(&self, value: Velocity) -> Result<Status, TLError> {
+            let properties = self.transport.mechanical_properties;
+            let word_value = Self::convert_velocity_to_word(value, properties);
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            datalink.set_word16(word_value.into(), word_address.into())
+        }
+
+        pub fn get(&self) -> Result<Velocity, TLError> {
+            let properties = self.transport.mechanical_properties;
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            let response = datalink
+                .get_word16(word_address.into())
+                .map(|word| Self::convert_word_to_velocity(word, properties));
+            response
         }
     }
 }
@@ -231,10 +333,17 @@ impl TransportLayer {
         SafeDatalink::new(&self.datalink)
     }
 
-    pub fn velocidade_de_avanco<'a>(&'a self) -> WordSetter<'a> {
-        WordSetter {
-            transport_layer: &self,
-            memory_map: WordAddress { word_address: 0x50 },
+    pub fn posicao_inicial<'a>(&'a self) -> DisplacementManipulator<'a> {
+        DisplacementManipulator {
+            transport: self,
+            address: 0x50.into(),
+        }
+    }
+
+    pub fn velocidade_de_avanco<'a>(&'a self) -> VelocityManipulator<'a> {
+        VelocityManipulator {
+            transport: self,
+            address: 0x50.into(),
         }
     }
 }

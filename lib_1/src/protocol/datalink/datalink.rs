@@ -244,6 +244,12 @@ impl Into<u16> for Word16 {
     }
 }
 
+impl From<u16> for Word16 {
+    fn from(value: u16) -> Self {
+        Word16::from_u16(value)
+    }
+}
+
 ///////////////////////////////////////////////////////////
 
 /// ByteDeErro is defined according to cmpp's protocol v1 specification. For more details see specification.
