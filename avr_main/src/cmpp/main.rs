@@ -64,24 +64,6 @@ fn test_cmpp() {
     }
 }
 
-/// TODO: I think this code can be removed safely.
-fn teste_dequeue() {
-    let mut queue: Deque<u8, 3> = Deque::new();
-
-    //queue.push_back(1);
-    queue.push_back(2);
-    queue.push_back(3);
-    lcd::print_u8_in_hex(queue.pop_front().unwrap());
-    match queue.push_back(4) {
-        Ok(_) => lcd::print("4o elemento OK"),
-        Err(_) => lcd::print("4o elemento PROBLEMA"),
-    }
-    // queue.push_front(20);
-    lcd::print_u8_in_hex(queue.pop_front().unwrap());
-    lcd::print_u8_in_hex(queue.pop_front().unwrap());
-    lcd::print_u8_in_hex(queue.pop_front().unwrap());
-}
-
 pub fn development_entry_point() -> ! {
     lcd::lcd_initialize();
     lcd::print("Juca kifuri");
