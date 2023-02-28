@@ -1,6 +1,6 @@
 use super::{
     checksum::calc_checksum,
-    datalink::Word16,
+    datalink::word16::Word16,
     encoder::Encoder,
     prelude::{MasterStartByte, SlaveStartByte, StartByte},
 };

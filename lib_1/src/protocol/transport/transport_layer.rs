@@ -1,6 +1,6 @@
 use crate::protocol::datalink::datalink::{
-    DLError, Datalink, PacodeDeRetornoDeSolicitacao, PacoteDeRetornoComErro,
-    PacoteDeRetornoDeEnvio, Status, Word16,
+    word16::Word16, DLError, Datalink, PacodeDeRetornoDeSolicitacao, PacoteDeRetornoComErro,
+    PacoteDeRetornoDeEnvio, Status,
 };
 
 use self::{
@@ -111,7 +111,7 @@ pub enum TLError {
 }
 
 pub mod manipulator {
-    use crate::protocol::datalink::datalink::{Status, Word16};
+    use crate::protocol::datalink::datalink::{word16::Word16, Status};
 
     use super::{
         cmpp_value::{self, Bit, IntoCmppValue},
@@ -159,7 +159,7 @@ pub mod manipulator {
 }
 
 pub mod new_proposal {
-    use crate::protocol::datalink::datalink::{Status, Word16};
+    use crate::protocol::datalink::datalink::{word16::Word16, Status};
 
     use super::{
         cmpp_value::MechanicalProperties,
@@ -465,7 +465,7 @@ mod tests {
     use crate::protocol::{
         datalink::datalink::{
             emulated::{lazy_now, loopback_try_rx, smart_try_tx},
-            Word16,
+            word16::Word16,
         },
         transport::{
             channel::Channel,

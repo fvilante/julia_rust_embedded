@@ -1,6 +1,8 @@
 ///////////////////////////////////////////////////////////
 
-use crate::utils::common::{get_bit_at, get_bit_at_as_bool, reset_bit_at, word_to_byte};
+use crate::utils::common::{get_bit_at, get_bit_at_as_bool, reset_bit_at};
+
+use self::word16::Word16;
 
 use super::{
     decoder::{Decoder, DecodingError},
@@ -185,68 +187,72 @@ impl DirectionAndChannel {
     }
 }
 
-///////////////////////////////////////////////////////////
+pub mod word16 {
+    use crate::utils::common::get_bit_at_as_bool;
 
-/// Represents a 16 bits word
-#[derive(Copy, Clone)]
-pub struct Word16 {
-    data: u16,
-}
+    use crate::utils::common::word_to_byte;
 
-impl Word16 {
-    pub fn from_u16(data: u16) -> Self {
-        Self { data }
+    /// Represents a 16 bits word
+    #[derive(Copy, Clone)]
+    pub struct Word16 {
+        pub(crate) data: u16,
     }
 
-    pub fn to_u16(&self) -> u16 {
-        self.data
-    }
+    impl Word16 {
+        pub fn from_u16(data: u16) -> Self {
+            Self { data }
+        }
 
-    /// Constructs a 16 bits word from two bytes
-    pub fn from_bytes(byte_low: u8, byte_high: u8) -> Self {
-        let value: u16 = ((byte_high as u16) * 256) + (byte_low as u16);
-        Self { data: value }
-    }
+        pub fn to_u16(&self) -> u16 {
+            self.data
+        }
 
-    /// Splits the word16 into (byte_low, byte_high)
-    pub fn split_bytes(&self) -> (u8, u8) {
-        word_to_byte(self.data)
-    }
+        /// Constructs a 16 bits word from two bytes
+        pub fn from_bytes(byte_low: u8, byte_high: u8) -> Self {
+            let value: u16 = ((byte_high as u16) * 256) + (byte_low as u16);
+            Self { data: value }
+        }
 
-    pub fn get_byte_low(&self) -> u8 {
-        self.split_bytes().0
-    }
+        /// Splits the word16 into (byte_low, byte_high)
+        pub fn split_bytes(&self) -> (u8, u8) {
+            word_to_byte(self.data)
+        }
 
-    pub fn get_byte_high(&self) -> u8 {
-        self.split_bytes().1
-    }
+        pub fn get_byte_low(&self) -> u8 {
+            self.split_bytes().0
+        }
 
-    /// if `bit position` is outside `0..15` returns None, because Word16 is just 16 bits long.
-    pub fn get_bit_at(&self, position: u8) -> Option<bool> {
-        if position < 16 {
-            if position < 8 {
-                //byte_low
-                Some(get_bit_at_as_bool(self.get_byte_low(), position))
+        pub fn get_byte_high(&self) -> u8 {
+            self.split_bytes().1
+        }
+
+        /// if `bit position` is outside `0..15` returns None, because Word16 is just 16 bits long.
+        pub fn get_bit_at(&self, position: u8) -> Option<bool> {
+            if position < 16 {
+                if position < 8 {
+                    //byte_low
+                    Some(get_bit_at_as_bool(self.get_byte_low(), position))
+                } else {
+                    //byte_high
+                    let position__ = position - 8; // rotate bits
+                    Some(get_bit_at_as_bool(self.get_byte_high(), position__))
+                }
             } else {
-                //byte_high
-                let position__ = position - 8; // rotate bits
-                Some(get_bit_at_as_bool(self.get_byte_high(), position__))
+                None
             }
-        } else {
-            None
         }
     }
-}
 
-impl Into<u16> for Word16 {
-    fn into(self) -> u16 {
-        self.to_u16()
+    impl Into<u16> for Word16 {
+        fn into(self) -> u16 {
+            self.to_u16()
+        }
     }
-}
 
-impl From<u16> for Word16 {
-    fn from(value: u16) -> Self {
-        Word16::from_u16(value)
+    impl From<u16> for Word16 {
+        fn from(value: u16) -> Self {
+            Word16::from_u16(value)
+        }
     }
 }
 
@@ -457,7 +463,7 @@ impl Datalink {
         word_value: u16,
     ) -> Encoder {
         let start_byte = StartByte::STX;
-        let (byte_low, byte_high) = Word16::from_u16(word_value).split_bytes();
+        let (byte_low, byte_high) = word16::Word16::from_u16(word_value).split_bytes();
         let direction_and_channel: u8 = channel.to_u8() + direction as u8;
         let payload: Payload = [direction_and_channel, word_address, byte_low, byte_high].into();
         let frame = Frame::new(start_byte, payload);

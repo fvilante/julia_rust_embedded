@@ -1,4 +1,4 @@
-use crate::protocol::datalink::datalink::Word16;
+use crate::protocol::datalink::datalink::word16::{self, Word16};
 use crate::protocol::datalink::frame::Payload;
 use crate::protocol::datalink::{frame::Frame, prelude::StartByte};
 

@@ -1,7 +1,7 @@
 use heapless::Deque;
 use lib_1::protocol::{
     datalink::{
-        datalink::{DLError, Datalink, Word16},
+        datalink::{word16::Word16, DLError, Datalink},
         decoder::{Decoder, DecodingError},
         frame::Frame,
         prelude::StartByte,
