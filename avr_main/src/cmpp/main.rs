@@ -1,14 +1,29 @@
 use heapless::Deque;
-use lib_1::protocol::datalink::{
-    decoder::{Decoder, DecodingError},
-    frame::Frame,
-    prelude::StartByte,
-    transact::{transact, DatalinkError},
+use lib_1::protocol::{
+    datalink::{
+        datalink::{DLError, Datalink},
+        decoder::{Decoder, DecodingError},
+        frame::Frame,
+        prelude::StartByte,
+        transact::{transact, DatalinkError},
+    },
+    transport::{
+        channel::Channel,
+        transport_layer::{
+            self,
+            cmpp_value::{self, MechanicalProperties},
+            TLError, TransportLayer,
+        },
+    },
 };
 
 use crate::{
     board::lcd,
-    microcontroler::{delay::delay_us, serial},
+    microcontroler::{
+        delay::{delay_ms, delay_us},
+        serial,
+        timer::now,
+    },
 };
 
 use super::datalink::concrete_serial::ConcreteSerialPort;
@@ -68,47 +83,72 @@ pub fn development_entry_point() -> ! {
     lcd::lcd_initialize();
     lcd::print("Juca kifuri");
 
-    let frame = Frame::new(StartByte::STX, [0, 0x50, 0, 0].into());
+    let channel = Channel::from_u8(0).unwrap();
+    let now = now;
+    let timeout_ms = 1000; // TODO: Maybe in future be calculated as a function of the connection baud rate
 
-    serial::init(9600);
+    let baud_rate = 9600; // FIX: 2400 is not working, the problem seems to be in the register's port setup configuration
+    let serial = serial::init(baud_rate);
 
-    lcd::print("(A);");
-    for byte in frame.encode() {
-        loop {
-            if let Ok(_) = serial::try_transmit(byte) {
-                break;
-            }
-        }
+    fn try_rx() -> Result<Option<u8>, ()> {
+        Ok(serial::try_receive())
     }
-    lcd::print("(B);");
 
-    let _count: u16 = 0;
+    fn try_tx(byte: u8) -> Option<()> {
+        serial::try_transmit(byte).ok()
+    }
 
-    let mut decoder = Decoder::new();
+    let datalink = Datalink {
+        channel,
+        now,
+        timeout_ms,
+        try_rx,
+        try_tx,
+    };
 
-    loop {
-        if let Some(byte) = serial::try_receive() {
-            match decoder.parse_next(byte) {
-                Ok(res) => {
-                    match res {
-                        Some(_frame) => {
-                            lcd::print("Success");
-                        }
-                        None => {
-                            // processing input
-                        }
+    let mechanical_properties = MechanicalProperties {
+        pulses_per_motor_revolution: 400,
+        linear_displacement_per_tooth_belt: 828,
+    };
+
+    let transport = TransportLayer::new(datalink, mechanical_properties);
+
+    let wadds = 0..0xFF;
+
+    let mut buffer: [u16; 0xFF] = [0; 0xFF];
+
+    lcd::clear();
+    lcd::print("Lendo. ");
+
+    for wadd in wadds {
+        let response = transport.safe_datalink().get_word16(wadd.into());
+
+        match response {
+            Ok(word) => {
+                let index = wadd as usize;
+                buffer[index] = word.to_u16();
+            }
+            Err(transport_error) => match transport_error {
+                transport_layer::TLError::PacoteDeRetornoComErro(_) => {
+                    lcd::print("Pacote recebido com NACK")
+                }
+                transport_layer::TLError::DLError(datalink_error) => match datalink_error {
+                    DLError::InvalidChannel(_) => lcd::print("InvalidChannel"),
+                    DLError::SerialTransmissionError => lcd::print("SerialTransmissionError"),
+                    DLError::DecodingError(_) => lcd::print("DecodingError"),
+                    DLError::Timeout(_) => lcd::print("Timeout"),
+                    DLError::SerialReceptionError => lcd::print("SerialReceptionError"),
+                    DLError::SlaveHasReturnedStartByteAsNeitherAckNorNack => {
+                        lcd::print("SlaveHasReturnedStartByteAsNeitherAckNorNack")
                     }
-                }
-                Err(_error) => {
-                    lcd::print("Error");
-                }
-            }
+                    DLError::SlaveHasReturnedNack(_) => lcd::print("SlaveHasReturnedNack"),
+                },
+            },
         }
+
+        //delay_ms(300);
     }
 
-    //crate::microcontroler::serial::development_entry_point();
-
-    //test_cmpp();
-
+    lcd::print("Feito.");
     loop {}
 }

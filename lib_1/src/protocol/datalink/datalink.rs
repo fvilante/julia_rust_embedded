@@ -427,6 +427,8 @@ pub struct Datalink {
     /// TODO: Study to change this to u8 to reduce memory footprint
     pub timeout_ms: u16,
     /// None if some error happened
+    /// TODO: When possible change this return type to Result<(), (transmission_error, byte_not_been_transmitted)> or something similar
+    /// TODO: Change name to try_receive
     pub try_tx: fn(u8) -> Option<()>,
     /// Ok_None if nothing to receive, Err if some error happened, Ok_Some if a byte has been received
     pub try_rx: fn() -> Result<Option<u8>, ()>,
@@ -455,11 +457,22 @@ impl Datalink {
     }
 
     fn transmit(&self, encoded_data: Encoder) -> Result<(), DLError> {
-        let send_byte = (self.try_tx);
+        let now = (self.now);
+        let start_time = now();
+        let timeout = self.timeout_ms;
+        let try_tx = (self.try_tx);
         for byte in encoded_data {
-            if let None = send_byte(byte) {
-                return Err(DLError::SerialTransmissionError);
-            };
+            loop {
+                if let Some(_) = try_tx(byte) {
+                    break;
+                } else {
+                    // test for timeout
+                    let time_elapsed = now() - start_time;
+                    if time_elapsed > (self.timeout_ms as u64) {
+                        return Err(DLError::SerialTransmissionError);
+                    }
+                };
+            }
         }
         Ok(())
     }

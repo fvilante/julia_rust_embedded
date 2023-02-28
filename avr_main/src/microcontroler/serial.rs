@@ -26,6 +26,8 @@ pub fn transmit(byte: u8) {
 }
 
 /// Non-blocking transmission of one byte and OK, or if not ready to transmit yet return Err
+/// NOTE: Pay attention the Err does not represent an error, but that transmission could not be performed yet,
+/// and that you may try send the same byte a few moment later.
 pub fn try_transmit(byte: u8) -> Result<(), ()> {
     serial::try_transmit(byte)
 }

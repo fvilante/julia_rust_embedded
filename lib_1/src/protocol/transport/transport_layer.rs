@@ -9,13 +9,13 @@ use self::{
     memory_map::{BitAddress, WordAddress},
 };
 
-mod cmpp_value {
+pub mod cmpp_value {
     use super::memory_map;
 
     #[derive(Clone, Copy)]
     pub struct MechanicalProperties {
         pub pulses_per_motor_revolution: u16,
-        pub linear_displacement_per_tooth_belt: u16,
+        pub linear_displacement_per_tooth_belt: u16, // unit centh of milimeter
     }
 
     pub trait IntoCmppValue<T> {
@@ -156,7 +156,7 @@ pub mod manipulator {
     }
 }
 
-struct SafeDatalink<'a> {
+pub struct SafeDatalink<'a> {
     datalink: &'a Datalink,
 }
 
@@ -214,17 +214,24 @@ pub struct TransportLayer {
 }
 
 impl TransportLayer {
-    fn get_mechanical_properties(&self) -> MechanicalProperties {
+    pub fn new(datalink: Datalink, mechanical_properties: MechanicalProperties) -> Self {
+        Self {
+            datalink,
+            mechanical_properties,
+        }
+    }
+
+    pub fn get_mechanical_properties(&self) -> MechanicalProperties {
         self.mechanical_properties
     }
 
     // Primitives in relation to datalink
 
-    fn safe_datalink<'a>(&'a self) -> SafeDatalink<'a> {
+    pub fn safe_datalink<'a>(&'a self) -> SafeDatalink<'a> {
         SafeDatalink::new(&self.datalink)
     }
 
-    fn velocidade_de_avanco<'a>(&'a self) -> WordSetter<'a> {
+    pub fn velocidade_de_avanco<'a>(&'a self) -> WordSetter<'a> {
         WordSetter {
             transport_layer: &self,
             memory_map: WordAddress { word_address: 0x50 },

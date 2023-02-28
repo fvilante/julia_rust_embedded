@@ -26,7 +26,7 @@ impl Channel {
     /// SAFETY: If given number is betweeen 0 and Self::MAX_Channels (inclusive, exclusivve) then
     /// it is safe to call this function. Always when possible prefer to call Self::from_u8 instead
     /// of this function
-    pub(self) unsafe fn from_u8_unchecked(number: u8) -> Self {
+    unsafe fn from_u8_unchecked(number: u8) -> Self {
         Self {
             number: number.clamp(0, Self::MAX_CHANNELS - 1),
         }
