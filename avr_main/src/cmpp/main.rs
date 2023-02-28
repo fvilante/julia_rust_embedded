@@ -134,7 +134,9 @@ pub fn development_entry_point() -> ! {
                 }
                 transport_layer::TLError::DLError(datalink_error) => match datalink_error {
                     DLError::InvalidChannel(_) => lcd::print("InvalidChannel"),
-                    DLError::SerialTransmissionError => lcd::print("SerialTransmissionError"),
+                    DLError::SerialTransmissionTimeedOut(_) => {
+                        lcd::print("SerialTransmissionError")
+                    }
                     DLError::DecodingError(_) => lcd::print("DecodingError"),
                     DLError::Timeout(_) => lcd::print("Timeout"),
                     DLError::SerialReceptionError => lcd::print("SerialReceptionError"),

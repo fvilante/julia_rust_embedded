@@ -19,8 +19,10 @@ use super::super::transport::channel::Channel;
 pub enum DLError {
     /// Channel number must be between range 0..64 (inclusive, exclusive)
     InvalidChannel(u8),
-    /// Low level (byte-level), serial TX function failed
-    SerialTransmissionError,
+    /// Low level (byte-level), this error means serial TX function timed out while transmitting data
+    /// Normally this error is associated to the serial driver used underneath
+    /// The parameter is the elapsed time out in miliseconds
+    SerialTransmissionTimeedOut(u64),
     /// The incomming byte stream from slave does not obey the right syntax of the protocol or the checksum is wrong
     DecodingError(DecodingError),
     /// Timeout error (cannot wait response forever!)
@@ -426,8 +428,9 @@ pub struct Datalink {
     ///timeout in miliseconds
     /// TODO: Study to change this to u8 to reduce memory footprint
     pub timeout_ms: u16,
-    /// None if some error happened
-    /// TODO: When possible change this return type to Result<(), (transmission_error, byte_not_been_transmitted)> or something similar
+    /// None if no error happened but byte could not be transmitted (for example buffer full)
+    /// NOTE:
+    /// TODO: When possible change this return type to Result<Option<byte_transmited>, (transmission_error, byte_not_been_transmitted)> or something similar
     /// TODO: Change name to try_receive
     pub try_tx: fn(u8) -> Option<()>,
     /// Ok_None if nothing to receive, Err if some error happened, Ok_Some if a byte has been received
@@ -469,7 +472,7 @@ impl Datalink {
                     // test for timeout
                     let time_elapsed = now() - start_time;
                     if time_elapsed > (self.timeout_ms as u64) {
-                        return Err(DLError::SerialTransmissionError);
+                        return Err(DLError::SerialTransmissionTimeedOut(time_elapsed));
                     }
                 };
             }
@@ -895,7 +898,7 @@ mod tests {
                 DLError::InvalidChannel(channel) => {
                     assert!(false, "InvalidChannel");
                 }
-                DLError::SerialTransmissionError => {
+                DLError::SerialTransmissionTimeedOut => {
                     assert!(false, "SerialTransmissionError");
                 }
                 DLError::DecodingError(segment_error) => {
