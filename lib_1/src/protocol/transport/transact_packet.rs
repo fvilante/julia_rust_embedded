@@ -15,13 +15,9 @@ pub fn transact_packet(
     delay_us: DelayFn,
 ) -> Result<DatalinkResult, TransportError> {
     let normalize_error = |datalink_error| TransportError::DatalinkError(datalink_error);
-    let transact_frame = |frame| {
-        let response = transact(frame, connection, timeout_us, delay_us);
-        response.map_err(normalize_error)
-    };
-    make_frame(channel, cmpp_mmesage)
-        .map(transact_frame)
-        .flatten()
+    let frame = make_frame(channel, cmpp_mmesage);
+    let response = transact(frame, connection, timeout_us, delay_us).map_err(normalize_error);
+    response
 }
 
 #[cfg(test)]

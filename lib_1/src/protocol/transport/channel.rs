@@ -9,11 +9,11 @@ impl Channel {
     const MAX_CHANNELS: u8 = 64;
 
     /// Creates a cmpp Channel from an 8 bits byte
-    pub fn from_u8(number: u8) -> Result<Channel, ()> {
+    pub fn from_u8(number: u8) -> Result<Channel, DLError> {
         match number {
             0..Self::MAX_CHANNELS => Ok(Self { number }),
 
-            _ => Err(()),
+            _ => Err(DLError::InvalidChannel(number)),
         }
     }
 

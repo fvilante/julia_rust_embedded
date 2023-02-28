@@ -22,7 +22,7 @@ pub enum CmppMessage {
     ResetBitmask { waddr: WordAddress, bitmask: u16 },
 }
 
-fn make_payload(channel: Channel, message: CmppMessage) -> Result<Payload, TransportError> {
+fn make_payload(channel: Channel, message: CmppMessage) -> Payload {
     let [direction, waddr, byte_low, byte_high] = match message {
         CmppMessage::GetWord { waddr } => [Direction::GetWord as u8, waddr, 0x00, 0x00],
 
@@ -42,18 +42,17 @@ fn make_payload(channel: Channel, message: CmppMessage) -> Result<Payload, Trans
         }
     };
 
-    let payload = [channel.to_u8() + direction, waddr, byte_low, byte_high].into();
-
-    Ok(payload)
+    [channel.to_u8() + direction, waddr, byte_low, byte_high].into()
 }
 
-pub fn make_frame(channel: Channel, message: CmppMessage) -> Result<Frame, TransportError> {
+pub fn make_frame(channel: Channel, message: CmppMessage) -> Frame {
     let start_byte = StartByte::STX;
     let payload = make_payload(channel, message);
-    payload.map(|payload| Frame {
+    let frame = Frame {
         start_byte,
         payload,
-    })
+    };
+    frame
 }
 
 #[cfg(test)]
