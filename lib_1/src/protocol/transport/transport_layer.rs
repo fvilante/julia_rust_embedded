@@ -195,21 +195,21 @@ pub mod new_proposal {
 
     impl<'a> DisplacementManipulator<'a> {
         // TODO: Not implemented yet, just a fake implementation
-        fn convert_displacement_to_word(d: Displacement, _p: MechanicalProperties) -> Word16 {
+        fn convert_to_cmpp(d: Displacement, _p: MechanicalProperties) -> Word16 {
             let value = d.0;
             let new_value = d.0 * 1;
             new_value.into()
         }
 
         // TODO: Not implemented yet, just a fake implementation
-        fn convert_word_to_displacement(word: Word16, _p: MechanicalProperties) -> Displacement {
+        fn convert_from_cmpp(word: Word16, _p: MechanicalProperties) -> Displacement {
             let new_value = Displacement(word.into());
             new_value
         }
 
         pub fn set(&self, value: Displacement) -> Result<Status, TLError> {
             let properties = self.transport.mechanical_properties;
-            let word_value = Self::convert_displacement_to_word(value, properties);
+            let word_value = Self::convert_to_cmpp(value, properties);
             let datalink = self.transport.safe_datalink();
             let word_address = self.address.word_address;
             datalink.set_word16(word_value, word_address.into())
@@ -221,7 +221,7 @@ pub mod new_proposal {
             let word_address = self.address.word_address;
             let response = datalink
                 .get_word16(word_address.into())
-                .map(|word| Self::convert_word_to_displacement(word, properties));
+                .map(|word| Self::convert_from_cmpp(word, properties));
             response
         }
     }
@@ -241,21 +241,21 @@ pub mod new_proposal {
 
     impl<'a> VelocityManipulator<'a> {
         // TODO: Not implemented yet, just a fake implementation
-        fn convert_velocity_to_word(d: Velocity, _p: MechanicalProperties) -> Word16 {
+        fn convert_to_cmpp(d: Velocity, _p: MechanicalProperties) -> Word16 {
             let value = d.0;
             let new_value = d.0 * 1;
             new_value.into()
         }
 
         // TODO: Not implemented yet, just a fake implementation
-        fn convert_word_to_velocity(word: Word16, _p: MechanicalProperties) -> Velocity {
+        fn convert_from_cmpp(word: Word16, _p: MechanicalProperties) -> Velocity {
             let new_value = Velocity(word.into());
             new_value
         }
 
         pub fn set(&self, value: Velocity) -> Result<Status, TLError> {
             let properties = self.transport.mechanical_properties;
-            let word_value = Self::convert_velocity_to_word(value, properties);
+            let word_value = Self::convert_to_cmpp(value, properties);
             let datalink = self.transport.safe_datalink();
             let word_address = self.address.word_address;
             datalink.set_word16(word_value.into(), word_address.into())
@@ -267,7 +267,7 @@ pub mod new_proposal {
             let word_address = self.address.word_address;
             let response = datalink
                 .get_word16(word_address.into())
-                .map(|word| Self::convert_word_to_velocity(word, properties));
+                .map(|word| Self::convert_from_cmpp(word, properties));
             response
         }
     }
@@ -287,21 +287,21 @@ pub mod new_proposal {
 
     impl<'a> AccelerationManipulator<'a> {
         // TODO: Not implemented yet, just a fake implementation
-        fn convert_acceleration_to_word(d: Acceleration, _p: MechanicalProperties) -> Word16 {
+        fn convert_to_cmpp(d: Acceleration, _p: MechanicalProperties) -> Word16 {
             let value = d.0;
             let new_value = d.0 * 1;
             new_value.into()
         }
 
         // TODO: Not implemented yet, just a fake implementation
-        fn convert_word_to_acceleration(word: Word16, _p: MechanicalProperties) -> Acceleration {
+        fn convert_from_cmpp(word: Word16, _p: MechanicalProperties) -> Acceleration {
             let new_value = Acceleration(word.into());
             new_value
         }
 
         pub fn set(&self, value: Acceleration) -> Result<Status, TLError> {
             let properties = self.transport.mechanical_properties;
-            let word_value = Self::convert_acceleration_to_word(value, properties);
+            let word_value = Self::convert_to_cmpp(value, properties);
             let datalink = self.transport.safe_datalink();
             let word_address = self.address.word_address;
             datalink.set_word16(word_value.into(), word_address.into())
@@ -313,7 +313,7 @@ pub mod new_proposal {
             let word_address = self.address.word_address;
             let response = datalink
                 .get_word16(word_address.into())
-                .map(|word| Self::convert_word_to_acceleration(word, properties));
+                .map(|word| Self::convert_from_cmpp(word, properties));
             response
         }
     }
@@ -354,13 +354,11 @@ pub mod new_proposal {
     }
 
     impl<'a> ActivationStateManipulator<'a> {
-        // TODO: Not implemented yet, just a fake implementation
         fn convert_to_cmpp(value: ActivationState) -> Bit {
             let bit = value.into();
             Bit(bit)
         }
 
-        // TODO: Not implemented yet, just a fake implementation
         fn convert_from_cmpp(bit: Bit) -> ActivationState {
             bit.0.into()
         }
