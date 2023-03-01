@@ -171,6 +171,9 @@ pub mod manipulator {
     }
 }
 
+/// TODO: When possible refactor to abstract and generalize Manipulators. You shoul also
+/// refactor the concept of bitwise manipulation used inside Word16 as a consequence. Se also
+/// BitPosition type `todo` notes.
 pub mod new_proposal {
     use crate::protocol::datalink::datalink::{word16::Word16, Status};
 
