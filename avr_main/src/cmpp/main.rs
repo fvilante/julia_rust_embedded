@@ -58,7 +58,7 @@ pub fn development_entry_point() {
         serial::try_transmit(byte).ok()
     }
 
-    let datalink = Datalink {
+    let datalink = &Datalink {
         channel,
         now,
         timeout_ms,

@@ -133,7 +133,7 @@ pub mod manipulator {
     };
 
     pub struct WordSetter<'a> {
-        pub transport_layer: &'a TransportLayer,
+        pub transport_layer: &'a TransportLayer<'a>,
         pub memory_map: WordAddress,
     }
 
@@ -152,7 +152,7 @@ pub mod manipulator {
     }
 
     pub struct BitSetter<'a> {
-        transport_layer: &'a TransportLayer,
+        transport_layer: &'a TransportLayer<'a>,
         memory_map: BitAddress,
     }
 
@@ -192,7 +192,7 @@ pub mod new_proposal {
     pub struct Displacement(pub u16);
 
     pub struct DisplacementManipulator<'a> {
-        pub transport: &'a TransportLayer,
+        pub transport: &'a TransportLayer<'a>,
         pub address: WordAddress,
     }
 
@@ -238,7 +238,7 @@ pub mod new_proposal {
     pub struct Velocity(pub u16);
 
     pub struct VelocityManipulator<'a> {
-        pub transport: &'a TransportLayer,
+        pub transport: &'a TransportLayer<'a>,
         pub address: WordAddress,
     }
 
@@ -284,7 +284,7 @@ pub mod new_proposal {
     pub struct Acceleration(pub u16);
 
     pub struct AccelerationManipulator<'a> {
-        pub transport: &'a TransportLayer,
+        pub transport: &'a TransportLayer<'a>,
         pub address: WordAddress,
     }
 
@@ -352,7 +352,7 @@ pub mod new_proposal {
     }
 
     pub struct ActivationStateManipulator<'a> {
-        pub transport: &'a TransportLayer,
+        pub transport: &'a TransportLayer<'a>,
         pub address: BitAddress,
     }
 
@@ -407,6 +407,7 @@ pub mod new_proposal {
     }
 }
 
+/// TODO: Rename to `DatalinkUtilities`
 pub struct SafeDatalink<'a> {
     datalink: &'a Datalink,
 }
@@ -459,13 +460,13 @@ impl<'a> SafeDatalink<'a> {
     }
 }
 
-pub struct TransportLayer {
-    datalink: Datalink,
+pub struct TransportLayer<'a> {
+    datalink: &'a Datalink,
     mechanical_properties: MechanicalProperties,
 }
 
-impl TransportLayer {
-    pub fn new(datalink: Datalink, mechanical_properties: MechanicalProperties) -> Self {
+impl<'a> TransportLayer<'a> {
+    pub fn new(datalink: &'a Datalink, mechanical_properties: MechanicalProperties) -> Self {
         Self {
             datalink,
             mechanical_properties,
@@ -478,32 +479,32 @@ impl TransportLayer {
 
     // Primitives in relation to datalink
 
-    pub fn safe_datalink<'a>(&'a self) -> SafeDatalink<'a> {
+    pub fn safe_datalink(&self) -> SafeDatalink<'a> {
         SafeDatalink::new(&self.datalink)
     }
 
-    pub fn posicao_inicial<'a>(&'a self) -> DisplacementManipulator<'a> {
+    pub fn posicao_inicial(&self) -> DisplacementManipulator {
         DisplacementManipulator {
             transport: self,
             address: 0x50.into(),
         }
     }
 
-    pub fn velocidade_de_avanco<'a>(&'a self) -> VelocityManipulator<'a> {
+    pub fn velocidade_de_avanco(&self) -> VelocityManipulator {
         VelocityManipulator {
             transport: self,
             address: 0x50.into(),
         }
     }
 
-    pub fn aceleracao_de_avanco<'a>(&'a self) -> AccelerationManipulator<'a> {
+    pub fn aceleracao_de_avanco(&self) -> AccelerationManipulator {
         AccelerationManipulator {
             transport: self,
             address: 0x50.into(),
         }
     }
 
-    pub fn start_automatico_no_avanco<'a>(&'a self) -> ActivationStateManipulator<'a> {
+    pub fn start_automatico_no_avanco(&self) -> ActivationStateManipulator {
         ActivationStateManipulator {
             transport: self,
             address: BitAddress {
@@ -546,7 +547,7 @@ mod tests {
     #[test]
     fn it_can_transact_something() {
         // setup
-        let datalink = Datalink {
+        let datalink = &Datalink {
             channel: Channel::from_u8(1).unwrap(),
             timeout_ms: 1000,
             try_tx: smart_try_tx,
@@ -575,7 +576,7 @@ mod tests {
     #[test]
     fn it_can_transact_something_using_manipulator() {
         // setup
-        let datalink = Datalink {
+        let datalink = &Datalink {
             channel: Channel::from_u8(1).unwrap(),
             timeout_ms: 1000,
             try_tx: smart_try_tx,
