@@ -6,8 +6,11 @@ use crate::protocol::datalink::datalink::{
 use self::{
     cmpp_value::{Bit, MechanicalProperties},
     manipulator::WordSetter,
-    memory_map::{BitAddress, WordAddress},
-    new_proposal::{AccelerationManipulator, DisplacementManipulator, VelocityManipulator},
+    memory_map::{BitAddress, BitPosition, WordAddress},
+    new_proposal::{
+        AccelerationManipulator, ActivationStateManipulator, DisplacementManipulator,
+        VelocityManipulator,
+    },
 };
 
 pub mod cmpp_value {
@@ -29,6 +32,16 @@ pub mod cmpp_value {
     impl Into<bool> for Bit {
         fn into(self) -> bool {
             self.0
+        }
+    }
+
+    impl From<bool> for Bit {
+        fn from(value: bool) -> Self {
+            if value {
+                Bit(true)
+            } else {
+                Bit(false)
+            }
         }
     }
 
@@ -162,8 +175,8 @@ pub mod new_proposal {
     use crate::protocol::datalink::datalink::{word16::Word16, Status};
 
     use super::{
-        cmpp_value::MechanicalProperties,
-        memory_map::{BitAddress, WordAddress},
+        cmpp_value::{Bit, MechanicalProperties},
+        memory_map::{BitAddress, BitPosition, WordAddress},
         TLError, TransportLayer,
     };
 
@@ -305,17 +318,35 @@ pub mod new_proposal {
         }
     }
 
-    /*
     //  ///////////////////////////////////////////////////////////////////////////////////
     //
     //      ActivationState
     //
     //  ///////////////////////////////////////////////////////////////////////////////////
 
+    #[repr(u8)]
     pub enum ActivationState {
-        Activated,
-        Deactivated,
-    };
+        Activated = 1,
+        Deactivated = 0,
+    }
+
+    impl From<bool> for ActivationState {
+        fn from(value: bool) -> Self {
+            match value {
+                true => ActivationState::Activated,
+                false => ActivationState::Deactivated,
+            }
+        }
+    }
+
+    impl Into<bool> for ActivationState {
+        fn into(self) -> bool {
+            match self {
+                ActivationState::Activated => false,
+                ActivationState::Deactivated => true,
+            }
+        }
+    }
 
     pub struct ActivationStateManipulator<'a> {
         pub transport: &'a TransportLayer,
@@ -324,34 +355,55 @@ pub mod new_proposal {
 
     impl<'a> ActivationStateManipulator<'a> {
         // TODO: Not implemented yet, just a fake implementation
-        fn convert_acceleration_to_word(d: ActivationState) -> u16 {
-            d
+        fn convert_to_cmpp(value: ActivationState) -> Bit {
+            let bit = value.into();
+            Bit(bit)
         }
 
         // TODO: Not implemented yet, just a fake implementation
-        fn convert_word_to_acceleration(word: Word16, _p: MechanicalProperties) -> Acceleration {
-            let new_value = Acceleration(word.into());
-            new_value
+        fn convert_from_cmpp(bit: Bit) -> ActivationState {
+            bit.0.into()
         }
 
-        pub fn set(&self, value: Acceleration) -> Result<Status, TLError> {
-            let properties = self.transport.mechanical_properties;
-            let word_value = Self::convert_acceleration_to_word(value, properties);
-            let datalink = self.transport.safe_datalink();
-            let word_address = self.address.word_address;
-            datalink.set_word16(word_value.into(), word_address.into())
+        pub fn set(&self, value: ActivationState) -> Result<Status, TLError> {
+            let bit = Self::convert_to_cmpp(value);
+            let map = self.address;
+            self.transport.safe_datalink().send_bit(bit, map)
         }
 
-        pub fn get(&self) -> Result<Acceleration, TLError> {
-            let properties = self.transport.mechanical_properties;
+        /// TODO: Check if I would return also the complete Word16 once I have to get it in
+        /// order to get its bit value.
+        pub fn get(&self) -> Result<ActivationState, TLError> {
             let datalink = self.transport.safe_datalink();
             let word_address = self.address.word_address;
-            let response = datalink
-                .get_word16(word_address.into())
-                .map(|word| Self::convert_word_to_acceleration(word, properties));
+            let response = datalink.get_word16(word_address.into()).map(|word| {
+                let p = self.address.bit_position;
+                // TODO: Remove the need for this large match here!
+                let position = match p {
+                    BitPosition::D0 => 0,
+                    BitPosition::D1 => 1,
+                    BitPosition::D2 => 2,
+                    BitPosition::D3 => 3,
+                    BitPosition::D4 => 4,
+                    BitPosition::D5 => 5,
+                    BitPosition::D6 => 6,
+                    BitPosition::D7 => 7,
+                    BitPosition::D8 => 8,
+                    BitPosition::D9 => 9,
+                    BitPosition::D10 => 10,
+                    BitPosition::D11 => 11,
+                    BitPosition::D12 => 12,
+                    BitPosition::D13 => 13,
+                    BitPosition::D14 => 14,
+                    BitPosition::D15 => 15,
+                };
+                let bit = word.get_bit_at(position).unwrap();
+                let value = Self::convert_from_cmpp(bit.into());
+                value
+            });
             response
         }
-    }*/
+    }
 }
 
 pub struct SafeDatalink<'a> {
@@ -447,6 +499,16 @@ impl TransportLayer {
         AccelerationManipulator {
             transport: self,
             address: 0x50.into(),
+        }
+    }
+
+    pub fn start_automatico_no_avanco<'a>(&'a self) -> ActivationStateManipulator<'a> {
+        ActivationStateManipulator {
+            transport: self,
+            address: BitAddress {
+                word_address: 0x60.into(),
+                bit_position: BitPosition::D0,
+            },
         }
     }
 }

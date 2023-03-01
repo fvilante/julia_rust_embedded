@@ -190,6 +190,7 @@ impl DirectionAndChannel {
 pub mod word16 {
     use crate::utils::common::get_bit_at_as_bool;
 
+    use crate::utils::common::set_bit_at;
     use crate::utils::common::word_to_byte;
 
     /// Represents a 16 bits word
@@ -226,7 +227,12 @@ pub mod word16 {
             self.split_bytes().1
         }
 
+        /// Gets a particular bit.
+        ///
         /// if `bit position` is outside `0..15` returns None, because Word16 is just 16 bits long.
+        /// TODO: Make position an enum and change the return type from Option<bool> to bool
+        /// TODO: Make an utility module that is generic in relation of the type of bit to set
+        /// for example: Bitwise<u8> Bitwise<u16>
         pub fn get_bit_at(&self, position: u8) -> Option<bool> {
             if position < 16 {
                 if position < 8 {
@@ -237,6 +243,28 @@ pub mod word16 {
                     let position__ = position - 8; // rotate bits
                     Some(get_bit_at_as_bool(self.get_byte_high(), position__))
                 }
+            } else {
+                None
+            }
+        }
+
+        /// Sets a particular bit.
+        ///
+        /// TODO: Make position an enum and change the return type from Option<Self> to Self
+        /// TODO: Make an utility module that is generic in relation of the type of bit to set
+        /// for example: Bitwise<u8> Bitwise<u16>
+        pub fn set_bit_at(&self, position: u8) -> Option<Self> {
+            if position < 16 {
+                let (mut byte_low, mut byte_high) = self.split_bytes();
+                if position < 8 {
+                    //byte_low
+                    byte_low = set_bit_at(byte_low, position);
+                } else {
+                    //byte_high
+                    let position__ = position - 8; // rotate bits
+                    byte_high = set_bit_at(byte_high, position__);
+                }
+                Some(Self::from_bytes(byte_low, byte_high))
             } else {
                 None
             }
