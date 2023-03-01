@@ -10,35 +10,38 @@ use lib_1::protocol::{
 
 use crate::{
     board::lcd,
-    microcontroler::{serial, timer::now},
+    microcontroler::{delay::delay_ms, serial, timer::now},
 };
 
 use lib_1::types::serial_connection::SerialConnection;
 
 fn panic_error_message(error: TLError) -> () {
-    match error {
-        TLError::PacoteDeRetornoComErro(_) => {
-            panic!("Pacote recebido com NACK")
-        }
-        TLError::DLError(datalink_error) => match datalink_error {
-            DLError::InvalidChannel(_) => panic!("InvalidChannel"),
-            DLError::SerialTransmissionTimeedOut(_) => {
-                panic!("SerialTransmissionError")
-            }
-            DLError::DecodingError(_) => panic!("DecodingError"),
-            DLError::Timeout(_) => panic!("Timeout"),
-            DLError::SerialReceptionError => panic!("SerialReceptionError"),
-            DLError::SlaveHasReturnedStartByteAsNeitherAckNorNack => {
-                panic!("SlaveHasReturnedStartByteAsNeitherAckNorNack")
-            }
-            DLError::SlaveHasReturnedNack(_) => panic!("SlaveHasReturnedNack"),
-        },
-    }
+    panic!("TLErr");
+    //match error {
+    //    TLError::PacoteDeRetornoComErro(_) => {
+    //        panic!("Pacote recebido com NACK")
+    //    }
+    //    TLError::DLError(datalink_error) => match datalink_error {
+    //        DLError::InvalidChannel(_) => panic!("InvalidChannel"),
+    //        DLError::SerialTransmissionTimeedOut(_) => {
+    //            panic!("SerialTransmissionError")
+    //        }
+    //        DLError::DecodingError(_) => panic!("DecodingError"),
+    //        DLError::Timeout(_) => panic!("Timeout"),
+    //        DLError::SerialReceptionError => panic!("SerialReceptionError"),
+    //        DLError::SlaveHasReturnedStartByteAsNeitherAckNorNack => {
+    //            panic!("SlaveHasReturnedStartByteAsNeitherAckNorNack")
+    //        }
+    //        DLError::SlaveHasReturnedNack(_) => panic!("SlaveHasReturnedNack"),
+    //    },
+    //}
 }
 
-pub fn development_entry_point() -> ! {
+pub fn development_entry_point() {
     lcd::lcd_initialize();
-    lcd::print("Juca kifuri");
+
+    lcd::clear();
+    lcd::print("Ini");
 
     let channel = Channel::from_u8(0).unwrap();
     let now = now;
@@ -70,9 +73,6 @@ pub fn development_entry_point() -> ! {
 
     let transport = TransportLayer::new(datalink, mechanical_properties);
 
-    lcd::clear();
-    lcd::print("Lendo posicao inicial. ");
-
     let _status = transport
         .posicao_inicial()
         .set(Displacement(0x200))
@@ -103,6 +103,7 @@ pub fn development_entry_point() -> ! {
 
     lcd::print_u16_in_hex(value.0);
 
-    lcd::print("Feito.");
-    loop {}
+    lcd::print("Fim");
+
+    delay_ms(4000);
 }
