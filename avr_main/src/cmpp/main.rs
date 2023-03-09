@@ -1,5 +1,5 @@
 use lib_1::protocol::{
-    datalink::datalink::{DLError, Datalink},
+    datalink::datalink::Datalink,
     transport::{
         channel::Channel,
         transport_layer::{
@@ -15,7 +15,7 @@ use crate::{
 
 use lib_1::types::serial_connection::SerialConnection;
 
-fn panic_error_message(error: TLError) -> () {
+fn panic_error_message(_error: TLError) -> () {
     panic!("TLErr");
     //match error {
     //    TLError::PacoteDeRetornoComErro(_) => {
