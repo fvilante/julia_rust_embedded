@@ -45,9 +45,9 @@ pub fn development_entry_point() {
 
     let channel = Channel::from_u8(0).unwrap();
     let now = now;
-    let timeout_ms = 1000; // TODO: Maybe in future be calculated as a function of the connection baud rate
+    const timeout_ms: u16 = 1000; // TODO: Maybe in future be calculated as a function of the connection baud rate
 
-    let baud_rate = 9600; // FIX: 2400 is not working, the problem seems to be in the register's port setup configuration
+    const baud_rate: u32 = 9600; // FIX: 2400 is not working, the problem seems to be in the register's port setup configuration
     let _serial = serial::init(baud_rate);
 
     fn try_rx() -> Result<Option<u8>, ()> {
@@ -102,7 +102,6 @@ pub fn development_entry_point() {
         .unwrap();
 
     lcd::print_u16_in_hex(value.0);
-
     lcd::print("Fim");
 
     delay_ms(4000);
