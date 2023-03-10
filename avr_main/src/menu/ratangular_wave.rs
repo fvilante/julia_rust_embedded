@@ -3,14 +3,14 @@ use crate::microcontroler::timer::now;
 type X = u16;
 
 /// Generates a non-synchronous assymetric parametrizable retangular wave form
-pub struct RectangularWave<T = X> {
-    up_interval: T,
-    down_interval: T,
+pub struct RectangularWave {
+    up_interval: X,
+    down_interval: X,
     next_time_point: X,
     current_state: bool,
 }
 
-impl RectangularWave<X> {
+impl RectangularWave {
     /// interval in miliseconds
     pub fn new(up_interval: X, down_interval: X) -> Self {
         let initial_state = true;
