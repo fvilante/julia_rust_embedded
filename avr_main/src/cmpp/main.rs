@@ -10,7 +10,7 @@ use lib_1::protocol::{
 
 use crate::{
     board::lcd,
-    microcontroler::{delay::delay_ms, serial, timer::now},
+    microcontroler::{delay::delay_ms, serial, timer},
 };
 
 use lib_1::types::serial_connection::SerialConnection;
@@ -44,7 +44,9 @@ pub fn development_entry_point() {
     lcd::print("Ini");
 
     let channel = Channel::from_u8(0).unwrap();
-    let now = now;
+    fn now() -> u16 {
+        timer::now() as u16
+    }
     const timeout_ms: u16 = 1000; // TODO: Maybe in future be calculated as a function of the connection baud rate
 
     const baud_rate: u32 = 9600; // FIX: 2400 is not working, the problem seems to be in the register's port setup configuration
