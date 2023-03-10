@@ -3,17 +3,19 @@ use crate::board::keyboard::Keypad;
 use crate::microcontroler::delay::delay_ms;
 use crate::microcontroler::timer::now;
 
+type TimePoint = u8;
+
+const DEBOUNCE_TIME: TimePoint = 250; // miliseconds
+
 pub struct Debounce {
-    pub debounce_time: u64,
-    pub last_key_time: u64,
+    pub last_key_time: TimePoint,
     pub last_key: KeyCode,
 }
 
 impl Debounce {
-    pub fn new(debounce_time: u64) -> Self {
+    pub fn new() -> Self {
         Self {
-            debounce_time,
-            last_key_time: now(),
+            last_key_time: now() as TimePoint,
             last_key: KeyCode::NO_KEY,
         }
     }
@@ -26,7 +28,7 @@ impl Debounce {
                 // new key detected
                 // register it
                 self.last_key = current_key;
-                self.last_key_time = now();
+                self.last_key_time = now() as TimePoint;
                 // initial point
                 return Some(current_key);
             } else {
@@ -41,17 +43,17 @@ impl Debounce {
                 // key unpressed
                 // then reset debounce state
                 self.last_key = current_key;
-                self.last_key_time = now();
+                self.last_key_time = now() as TimePoint;
                 return None;
             } else {
                 // last and current key are some
                 if current_and_last_key_are_equal {
                     let has_debounce_time_been_passed =
-                        now() > (self.last_key_time + self.debounce_time);
+                        now() as TimePoint > (self.last_key_time + DEBOUNCE_TIME);
                     if has_debounce_time_been_passed {
                         //TODO: PERFORM repetition code
                         self.last_key = current_key;
-                        self.last_key_time = now();
+                        self.last_key_time = now() as TimePoint;
                         return Some(current_key);
                     } else {
                         return None;
@@ -69,7 +71,6 @@ impl Debounce {
 
 pub struct Keyboard {
     pub keypad: Keypad,
-    pub last_key: KeyCode,
     pub beep: fn(bool),
     pub debouncer: Debounce,
 }
@@ -78,9 +79,8 @@ impl Keyboard {
     pub fn new(beep: fn(on: bool)) -> Self {
         Self {
             keypad: Keypad::new(),
-            last_key: KeyCode::NO_KEY,
             beep,
-            debouncer: Debounce::new(250),
+            debouncer: Debounce::new(),
         }
     }
 
