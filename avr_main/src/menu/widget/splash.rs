@@ -61,7 +61,7 @@ impl State {
 
 pub struct Splash<'a> {
     current_state: State,
-    next_state_time_point: u64,
+    next_state_time_point: u32,
     widget: Option<IWidget<'a>>,
 }
 
@@ -76,7 +76,7 @@ impl<'a> Splash<'a> {
     }
 
     /// gets time interval (in miliseconds) to wait until reach next state
-    fn get_time_to_wait_in(current_state: State) -> u64 {
+    fn get_time_to_wait_in(current_state: State) -> u32 {
         match current_state {
             State::Initial => 0,
             State::BrandName => 2000,

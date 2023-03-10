@@ -49,17 +49,32 @@ pub const fn configure_bit(byte: u8, position: u8, data_bit: bool) -> u8 {
     }
 }
 
-const TABLE: [char; 16] = [
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
-];
+/// SAFETY: Do not call this function with index outside the 0..15 range! Else this function will panic!
+const fn get_char(index: u8) -> char {
+    match index {
+        0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 => {
+            let zero_char: u8 = 48; // ascii code
+            let result = (zero_char + index) as char;
+            result
+        }
+        10 | 11 | 12 | 13 | 14 | 15 => {
+            let letter_a: u8 = 65; // letter 'A' capital
+            let result = (letter_a + index) as char;
+            result
+        }
+        _ => {
+            unreachable!()
+        }
+    }
+}
 
 // NOTE: return folows the order: "Most Significant on Right"
 pub const fn convert_u8_to_str_hex(data: u8) -> (char, char) {
     let low: u8 = data & 0b00001111;
     let high: u8 = (data & 0b11110000) >> 4;
 
-    let low_char = TABLE[low as usize];
-    let high_char = TABLE[high as usize];
+    let low_char = get_char(low);
+    let high_char = get_char(high);
 
     (high_char, low_char)
 }

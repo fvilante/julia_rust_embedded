@@ -1,5 +1,7 @@
 // low-level driver for keypad
 
+use avr_progmem::progmem;
+
 use crate::board::lcd;
 
 use super::{input_expander::InputExpander, output_expander::OutputExpander};
@@ -104,61 +106,61 @@ impl KeyCode {
         }
     }
 
-    // if key is a numerical digit, return its numeric char
-    pub fn as_numerical_char(&self) -> Option<char> {
-        match self {
-            KeyCode::KEY_0 => Some('0'),
-            KeyCode::KEY_1 => Some('1'),
-            KeyCode::KEY_2 => Some('2'),
-            KeyCode::KEY_3 => Some('3'),
-            KeyCode::KEY_4 => Some('4'),
-            KeyCode::KEY_5 => Some('5'),
-            KeyCode::KEY_6 => Some('6'),
-            KeyCode::KEY_7 => Some('7'),
-            KeyCode::KEY_8 => Some('8'),
-            KeyCode::KEY_9 => Some('9'),
-            _ => None,
-        }
-    }
+    // // if key is a numerical digit, return its numeric char
+    // pub fn as_numerical_char(&self) -> Option<char> {
+    //     match self {
+    //         KeyCode::KEY_0 => Some('0'),
+    //         KeyCode::KEY_1 => Some('1'),
+    //         KeyCode::KEY_2 => Some('2'),
+    //         KeyCode::KEY_3 => Some('3'),
+    //         KeyCode::KEY_4 => Some('4'),
+    //         KeyCode::KEY_5 => Some('5'),
+    //         KeyCode::KEY_6 => Some('6'),
+    //         KeyCode::KEY_7 => Some('7'),
+    //         KeyCode::KEY_8 => Some('8'),
+    //         KeyCode::KEY_9 => Some('9'),
+    //         _ => None,
+    //     }
+    // }
 
-    pub fn to_string(&self) -> &'static str {
-        match self {
-            KeyCode::NO_KEY => "NO_KEY",
-            KeyCode::KEY_ENTER => "KEY_ENTER",
-            KeyCode::KEY_ESC => "KEY_ESC",
-            KeyCode::KEY_SETA_BRANCA_ESQUERDA => "KEY_SETA_BRANCA_ESQUERDA",
-            KeyCode::KEY_SETA_BRANCA_DIREITA => "KEY_SETA_BRANCA_DIREITA",
-            KeyCode::KEY_MAIS_OU_MENOS => "KEY_MAIS_OU_MENOS",
-            KeyCode::KEY_PONTO => "KEY_PONTO",
-            KeyCode::KEY_0 => "KEY_0",
-            KeyCode::KEY_1 => "KEY_1",
-            KeyCode::KEY_2 => "KEY_2",
-            KeyCode::KEY_3 => "KEY_3",
-            KeyCode::KEY_4 => "KEY_4",
-            KeyCode::KEY_5 => "KEY_5",
-            KeyCode::KEY_6 => "KEY_6",
-            KeyCode::KEY_7 => "KEY_7",
-            KeyCode::KEY_8 => "KEY_8",
-            KeyCode::KEY_9 => "KEY_9",
-            KeyCode::KEY_START => "KEY_START",
-            KeyCode::KEY_STOP => "KEY_STOP",
-            KeyCode::KEY_MANUAL => "KEY_MANUAL",
-            KeyCode::KEY_EXECUCAO => "KEY_EXECUCAO",
-            KeyCode::KEY_PROGRAMA => "KEY_PROGRAMA",
-            KeyCode::KEY_F1 => "KEY_F1",
-            KeyCode::KEY_F2 => "KEY_F2",
-            KeyCode::KEY_F3 => "KEY_F3",
-            KeyCode::KEY_F4 => "KEY_F4",
-            KeyCode::KEY_DIRECIONAL_PARA_CIMA => "KEY_DIRECIONAL_PARA_CIMA",
-            KeyCode::KEY_DIRECIONAL_PARA_BAIXO => "KEY_DIRECIONAL_PARA_BAIXO",
-            KeyCode::KEY_DIRECIONAL_PARA_DIREITA => "KEY_DIRECIONAL_PARA_DIREITA",
-            KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => "KEY_DIRECIONAL_PARA_ESQUERDA",
-            KeyCode::KEY_INS => "KEY_INS",
-            KeyCode::KEY_DEL => "KEY_DEL",
-            KeyCode::KEY_CTRL => "KEY_CTRL",
-            KeyCode::KEY_HIDDEN_KEY => "KEY_HIDDEN_KEY",
-        }
-    }
+    // pub fn to_string(&self) -> &'static str {
+    //     match self {
+    //         KeyCode::NO_KEY => "NO_KEY",
+    //         KeyCode::KEY_ENTER => "KEY_ENTER",
+    //         KeyCode::KEY_ESC => "KEY_ESC",
+    //         KeyCode::KEY_SETA_BRANCA_ESQUERDA => "KEY_SETA_BRANCA_ESQUERDA",
+    //         KeyCode::KEY_SETA_BRANCA_DIREITA => "KEY_SETA_BRANCA_DIREITA",
+    //         KeyCode::KEY_MAIS_OU_MENOS => "KEY_MAIS_OU_MENOS",
+    //         KeyCode::KEY_PONTO => "KEY_PONTO",
+    //         KeyCode::KEY_0 => "KEY_0",
+    //         KeyCode::KEY_1 => "KEY_1",
+    //         KeyCode::KEY_2 => "KEY_2",
+    //         KeyCode::KEY_3 => "KEY_3",
+    //         KeyCode::KEY_4 => "KEY_4",
+    //         KeyCode::KEY_5 => "KEY_5",
+    //         KeyCode::KEY_6 => "KEY_6",
+    //         KeyCode::KEY_7 => "KEY_7",
+    //         KeyCode::KEY_8 => "KEY_8",
+    //         KeyCode::KEY_9 => "KEY_9",
+    //         KeyCode::KEY_START => "KEY_START",
+    //         KeyCode::KEY_STOP => "KEY_STOP",
+    //         KeyCode::KEY_MANUAL => "KEY_MANUAL",
+    //         KeyCode::KEY_EXECUCAO => "KEY_EXECUCAO",
+    //         KeyCode::KEY_PROGRAMA => "KEY_PROGRAMA",
+    //         KeyCode::KEY_F1 => "KEY_F1",
+    //         KeyCode::KEY_F2 => "KEY_F2",
+    //         KeyCode::KEY_F3 => "KEY_F3",
+    //         KeyCode::KEY_F4 => "KEY_F4",
+    //         KeyCode::KEY_DIRECIONAL_PARA_CIMA => "KEY_DIRECIONAL_PARA_CIMA",
+    //         KeyCode::KEY_DIRECIONAL_PARA_BAIXO => "KEY_DIRECIONAL_PARA_BAIXO",
+    //         KeyCode::KEY_DIRECIONAL_PARA_DIREITA => "KEY_DIRECIONAL_PARA_DIREITA",
+    //         KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA => "KEY_DIRECIONAL_PARA_ESQUERDA",
+    //         KeyCode::KEY_INS => "KEY_INS",
+    //         KeyCode::KEY_DEL => "KEY_DEL",
+    //         KeyCode::KEY_CTRL => "KEY_CTRL",
+    //         KeyCode::KEY_HIDDEN_KEY => "KEY_HIDDEN_KEY",
+    //     }
+    // }
 }
 
 //constants
@@ -169,48 +171,50 @@ pub struct Keypad {
     //last_keycode_read: KeyCode,
 }
 
-const KEYMAP: [[KeyCode; 8]; 4] = [
-    [
-        KeyCode::KEY_F1,
-        KeyCode::KEY_7,
-        KeyCode::KEY_8,
-        KeyCode::KEY_9,
-        KeyCode::KEY_EXECUCAO,
-        KeyCode::KEY_INS,
-        KeyCode::KEY_ESC,
-        KeyCode::KEY_HIDDEN_KEY,
-    ],
-    [
-        KeyCode::KEY_F2,
-        KeyCode::KEY_4,
-        KeyCode::KEY_5,
-        KeyCode::KEY_6,
-        KeyCode::KEY_MAIS_OU_MENOS,
-        KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA,
-        KeyCode::KEY_DIRECIONAL_PARA_CIMA,
-        KeyCode::KEY_START,
-    ],
-    [
-        KeyCode::KEY_F3,
-        KeyCode::KEY_1,
-        KeyCode::KEY_2,
-        KeyCode::KEY_3,
-        KeyCode::KEY_SETA_BRANCA_DIREITA,
-        KeyCode::KEY_DIRECIONAL_PARA_BAIXO,
-        KeyCode::KEY_DIRECIONAL_PARA_DIREITA,
-        KeyCode::KEY_MANUAL,
-    ],
-    [
-        KeyCode::KEY_F4,
-        KeyCode::KEY_0,
-        KeyCode::KEY_0,
-        KeyCode::KEY_ENTER,
-        KeyCode::KEY_SETA_BRANCA_ESQUERDA,
-        KeyCode::KEY_DEL,
-        KeyCode::KEY_STOP,
-        KeyCode::KEY_PROGRAMA,
-    ],
-];
+progmem! {
+    static progmem KEYMAP: [[KeyCode; 8]; 4] = [
+        [
+            KeyCode::KEY_F1,
+            KeyCode::KEY_7,
+            KeyCode::KEY_8,
+            KeyCode::KEY_9,
+            KeyCode::KEY_EXECUCAO,
+            KeyCode::KEY_INS,
+            KeyCode::KEY_ESC,
+            KeyCode::KEY_HIDDEN_KEY,
+        ],
+        [
+            KeyCode::KEY_F2,
+            KeyCode::KEY_4,
+            KeyCode::KEY_5,
+            KeyCode::KEY_6,
+            KeyCode::KEY_MAIS_OU_MENOS,
+            KeyCode::KEY_DIRECIONAL_PARA_ESQUERDA,
+            KeyCode::KEY_DIRECIONAL_PARA_CIMA,
+            KeyCode::KEY_START,
+        ],
+        [
+            KeyCode::KEY_F3,
+            KeyCode::KEY_1,
+            KeyCode::KEY_2,
+            KeyCode::KEY_3,
+            KeyCode::KEY_SETA_BRANCA_DIREITA,
+            KeyCode::KEY_DIRECIONAL_PARA_BAIXO,
+            KeyCode::KEY_DIRECIONAL_PARA_DIREITA,
+            KeyCode::KEY_MANUAL,
+        ],
+        [
+            KeyCode::KEY_F4,
+            KeyCode::KEY_0,
+            KeyCode::KEY_0,
+            KeyCode::KEY_ENTER,
+            KeyCode::KEY_SETA_BRANCA_ESQUERDA,
+            KeyCode::KEY_DEL,
+            KeyCode::KEY_STOP,
+            KeyCode::KEY_PROGRAMA,
+        ],
+    ];
+}
 
 impl Keypad {
     pub fn new() -> Self {
@@ -256,7 +260,8 @@ impl Keypad {
             for row in 0..=3 {
                 let bit = self.get_input(row);
                 if bit == ACTIVATED {
-                    key_code = KEYMAP[row as usize][collumn as usize];
+                    let cols = KEYMAP.load_at(row as usize);
+                    key_code = *cols.get(collumn as usize).unwrap();
                 }
             }
             self.set_output(collumn, DEACTIVATE);

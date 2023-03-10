@@ -13,7 +13,8 @@ use crate::menu::ratangular_wave::RectangularWave;
 use crate::menu::widget::widget::Editable;
 use lib_1::utils::cursor::Cursor;
 
-pub type OptionsBuffer = Vec<FlashString, 5>;
+// Variable to place the string representing the Optinal Field Parameter in Menu
+pub type OptionsBuffer = Vec<FlashString, 3>;
 
 /// TODO: If possible make this function unnecessary and remove it from code. I suppose I'm using
 /// it to avoid spread of some `lifetimes`, but I'm not sure it is the best decision.
@@ -25,7 +26,7 @@ pub fn make_options_buffer_from_array<const ARRAY_SIZE: usize>(
         match options.push(item) {
             Ok(_) => {}
             Err(_) => {
-                panic!("Err10");
+                panic!("E10");
                 // Error: Vector size not enough. Change 'OptionsBuffer' size to a higher value.
             }
         }
@@ -43,8 +44,8 @@ pub struct OptionEditorWidget<'a> {
 
 impl<'a> OptionEditorWidget<'a> {
     pub fn new(variable: &'a Cell<Cursor>, options: OptionsBuffer, is_in_edit_mode: bool) -> Self {
-        const T_ON: u64 = 600;
-        const T_OFF: u64 = 300;
+        const T_ON: u16 = 600;
+        const T_OFF: u16 = 300;
         let initial_value = variable.get();
         Self {
             options: options.clone(),

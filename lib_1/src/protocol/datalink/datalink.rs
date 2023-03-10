@@ -24,7 +24,7 @@ pub enum DLError {
     /// Low level (byte-level), this error means serial TX function timed out while transmitting data
     /// Normally this error is associated to the serial driver used underneath
     /// The parameter is the elapsed time out in miliseconds
-    SerialTransmissionTimeedOut(u64),
+    SerialTransmissionTimeedOut(u16),
     /// The incomming byte stream from slave does not obey the right syntax of the protocol or the checksum is wrong
     DecodingError(DecodingError),
     /// Timeout error (cannot wait response forever!)
@@ -476,10 +476,7 @@ pub struct Datalink {
     /// Ok_None if nothing to receive, Err if some error happened, Ok_Some if a byte has been received
     pub try_rx: fn() -> Result<Option<u8>, ()>,
     /// Returns miliseconds elapsed since `Epoch` (when machine was turned on)
-    /// TODO: Make this function more memory eficient, because I think it's not necessary
-    /// two u64 to calculate elapsed time like: `let time_elapsed = now() - start_time;`
-    /// eventually something with the size statically defined by user should be better
-    pub now: fn() -> u64,
+    pub now: fn() -> u16,
 }
 
 impl Datalink {
@@ -511,7 +508,7 @@ impl Datalink {
                 } else {
                     // test for timeout
                     let time_elapsed = now() - start_time;
-                    if time_elapsed > (self.timeout_ms as u64) {
+                    if time_elapsed > (self.timeout_ms) {
                         return Err(DLError::SerialTransmissionTimeedOut(time_elapsed));
                     }
                 };
@@ -552,7 +549,7 @@ impl Datalink {
                 // No byte available in this turn, check for timeout time to decide if is possible to continue waiting for.
                 Ok(None) => {
                     let time_elapsed = now() - start_time;
-                    if time_elapsed > (self.timeout_ms as u64) {
+                    if time_elapsed > (self.timeout_ms) {
                         return Err(DLError::Timeout(self.timeout_ms));
                     }
                 }
