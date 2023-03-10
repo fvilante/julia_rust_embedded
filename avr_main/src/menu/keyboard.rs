@@ -3,7 +3,7 @@ use crate::board::keyboard::Keypad;
 use crate::microcontroler::delay::delay_ms;
 use crate::microcontroler::timer::now;
 
-type TimePoint = u8;
+type TimePoint = u16;
 
 const DEBOUNCE_TIME: TimePoint = 250; // miliseconds
 
