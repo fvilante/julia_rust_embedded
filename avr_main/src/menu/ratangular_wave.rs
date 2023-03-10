@@ -1,23 +1,23 @@
 use crate::microcontroler::timer::now;
 
-type X = u16;
+type TimePoint = u16;
 
 /// Generates a non-synchronous assymetric parametrizable retangular wave form
 pub struct RectangularWave {
-    up_interval: X,
-    down_interval: X,
-    next_time_point: X,
+    up_interval: TimePoint,
+    down_interval: TimePoint,
+    next_time_point: TimePoint,
     current_state: bool,
 }
 
 impl RectangularWave {
     /// interval in miliseconds
-    pub fn new(up_interval: X, down_interval: X) -> Self {
+    pub fn new(up_interval: TimePoint, down_interval: TimePoint) -> Self {
         let initial_state = true;
         Self {
             up_interval: up_interval.clone(),
             down_interval,
-            next_time_point: now() as X + up_interval as X,
+            next_time_point: now() as TimePoint + up_interval as TimePoint,
             current_state: initial_state,
         }
     }
@@ -25,7 +25,7 @@ impl RectangularWave {
     /// Restarts the wave form
     pub fn reset(&mut self) -> &mut Self {
         let initial_state = true;
-        self.next_time_point = now() as X + self.up_interval.clone() as X;
+        self.next_time_point = now() as TimePoint + self.up_interval.clone() as TimePoint;
         self.current_state = initial_state;
         self
     }
@@ -34,16 +34,16 @@ impl RectangularWave {
     ///
     /// You should call this method in a frequency relative to the wave form being generated
     pub fn update(&mut self) -> &mut Self {
-        let is_it_moment_to_change_state = now() as X > self.next_time_point;
+        let is_it_moment_to_change_state = now() as TimePoint > self.next_time_point;
         if is_it_moment_to_change_state {
             if self.current_state == true {
                 // up-down edge
                 self.current_state = false;
-                self.next_time_point += self.down_interval.clone() as X;
+                self.next_time_point += self.down_interval.clone() as TimePoint;
             } else {
                 // down-up edge
                 self.current_state = true;
-                self.next_time_point += self.up_interval.clone() as X;
+                self.next_time_point += self.up_interval.clone() as TimePoint;
             }
         } else {
             // no nothing
