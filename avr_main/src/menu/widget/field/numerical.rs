@@ -283,8 +283,8 @@ pub struct NumberInputEditorWidget<'a> {
 
 impl<'a> NumberInputEditorWidget<'a> {
     pub fn new(variable: &'a Cell<u16>, format: Format, is_in_edit_mode: bool) -> Self {
-        const T_ON: u64 = 600;
-        const T_OFF: u64 = 300;
+        const T_ON: u32 = 600;
+        const T_OFF: u32 = 300;
         let __initial_value = variable.get();
         Self {
             u16_editor: NumberInputEditor::from_u16(__initial_value, format.clone()),

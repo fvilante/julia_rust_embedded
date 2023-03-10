@@ -36,7 +36,7 @@ pub fn development_entry_point() -> ! {
     let mut submenu = SubMenuRender::new(menu_root, &menu_storage);
 
     let fps = 30; // frames_per_second
-    let mut next_frame: u64 = now() + (1000 / fps);
+    let mut next_frame: u32 = now() + (1000 / fps);
 
     loop {
         if let Some(key) = keyboard.get_key() {

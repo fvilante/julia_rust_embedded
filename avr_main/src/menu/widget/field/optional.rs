@@ -43,8 +43,8 @@ pub struct OptionEditorWidget<'a> {
 
 impl<'a> OptionEditorWidget<'a> {
     pub fn new(variable: &'a Cell<Cursor>, options: OptionsBuffer, is_in_edit_mode: bool) -> Self {
-        const T_ON: u64 = 600;
-        const T_OFF: u64 = 300;
+        const T_ON: u32 = 600;
+        const T_OFF: u32 = 300;
         let initial_value = variable.get();
         Self {
             options: options.clone(),
