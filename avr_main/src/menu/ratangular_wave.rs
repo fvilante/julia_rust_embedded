@@ -1,14 +1,12 @@
 use crate::microcontroler::timer::now;
 
-/// TODO: I do not know why, but to change this type to reduce ram consuption is producing a little bug
-/// which is not to blink displayed NumericalField when editing
-type X = u32;
+type X = u16;
 
 /// Generates a non-synchronous assymetric parametrizable retangular wave form
 pub struct RectangularWave<T = X> {
     up_interval: T,
     down_interval: T,
-    next_time_point: u32,
+    next_time_point: X,
     current_state: bool,
 }
 
@@ -19,7 +17,7 @@ impl RectangularWave<X> {
         Self {
             up_interval: up_interval.clone(),
             down_interval,
-            next_time_point: now() + up_interval as u32,
+            next_time_point: now() as X + up_interval as X,
             current_state: initial_state,
         }
     }
@@ -27,7 +25,7 @@ impl RectangularWave<X> {
     /// Restarts the wave form
     pub fn reset(&mut self) -> &mut Self {
         let initial_state = true;
-        self.next_time_point = now() + self.up_interval.clone() as u32;
+        self.next_time_point = now() as X + self.up_interval.clone() as X;
         self.current_state = initial_state;
         self
     }
@@ -36,16 +34,16 @@ impl RectangularWave<X> {
     ///
     /// You should call this method in a frequency relative to the wave form being generated
     pub fn update(&mut self) -> &mut Self {
-        let is_it_moment_to_change_state = now() > self.next_time_point;
+        let is_it_moment_to_change_state = now() as X > self.next_time_point;
         if is_it_moment_to_change_state {
             if self.current_state == true {
                 // up-down edge
                 self.current_state = false;
-                self.next_time_point += self.down_interval.clone() as u32;
+                self.next_time_point += self.down_interval.clone() as X;
             } else {
                 // down-up edge
                 self.current_state = true;
-                self.next_time_point += self.up_interval.clone() as u32;
+                self.next_time_point += self.up_interval.clone() as X;
             }
         } else {
             // no nothing
