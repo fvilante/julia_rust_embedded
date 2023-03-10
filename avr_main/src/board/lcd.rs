@@ -179,11 +179,13 @@ pub fn print_u8_array<const N: usize>(text: &[u8; N]) -> () {
 // --------------------------------------------------------------------------
 /********** high level commands, for the user! */
 pub fn clear() -> () {
+    const LCD_CLEARDISPLAY: u8 = 0x01;
     command(LCD_CLEARDISPLAY); // clear display, set cursor position to zero
     delay_us(2000); // this command takes a long time!
 }
 
 pub fn set_cursor(col: u8, row: u8) {
+    const LCD_SETDDRAMADDR: u8 = 0x80;
     const LINE_0_OFFSET: u8 = 0x00;
     const LINE1_OFFSET: u8 = 0x00 + NUMBER_OF_COLS;
 
@@ -195,43 +197,30 @@ pub fn set_cursor(col: u8, row: u8) {
     command(LCD_SETDDRAMADDR | (col + line_offset));
 }
 
-// commands
-const LCD_CLEARDISPLAY: u8 = 0x01;
-const LCD_RETURNHOME: u8 = 0x02;
-const LCD_ENTRYMODESET: u8 = 0x04;
-const LCD_DISPLAYCONTROL: u8 = 0x08;
-const LCD_CURSORSHIFT: u8 = 0x10;
-const LCD_FUNCTIONSET: u8 = 0x20;
-const LCD_SETCGRAMADDR: u8 = 0x40;
-const LCD_SETDDRAMADDR: u8 = 0x80;
+// other commands
+// const LCD_RETURNHOME: u8 = 0x02;
+// const LCD_CURSORSHIFT: u8 = 0x10;
+// const LCD_SETCGRAMADDR: u8 = 0x40;
 
 // flags for display entry mode
-const LCD_ENTRYRIGHT: u8 = 0x00;
-const LCD_ENTRYLEFT: u8 = 0x02;
-const LCD_ENTRYSHIFTINCREMENT: u8 = 0x01;
-const LCD_ENTRYSHIFTDECREMENT: u8 = 0x00;
+// const LCD_ENTRYRIGHT: u8 = 0x00;
+// const LCD_ENTRYSHIFTINCREMENT: u8 = 0x01;
 
 // flags for display on/off control
-const LCD_DISPLAYON: u8 = 0x04;
-const LCD_DISPLAYOFF: u8 = 0x00;
-const LCD_CURSORON: u8 = 0x02;
-const LCD_CURSOROFF: u8 = 0x00;
-const LCD_BLINKON: u8 = 0x01;
-const LCD_BLINKOFF: u8 = 0x00;
+//const LCD_DISPLAYOFF: u8 = 0x00;
+//const LCD_CURSORON: u8 = 0x02;
+//const LCD_BLINKON: u8 = 0x01;
 
 // flags for display/cursor shift
-const LCD_DISPLAYMOVE: u8 = 0x08;
-const LCD_CURSORMOVE: u8 = 0x00;
-const LCD_MOVERIGHT: u8 = 0x04;
-const LCD_MOVELEFT: u8 = 0x00;
+// const LCD_DISPLAYMOVE: u8 = 0x08;
+// const LCD_CURSORMOVE: u8 = 0x00;
+// const LCD_MOVERIGHT: u8 = 0x04;
+// const LCD_MOVELEFT: u8 = 0x00;
 
 // flags for function set
-const LCD_8BITMODE: u8 = 0x10;
-const LCD_4BITMODE: u8 = 0x00;
-const LCD_2LINE: u8 = 0x08;
-const LCD_1LINE: u8 = 0x00;
-const LCD_5X10DOTS: u8 = 0x04;
-const LCD_5X8DOTS: u8 = 0x00;
+// const LCD_8BITMODE: u8 = 0x10;
+// const LCD_1LINE: u8 = 0x00;
+// const LCD_5X10DOTS: u8 = 0x04;
 
 /// Executes part of the initialization protocol for LCD according to its datasheet specification.
 ///
@@ -275,6 +264,18 @@ fn initialization_protocol() {
 /// save some bytes of memory state. But the more generic function can be acessed
 /// in the repository. See commit: 1cf9c0efe402afa2cfe61b67e3fff476cf1b9f01
 pub fn lcd_initialize() -> () {
+    const LCD_ENTRYMODESET: u8 = 0x04;
+    const LCD_DISPLAYCONTROL: u8 = 0x08;
+    const LCD_FUNCTIONSET: u8 = 0x20;
+    const LCD_ENTRYLEFT: u8 = 0x02;
+    const LCD_ENTRYSHIFTDECREMENT: u8 = 0x00;
+    const LCD_DISPLAYON: u8 = 0x04;
+    const LCD_CURSOROFF: u8 = 0x00;
+    const LCD_BLINKOFF: u8 = 0x00;
+    const LCD_4BITMODE: u8 = 0x00;
+    const LCD_2LINE: u8 = 0x08;
+    const LCD_5X8DOTS: u8 = 0x00;
+
     init_lcd_pins();
     initialization_protocol();
 
