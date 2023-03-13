@@ -1,3 +1,4 @@
+use avr_progmem::progmem;
 use lib_1::protocol::datalink::datalink::Datalink;
 use lib_1::protocol::transport::channel::Channel;
 use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
@@ -9,11 +10,13 @@ use super::widget::submenu::render::SubMenuRender;
 
 use crate::board::keyboard::KeyCode;
 use crate::board::lcd;
+use crate::menu::flash::FlashString;
 use crate::menu::widget::submenu::spec::{MenuStorage, SubMenuHandle};
 
 use crate::menu::widget::widget_tests::SystemEnviroment;
 
 use crate::microcontroler::delay::delay_ms;
+use crate::microcontroler::eeprom::auto_test_eeprom;
 use crate::microcontroler::serial;
 use crate::microcontroler::timer::{self, now};
 
@@ -62,7 +65,17 @@ pub fn development_entry_point() -> ! {
         ..
     } = SystemEnviroment::new();
 
-    let machine_model = MachineModel::new();
+    if let Err(_) = auto_test_eeprom(&mut canvas) {
+        progmem! {
+            static progmem string TEXT = "Erro durante auto-teste da eeprom";
+        }
+        canvas.clear();
+        canvas.print_flash_str(FlashString::new(&TEXT));
+        canvas.render();
+        delay_ms(2000);
+    }
+
+    let machine_model = MachineModel::load_from_eeprom();
 
     let menu_storage: MenuStorage = MenuStorage::new(&machine_model);
 
@@ -83,6 +96,16 @@ pub fn development_entry_point() -> ! {
                     lcd::clear();
                     lcd::print_u8_in_hex(index);
                 }
+            }
+            if key == KeyCode::KEY_F3 {
+                progmem! {
+                    static progmem string TEXT = "Gravando na EEPROM...";
+                }
+                canvas.clear();
+                canvas.print_flash_str(FlashString::new(&TEXT));
+                canvas.render();
+                machine_model.save_to_eeprom();
+                delay_ms(2000);
             }
             submenu.send_key(key);
         }

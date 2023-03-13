@@ -2,11 +2,13 @@ use core::cell::Cell;
 
 use lib_1::{
     protocol::{
-        datalink::datalink::Status,
+        datalink::datalink::{word16::Word16, Status},
         transport::transport_layer::{TLError, TransportLayer},
     },
     utils::cursor::Cursor,
 };
+
+use crate::microcontroler::eeprom::{read_eeprom, write_eeprom};
 
 pub struct ArquivoDeEixo {
     // PARAMETROS DE MOVIMENTO
@@ -125,18 +127,21 @@ impl Default for ConfiguracaoDoEixo {
 
 pub struct MachineModel {
     pub arquivo_de_eixo_x: ArquivoDeEixo,
-    pub arquivo_de_eixo_y: ArquivoDeEixo,
+    //pub arquivo_de_eixo_y: ArquivoDeEixo,
     pub configuracao_do_eixo_x: ConfiguracaoDoEixo,
-    pub configuracao_do_eixo_y: ConfiguracaoDoEixo,
+    //pub configuracao_do_eixo_y: ConfiguracaoDoEixo,
 }
 
 impl MachineModel {
+    const ADDR_LOW: u16 = 0x00;
+    const ADDR_HIGH: u16 = 0x01;
+
     pub fn new() -> Self {
         Self {
             arquivo_de_eixo_x: ArquivoDeEixo::default(),
-            arquivo_de_eixo_y: ArquivoDeEixo::default(),
+            //arquivo_de_eixo_y: ArquivoDeEixo::default(),
             configuracao_do_eixo_x: ConfiguracaoDoEixo::default(),
-            configuracao_do_eixo_y: ConfiguracaoDoEixo::default(),
+            //configuracao_do_eixo_y: ConfiguracaoDoEixo::default(),
         }
     }
 
@@ -147,6 +152,29 @@ impl MachineModel {
         };
 
         SendAllIterator::new(cmpp_data, transport)
+    }
+
+    pub fn save_to_eeprom(&self) {
+        let value = self.arquivo_de_eixo_x.posicao_inicial.get();
+        let word = Word16::from_u16(value);
+        let (byte_low, byte_high) = word.split_bytes();
+        write_eeprom(Self::ADDR_LOW, byte_low);
+        write_eeprom(Self::ADDR_HIGH, byte_high);
+    }
+
+    pub fn load_from_eeprom() -> Self {
+        let byte_low = read_eeprom(Self::ADDR_LOW);
+        let byte_high = read_eeprom(Self::ADDR_HIGH);
+        let word = Word16::from_bytes(byte_low, byte_high);
+        let value = word.to_u16();
+        let mut arquivo_de_eixo = ArquivoDeEixo::default();
+        arquivo_de_eixo.posicao_inicial.set(value);
+        let configuracao_de_eixo = ConfiguracaoDoEixo::default();
+
+        Self {
+            arquivo_de_eixo_x: arquivo_de_eixo,
+            configuracao_do_eixo_x: configuracao_de_eixo,
+        }
     }
 }
 
