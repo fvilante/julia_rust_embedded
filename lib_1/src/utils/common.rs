@@ -59,7 +59,7 @@ const fn get_char(index: u8) -> char {
         }
         10 | 11 | 12 | 13 | 14 | 15 => {
             let letter_a: u8 = 65; // letter 'A' capital
-            let result = (letter_a + index) as char;
+            let result = (letter_a + (index - 10)) as char;
             result
         }
         _ => {
