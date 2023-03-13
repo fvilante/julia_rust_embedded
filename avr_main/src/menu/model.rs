@@ -8,7 +8,7 @@ use lib_1::{
     utils::cursor::Cursor,
 };
 
-use crate::microcontroler::eeprom::{read_eeprom, write_eeprom};
+use crate::microcontroler::eeprom::EepromAddress;
 
 pub struct ArquivoDeEixo {
     // PARAMETROS DE MOVIMENTO
@@ -133,8 +133,8 @@ pub struct MachineModel {
 }
 
 impl MachineModel {
-    const ADDR_LOW: u16 = 0x00;
-    const ADDR_HIGH: u16 = 0x01;
+    const ADDR_LOW: u8 = 0x00;
+    const ADDR_HIGH: u8 = 0x01;
 
     pub fn new() -> Self {
         Self {
@@ -158,13 +158,13 @@ impl MachineModel {
         let value = self.arquivo_de_eixo_x.posicao_inicial.get();
         let word = Word16::from_u16(value);
         let (byte_low, byte_high) = word.split_bytes();
-        write_eeprom(Self::ADDR_LOW, byte_low);
-        write_eeprom(Self::ADDR_HIGH, byte_high);
+        EepromAddress(Self::ADDR_LOW).write(byte_low);
+        EepromAddress(Self::ADDR_HIGH).write(byte_high);
     }
 
     pub fn load_from_eeprom() -> Self {
-        let byte_low = read_eeprom(Self::ADDR_LOW);
-        let byte_high = read_eeprom(Self::ADDR_HIGH);
+        let byte_low = EepromAddress(Self::ADDR_LOW).read();
+        let byte_high = EepromAddress(Self::ADDR_HIGH).read();
         let word = Word16::from_bytes(byte_low, byte_high);
         let value = word.to_u16();
         let mut arquivo_de_eixo = ArquivoDeEixo::default();

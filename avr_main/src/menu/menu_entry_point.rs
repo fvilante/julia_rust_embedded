@@ -65,7 +65,7 @@ pub fn development_entry_point() -> ! {
         ..
     } = SystemEnviroment::new();
 
-    if let Err(_) = auto_test_eeprom(&mut canvas) {
+    if let Err(_) = auto_test_eeprom() {
         progmem! {
             static progmem string TEXT = "Erro durante auto-teste da eeprom";
         }

@@ -1,60 +1,43 @@
-use ruduino::prelude::without_interrupts;
-
-use crate::{
-    board::lcd,
-    menu::canvas::Canvas,
-    microcontroler::{
-        delay::delay_ms,
-        register::{read_register, write_register},
-    },
+use ruduino::{
+    cores::current as avr_core, interrupt::without_interrupts, Pin, Register, RegisterBits,
 };
 
-use lib_1::{
-    protocol::datalink::datalink::word16::Word16,
-    utils::common::{get_bit_at, word_to_byte},
-};
+use avr_core::{port, DDRB, DDRD, EEAR, EECR, EEDR, PCICR, PCMSK0, PORTB, PORTD, SPMCSR, SREG};
 
-//EEPROM registers addresses and bits
-const EEARH: *mut u8 = 0x42 as *mut u8;
-const EEARL: *mut u8 = 0x41 as *mut u8;
-const EECR: *mut u8 = 0x3F as *mut u8;
-const EEDR: *mut u8 = 0x40 as *mut u8;
-const EEPE: u8 = 0b0000010;
-const EEMPE: u8 = 0b0000100;
-const EERE: u8 = 0b0000001;
+/// This code was originally written by `MalteT` and was grab from github commit below:
+/// https://github.com/MalteT/counter-avr/blob/ebb7ca36d7a04b11265cb41024798a38ac31ad05/src/main.rs#L251
+pub struct EepromAddress(pub u8);
 
-/// normalize is to clamp the 16 bits address to a 9 bits address (1+8).
-/// only bit 9 of address16 are used, other bits are reserved by the microcontroller hardware.
-fn normalize_eeprom_address(address: u16) -> (u8, u8) {
-    let (byte_low, byte_high) = Word16::from_u16(address).split_bytes();
-    let address_high = get_bit_at(byte_high, 0);
-    let address_low = byte_low;
-    (address_high, address_low)
-}
-
-pub fn read_eeprom(address: u16) -> u8 {
-    let (address_high, address_low) = normalize_eeprom_address(address);
-    // set EEPROM address register
-    write_register(EEARH, address_high);
-    write_register(EEARL, address_low);
-    //do read
-    while (read_register(EECR) & (1 << EEPE)) == 1 {} // wait until EEPE become to zero by hardware
-    write_register(EECR, read_register(EECR) | (1 << EERE));
-    read_register(EEDR)
-}
-
-pub fn write_eeprom(address: u16, data: u8) -> () {
-    // set EEPROM address and data register
-    let (address_high, address_low) = normalize_eeprom_address(address);
-    write_register(EEARH, address_high);
-    write_register(EEARL, address_low);
-    write_register(EEDR, data);
-    // write operation
-    while (read_register(EECR) & (1 << EEPE)) == 1 {} // wait until EEPE become to zero
-    without_interrupts(|| {
-        write_register(EECR, read_register(EECR) | (1 << EEMPE));
-        write_register(EECR, read_register(EECR) | (1 << EEPE));
-    });
+impl EepromAddress {
+    pub fn read(&self) -> u8 {
+        without_interrupts(|| {
+            // Do not acces eeprom, if it is written to or the flash is currently programmed!
+            while EECR::is_set(EECR::EEPE) || SPMCSR::is_set(SPMCSR::SPMEN) {}
+            // Write the address
+            EEAR::write(self.0);
+            // Start reading from eeprom
+            // XXX: This could be `set` but `set` isn't using volatile_* atm.
+            EECR::write(EECR::EERE);
+            // Return the read value
+            let ret = EEDR::read();
+            ret
+        })
+    }
+    pub fn write(&mut self, val: u8) {
+        without_interrupts(|| {
+            // Do not acces eeprom, if it is written to or the flash is currently programmed!
+            while EECR::is_set(EECR::EEPE) || SPMCSR::is_set(SPMCSR::SPMEN) {}
+            // Write the address
+            EEAR::write(self.0);
+            // Write the value
+            EEDR::write(val);
+            // Start writing to the eeprom
+            // XXX: This could be `set` but `set` isn't using volatile_* atm.
+            EECR::write(EECR::EEMPE);
+            // XXX: This could be `set` but `set` isn't using volatile_* atm.
+            EECR::write(EECR::EEPE);
+        })
+    }
 }
 
 pub struct EepromTestError {
@@ -63,33 +46,22 @@ pub struct EepromTestError {
     actual_value: u8,
 }
 
-pub fn auto_test_eeprom(canvas: &mut Canvas) -> Result<(), EepromTestError> {
+/// CAUTION: This test will destroy the current content of the EEPROM
+pub fn auto_test_eeprom() -> Result<(), EepromTestError> {
     use core::ops::Range;
 
     fn write_data_into_eeprom(range: Range<u8>) {
         for address in range {
-            write_eeprom(address as u16, address);
+            EepromAddress(address).write(address);
         }
     }
 
     fn check_data_into_eeprom(range: Range<u8>) -> Result<(), EepromTestError> {
         for address in range {
-            let data_read = read_eeprom(address as u16);
+            let data_read = EepromAddress(address).read();
             if data_read == address {
                 continue;
             } else {
-                lcd::clear();
-                lcd::print("address:");
-                lcd::print_u8_in_hex(address);
-                lcd::print(" ");
-                lcd::print("expected_value:");
-                lcd::print_u8_in_hex(address);
-                lcd::print(" ");
-                lcd::print("actual_value:");
-                lcd::print_u8_in_hex(data_read);
-                lcd::print(" ");
-                delay_ms(5000);
-
                 return Err(EepromTestError {
                     address: address as u16,
                     expected_value: address,
@@ -101,8 +73,8 @@ pub fn auto_test_eeprom(canvas: &mut Canvas) -> Result<(), EepromTestError> {
         Ok(())
     }
 
-    let range = 0x32..0x99;
-    write_data_into_eeprom(range.clone());
-
-    check_data_into_eeprom(range.clone())
+    // Perform test
+    let address_range_to_check = 0..0xff;
+    write_data_into_eeprom(address_range_to_check.clone());
+    check_data_into_eeprom(address_range_to_check.clone())
 }

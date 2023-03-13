@@ -3,7 +3,7 @@
 use ruduino::cores::atmega328p::port;
 use ruduino::Pin;
 
-use crate::microcontroler::{delay::delay_ms, eeprom::read_eeprom, eeprom::write_eeprom};
+use crate::microcontroler::{delay::delay_ms, eeprom::EepromAddress};
 
 // -------------------------------------------------------------------------------------------------------
 
@@ -69,8 +69,8 @@ fn test_eeprom() -> bool {
     let mut result: bool = true;
     let eeprom_size: u16 = 1024; //1K bytes
     for address in 0..eeprom_size {
-        write_eeprom(address, data);
-        let data_read = read_eeprom(address);
+        EepromAddress(address as u8).write(data);
+        let data_read = EepromAddress(address as u8).read();
         if data_read != data {
             result = false;
             break;
