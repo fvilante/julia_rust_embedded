@@ -1,6 +1,9 @@
 use core::cell::Cell;
 
-use lib_1::utils::cursor::Cursor;
+use lib_1::{
+    protocol::transport::transport_layer::{TLError, TransportLayer},
+    utils::cursor::Cursor,
+};
 
 pub struct ArquivoDeEixo {
     // PARAMETROS DE MOVIMENTO
@@ -115,6 +118,8 @@ impl Default for ConfiguracaoDoEixo {
     }
 }
 
+///
+
 pub struct MachineModel {
     pub arquivo_de_eixo_x: ArquivoDeEixo,
     pub arquivo_de_eixo_y: ArquivoDeEixo,
@@ -131,4 +136,203 @@ impl MachineModel {
             configuracao_do_eixo_y: ConfiguracaoDoEixo::default(),
         }
     }
+
+    pub fn send_all<'a>(&self, transport: &'a TransportLayer) -> Result<(), TLError> {
+        send_all_for_machine(&self, transport)
+    }
+}
+
+/////
+
+pub struct CmppData<'a> {
+    arquivo_de_eixo: &'a ArquivoDeEixo,
+    configuracao_de_eixo: &'a ConfiguracaoDoEixo,
+}
+
+pub fn send_all<'a, 'b>(data: CmppData<'a>, transport: &'b TransportLayer) -> Result<(), TLError> {
+    let CmppData {
+        arquivo_de_eixo,
+        configuracao_de_eixo,
+    } = data;
+
+    let status = transport
+        .posicao_inicial()
+        .set(arquivo_de_eixo.posicao_inicial.get().into())?;
+    let status = transport
+        .posicao_final()
+        .set(arquivo_de_eixo.posicao_final.get().into())?;
+    let status = transport
+        .aceleracao_de_avanco()
+        .set(arquivo_de_eixo.aceleracao_de_avanco.get().into())?;
+    let status = transport
+        .aceleracao_de_retorno()
+        .set(arquivo_de_eixo.aceleracao_de_retorno.get().into())?;
+    let status = transport
+        .velocidade_de_avanco()
+        .set(arquivo_de_eixo.velocidade_de_avanco.get().into())?;
+    let status = transport
+        .velocidade_de_retorno()
+        .set(arquivo_de_eixo.velocidade_de_retorno.get().into())?;
+    let status = transport
+        .numero_de_mensagem_no_avanco()
+        .set(arquivo_de_eixo.numero_de_mensagem_no_avanco.get().into())?;
+    let status = transport
+        .numero_de_mensagem_no_retorno()
+        .set(arquivo_de_eixo.numero_de_mensagem_no_retorno.get().into())?;
+    let status = transport
+        .primeira_mensagem_no_avanco()
+        .set(arquivo_de_eixo.primeira_mensagem_no_avanco.get().into())?;
+    let status = transport
+        .ultima_mensagem_no_avanco()
+        .set(arquivo_de_eixo.ultima_mensagem_no_avanco.get().into())?;
+    let status = transport
+        .primeira_mensagem_no_retorno()
+        .set(arquivo_de_eixo.primeira_mensagem_no_retorno.get().into())?;
+    let status = transport
+        .ultima_mensagem_no_retorno()
+        .set(arquivo_de_eixo.ultima_mensagem_no_retorno.get().into())?;
+    let status = transport
+        .logica_do_sinal_de_impressao()
+        .set(arquivo_de_eixo.logica_do_sinal_de_impressao.get().into())?;
+    let status = transport
+        .largura_do_sinal_de_impressao()
+        .set(arquivo_de_eixo.largura_do_sinal_de_impressao.get().into())?;
+    let status = transport
+        .reversao_de_mensagem_via_serial()
+        .set(arquivo_de_eixo.reversao_de_mensagem_via_serial.get().into())?;
+    let status = transport
+        .selecao_de_mensagem_via_serial()
+        .set(arquivo_de_eixo.selecao_de_mensagem_via_serial.get().into())?;
+    let status = transport
+        .retardo_no_start_automatico()
+        .set(arquivo_de_eixo.retardo_no_start_automatico.get().into())?;
+    let status = transport
+        .retardo_no_start_externo()
+        .set(arquivo_de_eixo.retardo_no_start_externo.get().into())?;
+    let status = transport
+        .start_automatico_no_avanco()
+        .set(arquivo_de_eixo.start_automatico_no_avanco.get().into())?;
+    let status = transport
+        .start_automatico_no_retorno()
+        .set(arquivo_de_eixo.start_automatico_no_retorno.get().into())?;
+    let status = transport
+        .modo_de_trabalho_do_eixo()
+        .set(arquivo_de_eixo.modo_de_trabalho_do_eixo.get().into())?;
+    let status = transport
+        .antecipacao_da_saida_de_start()
+        .set(arquivo_de_eixo.antecipacao_da_saida_de_start.get().into())?;
+    let status = transport
+        .saida_de_start_no_avaco()
+        .set(arquivo_de_eixo.saida_de_start_no_avaco.get().into())?;
+    let status = transport
+        .saida_de_start_no_retorno()
+        .set(arquivo_de_eixo.saida_de_start_no_retorno.get().into())?;
+    let status = transport
+        .entrada_de_start_entre_eixos()
+        .set(arquivo_de_eixo.entrada_de_start_entre_eixos.get().into())?;
+    let status = transport
+        .retardo_do_start_entre_eixos()
+        .set(arquivo_de_eixo.retardo_do_start_entre_eixos.get().into())?;
+    let status = transport
+        .start_pelo_teclado_e_externo()
+        .set(arquivo_de_eixo.start_pelo_teclado_e_externo.get().into())?;
+    let status = transport
+        .retardo_no_sinal_de_impressao()
+        .set(arquivo_de_eixo.retardo_no_sinal_de_impressao.get().into())?;
+    let status = transport
+        .retardo_no_start_passo_a_passo()
+        .set(arquivo_de_eixo.retardo_no_start_passo_a_passo.get().into())?;
+    let status = transport
+        .start_automatico_passo_a_passo()
+        .set(arquivo_de_eixo.start_automatico_passo_a_passo.get().into())?;
+    let status = transport
+        .saida_de_start_passo_a_passo()
+        .set(arquivo_de_eixo.saida_de_start_passo_a_passo.get().into())?;
+    let status = transport
+        .numero_do_canal()
+        .set(configuracao_de_eixo.numero_do_canal.get().into())?;
+    let status = transport
+        .numero_de_pulso_do_giro()
+        .set(configuracao_de_eixo.numero_de_pulso_do_giro.get().into())?;
+    let status = transport
+        .janela_de_protecao_do_giro()
+        .set(configuracao_de_eixo.janela_de_protecao_do_giro.get().into())?;
+    let status = transport
+        .deslocamento_giro_do_motor()
+        .set(configuracao_de_eixo.deslocamento_giro_do_motor.get().into())?;
+    let status = transport.giro_com_funcao_de_protecao().set(
+        configuracao_de_eixo
+            .giro_com_funcao_de_protecao
+            .get()
+            .into(),
+    )?;
+    let status = transport.giro_com_funcao_de_correcao().set(
+        configuracao_de_eixo
+            .giro_com_funcao_de_correcao
+            .get()
+            .into(),
+    )?;
+    let status = transport
+        .logica_do_start_externo()
+        .set(configuracao_de_eixo.logica_do_start_externo.get().into())?;
+    let status = transport.valor_da_posicao_de_referencia().set(
+        configuracao_de_eixo
+            .valor_da_posicao_de_referencia
+            .get()
+            .into(),
+    )?;
+    let status = transport
+        .velocidade_para_referencia()
+        .set(configuracao_de_eixo.velocidade_para_referencia.get().into())?;
+    let status = transport
+        .aceleracao_para_referencia()
+        .set(configuracao_de_eixo.aceleracao_para_referencia.get().into())?;
+    let status = transport.reducao_da_corrente_em_repouso().set(
+        configuracao_de_eixo
+            .reducao_da_corrente_em_repouso
+            .get()
+            .into(),
+    )?;
+    let status = transport.referencia_pelo_start_externo().set(
+        configuracao_de_eixo
+            .referencia_pelo_start_externo
+            .get()
+            .into(),
+    )?;
+    let status = transport
+        .modo_turbo()
+        .set(configuracao_de_eixo.modo_turbo.get().into())?;
+
+    Ok(())
+}
+
+pub fn send_all_for_machine<'a, 'b>(
+    model: &'a MachineModel,
+    transport: &'b TransportLayer,
+) -> Result<(), TLError> {
+    let &MachineModel {
+        ref arquivo_de_eixo_x,
+        ref arquivo_de_eixo_y,
+        ref configuracao_do_eixo_x,
+        ref configuracao_do_eixo_y,
+    } = &model;
+
+    // Send for X-Axis
+    send_all(
+        CmppData {
+            arquivo_de_eixo: arquivo_de_eixo_x,
+            configuracao_de_eixo: configuracao_do_eixo_x,
+        },
+        transport,
+    )?;
+    // Send for Y-Axis
+    send_all(
+        CmppData {
+            arquivo_de_eixo: arquivo_de_eixo_y,
+            configuracao_de_eixo: configuracao_do_eixo_y,
+        },
+        transport,
+    )?;
+
+    Ok(())
 }

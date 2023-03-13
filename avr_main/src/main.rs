@@ -40,7 +40,7 @@ fn main() -> ! {
     //
 
     // Entry point for TL and DL
-    cmpp::main::development_entry_point();
+    //cmpp::main::development_entry_point();
 
     //crate::enviroment::front_panel::development_entry_point();
 

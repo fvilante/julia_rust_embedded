@@ -175,7 +175,10 @@ pub mod manipulator {
 /// refactor the concept of bitwise manipulation used inside Word16 as a consequence. Se also
 /// BitPosition type `todo` notes.
 pub mod new_proposal {
-    use crate::protocol::datalink::datalink::{word16::Word16, Status};
+    use crate::{
+        protocol::datalink::datalink::{word16::Word16, Status},
+        utils::cursor::Cursor,
+    };
 
     use super::{
         cmpp_value::{Bit, MechanicalProperties},
@@ -194,6 +197,12 @@ pub mod new_proposal {
     pub struct DisplacementManipulator<'a> {
         pub transport: &'a TransportLayer<'a>,
         pub address: WordAddress,
+    }
+
+    impl From<u16> for Displacement {
+        fn from(value: u16) -> Self {
+            Displacement(value)
+        }
     }
 
     impl<'a> DisplacementManipulator<'a> {
@@ -236,6 +245,12 @@ pub mod new_proposal {
     //  ///////////////////////////////////////////////////////////////////////////////////
 
     pub struct Velocity(pub u16);
+
+    impl From<u16> for Velocity {
+        fn from(value: u16) -> Self {
+            Velocity(value)
+        }
+    }
 
     pub struct VelocityManipulator<'a> {
         pub transport: &'a TransportLayer<'a>,
@@ -283,6 +298,12 @@ pub mod new_proposal {
 
     pub struct Acceleration(pub u16);
 
+    impl From<u16> for Acceleration {
+        fn from(value: u16) -> Self {
+            Acceleration(value)
+        }
+    }
+
     pub struct AccelerationManipulator<'a> {
         pub transport: &'a TransportLayer<'a>,
         pub address: WordAddress,
@@ -329,6 +350,18 @@ pub mod new_proposal {
 
     pub struct __Temp(pub u16);
 
+    impl From<Cursor> for __Temp {
+        fn from(value: Cursor) -> Self {
+            __Temp(0)
+        }
+    }
+
+    impl From<u16> for __Temp {
+        fn from(value: u16) -> Self {
+            __Temp(0)
+        }
+    }
+
     pub struct __TempManipulator<'a> {
         pub transport: &'a TransportLayer<'a>,
         pub address: WordAddress,
@@ -374,6 +407,12 @@ pub mod new_proposal {
     //  ///////////////////////////////////////////////////////////////////////////////////
 
     pub struct Adimensional(pub u16);
+
+    impl From<u16> for Adimensional {
+        fn from(value: u16) -> Self {
+            Adimensional(value)
+        }
+    }
 
     pub struct AdimensionalManipulator<'a> {
         pub transport: &'a TransportLayer<'a>,

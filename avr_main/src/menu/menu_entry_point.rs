@@ -1,31 +1,65 @@
+use lib_1::protocol::datalink::datalink::Datalink;
+use lib_1::protocol::transport::channel::Channel;
+use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
+use lib_1::protocol::transport::transport_layer::TransportLayer;
+
 use super::model::MachineModel;
 use super::widget::submenu::render::SubMenuRender;
 
+use crate::board::keyboard::KeyCode;
+use crate::board::lcd;
 use crate::menu::widget::submenu::spec::{MenuStorage, SubMenuHandle};
 
 use crate::menu::widget::widget_tests::SystemEnviroment;
 
-use crate::microcontroler::timer::now;
+use crate::microcontroler::delay::delay_ms;
+use crate::microcontroler::serial;
+use crate::microcontroler::timer::{self, now};
 
 ///
 
 pub fn development_entry_point() -> ! {
-    //optional_widget_test();
+    //
+
+    let channel = Channel::from_u8(0).unwrap();
+    fn now() -> u16 {
+        timer::now() as u16
+    }
+    const timeout_ms: u16 = 1000; // TODO: Maybe in future be calculated as a function of the connection baud rate
+
+    const baud_rate: u32 = 9600; // FIX: 2400 is not working, the problem seems to be in the register's port setup configuration
+    let _serial = serial::init(baud_rate);
+
+    fn try_rx() -> Result<Option<u8>, ()> {
+        Ok(serial::try_receive())
+    }
+
+    fn try_tx(byte: u8) -> Option<()> {
+        serial::try_transmit(byte).ok()
+    }
+
+    let datalink = &Datalink {
+        channel,
+        now,
+        timeout_ms,
+        try_rx,
+        try_tx,
+    };
+
+    let mechanical_properties = MechanicalProperties {
+        pulses_per_motor_revolution: 400,
+        linear_displacement_per_tooth_belt: 828,
+    };
+
+    let transport = TransportLayer::new(datalink, mechanical_properties);
+
+    //
 
     let SystemEnviroment {
         mut canvas,
         mut keyboard,
         ..
     } = SystemEnviroment::new();
-
-    /*     let slice = FlashSlice::new(&TABLE_02);
-    lcd::lcd_initialize();
-    for data in slice.to_iterator() {
-        lcd::print_u8_in_hex(data);
-    }
-    loop {}
-
-    canvas.render(); */
 
     let machine_model = MachineModel::new();
 
@@ -36,10 +70,15 @@ pub fn development_entry_point() -> ! {
     let mut submenu = SubMenuRender::new(menu_root, &menu_storage);
 
     let fps = 30; // frames_per_second
-    let mut next_frame: u32 = now() + (1000 / fps);
+    let mut next_frame: u16 = now() + (1000 / fps);
 
     loop {
         if let Some(key) = keyboard.get_key() {
+            if key == KeyCode::KEY_F4 {
+                lcd::clear();
+                lcd::print("Enviando");
+                machine_model.send_all(&transport);
+            }
             submenu.send_key(key);
         }
 
