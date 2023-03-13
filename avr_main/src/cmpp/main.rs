@@ -76,13 +76,13 @@ pub fn development_entry_point() {
     let transport = TransportLayer::new(datalink, mechanical_properties);
 
     let _status = transport
-        .posicao_inicial()
+        .__posicao_inicial()
         .set(Displacement(0x200))
         .map_err(panic_error_message)
         .unwrap();
 
     let value = transport
-        .posicao_inicial()
+        .__posicao_inicial()
         .get()
         .map_err(panic_error_message)
         .unwrap();
@@ -92,13 +92,13 @@ pub fn development_entry_point() {
     //
 
     let _status = transport
-        .posicao_inicial()
+        .__posicao_inicial()
         .set(Displacement(0x100))
         .map_err(panic_error_message)
         .unwrap();
 
     let value = transport
-        .posicao_inicial()
+        .__posicao_inicial()
         .get()
         .map_err(panic_error_message)
         .unwrap();

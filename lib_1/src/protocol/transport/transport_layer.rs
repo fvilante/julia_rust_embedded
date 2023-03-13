@@ -483,28 +483,28 @@ impl<'a> TransportLayer<'a> {
         SafeDatalink::new(&self.datalink)
     }
 
-    pub fn posicao_inicial(&self) -> DisplacementManipulator {
+    pub fn __posicao_inicial(&self) -> DisplacementManipulator {
         DisplacementManipulator {
             transport: self,
             address: 0x50.into(),
         }
     }
 
-    pub fn velocidade_de_avanco(&self) -> VelocityManipulator {
+    pub fn __velocidade_de_avanco(&self) -> VelocityManipulator {
         VelocityManipulator {
             transport: self,
             address: 0x50.into(),
         }
     }
 
-    pub fn aceleracao_de_avanco(&self) -> AccelerationManipulator {
+    pub fn __aceleracao_de_avanco(&self) -> AccelerationManipulator {
         AccelerationManipulator {
             transport: self,
             address: 0x50.into(),
         }
     }
 
-    pub fn start_automatico_no_avanco(&self) -> ActivationStateManipulator {
+    pub fn __start_automatico_no_avanco(&self) -> ActivationStateManipulator {
         ActivationStateManipulator {
             transport: self,
             address: BitAddress {
@@ -513,6 +513,8 @@ impl<'a> TransportLayer<'a> {
             },
         }
     }
+
+    // API Methods
 }
 
 ///////////////////////////////////
@@ -600,7 +602,7 @@ mod tests {
 
         //send
 
-        let response = transport.velocidade_de_avanco().set(Milimeter(10));
+        let response = transport.__velocidade_de_avanco().set(Milimeter(10));
 
         let status = response.unwrap();
 
