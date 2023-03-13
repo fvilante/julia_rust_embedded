@@ -8,8 +8,8 @@ use self::{
     manipulator::WordSetter,
     memory_map::{BitAddress, BitPosition, WordAddress},
     new_proposal::{
-        AccelerationManipulator, ActivationStateManipulator, DisplacementManipulator,
-        VelocityManipulator,
+        AccelerationManipulator, AdimensionalManipulator, DisplacementManipulator,
+        VelocityManipulator, __ActivationStateManipulator, __TempManipulator,
     },
 };
 
@@ -323,50 +323,142 @@ pub mod new_proposal {
 
     //  ///////////////////////////////////////////////////////////////////////////////////
     //
+    //      TEMP
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
+
+    pub struct __Temp(pub u16);
+
+    pub struct __TempManipulator<'a> {
+        pub transport: &'a TransportLayer<'a>,
+        pub address: WordAddress,
+    }
+
+    impl<'a> __TempManipulator<'a> {
+        // TODO: Not implemented yet, just a fake implementation
+        fn convert_to_cmpp(d: __Temp, _p: MechanicalProperties) -> Word16 {
+            let value = d.0;
+            let new_value = d.0 * 1;
+            new_value.into()
+        }
+
+        // TODO: Not implemented yet, just a fake implementation
+        fn convert_from_cmpp(word: Word16, _p: MechanicalProperties) -> __Temp {
+            let new_value = __Temp(word.into());
+            new_value
+        }
+
+        pub fn set(&self, value: __Temp) -> Result<Status, TLError> {
+            let properties = self.transport.mechanical_properties;
+            let word_value = Self::convert_to_cmpp(value, properties);
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            datalink.set_word16(word_value, word_address.into())
+        }
+
+        pub fn get(&self) -> Result<__Temp, TLError> {
+            let properties = self.transport.mechanical_properties;
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            let response = datalink
+                .get_word16(word_address.into())
+                .map(|word| Self::convert_from_cmpp(word, properties));
+            response
+        }
+    }
+
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //      Adimensional
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
+
+    pub struct Adimensional(pub u16);
+
+    pub struct AdimensionalManipulator<'a> {
+        pub transport: &'a TransportLayer<'a>,
+        pub address: WordAddress,
+    }
+
+    impl<'a> AdimensionalManipulator<'a> {
+        // TODO: Not implemented yet, just a fake implementation
+        fn convert_to_cmpp(d: Adimensional, _p: MechanicalProperties) -> Word16 {
+            let value = d.0;
+            let new_value = d.0 * 1;
+            new_value.into()
+        }
+
+        // TODO: Not implemented yet, just a fake implementation
+        fn convert_from_cmpp(word: Word16, _p: MechanicalProperties) -> Adimensional {
+            let new_value = Adimensional(word.into());
+            new_value
+        }
+
+        pub fn set(&self, value: Adimensional) -> Result<Status, TLError> {
+            let properties = self.transport.mechanical_properties;
+            let word_value = Self::convert_to_cmpp(value, properties);
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            datalink.set_word16(word_value.into(), word_address.into())
+        }
+
+        pub fn get(&self) -> Result<Adimensional, TLError> {
+            let properties = self.transport.mechanical_properties;
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            let response = datalink
+                .get_word16(word_address.into())
+                .map(|word| Self::convert_from_cmpp(word, properties));
+            response
+        }
+    }
+
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
     //      ActivationState
     //
     //  ///////////////////////////////////////////////////////////////////////////////////
 
     #[repr(u8)]
-    pub enum ActivationState {
+    pub enum __ActivationState {
         Activated = 1,
         Deactivated = 0,
     }
 
-    impl From<bool> for ActivationState {
+    impl From<bool> for __ActivationState {
         fn from(value: bool) -> Self {
             match value {
-                true => ActivationState::Activated,
-                false => ActivationState::Deactivated,
+                true => __ActivationState::Activated,
+                false => __ActivationState::Deactivated,
             }
         }
     }
 
-    impl Into<bool> for ActivationState {
+    impl Into<bool> for __ActivationState {
         fn into(self) -> bool {
             match self {
-                ActivationState::Activated => false,
-                ActivationState::Deactivated => true,
+                __ActivationState::Activated => false,
+                __ActivationState::Deactivated => true,
             }
         }
     }
 
-    pub struct ActivationStateManipulator<'a> {
+    pub struct __ActivationStateManipulator<'a> {
         pub transport: &'a TransportLayer<'a>,
         pub address: BitAddress,
     }
 
-    impl<'a> ActivationStateManipulator<'a> {
-        fn convert_to_cmpp(value: ActivationState) -> Bit {
+    impl<'a> __ActivationStateManipulator<'a> {
+        fn convert_to_cmpp(value: __ActivationState) -> Bit {
             let bit = value.into();
             Bit(bit)
         }
 
-        fn convert_from_cmpp(bit: Bit) -> ActivationState {
+        fn convert_from_cmpp(bit: Bit) -> __ActivationState {
             bit.0.into()
         }
 
-        pub fn set(&self, value: ActivationState) -> Result<Status, TLError> {
+        pub fn set(&self, value: __ActivationState) -> Result<Status, TLError> {
             let bit = Self::convert_to_cmpp(value);
             let map = self.address;
             self.transport.safe_datalink().send_bit(bit, map)
@@ -374,7 +466,7 @@ pub mod new_proposal {
 
         /// TODO: Check if I would return also the complete Word16 once I have to get it in
         /// order to get its bit value.
-        pub fn get(&self) -> Result<ActivationState, TLError> {
+        pub fn get(&self) -> Result<__ActivationState, TLError> {
             let datalink = self.transport.safe_datalink();
             let word_address = self.address.word_address;
             let response = datalink.get_word16(word_address.into()).map(|word| {
@@ -504,8 +596,8 @@ impl<'a> TransportLayer<'a> {
         }
     }
 
-    pub fn __start_automatico_no_avanco(&self) -> ActivationStateManipulator {
-        ActivationStateManipulator {
+    pub fn __start_automatico_no_avanco(&self) -> __ActivationStateManipulator {
+        __ActivationStateManipulator {
             transport: self,
             address: BitAddress {
                 word_address: 0x60.into(),
@@ -515,6 +607,271 @@ impl<'a> TransportLayer<'a> {
     }
 
     // API Methods
+
+    pub fn posicao_inicial(&self) -> DisplacementManipulator {
+        DisplacementManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn posicao_final(&self) -> DisplacementManipulator {
+        DisplacementManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn aceleracao_de_avanco(&self) -> AccelerationManipulator {
+        AccelerationManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn aceleracao_de_retorno(&self) -> AccelerationManipulator {
+        AccelerationManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn velocidade_de_avanco(&self) -> VelocityManipulator {
+        VelocityManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn velocidade_de_retorno(&self) -> VelocityManipulator {
+        VelocityManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn numero_de_mensagem_no_avanco(&self) -> AdimensionalManipulator {
+        AdimensionalManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn numero_de_mensagem_no_retorno(&self) -> AdimensionalManipulator {
+        AdimensionalManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn primeira_mensagem_no_avanco(&self) -> DisplacementManipulator {
+        DisplacementManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn ultima_mensagem_no_avanco(&self) -> DisplacementManipulator {
+        DisplacementManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn primeira_mensagem_no_retorno(&self) -> DisplacementManipulator {
+        DisplacementManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn ultima_mensagem_no_retorno(&self) -> DisplacementManipulator {
+        DisplacementManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn logica_do_sinal_de_impressao(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn largura_do_sinal_de_impressao(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn reversao_de_mensagem_via_serial(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn selecao_de_mensagem_via_serial(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn retardo_no_start_automatico(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn retardo_no_start_externo(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn start_automatico_no_avanco(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn start_automatico_no_retorno(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn modo_de_trabalho_do_eixo(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn antecipacao_da_saida_de_start(&self) -> DisplacementManipulator {
+        DisplacementManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn saida_de_start_no_avaco(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn saida_de_start_no_retorno(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn entrada_de_start_entre_eixos(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn retardo_do_start_entre_eixos(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn start_pelo_teclado_e_externo(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn retardo_no_sinal_de_impressao(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn retardo_no_start_passo_a_passo(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn start_automatico_passo_a_passo(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn saida_de_start_passo_a_passo(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn numero_do_canal(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn numero_de_pulso_do_giro(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn janela_de_protecao_do_giro(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn deslocamento_giro_do_motor(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn giro_com_funcao_de_protecao(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn giro_com_funcao_de_correcao(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn logica_do_start_externo(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn valor_da_posicao_de_referencia(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn velocidade_para_referencia(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn aceleracao_para_referencia(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn reducao_da_corrente_em_repouso(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn referencia_pelo_start_externo(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
+    pub fn modo_turbo(&self) -> __TempManipulator {
+        __TempManipulator {
+            transport: self,
+            address: 0xFF.into(),
+        }
+    }
 }
 
 ///////////////////////////////////
