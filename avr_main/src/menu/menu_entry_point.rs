@@ -2,6 +2,7 @@ use lib_1::protocol::datalink::datalink::Datalink;
 use lib_1::protocol::transport::channel::Channel;
 use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
 use lib_1::protocol::transport::transport_layer::TransportLayer;
+use lib_1::utils::common::usize_to_u8_clamper;
 
 use super::model::MachineModel;
 use super::widget::submenu::render::SubMenuRender;
@@ -77,7 +78,11 @@ pub fn development_entry_point() -> ! {
             if key == KeyCode::KEY_F4 {
                 lcd::clear();
                 lcd::print("Enviando");
-                machine_model.send_all(&transport);
+                for (index, _response) in machine_model.send_all(&transport).enumerate() {
+                    let index = usize_to_u8_clamper(index);
+                    lcd::clear();
+                    lcd::print_u8_in_hex(index);
+                }
             }
             submenu.send_key(key);
         }
