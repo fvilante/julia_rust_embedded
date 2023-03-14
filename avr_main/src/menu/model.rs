@@ -38,7 +38,7 @@ pub struct ArquivoDeEixo {
     pub modo_de_trabalho_do_eixo: Cell<Cursor>,
     // INTERTRAVAMENTO ENTRE DOIS EIXOS
     pub antecipacao_da_saida_de_start: Cell<u16>,
-    pub saida_de_start_no_avaco: Cell<Cursor>,
+    pub saida_de_start_no_avaco: Cell<Cursor>, // TODO: Correct typo `avaco` to `avanco`
     pub saida_de_start_no_retorno: Cell<Cursor>,
     pub entrada_de_start_entre_eixos: Cell<Cursor>,
     pub retardo_do_start_entre_eixos: Cell<u16>,
@@ -52,20 +52,158 @@ pub struct ArquivoDeEixo {
 impl ArquivoDeEixo {
     const INITIAL_ADDRESS: u8 = 0x00;
 
+    /// Signature is used to inform that the eeprom is correctly initialized.
+    ///
+    /// When microcontroler is flashed first time, the eeprom is erased and is in an invalid state
+    /// we use this signature to inform that the block of eeprom data is initialized
+    const SIGNATURE: u16 = 0xA000;
+
     fn save_into_eeprom(&self) {
-        let address = Self::INITIAL_ADDRESS;
-        let value = self.posicao_inicial.get();
-        let mut next = EepromAddress(address).write_u16(value);
-        let value = self.posicao_final.get();
-        let mut next = next.write_u16(value);
+        EepromAddress(Self::INITIAL_ADDRESS)
+            .write_u16(Self::SIGNATURE)
+            .write_u16(self.posicao_inicial.get())
+            .write_u16(self.posicao_final.get())
+            .write_u16(self.aceleracao_de_avanco.get())
+            .write_u16(self.aceleracao_de_retorno.get())
+            .write_u16(self.velocidade_de_avanco.get())
+            .write_u16(self.velocidade_de_retorno.get())
+            .write_u16(self.numero_de_mensagem_no_avanco.get())
+            .write_u16(self.numero_de_mensagem_no_retorno.get())
+            .write_u16(self.primeira_mensagem_no_avanco.get())
+            .write_u16(self.ultima_mensagem_no_avanco.get())
+            .write_u16(self.primeira_mensagem_no_retorno.get())
+            .write_u16(self.ultima_mensagem_no_retorno.get())
+            .write_cursor(self.logica_do_sinal_de_impressao.get())
+            .write_u16(self.largura_do_sinal_de_impressao.get())
+            .write_cursor(self.reversao_de_mensagem_via_serial.get())
+            .write_cursor(self.selecao_de_mensagem_via_serial.get())
+            .write_u16(self.retardo_no_start_automatico.get())
+            .write_u16(self.retardo_no_start_externo.get())
+            .write_cursor(self.start_automatico_no_avanco.get())
+            .write_cursor(self.start_automatico_no_retorno.get())
+            .write_cursor(self.modo_de_trabalho_do_eixo.get())
+            .write_u16(self.antecipacao_da_saida_de_start.get())
+            .write_cursor(self.saida_de_start_no_avaco.get())
+            .write_cursor(self.saida_de_start_no_retorno.get())
+            .write_cursor(self.entrada_de_start_entre_eixos.get())
+            .write_u16(self.retardo_do_start_entre_eixos.get())
+            .write_cursor(self.start_pelo_teclado_e_externo.get())
+            .write_u16(self.retardo_no_sinal_de_impressao.get())
+            .write_u16(self.retardo_no_start_passo_a_passo.get())
+            .write_cursor(self.start_automatico_passo_a_passo.get())
+            .write_cursor(self.saida_de_start_passo_a_passo.get());
     }
 
     fn load_from_eeprom(&mut self) {
-        let address = Self::INITIAL_ADDRESS;
-        let (value, next) = EepromAddress(address).read_u16();
-        self.posicao_inicial.set(value);
-        let (value, _next) = next.read_u16();
-        self.posicao_final.set(value);
+        let next = EepromAddress(Self::INITIAL_ADDRESS);
+        let (signature, next) = next.read_u16();
+
+        let signature_is_valid = signature == Self::SIGNATURE;
+
+        if signature_is_valid {
+            let (value, next) = next.read_u16();
+            self.posicao_inicial.set(value);
+
+            let (value, next) = next.read_u16();
+            self.posicao_final.set(value);
+
+            let (value, next) = next.read_u16();
+            self.aceleracao_de_avanco.set(value);
+
+            let (value, next) = next.read_u16();
+            self.aceleracao_de_retorno.set(value);
+
+            let (value, next) = next.read_u16();
+            self.velocidade_de_avanco.set(value);
+
+            let (value, next) = next.read_u16();
+            self.velocidade_de_retorno.set(value);
+
+            let (value, next) = next.read_u16();
+            self.numero_de_mensagem_no_avanco.set(value);
+
+            let (value, next) = next.read_u16();
+            self.numero_de_mensagem_no_retorno.set(value);
+
+            let (value, next) = next.read_u16();
+            self.primeira_mensagem_no_avanco.set(value);
+
+            let (value, next) = next.read_u16();
+            self.ultima_mensagem_no_avanco.set(value);
+
+            let (value, next) = next.read_u16();
+            self.primeira_mensagem_no_retorno.set(value);
+
+            let (value, next) = next.read_u16();
+            self.ultima_mensagem_no_retorno.set(value);
+
+            /*
+
+            let (value, next) = next.read_cursor();
+            self.logica_do_sinal_de_impressao.set(value);
+
+            let (value, next) = next.read_u16();
+            self.largura_do_sinal_de_impressao.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.reversao_de_mensagem_via_serial.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.selecao_de_mensagem_via_serial.set(value);
+
+            let (value, next) = next.read_u16();
+            self.retardo_no_start_automatico.set(value);
+
+            let (value, next) = next.read_u16();
+            self.retardo_no_start_externo.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.start_automatico_no_avanco.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.start_automatico_no_retorno.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.modo_de_trabalho_do_eixo.set(value);
+
+            let (value, next) = next.read_u16();
+            self.antecipacao_da_saida_de_start.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.saida_de_start_no_avaco.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.saida_de_start_no_retorno.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.entrada_de_start_entre_eixos.set(value);
+
+            let (value, next) = next.read_u16();
+            self.retardo_do_start_entre_eixos.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.start_pelo_teclado_e_externo.set(value);
+
+            let (value, next) = next.read_u16();
+            self.retardo_no_sinal_de_impressao.set(value);
+
+            let (value, next) = next.read_u16();
+            self.retardo_no_start_passo_a_passo.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.start_automatico_passo_a_passo.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.saida_de_start_passo_a_passo.set(value);
+            */
+        } else {
+            // EEPROM is not initialized yet
+            // Then initialize it.
+
+            let default = ArquivoDeEixo::default();
+            default.save_into_eeprom();
+            self.load_from_eeprom();
+        }
     }
 }
 

@@ -1,4 +1,4 @@
-use lib_1::protocol::datalink::datalink::word16::Word16;
+use lib_1::{protocol::datalink::datalink::word16::Word16, utils::cursor::Cursor};
 use ruduino::{cores::current as avr_core, interrupt::without_interrupts, Register};
 
 use avr_core::{EEAR, EECR, EEDR, SPMCSR};
@@ -40,14 +40,18 @@ impl EepromAddress {
 
     // Flavio's API
 
+    pub fn out_of_range_error() -> ! {
+        panic!("E81") // EEprom address out of 255 range.
+                      //TODO: Currently this eeprom driver only address 255 bytes, change it to address the 1KB available
+                      //      in the avr328p
+    }
+
     /// Writes u16 into the current address (in `little-endian` format) and returns the address of the next chunk.
     /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom, and cannot address the last word address.
     pub fn write_u16(&mut self, val: u16) -> EepromAddress {
         let address_low = self.0;
         let Some(address_next) = address_low.checked_add(2) else {
-            panic!("81") // EEprom address out of 255 range.
-            //TODO: Currently this eeprom driver only address 255 bytes, change it to address the 1KB available
-            //      in the avr328p
+            Self::out_of_range_error()
         };
         // SAFETY: Safe because the check is done above
         let address_high = unsafe { address_low.unchecked_add(1) };
@@ -57,14 +61,25 @@ impl EepromAddress {
         EepromAddress(address_next)
     }
 
+    /// TODO: Cursor is using 4 bytes in eeprom when at least 2 bytes is enough
+    pub fn write_cursor(&mut self, cursor: Cursor) -> EepromAddress {
+        let byte_0 = cursor.get_current();
+        let byte_1 = cursor.get_range().start; // TODO: Check if this byte is always 0, and if it is remove it from eeprom
+        let byte_2 = cursor.get_range().end;
+        let byte_3 = 0_u8; // not used
+        let word_1 = Word16::from_bytes(byte_0, byte_1).to_u16();
+        let word_2 = Word16::from_bytes(byte_0, byte_1).to_u16();
+        let mut next = self.write_u16(word_1);
+        let next = next.write_u16(word_2);
+        next
+    }
+
     /// Return the u16 read (in `little-endian` format) and the address pointing to the next chunk
     /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom, and cannot address the last word address.
     pub fn read_u16(&self) -> (u16, Self) {
         let address_low = self.0;
-        let Some(address_next) = address_low.checked_add(2) else {
-            panic!("82") // EEprom address out of 255 range.
-            //TODO: Currently this eeprom driver only address 255 bytes, change it to address the 1KB available
-            //      in the avr328p
+        let Some(address_next) = address_low.checked_add(2) else  {
+            Self::out_of_range_error()
         };
         // SAFETY: Safe because the check is done above
         let address_high = unsafe { address_low.unchecked_add(1) };
@@ -72,6 +87,18 @@ impl EepromAddress {
         let byte_high = EepromAddress(address_high).read();
         let value = Word16::from_bytes(byte_low, byte_high).to_u16();
         (value, EepromAddress(address_next))
+    }
+
+    pub fn read_cursor(&self) -> (Cursor, Self) {
+        let (word_1, next) = self.read_u16();
+        let (word_2, next) = next.read_u16();
+        let (byte_0, byte_1) = Word16::from_u16(word_1).split_bytes();
+        let (byte_2, _byte_3) = Word16::from_u16(word_2).split_bytes();
+        let initial_value = byte_0;
+        let start = byte_1;
+        let end = byte_2;
+        let cursor = Cursor::new(start, end, initial_value);
+        (cursor, next)
     }
 }
 
