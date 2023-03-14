@@ -65,17 +65,18 @@ pub fn development_entry_point() -> ! {
         ..
     } = SystemEnviroment::new();
 
-    if let Err(_) = auto_test_eeprom() {
-        progmem! {
-            static progmem string TEXT = "Erro durante auto-teste da eeprom";
-        }
-        canvas.clear();
-        canvas.print_flash_str(FlashString::new(&TEXT));
-        canvas.render();
-        delay_ms(2000);
-    }
+    //if let Err(_) = auto_test_eeprom() {
+    //    progmem! {
+    //        static progmem string TEXT = "Erro durante auto-teste da eeprom";
+    //    }
+    //    canvas.clear();
+    //    canvas.print_flash_str(FlashString::new(&TEXT));
+    //    canvas.render();
+    //    delay_ms(2000);
+    //}
 
-    let machine_model = MachineModel::load_from_eeprom();
+    let mut machine_model = MachineModel::new();
+    machine_model.load_from_eeprom();
 
     let menu_storage: MenuStorage = MenuStorage::new(&machine_model);
 

@@ -49,6 +49,26 @@ pub struct ArquivoDeEixo {
     pub saida_de_start_passo_a_passo: Cell<Cursor>,
 }
 
+impl ArquivoDeEixo {
+    const INITIAL_ADDRESS: u8 = 0x00;
+
+    fn save_into_eeprom(&self) {
+        let address = Self::INITIAL_ADDRESS;
+        let value = self.posicao_inicial.get();
+        let mut next = EepromAddress(address).write_u16(value);
+        let value = self.posicao_final.get();
+        let mut next = next.write_u16(value);
+    }
+
+    fn load_from_eeprom(&mut self) {
+        let address = Self::INITIAL_ADDRESS;
+        let (value, next) = EepromAddress(address).read_u16();
+        self.posicao_inicial.set(value);
+        let (value, _next) = next.read_u16();
+        self.posicao_final.set(value);
+    }
+}
+
 impl Default for ArquivoDeEixo {
     fn default() -> Self {
         Self {
@@ -155,26 +175,11 @@ impl MachineModel {
     }
 
     pub fn save_to_eeprom(&self) {
-        let value = self.arquivo_de_eixo_x.posicao_inicial.get();
-        let word = Word16::from_u16(value);
-        let (byte_low, byte_high) = word.split_bytes();
-        EepromAddress(Self::ADDR_LOW).write(byte_low);
-        EepromAddress(Self::ADDR_HIGH).write(byte_high);
+        self.arquivo_de_eixo_x.save_into_eeprom();
     }
 
-    pub fn load_from_eeprom() -> Self {
-        let byte_low = EepromAddress(Self::ADDR_LOW).read();
-        let byte_high = EepromAddress(Self::ADDR_HIGH).read();
-        let word = Word16::from_bytes(byte_low, byte_high);
-        let value = word.to_u16();
-        let arquivo_de_eixo = ArquivoDeEixo::default();
-        arquivo_de_eixo.posicao_inicial.set(value);
-        let configuracao_de_eixo = ConfiguracaoDoEixo::default();
-
-        Self {
-            arquivo_de_eixo_x: arquivo_de_eixo,
-            configuracao_do_eixo_x: configuracao_de_eixo,
-        }
+    pub fn load_from_eeprom(&mut self) {
+        self.arquivo_de_eixo_x.load_from_eeprom();
     }
 }
 

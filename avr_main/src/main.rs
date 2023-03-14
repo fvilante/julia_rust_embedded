@@ -10,6 +10,7 @@
 #![allow(non_snake_case)] // remove this line when possible
 #![allow(dead_code)]
 #![feature(lang_items)] // Necessary to eh_personality and to run "cargo fix" on the code.
+#![feature(unchecked_math)] // Used in EepromAddress::{ read_u16, write_u16 } // TODO: Remove when possible
 
 extern crate alloc;
 //extern crate avr_std_stub;
