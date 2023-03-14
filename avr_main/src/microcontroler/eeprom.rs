@@ -1,8 +1,6 @@
-use ruduino::{
-    cores::current as avr_core, interrupt::without_interrupts, Pin, Register, RegisterBits,
-};
+use ruduino::{cores::current as avr_core, interrupt::without_interrupts, Register};
 
-use avr_core::{port, DDRB, DDRD, EEAR, EECR, EEDR, PCICR, PCMSK0, PORTB, PORTD, SPMCSR, SREG};
+use avr_core::{EEAR, EECR, EEDR, SPMCSR};
 
 /// This code was originally written by `MalteT` and was grab from github commit below:
 /// https://github.com/MalteT/counter-avr/blob/ebb7ca36d7a04b11265cb41024798a38ac31ad05/src/main.rs#L251

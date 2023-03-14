@@ -167,7 +167,7 @@ impl MachineModel {
         let byte_high = EepromAddress(Self::ADDR_HIGH).read();
         let word = Word16::from_bytes(byte_low, byte_high);
         let value = word.to_u16();
-        let mut arquivo_de_eixo = ArquivoDeEixo::default();
+        let arquivo_de_eixo = ArquivoDeEixo::default();
         arquivo_de_eixo.posicao_inicial.set(value);
         let configuracao_de_eixo = ConfiguracaoDoEixo::default();
 

@@ -18,7 +18,7 @@ use crate::menu::widget::widget_tests::SystemEnviroment;
 use crate::microcontroler::delay::delay_ms;
 use crate::microcontroler::eeprom::auto_test_eeprom;
 use crate::microcontroler::serial;
-use crate::microcontroler::timer::{self, now};
+use crate::microcontroler::timer::{self};
 
 ///
 
@@ -29,10 +29,10 @@ pub fn development_entry_point() -> ! {
     fn now() -> u16 {
         timer::now() as u16
     }
-    const timeout_ms: u16 = 1000; // TODO: Maybe in future be calculated as a function of the connection baud rate
+    const TIMEOUT_MS: u16 = 1000; // TODO: Maybe in future be calculated as a function of the connection baud rate
 
-    const baud_rate: u32 = 9600; // FIX: 2400 is not working, the problem seems to be in the register's port setup configuration
-    let _serial = serial::init(baud_rate);
+    const BAUD_RATE: u32 = 9600; // FIX: 2400 is not working, the problem seems to be in the register's port setup configuration
+    let _serial = serial::init(BAUD_RATE);
 
     fn try_rx() -> Result<Option<u8>, ()> {
         Ok(serial::try_receive())
@@ -45,7 +45,7 @@ pub fn development_entry_point() -> ! {
     let datalink = &Datalink {
         channel,
         now,
-        timeout_ms,
+        timeout_ms: TIMEOUT_MS,
         try_rx,
         try_tx,
     };
