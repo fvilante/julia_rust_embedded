@@ -8,8 +8,8 @@ use self::{
     manipulator::WordSetter,
     memory_map::{BitAddress, BitPosition, WordAddress},
     new_proposal::{
-        AccelerationManipulator, AdimensionalManipulator, DisplacementManipulator,
-        VelocityManipulator, __ActivationStateManipulator, __TempManipulator,
+        AccelerationManipulator, AdimensionalManipulator, BinaryManipulator,
+        DisplacementManipulator, VelocityManipulator, __TempManipulator,
     },
 };
 
@@ -175,6 +175,8 @@ pub mod manipulator {
 /// refactor the concept of bitwise manipulation used inside Word16 as a consequence. Se also
 /// BitPosition type `todo` notes.
 pub mod new_proposal {
+    use core::marker::PhantomData;
+
     use crate::{
         protocol::datalink::datalink::{word16::Word16, Status},
         utils::cursor::Cursor,
@@ -482,22 +484,23 @@ pub mod new_proposal {
         }
     }
 
-    pub struct __ActivationStateManipulator<'a> {
+    pub struct BinaryManipulator<'a, T: Into<bool> + From<bool>> {
         pub transport: &'a TransportLayer<'a>,
         pub address: BitAddress,
+        phanton: PhantomData<T>,
     }
 
-    impl<'a> __ActivationStateManipulator<'a> {
-        fn convert_to_cmpp(value: __ActivationState) -> Bit {
+    impl<'a, T: Into<bool> + From<bool>> BinaryManipulator<'a, T> {
+        fn convert_to_cmpp(value: T) -> Bit {
             let bit = value.into();
             Bit(bit)
         }
 
-        fn convert_from_cmpp(bit: Bit) -> __ActivationState {
+        fn convert_from_cmpp(bit: Bit) -> T {
             bit.0.into()
         }
 
-        pub fn set(&self, value: __ActivationState) -> Result<Status, TLError> {
+        pub fn set(&self, value: T) -> Result<Status, TLError> {
             let bit = Self::convert_to_cmpp(value);
             let map = self.address;
             self.transport.safe_datalink().send_bit(bit, map)
@@ -505,7 +508,7 @@ pub mod new_proposal {
 
         /// TODO: Check if I would return also the complete Word16 once I have to get it in
         /// order to get its bit value.
-        pub fn get(&self) -> Result<__ActivationState, TLError> {
+        pub fn get(&self) -> Result<T, TLError> {
             let datalink = self.transport.safe_datalink();
             let word_address = self.address.word_address;
             let response = datalink.get_word16(word_address.into()).map(|word| {
