@@ -7,10 +7,12 @@ use super::common::{const_clamp, usize_to_u8_clamper};
 ///
 #[derive(Copy, Clone)]
 pub struct Cursor {
-    // size = 3 bytes
-    current: u8, // varies between start (inclusive) and end (exclusive)
-    start: u8,   // included
-    end: u8,     // excluded
+    /// varies between start (inclusive) and end (exclusive)
+    current: u8,
+    /// included
+    start: u8,
+    /// excluded
+    end: u8,
 }
 
 impl Cursor {

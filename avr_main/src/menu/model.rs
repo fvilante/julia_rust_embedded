@@ -137,8 +137,6 @@ impl ArquivoDeEixo {
             let (value, next) = next.read_u16();
             self.ultima_mensagem_no_retorno.set(value);
 
-            /*
-
             let (value, next) = next.read_cursor();
             self.logica_do_sinal_de_impressao.set(value);
 
@@ -195,7 +193,6 @@ impl ArquivoDeEixo {
 
             let (value, next) = next.read_cursor();
             self.saida_de_start_passo_a_passo.set(value);
-            */
         } else {
             // EEPROM is not initialized yet
             // Then initialize it.

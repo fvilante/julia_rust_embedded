@@ -16,7 +16,7 @@ use crate::menu::widget::submenu::spec::{MenuStorage, SubMenuHandle};
 use crate::menu::widget::widget_tests::SystemEnviroment;
 
 use crate::microcontroler::delay::delay_ms;
-use crate::microcontroler::eeprom::auto_test_eeprom;
+
 use crate::microcontroler::serial;
 use crate::microcontroler::timer::{self};
 
