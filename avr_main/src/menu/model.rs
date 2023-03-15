@@ -275,7 +275,19 @@ impl ConfiguracaoDoEixo {
     fn save_into_eeprom(&self, mut initial_address: EepromAddress) -> (EepromAddress, u8) {
         let next = initial_address
             .write_u16(Self::SIGNATURE)
-            .write_u16(self.numero_do_canal.get());
+            .write_u16(self.numero_do_canal.get())
+            .write_u16(self.numero_de_pulso_do_giro.get())
+            .write_u16(self.janela_de_protecao_do_giro.get())
+            .write_cursor(self.deslocamento_giro_do_motor.get())
+            .write_cursor(self.giro_com_funcao_de_protecao.get())
+            .write_cursor(self.giro_com_funcao_de_correcao.get())
+            .write_cursor(self.logica_do_start_externo.get())
+            .write_u16(self.valor_da_posicao_de_referencia.get())
+            .write_u16(self.velocidade_para_referencia.get())
+            .write_u16(self.aceleracao_para_referencia.get())
+            .write_cursor(self.reducao_da_corrente_em_repouso.get())
+            .write_cursor(self.referencia_pelo_start_externo.get())
+            .write_cursor(self.modo_turbo.get());
 
         let size_of_bytes_written = next.0 - initial_address.0;
         (next, size_of_bytes_written)
@@ -293,6 +305,42 @@ impl ConfiguracaoDoEixo {
         if signature_is_valid {
             let (value, next) = next.read_u16();
             self.numero_do_canal.set(value);
+
+            let (value, next) = next.read_u16();
+            self.numero_de_pulso_do_giro.set(value);
+
+            let (value, next) = next.read_u16();
+            self.janela_de_protecao_do_giro.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.deslocamento_giro_do_motor.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.giro_com_funcao_de_protecao.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.giro_com_funcao_de_correcao.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.logica_do_start_externo.set(value);
+
+            let (value, next) = next.read_u16();
+            self.valor_da_posicao_de_referencia.set(value);
+
+            let (value, next) = next.read_u16();
+            self.velocidade_para_referencia.set(value);
+
+            let (value, next) = next.read_u16();
+            self.aceleracao_para_referencia.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.reducao_da_corrente_em_repouso.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.referencia_pelo_start_externo.set(value);
+
+            let (value, next) = next.read_cursor();
+            self.modo_turbo.set(value);
 
             //
             let size_of_bytes_loadded = next.0 - initial_address.0;
