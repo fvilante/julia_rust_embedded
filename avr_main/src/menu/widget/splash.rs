@@ -62,6 +62,7 @@ impl State {
 pub struct Splash<'a> {
     current_state: State,
     next_state_time_point: u32,
+    /// pointer to the next widget to be loaded
     widget: Option<IWidget<'a>>,
 }
 
@@ -93,7 +94,7 @@ impl<'a> Widget for Splash<'a> {
         if has_finished == false {
             // do nothing
         } else {
-            // delegate / by-pass
+            // delegate / by-pass to next widget
             if let Some(widget) = &mut self.widget {
                 (*widget).send_key(key)
             }

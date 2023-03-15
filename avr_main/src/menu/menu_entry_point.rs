@@ -11,8 +11,14 @@ use super::widget::submenu::render::SubMenuRender;
 use crate::board::keyboard::KeyCode;
 use crate::board::lcd;
 use crate::menu::flash::FlashString;
+use crate::menu::point::Point;
+use crate::menu::widget::execucao::MenuExecucao;
+use crate::menu::widget::main_menu::MainMenu;
+use crate::menu::widget::manual_mode::ManualModeMenu;
+use crate::menu::widget::splash::Splash;
 use crate::menu::widget::submenu::spec::{MenuStorage, SubMenuHandle};
 
+use crate::menu::widget::widget::Widget;
 use crate::menu::widget::widget_tests::SystemEnviroment;
 
 use crate::microcontroler::delay::delay_ms;
@@ -74,6 +80,29 @@ pub fn development_entry_point() -> ! {
     //    canvas.render();
     //    delay_ms(2000);
     //}
+
+    //////
+
+    let menu_manual = ManualModeMenu::new();
+    let menu_execucao = MenuExecucao::new();
+    let mut main_menu: &mut dyn Widget = &mut MainMenu::new(menu_manual, menu_execucao);
+
+    ///////
+
+    let mut splash_window = Splash::new(Some(main_menu));
+
+    loop {
+        if let Some(key) = keyboard.get_key() {
+            splash_window.send_key(key);
+        }
+
+        splash_window.update();
+        let start_point = Point::new(0, 0);
+        splash_window.draw(&mut canvas, start_point);
+        canvas.render();
+    }
+
+    ///////
 
     let mut machine_model = MachineModel::new();
     machine_model.load_from_eeprom();
