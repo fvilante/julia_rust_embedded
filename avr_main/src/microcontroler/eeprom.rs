@@ -47,6 +47,7 @@ impl EepromAddress {
         panic!("E81")
     }
 
+    /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom, and cannot address the last word address.
     pub fn write_u8(&mut self, val: u8) -> EepromAddress {
         let address = self.0;
         let Some(next_address) = address.checked_add(1) else {
@@ -65,19 +66,18 @@ impl EepromAddress {
         next
     }
 
-    /// TODO: Cursor is using 4 bytes in eeprom when at least 2 bytes is enough
+    /// TODO: Cursor is being write in eeprom using 3 bytes, but if Cursor::start is always zero we can use just 2 bytes
     pub fn write_cursor(&mut self, cursor: Cursor) -> EepromAddress {
         let byte_0 = cursor.get_current();
         let byte_1 = cursor.get_range().start; // TODO: Check if this byte is always 0, and if it is remove it from eeprom
         let byte_2 = cursor.get_range().end;
-        let _byte_3 = 0_u8; // not used
-        let word_1 = Word16::from_bytes(byte_0, byte_1).to_u16();
-        let word_2 = Word16::from_bytes(byte_2, _byte_3).to_u16();
-        let mut next = self.write_u16(word_1);
-        let next = next.write_u16(word_2);
+        let mut next = self.write_u8(byte_0);
+        let mut next = next.write_u8(byte_1);
+        let next = next.write_u8(byte_2);
         next
     }
 
+    /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom, and cannot address the last word address.
     pub fn read_u8(&self) -> (u8, Self) {
         let address = self.0;
         let Some(next_address) = address.checked_add(1) else {
@@ -90,26 +90,17 @@ impl EepromAddress {
     /// Return the u16 read (in `little-endian` format) and the address pointing to the next chunk
     /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom, and cannot address the last word address.
     pub fn read_u16(&self) -> (u16, Self) {
-        let address_low = self.0;
-        let Some(address_next) = address_low.checked_add(2) else  {
-            Self::out_of_range_error()
-        };
-        // SAFETY: Safe because the check is done above
-        let address_high = unsafe { address_low.unchecked_add(1) };
-        let byte_low = EepromAddress(address_low).read();
-        let byte_high = EepromAddress(address_high).read();
+        let (byte_low, next) = self.read_u8();
+        let (byte_high, next) = next.read_u8();
         let value = Word16::from_bytes(byte_low, byte_high).to_u16();
-        (value, EepromAddress(address_next))
+        (value, next)
     }
 
     pub fn read_cursor(&self) -> (Cursor, Self) {
-        let (word_1, next) = self.read_u16();
-        let (word_2, next) = next.read_u16();
-        let (byte_0, byte_1) = Word16::from_u16(word_1).split_bytes();
-        let (byte_2, _byte_3) = Word16::from_u16(word_2).split_bytes();
-        let initial_value = byte_0;
-        let start = byte_1;
-        let end = byte_2;
+        let (byte_0, next) = self.read_u8();
+        let (byte_1, next) = next.read_u8();
+        let (byte_2, next) = next.read_u8();
+        let (initial_value, start, end) = (byte_0, byte_1, byte_2);
         let cursor = Cursor::new(start, end, initial_value);
         (cursor, next)
     }
