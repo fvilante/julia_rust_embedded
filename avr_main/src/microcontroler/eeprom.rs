@@ -5,6 +5,7 @@ use avr_core::{EEAR, EECR, EEDR, SPMCSR};
 
 /// This code was originally written by `MalteT` and was grab from github commit below:
 /// https://github.com/MalteT/counter-avr/blob/ebb7ca36d7a04b11265cb41024798a38ac31ad05/src/main.rs#L251
+#[derive(Copy, Clone)]
 pub struct EepromAddress(pub u8);
 
 impl EepromAddress {

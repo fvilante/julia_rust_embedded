@@ -50,16 +50,16 @@ pub struct ArquivoDeEixo {
 }
 
 impl ArquivoDeEixo {
-    const INITIAL_ADDRESS: u8 = 0x00;
-
     /// Signature is used to inform that the eeprom is correctly initialized.
     ///
     /// When microcontroler is flashed first time, the eeprom is erased and is in an invalid state
     /// we use this signature to inform that the block of eeprom data is initialized
     const SIGNATURE: u16 = 0xA000;
 
-    fn save_into_eeprom(&self) {
-        EepromAddress(Self::INITIAL_ADDRESS)
+    /// Given initial address, write data and return next available address and size written in bytes
+    /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom
+    fn save_into_eeprom(&self, mut initial_address: EepromAddress) -> (EepromAddress, u8) {
+        let next = initial_address
             .write_u16(Self::SIGNATURE)
             .write_u16(self.posicao_inicial.get())
             .write_u16(self.posicao_final.get())
@@ -92,10 +92,16 @@ impl ArquivoDeEixo {
             .write_u16(self.retardo_no_start_passo_a_passo.get())
             .write_cursor(self.start_automatico_passo_a_passo.get())
             .write_cursor(self.saida_de_start_passo_a_passo.get());
+
+        let size_of_bytes_written = next.0 - initial_address.0;
+        (next, size_of_bytes_written)
     }
 
-    fn load_from_eeprom(&mut self) {
-        let next = EepromAddress(Self::INITIAL_ADDRESS);
+    /// Given an initial address load data from eeprom in itself and return next address available
+    /// and the size of bytes read
+    /// /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom
+    fn load_from_eeprom(&mut self, initial_address: EepromAddress) -> (EepromAddress, u8) {
+        let next = initial_address;
         let (signature, next) = next.read_u16();
 
         let signature_is_valid = signature == Self::SIGNATURE;
@@ -193,13 +199,16 @@ impl ArquivoDeEixo {
 
             let (value, next) = next.read_cursor();
             self.saida_de_start_passo_a_passo.set(value);
+
+            //
+            let size_of_bytes_loadded = next.0 - initial_address.0;
+            (next, size_of_bytes_loadded)
         } else {
             // EEPROM is not initialized yet
             // Then initialize it.
 
-            let default = ArquivoDeEixo::default();
-            default.save_into_eeprom();
-            self.load_from_eeprom();
+            Self::default().save_into_eeprom(initial_address);
+            self.load_from_eeprom(initial_address)
         }
     }
 }
@@ -258,6 +267,46 @@ pub struct ConfiguracaoDoEixo {
     pub modo_turbo: Cell<Cursor>,
 }
 
+impl ConfiguracaoDoEixo {
+    const SIGNATURE: u16 = 0xB000;
+
+    /// Given initial address, write data and return next available address and size written in bytes
+    /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom
+    fn save_into_eeprom(&self, mut initial_address: EepromAddress) -> (EepromAddress, u8) {
+        let next = initial_address
+            .write_u16(Self::SIGNATURE)
+            .write_u16(self.numero_do_canal.get());
+
+        let size_of_bytes_written = next.0 - initial_address.0;
+        (next, size_of_bytes_written)
+    }
+
+    /// Given an initial address load data from eeprom in itself and return next address available
+    /// and the size of bytes read
+    /// /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom
+    fn load_from_eeprom(&mut self, initial_address: EepromAddress) -> (EepromAddress, u8) {
+        let next = initial_address;
+        let (signature, next) = next.read_u16();
+
+        let signature_is_valid = signature == Self::SIGNATURE;
+
+        if signature_is_valid {
+            let (value, next) = next.read_u16();
+            self.numero_do_canal.set(value);
+
+            //
+            let size_of_bytes_loadded = next.0 - initial_address.0;
+            (next, size_of_bytes_loadded)
+        } else {
+            // EEPROM is not initialized yet
+            // Then initialize it.
+
+            Self::default().save_into_eeprom(initial_address);
+            self.load_from_eeprom(initial_address)
+        }
+    }
+}
+
 impl Default for ConfiguracaoDoEixo {
     fn default() -> Self {
         Self {
@@ -291,6 +340,9 @@ impl MachineModel {
     const ADDR_LOW: u8 = 0x00;
     const ADDR_HIGH: u8 = 0x01;
 
+    /// Start address to store data in eeprom
+    const INITIAL_ADDRESS: EepromAddress = EepromAddress(0x00);
+
     pub fn new() -> Self {
         Self {
             arquivo_de_eixo_x: ArquivoDeEixo::default(),
@@ -310,11 +362,18 @@ impl MachineModel {
     }
 
     pub fn save_to_eeprom(&self) {
-        self.arquivo_de_eixo_x.save_into_eeprom();
+        let (next, size) = self
+            .arquivo_de_eixo_x
+            .save_into_eeprom(Self::INITIAL_ADDRESS);
+
+        let (next, size) = self.configuracao_do_eixo_x.save_into_eeprom(next);
     }
 
     pub fn load_from_eeprom(&mut self) {
-        self.arquivo_de_eixo_x.load_from_eeprom();
+        let (next, address) = self
+            .arquivo_de_eixo_x
+            .load_from_eeprom(Self::INITIAL_ADDRESS);
+        let (next, size) = self.configuracao_do_eixo_x.load_from_eeprom(next);
     }
 }
 
