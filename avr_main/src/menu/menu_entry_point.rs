@@ -85,11 +85,11 @@ pub fn development_entry_point() -> ! {
 
     let menu_manual = ManualModeMenu::new();
     let menu_execucao = MenuExecucao::new();
-    let mut main_menu: &mut dyn Widget = &mut MainMenu::new(menu_manual, menu_execucao);
+    let mut main_menu = MainMenu::new(menu_manual, menu_execucao);
 
     ///////
 
-    let mut splash_window = Splash::new(Some(main_menu));
+    let mut splash_window = Splash::new(&mut main_menu);
 
     loop {
         if let Some(key) = keyboard.get_key() {

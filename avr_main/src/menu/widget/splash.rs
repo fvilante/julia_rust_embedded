@@ -7,7 +7,10 @@ use crate::{
     utils::generic_string::GenericString,
 };
 
-use super::widget::{IWidget, Widget};
+use super::{
+    main_menu::MainMenu,
+    widget::{IWidget, Widget},
+};
 
 progmem! {
     static progmem string TEXT0 = "Posijet Industria e Comercio Ltda.";
@@ -63,16 +66,16 @@ pub struct Splash<'a> {
     current_state: State,
     next_state_time_point: u32,
     /// pointer to the next widget to be loaded
-    widget: Option<IWidget<'a>>,
+    next_widget: &'a mut MainMenu,
 }
 
 impl<'a> Splash<'a> {
-    pub fn new(widget: Option<IWidget<'a>>) -> Self {
+    pub fn new(next_widget: &'a mut MainMenu) -> Self {
         let initial_state = State::Initial;
         Self {
             current_state: initial_state,
             next_state_time_point: now() + Self::get_time_to_wait_in(initial_state),
-            widget,
+            next_widget,
         }
     }
 
@@ -95,9 +98,7 @@ impl<'a> Widget for Splash<'a> {
             // do nothing
         } else {
             // delegate / by-pass to next widget
-            if let Some(widget) = &mut self.widget {
-                (*widget).send_key(key)
-            }
+            self.next_widget.send_key(key)
         }
     }
 
@@ -111,9 +112,7 @@ impl<'a> Widget for Splash<'a> {
             }
         } else {
             // delegate
-            if let Some(widget) = &mut self.widget {
-                (*widget).update()
-            }
+            self.next_widget.update()
         }
     }
 
@@ -128,9 +127,7 @@ impl<'a> Widget for Splash<'a> {
             State::LoadingY => canvas.print_xy(Point::new(0, 0), GenericString::from_flash(&TEXT2)),
             State::End => {
                 //delegate / by-pass
-                if let Some(widget) = &self.widget {
-                    (*widget).draw(canvas, start_point)
-                }
+                self.next_widget.draw(canvas, start_point)
             }
         }
     }
