@@ -29,7 +29,7 @@ use crate::microcontroler::timer::{self};
 ///
 
 pub fn development_entry_point() -> ! {
-    //
+    ///////////////////
 
     let channel = Channel::from_u8(0).unwrap();
     fn now() -> u16 {
@@ -63,7 +63,7 @@ pub fn development_entry_point() -> ! {
 
     let transport = TransportLayer::new(datalink, mechanical_properties);
 
-    //
+    ///////////////////
 
     let SystemEnviroment {
         mut canvas,
@@ -71,15 +71,10 @@ pub fn development_entry_point() -> ! {
         ..
     } = SystemEnviroment::new();
 
-    //if let Err(_) = auto_test_eeprom() {
-    //    progmem! {
-    //        static progmem string TEXT = "Erro durante auto-teste da eeprom";
-    //    }
-    //    canvas.clear();
-    //    canvas.print_flash_str(FlashString::new(&TEXT));
-    //    canvas.render();
-    //    delay_ms(2000);
-    //}
+    ///////////////////
+
+    let mut machine_model = MachineModel::new();
+    machine_model.load_from_eeprom();
 
     //////
 
@@ -103,9 +98,6 @@ pub fn development_entry_point() -> ! {
     }
 
     ///////
-
-    let mut machine_model = MachineModel::new();
-    machine_model.load_from_eeprom();
 
     let menu_storage: MenuStorage = MenuStorage::new(&machine_model);
 

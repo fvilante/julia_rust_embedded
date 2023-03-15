@@ -614,37 +614,6 @@ impl<'a> TransportLayer<'a> {
         SafeDatalink::new(&self.datalink)
     }
 
-    pub fn __posicao_inicial(&self) -> DisplacementManipulator {
-        DisplacementManipulator {
-            transport: self,
-            address: 0x50.into(),
-        }
-    }
-
-    pub fn __velocidade_de_avanco(&self) -> VelocityManipulator {
-        VelocityManipulator {
-            transport: self,
-            address: 0x50.into(),
-        }
-    }
-
-    pub fn __aceleracao_de_avanco(&self) -> AccelerationManipulator {
-        AccelerationManipulator {
-            transport: self,
-            address: 0x50.into(),
-        }
-    }
-
-    pub fn __start_automatico_no_avanco(&self) -> __ActivationStateManipulator {
-        __ActivationStateManipulator {
-            transport: self,
-            address: BitAddress {
-                word_address: 0x60.into(),
-                bit_position: BitPosition::D0,
-            },
-        }
-    }
-
     // API Methods
 
     pub fn posicao_inicial(&self) -> DisplacementManipulator {
