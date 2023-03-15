@@ -89,9 +89,9 @@ pub fn development_entry_point() -> ! {
 
     ///////
 
-    let mut splash_window = Splash::new(&mut main_menu);
+    let mut splash_window = Splash::new();
 
-    loop {
+    while splash_window.is_running() {
         if let Some(key) = keyboard.get_key() {
             splash_window.send_key(key);
         }

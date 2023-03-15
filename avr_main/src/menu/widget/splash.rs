@@ -40,7 +40,7 @@ enum State {
 }
 
 impl State {
-    pub fn from_u8(state: u8) -> Self {
+    fn from_u8(state: u8) -> Self {
         match state {
             0 => Self::Initial,
             1 => Self::BrandName,
@@ -51,31 +51,28 @@ impl State {
         }
     }
 
-    pub fn as_u8(&self) -> u8 {
+    fn as_u8(&self) -> u8 {
         *self as u8
     }
 
-    pub fn next_state(&self) -> Self {
+    fn next_state(&self) -> Self {
         let current_state = self;
         let next_state = current_state.as_u8() + 1;
         State::from_u8(next_state)
     }
 }
 
-pub struct Splash<'a> {
+pub struct Splash {
     current_state: State,
     next_state_time_point: u32,
-    /// pointer to the next widget to be loaded
-    next_widget: &'a mut MainMenu,
 }
 
-impl<'a> Splash<'a> {
-    pub fn new(next_widget: &'a mut MainMenu) -> Self {
+impl Splash {
+    pub fn new() -> Self {
         let initial_state = State::Initial;
         Self {
             current_state: initial_state,
             next_state_time_point: now() + Self::get_time_to_wait_in(initial_state),
-            next_widget,
         }
     }
 
@@ -89,17 +86,15 @@ impl<'a> Splash<'a> {
             State::End => 0,
         }
     }
+
+    pub fn is_running(&self) -> bool {
+        self.current_state != State::End
+    }
 }
 
-impl<'a> Widget for Splash<'a> {
+impl Widget for Splash {
     fn send_key(&mut self, key: KeyCode) {
-        let has_finished = self.current_state == State::End;
-        if has_finished == false {
-            // do nothing
-        } else {
-            // delegate / by-pass to next widget
-            self.next_widget.send_key(key)
-        }
+        // do nothing
     }
 
     fn update(&mut self) {
@@ -110,9 +105,6 @@ impl<'a> Widget for Splash<'a> {
                 let time_interval = Self::get_time_to_wait_in(self.current_state.clone());
                 self.next_state_time_point = now() + time_interval;
             }
-        } else {
-            // delegate
-            self.next_widget.update()
         }
     }
 
@@ -126,8 +118,7 @@ impl<'a> Widget for Splash<'a> {
             State::LoadingX => canvas.print_xy(Point::new(0, 1), GenericString::from_flash(&TEXT1)),
             State::LoadingY => canvas.print_xy(Point::new(0, 0), GenericString::from_flash(&TEXT2)),
             State::End => {
-                //delegate / by-pass
-                self.next_widget.draw(canvas, start_point)
+                // do nothing
             }
         }
     }
