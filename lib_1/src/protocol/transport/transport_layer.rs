@@ -960,7 +960,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn logica_do_sinal_de_impressao(&'a self) -> BinaryManipulator<'a, __SignalLogic> {
+    pub fn logica_do_sinal_de_impressao(&self) -> BinaryManipulator<__SignalLogic> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -977,7 +977,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn reversao_de_mensagem_via_serial(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn reversao_de_mensagem_via_serial(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -987,7 +987,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn selecao_de_mensagem_via_serial(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn selecao_de_mensagem_via_serial(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1011,7 +1011,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn start_automatico_no_avanco(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn start_automatico_no_avanco(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1021,7 +1021,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn start_automatico_no_retorno(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn start_automatico_no_retorno(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1031,7 +1031,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn modo_de_trabalho_do_eixo(&'a self) -> BinaryManipulator<'a, __AxisMode> {
+    pub fn modo_de_trabalho_do_eixo(&self) -> BinaryManipulator<__AxisMode> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1048,7 +1048,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn saida_de_start_no_avaco(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn saida_de_start_no_avaco(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1058,7 +1058,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn saida_de_start_no_retorno(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn saida_de_start_no_retorno(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1068,7 +1068,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn entrada_de_start_entre_eixos(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn entrada_de_start_entre_eixos(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1085,7 +1085,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn start_pelo_teclado_e_externo(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn start_pelo_teclado_e_externo(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1109,7 +1109,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn start_automatico_passo_a_passo(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn start_automatico_passo_a_passo(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1119,7 +1119,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn saida_de_start_passo_a_passo(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn saida_de_start_passo_a_passo(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1157,7 +1157,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn giro_com_funcao_de_protecao(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn giro_com_funcao_de_protecao(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1167,7 +1167,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn giro_com_funcao_de_correcao(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn giro_com_funcao_de_correcao(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1177,7 +1177,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn logica_do_start_externo(&'a self) -> BinaryManipulator<'a, __SignalLogic> {
+    pub fn logica_do_start_externo(&self) -> BinaryManipulator<__SignalLogic> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1208,7 +1208,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn reducao_da_corrente_em_repouso(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn reducao_da_corrente_em_repouso(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1218,7 +1218,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn referencia_pelo_start_externo(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn referencia_pelo_start_externo(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1228,7 +1228,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn modo_turbo(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+    pub fn modo_turbo(&self) -> BinaryManipulator<__ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
