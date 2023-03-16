@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 use crate::protocol::datalink::datalink::{
     word16::Word16, DLError, Datalink, PacodeDeRetornoDeSolicitacao, PacoteDeRetornoComErro,
     PacoteDeRetornoDeEnvio, Status,
@@ -8,9 +10,9 @@ use self::{
     manipulator::WordSetter,
     memory_map::{BitAddress, BitPosition, WordAddress},
     new_proposal::{
-        AccelerationManipulator, AdimensionalManipulator, BinaryManipulator,
-        DisplacementManipulator, VelocityManipulator, __ActivationState, __AxisMode, __SignalLogic,
-        __TempManipulator,
+        AccelerationManipulator, AdimensionalManipulator, BinaryManipulator, Displacement,
+        DisplacementManipulator, VelocityManipulator, WordManipulator, __ActivationState,
+        __AxisMode, __SignalLogic, __TempManipulator,
     },
 };
 
@@ -208,6 +210,20 @@ pub mod new_proposal {
         }
     }
 
+    impl FromCmpp<u16> for Displacement {
+        ///TODO: Fake implementation, not performing physical convertion
+        fn from_cmpp(value: u16, context: MechanicalProperties) -> Self {
+            Displacement(value)
+        }
+    }
+
+    impl ToCmpp<u16> for Displacement {
+        ///TODO: Fake implementation, not performing physical convertion
+        fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
+            self.0
+        }
+    }
+
     impl<'a> DisplacementManipulator<'a> {
         // TODO: Not implemented yet, just a fake implementation
         fn convert_to_cmpp(d: Displacement, _p: MechanicalProperties) -> Word16 {
@@ -341,6 +357,46 @@ pub mod new_proposal {
             let response = datalink
                 .get_word16(word_address.into())
                 .map(|word| Self::convert_from_cmpp(word, properties));
+            response
+        }
+    }
+
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //      Word Manipulator
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
+
+    pub trait ToCmpp<T> {
+        fn to_cmpp(&self, context: MechanicalProperties) -> T;
+    }
+
+    pub trait FromCmpp<T> {
+        fn from_cmpp(value: T, context: MechanicalProperties) -> Self;
+    }
+
+    pub struct WordManipulator<'a, T: ToCmpp<u16> + FromCmpp<u16>> {
+        pub transport: &'a TransportLayer<'a>,
+        pub address: WordAddress,
+        pub phantom: PhantomData<T>,
+    }
+
+    impl<'a, T: ToCmpp<u16> + FromCmpp<u16>> WordManipulator<'a, T> {
+        pub fn set(&self, user_value: T) -> Result<Status, TLError> {
+            let context = self.transport.get_mechanical_properties();
+            let word_value = user_value.to_cmpp(context);
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            datalink.set_word16(word_value.into(), word_address.into())
+        }
+
+        pub fn get(&self) -> Result<T, TLError> {
+            let context = self.transport.mechanical_properties;
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            let response = datalink
+                .get_word16(word_address.into())
+                .map(|word| T::from_cmpp(word.to_u16(), context));
             response
         }
     }
@@ -764,10 +820,11 @@ impl<'a> TransportLayer<'a> {
 
     // API Methods
 
-    pub fn posicao_inicial(&self) -> DisplacementManipulator {
-        DisplacementManipulator {
+    pub fn posicao_inicial(&self) -> WordManipulator<Displacement> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
     pub fn posicao_final(&self) -> DisplacementManipulator {
