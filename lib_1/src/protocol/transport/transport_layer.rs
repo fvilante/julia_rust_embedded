@@ -9,7 +9,7 @@ use self::{
     memory_map::{BitAddress, BitPosition, WordAddress},
     new_proposal::{
         AccelerationManipulator, AdimensionalManipulator, BinaryManipulator,
-        DisplacementManipulator, VelocityManipulator, __TempManipulator,
+        DisplacementManipulator, VelocityManipulator, __ActivationState, __TempManipulator,
     },
 };
 
@@ -484,20 +484,60 @@ pub mod new_proposal {
         }
     }
 
-    pub struct BinaryManipulator<'a, T: Into<bool> + From<bool>> {
-        pub transport: &'a TransportLayer<'a>,
-        pub address: BitAddress,
-        phanton: PhantomData<T>,
+    impl From<Cursor> for __ActivationState {
+        fn from(value: Cursor) -> Self {
+            match value.get_current() {
+                0 => __ActivationState::Deactivated,
+                1 => __ActivationState::Activated,
+                // TODO: Ideally instead of Cursor we should use an BinaryCursor (that has just two possible options at compile-time)
+                // Below error means that you are using a Cursor with more then 2 options, which are not currently supported
+                _ => unreachable!("E23"),
+            }
+        }
     }
 
-    impl<'a, T: Into<bool> + From<bool>> BinaryManipulator<'a, T> {
+    impl Into<Cursor> for __ActivationState {
+        fn into(self) -> Cursor {
+            let current: u8 = match self {
+                __ActivationState::Activated => 1,
+                __ActivationState::Deactivated => 0,
+            };
+            Cursor::new(0, 2, current)
+        }
+    }
+
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //      Binary Manipulator
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
+
+    /// TODO: Make a constructor and then make this fields privates
+    pub struct BinaryManipulator<'a, T: Into<Cursor> + From<Cursor>> {
+        pub transport: &'a TransportLayer<'a>,
+        pub address: BitAddress,
+        pub phanton: PhantomData<T>,
+    }
+
+    /// TODO: This is a binary manipulator and we are using `Cursor` instead of `BinaryCursor`. This means
+    /// that any value beeing Cursored that has more then two elements will be clamped.
+    /// Change this behaviour to raisa a compile-time error instead of a run-time clamping.
+    impl<'a, T: Into<Cursor> + From<Cursor>> BinaryManipulator<'a, T> {
         fn convert_to_cmpp(value: T) -> Bit {
-            let bit = value.into();
+            let cursor: Cursor = value.into();
+            //TODO: Avoid this simplistic convertion
+            let bit = if cursor.get_current() == 0 {
+                false
+            } else {
+                true
+            };
             Bit(bit)
         }
 
         fn convert_from_cmpp(bit: Bit) -> T {
-            bit.0.into()
+            let current = if bit.0 == false { 0 } else { 1 };
+            let cursor = Cursor::new(0, 2, current);
+            cursor.into()
         }
 
         pub fn set(&self, value: T) -> Result<Status, TLError> {
@@ -703,10 +743,14 @@ impl<'a> TransportLayer<'a> {
             address: 0xFF.into(),
         }
     }
-    pub fn reversao_de_mensagem_via_serial(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn reversao_de_mensagem_via_serial(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
     pub fn selecao_de_mensagem_via_serial(&self) -> __TempManipulator {
