@@ -9,7 +9,8 @@ use self::{
     memory_map::{BitAddress, BitPosition, WordAddress},
     new_proposal::{
         AccelerationManipulator, AdimensionalManipulator, BinaryManipulator,
-        DisplacementManipulator, VelocityManipulator, __ActivationState, __TempManipulator,
+        DisplacementManipulator, VelocityManipulator, __ActivationState, __AxisMode, __SignalLogic,
+        __TempManipulator,
     },
 };
 
@@ -462,8 +463,8 @@ pub mod new_proposal {
 
     #[repr(u8)]
     pub enum __ActivationState {
-        Activated = 1,
         Deactivated = 0,
+        Activated = 1,
     }
 
     impl From<bool> for __ActivationState {
@@ -501,6 +502,110 @@ pub mod new_proposal {
             let current: u8 = match self {
                 __ActivationState::Activated => 1,
                 __ActivationState::Deactivated => 0,
+            };
+            Cursor::new(0, 2, current)
+        }
+    }
+
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //      Signal Logic
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
+
+    #[repr(u8)]
+    pub enum __SignalLogic {
+        Closed = 0,
+        Open = 1,
+    }
+
+    impl From<bool> for __SignalLogic {
+        fn from(value: bool) -> Self {
+            match value {
+                true => __SignalLogic::Open,
+                false => __SignalLogic::Closed,
+            }
+        }
+    }
+
+    impl Into<bool> for __SignalLogic {
+        fn into(self) -> bool {
+            match self {
+                __SignalLogic::Open => false,
+                __SignalLogic::Closed => true,
+            }
+        }
+    }
+
+    impl From<Cursor> for __SignalLogic {
+        fn from(value: Cursor) -> Self {
+            match value.get_current() {
+                0 => __SignalLogic::Closed,
+                1 => __SignalLogic::Open,
+                // TODO: Ideally instead of Cursor we should use an BinaryCursor (that has just two possible options at compile-time)
+                // Below error means that you are using a Cursor with more then 2 options, which are not currently supported
+                _ => unreachable!("E23"),
+            }
+        }
+    }
+
+    impl Into<Cursor> for __SignalLogic {
+        fn into(self) -> Cursor {
+            let current: u8 = match self {
+                __SignalLogic::Open => 1,
+                __SignalLogic::Closed => 0,
+            };
+            Cursor::new(0, 2, current)
+        }
+    }
+
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //      Axis Mode
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
+
+    #[repr(u8)]
+    pub enum __AxisMode {
+        Continuous = 0,
+        StepToStep = 1,
+    }
+
+    impl From<bool> for __AxisMode {
+        fn from(value: bool) -> Self {
+            match value {
+                false => __AxisMode::Continuous,
+                true => __AxisMode::StepToStep,
+            }
+        }
+    }
+
+    impl Into<bool> for __AxisMode {
+        fn into(self) -> bool {
+            match self {
+                __AxisMode::Continuous => false,
+                __AxisMode::StepToStep => true,
+            }
+        }
+    }
+
+    impl From<Cursor> for __AxisMode {
+        fn from(value: Cursor) -> Self {
+            match value.get_current() {
+                0 => __AxisMode::Continuous,
+                1 => __AxisMode::StepToStep,
+                // TODO: Ideally instead of Cursor we should use an BinaryCursor (that has just two possible options at compile-time)
+                // Below error means that you are using a Cursor with more then 2 options, which are not currently supported
+                _ => unreachable!("E23"),
+            }
+        }
+    }
+
+    impl Into<Cursor> for __AxisMode {
+        fn into(self) -> Cursor {
+            let current: u8 = match self {
+                __AxisMode::Continuous => 0,
+                __AxisMode::StepToStep => 1,
             };
             Cursor::new(0, 2, current)
         }
@@ -731,10 +836,14 @@ impl<'a> TransportLayer<'a> {
             address: 0xFF.into(),
         }
     }
-    pub fn logica_do_sinal_de_impressao(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn logica_do_sinal_de_impressao(&'a self) -> BinaryManipulator<'a, __SignalLogic> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
     pub fn largura_do_sinal_de_impressao(&self) -> __TempManipulator {
@@ -753,10 +862,14 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn selecao_de_mensagem_via_serial(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn selecao_de_mensagem_via_serial(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
     pub fn retardo_no_start_automatico(&self) -> __TempManipulator {
@@ -771,22 +884,34 @@ impl<'a> TransportLayer<'a> {
             address: 0xFF.into(),
         }
     }
-    pub fn start_automatico_no_avanco(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn start_automatico_no_avanco(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
-    pub fn start_automatico_no_retorno(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn start_automatico_no_retorno(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
-    pub fn modo_de_trabalho_do_eixo(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn modo_de_trabalho_do_eixo(&'a self) -> BinaryManipulator<'a, __AxisMode> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
     pub fn antecipacao_da_saida_de_start(&self) -> DisplacementManipulator {
@@ -795,22 +920,34 @@ impl<'a> TransportLayer<'a> {
             address: 0xFF.into(),
         }
     }
-    pub fn saida_de_start_no_avaco(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn saida_de_start_no_avaco(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
-    pub fn saida_de_start_no_retorno(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn saida_de_start_no_retorno(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
-    pub fn entrada_de_start_entre_eixos(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn entrada_de_start_entre_eixos(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
     pub fn retardo_do_start_entre_eixos(&self) -> __TempManipulator {
@@ -819,10 +956,14 @@ impl<'a> TransportLayer<'a> {
             address: 0xFF.into(),
         }
     }
-    pub fn start_pelo_teclado_e_externo(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn start_pelo_teclado_e_externo(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
     pub fn retardo_no_sinal_de_impressao(&self) -> __TempManipulator {
@@ -837,16 +978,24 @@ impl<'a> TransportLayer<'a> {
             address: 0xFF.into(),
         }
     }
-    pub fn start_automatico_passo_a_passo(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn start_automatico_passo_a_passo(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
-    pub fn saida_de_start_passo_a_passo(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn saida_de_start_passo_a_passo(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
     pub fn numero_do_canal(&self) -> __TempManipulator {
@@ -873,22 +1022,34 @@ impl<'a> TransportLayer<'a> {
             address: 0xFF.into(),
         }
     }
-    pub fn giro_com_funcao_de_protecao(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn giro_com_funcao_de_protecao(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
-    pub fn giro_com_funcao_de_correcao(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn giro_com_funcao_de_correcao(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
-    pub fn logica_do_start_externo(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn logica_do_start_externo(&'a self) -> BinaryManipulator<'a, __SignalLogic> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
     pub fn valor_da_posicao_de_referencia(&self) -> __TempManipulator {
@@ -909,22 +1070,34 @@ impl<'a> TransportLayer<'a> {
             address: 0xFF.into(),
         }
     }
-    pub fn reducao_da_corrente_em_repouso(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn reducao_da_corrente_em_repouso(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
-    pub fn referencia_pelo_start_externo(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn referencia_pelo_start_externo(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
-    pub fn modo_turbo(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn modo_turbo(&'a self) -> BinaryManipulator<'a, __ActivationState> {
+        BinaryManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: BitAddress {
+                word_address: 0xFF.into(),
+                bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
         }
     }
 }
