@@ -10,9 +10,8 @@ use self::{
     manipulator::WordSetter,
     memory_map::{BitAddress, BitPosition, WordAddress},
     new_proposal::{
-        Acceleration, AccelerationManipulator, Adimensional, AdimensionalManipulator,
-        BinaryManipulator, Displacement, DisplacementManipulator, Velocity, VelocityManipulator,
-        WordManipulator, __ActivationState, __AxisMode, __SignalLogic, __Temp, __TempManipulator,
+        Acceleration, Adimensional, BinaryManipulator, Displacement, Velocity, WordManipulator,
+        __ActivationState, __AxisMode, __SignalLogic, __Temp,
     },
 };
 
@@ -224,39 +223,6 @@ pub mod new_proposal {
         }
     }
 
-    impl<'a> DisplacementManipulator<'a> {
-        // TODO: Not implemented yet, just a fake implementation
-        fn convert_to_cmpp(d: Displacement, _p: MechanicalProperties) -> Word16 {
-            let value = d.0;
-            let new_value = d.0 * 1;
-            new_value.into()
-        }
-
-        // TODO: Not implemented yet, just a fake implementation
-        fn convert_from_cmpp(word: Word16, _p: MechanicalProperties) -> Displacement {
-            let new_value = Displacement(word.into());
-            new_value
-        }
-
-        pub fn set(&self, value: Displacement) -> Result<Status, TLError> {
-            let properties = self.transport.mechanical_properties;
-            let word_value = Self::convert_to_cmpp(value, properties);
-            let datalink = self.transport.safe_datalink();
-            let word_address = self.address.word_address;
-            datalink.set_word16(word_value, word_address.into())
-        }
-
-        pub fn get(&self) -> Result<Displacement, TLError> {
-            let properties = self.transport.mechanical_properties;
-            let datalink = self.transport.safe_datalink();
-            let word_address = self.address.word_address;
-            let response = datalink
-                .get_word16(word_address.into())
-                .map(|word| Self::convert_from_cmpp(word, properties));
-            response
-        }
-    }
-
     //  ///////////////////////////////////////////////////////////////////////////////////
     //
     //      VELOCITY
@@ -290,39 +256,6 @@ pub mod new_proposal {
         pub address: WordAddress,
     }
 
-    impl<'a> VelocityManipulator<'a> {
-        // TODO: Not implemented yet, just a fake implementation
-        fn convert_to_cmpp(d: Velocity, _p: MechanicalProperties) -> Word16 {
-            let value = d.0;
-            let new_value = d.0 * 1;
-            new_value.into()
-        }
-
-        // TODO: Not implemented yet, just a fake implementation
-        fn convert_from_cmpp(word: Word16, _p: MechanicalProperties) -> Velocity {
-            let new_value = Velocity(word.into());
-            new_value
-        }
-
-        pub fn set(&self, value: Velocity) -> Result<Status, TLError> {
-            let properties = self.transport.mechanical_properties;
-            let word_value = Self::convert_to_cmpp(value, properties);
-            let datalink = self.transport.safe_datalink();
-            let word_address = self.address.word_address;
-            datalink.set_word16(word_value.into(), word_address.into())
-        }
-
-        pub fn get(&self) -> Result<Velocity, TLError> {
-            let properties = self.transport.mechanical_properties;
-            let datalink = self.transport.safe_datalink();
-            let word_address = self.address.word_address;
-            let response = datalink
-                .get_word16(word_address.into())
-                .map(|word| Self::convert_from_cmpp(word, properties));
-            response
-        }
-    }
-
     //  ///////////////////////////////////////////////////////////////////////////////////
     //
     //      ACCELERATION
@@ -354,39 +287,6 @@ pub mod new_proposal {
     pub struct AccelerationManipulator<'a> {
         pub transport: &'a TransportLayer<'a>,
         pub address: WordAddress,
-    }
-
-    impl<'a> AccelerationManipulator<'a> {
-        // TODO: Not implemented yet, just a fake implementation
-        fn convert_to_cmpp(d: Acceleration, _p: MechanicalProperties) -> Word16 {
-            let value = d.0;
-            let new_value = d.0 * 1;
-            new_value.into()
-        }
-
-        // TODO: Not implemented yet, just a fake implementation
-        fn convert_from_cmpp(word: Word16, _p: MechanicalProperties) -> Acceleration {
-            let new_value = Acceleration(word.into());
-            new_value
-        }
-
-        pub fn set(&self, value: Acceleration) -> Result<Status, TLError> {
-            let properties = self.transport.mechanical_properties;
-            let word_value = Self::convert_to_cmpp(value, properties);
-            let datalink = self.transport.safe_datalink();
-            let word_address = self.address.word_address;
-            datalink.set_word16(word_value.into(), word_address.into())
-        }
-
-        pub fn get(&self) -> Result<Acceleration, TLError> {
-            let properties = self.transport.mechanical_properties;
-            let datalink = self.transport.safe_datalink();
-            let word_address = self.address.word_address;
-            let response = datalink
-                .get_word16(word_address.into())
-                .map(|word| Self::convert_from_cmpp(word, properties));
-            response
-        }
     }
 
     //  ///////////////////////////////////////////////////////////////////////////////////
@@ -463,44 +363,6 @@ pub mod new_proposal {
         }
     }
 
-    pub struct __TempManipulator<'a> {
-        pub transport: &'a TransportLayer<'a>,
-        pub address: WordAddress,
-    }
-
-    impl<'a> __TempManipulator<'a> {
-        // TODO: Not implemented yet, just a fake implementation
-        fn convert_to_cmpp(d: __Temp, _p: MechanicalProperties) -> Word16 {
-            let value = d.0;
-            let new_value = d.0 * 1;
-            new_value.into()
-        }
-
-        // TODO: Not implemented yet, just a fake implementation
-        fn convert_from_cmpp(word: Word16, _p: MechanicalProperties) -> __Temp {
-            let new_value = __Temp(word.into());
-            new_value
-        }
-
-        pub fn set(&self, value: __Temp) -> Result<Status, TLError> {
-            let properties = self.transport.mechanical_properties;
-            let word_value = Self::convert_to_cmpp(value, properties);
-            let datalink = self.transport.safe_datalink();
-            let word_address = self.address.word_address;
-            datalink.set_word16(word_value, word_address.into())
-        }
-
-        pub fn get(&self) -> Result<__Temp, TLError> {
-            let properties = self.transport.mechanical_properties;
-            let datalink = self.transport.safe_datalink();
-            let word_address = self.address.word_address;
-            let response = datalink
-                .get_word16(word_address.into())
-                .map(|word| Self::convert_from_cmpp(word, properties));
-            response
-        }
-    }
-
     //  ///////////////////////////////////////////////////////////////////////////////////
     //
     //      Adimensional
@@ -526,44 +388,6 @@ pub mod new_proposal {
         ///TODO: Fake implementation, not performing physical convertion
         fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
             self.0
-        }
-    }
-
-    pub struct AdimensionalManipulator<'a> {
-        pub transport: &'a TransportLayer<'a>,
-        pub address: WordAddress,
-    }
-
-    impl<'a> AdimensionalManipulator<'a> {
-        // TODO: Not implemented yet, just a fake implementation
-        fn convert_to_cmpp(d: Adimensional, _p: MechanicalProperties) -> Word16 {
-            let value = d.0;
-            let new_value = d.0 * 1;
-            new_value.into()
-        }
-
-        // TODO: Not implemented yet, just a fake implementation
-        fn convert_from_cmpp(word: Word16, _p: MechanicalProperties) -> Adimensional {
-            let new_value = Adimensional(word.into());
-            new_value
-        }
-
-        pub fn set(&self, value: Adimensional) -> Result<Status, TLError> {
-            let properties = self.transport.mechanical_properties;
-            let word_value = Self::convert_to_cmpp(value, properties);
-            let datalink = self.transport.safe_datalink();
-            let word_address = self.address.word_address;
-            datalink.set_word16(word_value.into(), word_address.into())
-        }
-
-        pub fn get(&self) -> Result<Adimensional, TLError> {
-            let properties = self.transport.mechanical_properties;
-            let datalink = self.transport.safe_datalink();
-            let word_address = self.address.word_address;
-            let response = datalink
-                .get_word16(word_address.into())
-                .map(|word| Self::convert_from_cmpp(word, properties));
-            response
         }
     }
 
