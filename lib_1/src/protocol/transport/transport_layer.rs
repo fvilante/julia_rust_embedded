@@ -291,46 +291,6 @@ pub mod new_proposal {
 
     //  ///////////////////////////////////////////////////////////////////////////////////
     //
-    //      Word Manipulator
-    //
-    //  ///////////////////////////////////////////////////////////////////////////////////
-
-    pub trait ToCmpp<T> {
-        fn to_cmpp(&self, context: MechanicalProperties) -> T;
-    }
-
-    pub trait FromCmpp<T> {
-        fn from_cmpp(value: T, context: MechanicalProperties) -> Self;
-    }
-
-    pub struct WordManipulator<'a, T: ToCmpp<u16> + FromCmpp<u16>> {
-        pub transport: &'a TransportLayer<'a>,
-        pub address: WordAddress,
-        pub phantom: PhantomData<T>,
-    }
-
-    impl<'a, T: ToCmpp<u16> + FromCmpp<u16>> WordManipulator<'a, T> {
-        pub fn set(&self, user_value: T) -> Result<Status, TLError> {
-            let context = self.transport.get_mechanical_properties();
-            let word_value = user_value.to_cmpp(context);
-            let datalink = self.transport.safe_datalink();
-            let word_address = self.address.word_address;
-            datalink.set_word16(word_value.into(), word_address.into())
-        }
-
-        pub fn get(&self) -> Result<T, TLError> {
-            let context = self.transport.mechanical_properties;
-            let datalink = self.transport.safe_datalink();
-            let word_address = self.address.word_address;
-            let response = datalink
-                .get_word16(word_address.into())
-                .map(|word| T::from_cmpp(word.to_u16(), context));
-            response
-        }
-    }
-
-    //  ///////////////////////////////////////////////////////////////////////////////////
-    //
     //      TEMP
     //
     //  ///////////////////////////////////////////////////////////////////////////////////
@@ -544,6 +504,46 @@ pub mod new_proposal {
                 __AxisMode::StepToStep => 1,
             };
             Cursor::new(0, 2, current)
+        }
+    }
+
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //      Word Manipulator
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
+
+    pub trait ToCmpp<T> {
+        fn to_cmpp(&self, context: MechanicalProperties) -> T;
+    }
+
+    pub trait FromCmpp<T> {
+        fn from_cmpp(value: T, context: MechanicalProperties) -> Self;
+    }
+
+    pub struct WordManipulator<'a, T: ToCmpp<u16> + FromCmpp<u16>> {
+        pub transport: &'a TransportLayer<'a>,
+        pub address: WordAddress,
+        pub phantom: PhantomData<T>,
+    }
+
+    impl<'a, T: ToCmpp<u16> + FromCmpp<u16>> WordManipulator<'a, T> {
+        pub fn set(&self, user_value: T) -> Result<Status, TLError> {
+            let context = self.transport.get_mechanical_properties();
+            let word_value = user_value.to_cmpp(context);
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            datalink.set_word16(word_value.into(), word_address.into())
+        }
+
+        pub fn get(&self) -> Result<T, TLError> {
+            let context = self.transport.mechanical_properties;
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            let response = datalink
+                .get_word16(word_address.into())
+                .map(|word| T::from_cmpp(word.to_u16(), context));
+            response
         }
     }
 
