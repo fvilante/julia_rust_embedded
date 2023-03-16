@@ -10,9 +10,9 @@ use self::{
     manipulator::WordSetter,
     memory_map::{BitAddress, BitPosition, WordAddress},
     new_proposal::{
-        AccelerationManipulator, AdimensionalManipulator, BinaryManipulator, Displacement,
-        DisplacementManipulator, VelocityManipulator, WordManipulator, __ActivationState,
-        __AxisMode, __SignalLogic, __TempManipulator,
+        Acceleration, AccelerationManipulator, Adimensional, AdimensionalManipulator,
+        BinaryManipulator, Displacement, DisplacementManipulator, Velocity, VelocityManipulator,
+        WordManipulator, __ActivationState, __AxisMode, __SignalLogic, __Temp, __TempManipulator,
     },
 };
 
@@ -213,7 +213,7 @@ pub mod new_proposal {
     impl FromCmpp<u16> for Displacement {
         ///TODO: Fake implementation, not performing physical convertion
         fn from_cmpp(value: u16, context: MechanicalProperties) -> Self {
-            Displacement(value)
+            Self(value)
         }
     }
 
@@ -271,6 +271,20 @@ pub mod new_proposal {
         }
     }
 
+    impl FromCmpp<u16> for Velocity {
+        ///TODO: Fake implementation, not performing physical convertion
+        fn from_cmpp(value: u16, context: MechanicalProperties) -> Self {
+            Self(value)
+        }
+    }
+
+    impl ToCmpp<u16> for Velocity {
+        ///TODO: Fake implementation, not performing physical convertion
+        fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
+            self.0
+        }
+    }
+
     pub struct VelocityManipulator<'a> {
         pub transport: &'a TransportLayer<'a>,
         pub address: WordAddress,
@@ -320,6 +334,20 @@ pub mod new_proposal {
     impl From<u16> for Acceleration {
         fn from(value: u16) -> Self {
             Acceleration(value)
+        }
+    }
+
+    impl FromCmpp<u16> for Acceleration {
+        ///TODO: Fake implementation, not performing physical convertion
+        fn from_cmpp(value: u16, context: MechanicalProperties) -> Self {
+            Self(value)
+        }
+    }
+
+    impl ToCmpp<u16> for Acceleration {
+        ///TODO: Fake implementation, not performing physical convertion
+        fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
+            self.0
         }
     }
 
@@ -421,6 +449,20 @@ pub mod new_proposal {
         }
     }
 
+    impl FromCmpp<u16> for __Temp {
+        ///TODO: Fake implementation, not performing physical convertion
+        fn from_cmpp(value: u16, context: MechanicalProperties) -> Self {
+            Self(value)
+        }
+    }
+
+    impl ToCmpp<u16> for __Temp {
+        ///TODO: Fake implementation, not performing physical convertion
+        fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
+            self.0
+        }
+    }
+
     pub struct __TempManipulator<'a> {
         pub transport: &'a TransportLayer<'a>,
         pub address: WordAddress,
@@ -470,6 +512,20 @@ pub mod new_proposal {
     impl From<u16> for Adimensional {
         fn from(value: u16) -> Self {
             Adimensional(value)
+        }
+    }
+
+    impl FromCmpp<u16> for Adimensional {
+        ///TODO: Fake implementation, not performing physical convertion
+        fn from_cmpp(value: u16, context: MechanicalProperties) -> Self {
+            Self(value)
+        }
+    }
+
+    impl ToCmpp<u16> for Adimensional {
+        ///TODO: Fake implementation, not performing physical convertion
+        fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
+            self.0
         }
     }
 
@@ -827,70 +883,81 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn posicao_final(&self) -> DisplacementManipulator {
-        DisplacementManipulator {
+    pub fn posicao_final(&self) -> WordManipulator<Displacement> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn aceleracao_de_avanco(&self) -> AccelerationManipulator {
-        AccelerationManipulator {
+    pub fn aceleracao_de_avanco(&self) -> WordManipulator<Acceleration> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn aceleracao_de_retorno(&self) -> AccelerationManipulator {
-        AccelerationManipulator {
+    pub fn aceleracao_de_retorno(&self) -> WordManipulator<Acceleration> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn velocidade_de_avanco(&self) -> VelocityManipulator {
-        VelocityManipulator {
+    pub fn velocidade_de_avanco(&self) -> WordManipulator<Velocity> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn velocidade_de_retorno(&self) -> VelocityManipulator {
-        VelocityManipulator {
+    pub fn velocidade_de_retorno(&self) -> WordManipulator<Velocity> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn numero_de_mensagem_no_avanco(&self) -> AdimensionalManipulator {
-        AdimensionalManipulator {
+    pub fn numero_de_mensagem_no_avanco(&self) -> WordManipulator<Adimensional> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn numero_de_mensagem_no_retorno(&self) -> AdimensionalManipulator {
-        AdimensionalManipulator {
+    pub fn numero_de_mensagem_no_retorno(&self) -> WordManipulator<Adimensional> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn primeira_mensagem_no_avanco(&self) -> DisplacementManipulator {
-        DisplacementManipulator {
+    pub fn primeira_mensagem_no_avanco(&self) -> WordManipulator<Displacement> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn ultima_mensagem_no_avanco(&self) -> DisplacementManipulator {
-        DisplacementManipulator {
+    pub fn ultima_mensagem_no_avanco(&self) -> WordManipulator<Displacement> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn primeira_mensagem_no_retorno(&self) -> DisplacementManipulator {
-        DisplacementManipulator {
+    pub fn primeira_mensagem_no_retorno(&self) -> WordManipulator<Displacement> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn ultima_mensagem_no_retorno(&self) -> DisplacementManipulator {
-        DisplacementManipulator {
+    pub fn ultima_mensagem_no_retorno(&self) -> WordManipulator<Displacement> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
     pub fn logica_do_sinal_de_impressao(&'a self) -> BinaryManipulator<'a, __SignalLogic> {
@@ -903,10 +970,11 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn largura_do_sinal_de_impressao(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn largura_do_sinal_de_impressao(&self) -> WordManipulator<__Temp> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
     pub fn reversao_de_mensagem_via_serial(&'a self) -> BinaryManipulator<'a, __ActivationState> {
@@ -929,16 +997,18 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn retardo_no_start_automatico(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn retardo_no_start_automatico(&self) -> WordManipulator<__Temp> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn retardo_no_start_externo(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn retardo_no_start_externo(&self) -> WordManipulator<__Temp> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
     pub fn start_automatico_no_avanco(&'a self) -> BinaryManipulator<'a, __ActivationState> {
@@ -971,10 +1041,11 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn antecipacao_da_saida_de_start(&self) -> DisplacementManipulator {
-        DisplacementManipulator {
+    pub fn antecipacao_da_saida_de_start(&self) -> WordManipulator<Displacement> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
     pub fn saida_de_start_no_avaco(&'a self) -> BinaryManipulator<'a, __ActivationState> {
@@ -1007,10 +1078,11 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn retardo_do_start_entre_eixos(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn retardo_do_start_entre_eixos(&self) -> WordManipulator<__Temp> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
     pub fn start_pelo_teclado_e_externo(&'a self) -> BinaryManipulator<'a, __ActivationState> {
@@ -1023,16 +1095,18 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn retardo_no_sinal_de_impressao(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn retardo_no_sinal_de_impressao(&self) -> WordManipulator<__Temp> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn retardo_no_start_passo_a_passo(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn retardo_no_start_passo_a_passo(&self) -> WordManipulator<__Temp> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
     pub fn start_automatico_passo_a_passo(&'a self) -> BinaryManipulator<'a, __ActivationState> {
@@ -1055,28 +1129,32 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn numero_do_canal(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn numero_do_canal(&self) -> WordManipulator<__Temp> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn numero_de_pulso_do_giro(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn numero_de_pulso_do_giro(&self) -> WordManipulator<__Temp> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn janela_de_protecao_do_giro(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn janela_de_protecao_do_giro(&self) -> WordManipulator<__Temp> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn deslocamento_giro_do_motor(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn deslocamento_giro_do_motor(&self) -> WordManipulator<__Temp> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
     pub fn giro_com_funcao_de_protecao(&'a self) -> BinaryManipulator<'a, __ActivationState> {
@@ -1109,22 +1187,25 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn valor_da_posicao_de_referencia(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn valor_da_posicao_de_referencia(&self) -> WordManipulator<__Temp> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn velocidade_para_referencia(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn velocidade_para_referencia(&self) -> WordManipulator<__Temp> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
-    pub fn aceleracao_para_referencia(&self) -> __TempManipulator {
-        __TempManipulator {
+    pub fn aceleracao_para_referencia(&self) -> WordManipulator<__Temp> {
+        WordManipulator {
             transport: self,
             address: 0xFF.into(),
+            phantom: core::marker::PhantomData,
         }
     }
     pub fn reducao_da_corrente_em_repouso(&'a self) -> BinaryManipulator<'a, __ActivationState> {
