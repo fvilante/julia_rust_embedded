@@ -681,6 +681,8 @@ pub struct TransportLayer<'a> {
 }
 
 impl<'a> TransportLayer<'a> {
+    /// user start address
+    const X: u8 = 0xA0;
     pub fn new(datalink: &'a Datalink, mechanical_properties: MechanicalProperties) -> Self {
         Self {
             datalink,
@@ -703,84 +705,88 @@ impl<'a> TransportLayer<'a> {
     pub fn posicao_inicial(&self) -> WordManipulator<Displacement> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x00).into(),
             phantom: core::marker::PhantomData,
         }
     }
     pub fn posicao_final(&self) -> WordManipulator<Displacement> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x02).into(),
             phantom: core::marker::PhantomData,
         }
     }
     pub fn aceleracao_de_avanco(&self) -> WordManipulator<Acceleration> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x04).into(),
             phantom: core::marker::PhantomData,
         }
     }
     pub fn aceleracao_de_retorno(&self) -> WordManipulator<Acceleration> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x06).into(),
             phantom: core::marker::PhantomData,
         }
     }
     pub fn velocidade_de_avanco(&self) -> WordManipulator<Velocity> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x08).into(),
             phantom: core::marker::PhantomData,
         }
     }
     pub fn velocidade_de_retorno(&self) -> WordManipulator<Velocity> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x0A).into(),
             phantom: core::marker::PhantomData,
         }
     }
+
+    /// TODO: This should be a ByteManipulator instead of WordManipulator
     pub fn numero_de_mensagem_no_avanco(&self) -> WordManipulator<Adimensional> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x0C).into(),
             phantom: core::marker::PhantomData,
         }
     }
+
+    /// TODO: This should be a ByteManipulator instead of WordManipulator
     pub fn numero_de_mensagem_no_retorno(&self) -> WordManipulator<Adimensional> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x0C).into(),
             phantom: core::marker::PhantomData,
         }
     }
     pub fn primeira_mensagem_no_avanco(&self) -> WordManipulator<Displacement> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x0E).into(),
             phantom: core::marker::PhantomData,
         }
     }
     pub fn ultima_mensagem_no_avanco(&self) -> WordManipulator<Displacement> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x12).into(),
             phantom: core::marker::PhantomData,
         }
     }
     pub fn primeira_mensagem_no_retorno(&self) -> WordManipulator<Displacement> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x10).into(),
             phantom: core::marker::PhantomData,
         }
     }
     pub fn ultima_mensagem_no_retorno(&self) -> WordManipulator<Displacement> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x14).into(),
             phantom: core::marker::PhantomData,
         }
     }
@@ -788,8 +794,19 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x20).into(),
+                bit_position: BitPosition::D8,
+            },
+            phanton: core::marker::PhantomData,
+        }
+    }
+
+    pub fn logica_do_sinal_de_reversao(&self) -> BinaryManipulator<__SignalLogic> {
+        BinaryManipulator {
+            transport: self,
+            address: BitAddress {
+                word_address: (Self::X + 0x20).into(),
+                bit_position: BitPosition::D9,
             },
             phanton: core::marker::PhantomData,
         }
@@ -797,7 +814,7 @@ impl<'a> TransportLayer<'a> {
     pub fn largura_do_sinal_de_impressao(&self) -> WordManipulator<__Temp> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x16).into(),
             phantom: core::marker::PhantomData,
         }
     }
@@ -805,8 +822,8 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x20).into(),
+                bit_position: BitPosition::D11,
             },
             phanton: core::marker::PhantomData,
         }
@@ -815,8 +832,8 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x20).into(),
+                bit_position: BitPosition::D10,
             },
             phanton: core::marker::PhantomData,
         }
@@ -824,14 +841,14 @@ impl<'a> TransportLayer<'a> {
     pub fn retardo_no_start_automatico(&self) -> WordManipulator<__Temp> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x18).into(),
             phantom: core::marker::PhantomData,
         }
     }
     pub fn retardo_no_start_externo(&self) -> WordManipulator<__Temp> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x1A).into(),
             phantom: core::marker::PhantomData,
         }
     }
@@ -839,8 +856,8 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x20).into(),
+                bit_position: BitPosition::D0,
             },
             phanton: core::marker::PhantomData,
         }
@@ -849,8 +866,8 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x20).into(),
+                bit_position: BitPosition::D1,
             },
             phanton: core::marker::PhantomData,
         }
@@ -859,8 +876,8 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x20).into(),
+                bit_position: BitPosition::D15,
             },
             phanton: core::marker::PhantomData,
         }
@@ -868,7 +885,7 @@ impl<'a> TransportLayer<'a> {
     pub fn antecipacao_da_saida_de_start(&self) -> WordManipulator<Displacement> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x1C).into(),
             phantom: core::marker::PhantomData,
         }
     }
@@ -876,8 +893,8 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x20).into(),
+                bit_position: BitPosition::D2,
             },
             phanton: core::marker::PhantomData,
         }
@@ -886,8 +903,8 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x20).into(),
+                bit_position: BitPosition::D3,
             },
             phanton: core::marker::PhantomData,
         }
@@ -896,8 +913,8 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x20).into(),
+                bit_position: BitPosition::D6,
             },
             phanton: core::marker::PhantomData,
         }
@@ -905,7 +922,7 @@ impl<'a> TransportLayer<'a> {
     pub fn retardo_do_start_entre_eixos(&self) -> WordManipulator<__Temp> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x1E).into(),
             phantom: core::marker::PhantomData,
         }
     }
@@ -913,8 +930,8 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x20).into(),
+                bit_position: BitPosition::D4,
             },
             phanton: core::marker::PhantomData,
         }
@@ -922,14 +939,14 @@ impl<'a> TransportLayer<'a> {
     pub fn retardo_no_sinal_de_impressao(&self) -> WordManipulator<__Temp> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x22).into(),
             phantom: core::marker::PhantomData,
         }
     }
     pub fn retardo_no_start_passo_a_passo(&self) -> WordManipulator<__Temp> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x1E).into(),
             phantom: core::marker::PhantomData,
         }
     }
@@ -937,8 +954,8 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x30).into(),
+                bit_position: BitPosition::D1,
             },
             phanton: core::marker::PhantomData,
         }
@@ -947,8 +964,8 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x30).into(),
+                bit_position: BitPosition::D0,
             },
             phanton: core::marker::PhantomData,
         }
@@ -970,14 +987,16 @@ impl<'a> TransportLayer<'a> {
     pub fn janela_de_protecao_do_giro(&self) -> WordManipulator<__Temp> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x26).into(),
             phantom: core::marker::PhantomData,
         }
     }
+
+    /// Numero de pulsos por giro do motor
     pub fn deslocamento_giro_do_motor(&self) -> WordManipulator<__Temp> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x28).into(),
             phantom: core::marker::PhantomData,
         }
     }
@@ -985,7 +1004,7 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
+                word_address: (Self::X + 0x20).into(),
                 bit_position: BitPosition::D12,
             },
             phanton: core::marker::PhantomData,
@@ -996,7 +1015,7 @@ impl<'a> TransportLayer<'a> {
             transport: self,
             address: BitAddress {
                 word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                bit_position: BitPosition::D13,
             },
             phanton: core::marker::PhantomData,
         }
@@ -1005,8 +1024,8 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x20).into(),
+                bit_position: BitPosition::D5,
             },
             phanton: core::marker::PhantomData,
         }
@@ -1014,21 +1033,21 @@ impl<'a> TransportLayer<'a> {
     pub fn valor_da_posicao_de_referencia(&self) -> WordManipulator<__Temp> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x2A).into(),
             phantom: core::marker::PhantomData,
         }
     }
     pub fn velocidade_para_referencia(&self) -> WordManipulator<__Temp> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x2A).into(),
             phantom: core::marker::PhantomData,
         }
     }
     pub fn aceleracao_para_referencia(&self) -> WordManipulator<__Temp> {
         WordManipulator {
             transport: self,
-            address: 0xFF.into(),
+            address: (Self::X + 0x2C).into(),
             phantom: core::marker::PhantomData,
         }
     }
@@ -1036,8 +1055,8 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x20).into(),
+                bit_position: BitPosition::D14,
             },
             phanton: core::marker::PhantomData,
         }
@@ -1046,8 +1065,8 @@ impl<'a> TransportLayer<'a> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
+                word_address: (Self::X + 0x20).into(),
+                bit_position: BitPosition::D7,
             },
             phanton: core::marker::PhantomData,
         }
@@ -1058,6 +1077,80 @@ impl<'a> TransportLayer<'a> {
             address: BitAddress {
                 word_address: 0xFF.into(),
                 bit_position: BitPosition::D12,
+            },
+            phanton: core::marker::PhantomData,
+        }
+    }
+
+    // Controle via serial
+
+    /// TODO: Make the manipulator only write this value
+    pub fn start_serial(&self) -> BinaryManipulator<__ActivationState> {
+        BinaryManipulator {
+            transport: self,
+            address: BitAddress {
+                word_address: (Self::X + 0x32).into(),
+                bit_position: BitPosition::D0,
+            },
+            phanton: core::marker::PhantomData,
+        }
+    }
+
+    /// TODO: Make the manipulator only write this value
+    pub fn stop_serial(&self) -> BinaryManipulator<__ActivationState> {
+        BinaryManipulator {
+            transport: self,
+            address: BitAddress {
+                word_address: (Self::X + 0x32).into(),
+                bit_position: BitPosition::D1,
+            },
+            phanton: core::marker::PhantomData,
+        }
+    }
+
+    /// TODO: Make the manipulator only write this value
+    pub fn pausa_serial(&self) -> BinaryManipulator<__ActivationState> {
+        BinaryManipulator {
+            transport: self,
+            address: BitAddress {
+                word_address: (Self::X + 0x32).into(),
+                bit_position: BitPosition::D2,
+            },
+            phanton: core::marker::PhantomData,
+        }
+    }
+
+    /// TODO: Make the manipulator only write this value
+    pub fn modo_manual_serial(&self) -> BinaryManipulator<__ActivationState> {
+        BinaryManipulator {
+            transport: self,
+            address: BitAddress {
+                word_address: (Self::X + 0x32).into(),
+                bit_position: BitPosition::D3,
+            },
+            phanton: core::marker::PhantomData,
+        }
+    }
+
+    /// TODO: Make the manipulator only write this value
+    pub fn teste_de_impressao_serial(&self) -> BinaryManipulator<__ActivationState> {
+        BinaryManipulator {
+            transport: self,
+            address: BitAddress {
+                word_address: (Self::X + 0x32).into(),
+                bit_position: BitPosition::D4,
+            },
+            phanton: core::marker::PhantomData,
+        }
+    }
+
+    /// TODO: Make the manipulator only write this value
+    pub fn grava_eeprom2(&self) -> BinaryManipulator<__ActivationState> {
+        BinaryManipulator {
+            transport: self,
+            address: BitAddress {
+                word_address: (Self::X + 0x32).into(),
+                bit_position: BitPosition::D6,
             },
             phanton: core::marker::PhantomData,
         }
