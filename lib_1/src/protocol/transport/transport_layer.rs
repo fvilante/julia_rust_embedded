@@ -1165,6 +1165,95 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
+
+    // Compound Methods
+
+    /// Obtem o Status da placa cmpp
+    ///
+    /// TODO: O Waddr do status é 0x49, atualizar a questao abaixo quando possivel, isto irá fazer a o
+    /// rotina de obtencao de status mais rapida.
+    /// TODO: Should return  an Readonly manupulator
+    pub fn get_status(&self) -> Result<Status, TLError> {
+        //TODO: Get the correct waddr of Status byte, to avoid bellow indirect algorighm
+        //strategy: I cannot resolve the waddr of statusL correctly, so I will
+        //read 'posicao inicial' and write the same value to get a return packet with the statusL
+        let displacement = self.posicao_inicial().get()?;
+        let status = self.posicao_inicial().set(displacement)?;
+        Ok(status)
+    }
+
+    pub fn is_referencing(&self) -> Result<bool, TLError> {
+        let status = self.get_status()?;
+        Ok(status.is_referenring())
+    }
+
+    pub fn is_referenced(&self) -> Result<bool, TLError> {
+        let status = self.get_status()?;
+        Ok(status.is_referenced())
+    }
+
+    pub fn is_stopped(&self) -> Result<bool, TLError> {
+        let status = self.get_status()?;
+        let is_stopped =
+            (status.is_accelerating() == false) && (status.is_deacelerating() == false);
+        Ok(is_stopped)
+    }
+
+    pub fn is_in_constant_speed_greater_than_zero(&self) -> Result<bool, TLError> {
+        let status = self.get_status()?;
+        let is_stopped = self.is_stopped()?;
+        let result = status.is_accelerating() && status.is_deacelerating() && (is_stopped == false);
+        Ok(result)
+    }
+
+    pub fn is_changing_velocity(&self) -> Result<bool, TLError> {
+        let status = self.get_status()?;
+        let result = status.is_accelerating() || status.is_deacelerating();
+        Ok(result)
+    }
+
+    pub fn force_loose_reference(&self) -> Result<(), TLError> {
+        let is_referenced = self.is_referenced()?;
+        if is_referenced {
+            self.modo_manual_serial()
+                .set(__ActivationState::Activated)?;
+            self.stop_serial().set(__ActivationState::Activated)?;
+            self.pausa_serial().set(__ActivationState::Activated)?;
+        } else {
+            // already deferenced so do nothing
+        };
+        Ok(())
+    }
+
+    pub fn force_reference(
+        &self,
+        velocidade: Option<__Temp>,
+        aceleracao: Option<__Temp>,
+    ) -> Result<(), TLError> {
+        self.force_loose_reference()?;
+        self.velocidade_para_referencia()
+            .set(velocidade.unwrap_or(__Temp(600)))?;
+        self.aceleracao_para_referencia()
+            .set(aceleracao.unwrap_or(__Temp(5000)))?;
+        self.pausa_serial().set(__ActivationState::Deactivated)?;
+        self.start_serial().set(__ActivationState::Activated)?;
+        while self.is_referenced()? == false {
+            // TODO: Set a timeout here
+        }
+        Ok(())
+    }
+
+    pub fn wait_to_stop(&self) -> Result<(), TLError> {
+        let mut is_stopped = self.is_stopped()?;
+        while is_stopped == false {
+            is_stopped = self.is_stopped()?;
+        }
+        Ok(())
+    }
+
+    pub fn start(&self) -> Result<Status, TLError> {
+        self.start_serial().set(__ActivationState::Activated)
+    }
 }
 
 ///////////////////////////////////

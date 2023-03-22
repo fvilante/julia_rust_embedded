@@ -1,8 +1,15 @@
 use avr_progmem::progmem;
-use lib_1::protocol::datalink::datalink::Datalink;
+use lib_1::protocol::datalink::datalink::word16::Word16;
+use lib_1::protocol::datalink::datalink::{Datalink, Direction, Status};
 use lib_1::protocol::transport::channel::Channel;
 use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
-use lib_1::protocol::transport::transport_layer::TransportLayer;
+use lib_1::protocol::transport::transport_layer::memory_map::{
+    BitAddress, BitPosition, WordAddress,
+};
+use lib_1::protocol::transport::transport_layer::new_proposal::{
+    Acceleration, Displacement, Velocity, __ActivationState, __Temp,
+};
+use lib_1::protocol::transport::transport_layer::{TLError, TransportLayer};
 use lib_1::utils::common::usize_to_u8_clamper;
 
 use super::model::MachineModel;
@@ -25,6 +32,26 @@ use crate::microcontroler::delay::delay_ms;
 
 use crate::microcontroler::serial;
 use crate::microcontroler::timer::{self};
+
+fn example_00(transport: &TransportLayer) {
+    lcd::print("ini");
+    transport.force_reference(None, None);
+    transport.wait_to_stop();
+    transport.posicao_inicial().set(Displacement(500));
+    transport.posicao_final().set(Displacement(2500));
+    transport.velocidade_de_avanco().set(Velocity(5000));
+    transport.aceleracao_de_avanco().set(Acceleration(5000));
+
+    for _ in 0..5 {
+        transport.start();
+        transport.wait_to_stop();
+    }
+
+    transport.start();
+    transport.start();
+
+    lcd::print("Fim");
+}
 
 ///
 
@@ -70,6 +97,11 @@ pub fn development_entry_point() -> ! {
         mut keyboard,
         ..
     } = SystemEnviroment::new();
+
+    ////
+    ///
+    example_00(&transport);
+    loop {}
 
     ///////////////////
 
