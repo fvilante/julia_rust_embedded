@@ -619,7 +619,7 @@ impl Datalink {
         word_address: u8,
         bit_mask: u16,
     ) -> Result<Result<PacoteDeRetornoDeEnvio, PacoteDeRetornoComErro>, DLError> {
-        let direction = Direction::Get;
+        let direction = Direction::ResetBitmask;
         self.transact(direction, word_address, bit_mask)
             .map(Self::cast_to_pacote_de_retorno_envio)
     }
@@ -629,7 +629,7 @@ impl Datalink {
         word_address: u8,
         bit_mask: u16,
     ) -> Result<Result<PacoteDeRetornoDeEnvio, PacoteDeRetornoComErro>, DLError> {
-        let direction = Direction::Get;
+        let direction = Direction::SetBitmask;
         self.transact(direction, word_address, bit_mask)
             .map(Self::cast_to_pacote_de_retorno_envio)
     }
