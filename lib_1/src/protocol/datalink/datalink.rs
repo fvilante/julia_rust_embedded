@@ -482,6 +482,8 @@ pub struct Datalink {
     pub try_rx: fn() -> Result<Option<u8>, ()>,
     /// Returns miliseconds elapsed since `Epoch` (when machine was turned on)
     pub now: fn() -> u16,
+    /// If there exists some function, then call it with the content of each byte received
+    pub debug_reception: Option<fn(u8)>,
 }
 
 impl Datalink {
@@ -537,6 +539,9 @@ impl Datalink {
             match try_receive_some_byte_from_serial() {
                 // Ok we received some byte !
                 Ok(Some(byte)) => {
+                    if let Some(debug_log) = self.debug_reception {
+                        debug_log(byte);
+                    };
                     match decoder.parse_next(byte) {
                         // Still decoding; after considering incomming byte continue to wait next byte.
                         Ok(None) => {}
@@ -851,6 +856,7 @@ mod tests {
             try_tx: smart_try_tx,
             try_rx: loopback_try_rx,
             now: lazy_now,
+            debug_reception: None,
         };
 
         // run

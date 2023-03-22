@@ -1294,6 +1294,7 @@ mod tests {
             try_tx: smart_try_tx,
             try_rx: loopback_try_rx,
             now: lazy_now,
+            debug_reception: None,
         };
 
         let transport = TransportLayer {
@@ -1323,6 +1324,7 @@ mod tests {
             try_tx: smart_try_tx,
             try_rx: loopback_try_rx,
             now: lazy_now,
+            debug_reception: None,
         };
 
         let transport = TransportLayer {

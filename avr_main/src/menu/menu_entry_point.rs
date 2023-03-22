@@ -81,6 +81,7 @@ pub fn development_entry_point() -> ! {
         timeout_ms: TIMEOUT_MS,
         try_rx,
         try_tx,
+        debug_reception: None,
     };
 
     let mechanical_properties = MechanicalProperties {
