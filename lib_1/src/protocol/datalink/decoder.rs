@@ -123,22 +123,19 @@ impl Decoder {
             }
 
             State::WaitingChecksum => {
-                fn try_get_frame(self_: &Decoder) -> Option<Frame> {
+                /// SAFETY: This function and all its dependent functions are called from inside the State::WaitingChecksum
+                fn get_frame(decoder: &Decoder) -> Frame {
                     /// For safety asserts current state is safe to try get frame
-                    if self_.state == State::WaitingChecksum {
+                    if decoder.state == State::WaitingChecksum {
                         let frame = Frame {
-                            start_byte: self_.start_byte,
-                            payload: self_.payload_buffer.into(),
+                            start_byte: decoder.start_byte,
+                            payload: decoder.payload_buffer.into(),
                         };
                         Some(frame)
                     } else {
                         None
                     }
-                }
-
-                /// SAFETY: This function and all its dependent functions are called from inside the State::WaitingChecksum
-                fn get_frame(self_: &Decoder) -> Frame {
-                    try_get_frame(self_).unwrap_or_else(|| {
+                    .unwrap_or_else(|| {
                         // NOTE: This is considered unreachable code because its condition never happens
                         // Error: "Cannot get frame because current state is not "WaitingChecksum"
                         unreachable!("E231");
