@@ -611,7 +611,7 @@ impl Datalink {
         let direction = Direction::Get;
         let word_value = 0x00; // according spec this value does not matter
         self.transact(direction, word_address, word_value)
-            .map(|slave_frame| Self::cast_to_pacote_de_retorno_solicitacao(slave_frame))
+            .map(Self::cast_to_pacote_de_retorno_solicitacao)
     }
 
     pub fn reset_bit_mask(
@@ -621,7 +621,7 @@ impl Datalink {
     ) -> Result<Result<PacoteDeRetornoDeEnvio, PacoteDeRetornoComErro>, DLError> {
         let direction = Direction::Get;
         self.transact(direction, word_address, bit_mask)
-            .map(|slave_frame| Self::cast_to_pacote_de_retorno_envio(slave_frame))
+            .map(Self::cast_to_pacote_de_retorno_envio)
     }
 
     pub fn set_bit_mask(
@@ -631,7 +631,7 @@ impl Datalink {
     ) -> Result<Result<PacoteDeRetornoDeEnvio, PacoteDeRetornoComErro>, DLError> {
         let direction = Direction::Get;
         self.transact(direction, word_address, bit_mask)
-            .map(|slave_frame| Self::cast_to_pacote_de_retorno_envio(slave_frame))
+            .map(Self::cast_to_pacote_de_retorno_envio)
     }
 
     pub fn set_word16(
@@ -641,7 +641,7 @@ impl Datalink {
     ) -> Result<Result<PacoteDeRetornoDeEnvio, PacoteDeRetornoComErro>, DLError> {
         let direction = Direction::Set;
         self.transact(direction, word_address, word_value)
-            .map(|slave_frame| Self::cast_to_pacote_de_retorno_envio(slave_frame))
+            .map(Self::cast_to_pacote_de_retorno_envio)
     }
 
     // Testing new api
