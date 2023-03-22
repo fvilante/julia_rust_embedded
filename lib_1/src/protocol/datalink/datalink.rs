@@ -66,7 +66,12 @@ pub struct Status {
 }
 
 impl Status {
+    ///TODO: Remove this method, duplicated
     fn new_from_raw(byte_low: u8) -> Self {
+        Self { low: byte_low }
+    }
+
+    pub fn from_byte_low(byte_low: u8) -> Self {
         Self { low: byte_low }
     }
 
@@ -569,7 +574,7 @@ impl Datalink {
             .map_err(|_| DLError::SlaveHasReturnedStartByteAsNeitherAckNorNack)
     }
 
-    fn transact(
+    pub fn transact(
         &self,
         direction: Direction,
         word_address: u8,

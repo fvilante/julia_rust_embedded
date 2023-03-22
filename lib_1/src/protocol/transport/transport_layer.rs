@@ -50,7 +50,7 @@ pub mod cmpp_value {
     pub struct Byte(pub u8);
 }
 
-mod memory_map {
+pub mod memory_map {
 
     #[derive(Copy, Clone)]
     /// Also known as `cmpp command`
@@ -698,6 +698,11 @@ impl<'a> TransportLayer<'a> {
 
     pub fn safe_datalink(&self) -> SafeDatalink<'a> {
         SafeDatalink::new(&self.datalink)
+    }
+
+    /// TODO: Mark this function as unsafe (if it is the case)
+    pub fn datalink(&'a self) -> &'a Datalink {
+        self.datalink
     }
 
     // API Methods
