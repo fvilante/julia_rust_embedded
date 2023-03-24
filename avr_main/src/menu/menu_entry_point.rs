@@ -99,11 +99,6 @@ pub fn development_entry_point() -> ! {
         ..
     } = SystemEnviroment::new();
 
-    ////
-    ///
-    example_00(&transport);
-    loop {}
-
     ///////////////////
 
     let mut machine_model = MachineModel::new();
@@ -117,7 +112,7 @@ pub fn development_entry_point() -> ! {
 
     ///////
 
-    let mut splash_window = Splash::new();
+    let mut splash_window = Splash::new(&machine_model, &transport);
 
     while splash_window.is_running() {
         if let Some(key) = keyboard.get_key() {
@@ -161,6 +156,27 @@ pub fn development_entry_point() -> ! {
                 canvas.render();
                 machine_model.save_to_eeprom();
                 delay_ms(2000);
+            }
+            if key == KeyCode::KEY_F2 {
+                progmem! {
+                    static progmem string TEXT = "Enviando dados para cmpp";
+                }
+                canvas.clear();
+                canvas.print_flash_str(FlashString::new(&TEXT));
+                canvas.render();
+                for _ in machine_model.send_all(&transport) {}
+                delay_ms(500);
+            }
+            if key == KeyCode::KEY_F1 {
+                progmem! {
+                    static progmem string TEXT = "Enviando start para cmpp";
+                }
+                canvas.clear();
+                canvas.print_flash_str(FlashString::new(&TEXT));
+                canvas.render();
+                transport.force_reference(None, None);
+                //transport.start();
+                delay_ms(500);
             }
             submenu.send_key(key);
         }

@@ -1,9 +1,12 @@
 use avr_progmem::progmem;
+use lib_1::{
+    protocol::transport::transport_layer::TransportLayer, utils::common::usize_to_u8_clamper,
+};
 
 use crate::{
-    board::keyboard::KeyCode,
-    menu::{canvas::Canvas, point::Point},
-    microcontroler::timer::now,
+    board::{keyboard::KeyCode, lcd},
+    menu::{canvas::Canvas, model::MachineModel, point::Point},
+    microcontroler::{delay::delay_ms, timer::now},
     utils::generic_string::GenericString,
 };
 
@@ -62,17 +65,21 @@ impl State {
     }
 }
 
-pub struct Splash {
+pub struct Splash<'a> {
     current_state: State,
     next_state_time_point: u32,
+    model: &'a MachineModel,
+    transport: &'a TransportLayer<'a>,
 }
 
-impl Splash {
-    pub fn new() -> Self {
+impl<'a> Splash<'a> {
+    pub fn new(model: &'a MachineModel, transport: &'a TransportLayer<'a>) -> Self {
         let initial_state = State::Initial;
         Self {
             current_state: initial_state,
             next_state_time_point: now() + Self::get_time_to_wait_in(initial_state),
+            model,
+            transport,
         }
     }
 
@@ -92,7 +99,7 @@ impl Splash {
     }
 }
 
-impl Widget for Splash {
+impl Widget for Splash<'_> {
     fn send_key(&mut self, key: KeyCode) {
         // do nothing
     }
@@ -115,7 +122,16 @@ impl Widget for Splash {
             State::BrandName => {
                 canvas.print_xy(Point::new(4, 0), GenericString::from_flash(&TEXT0))
             }
-            State::LoadingX => canvas.print_xy(Point::new(0, 1), GenericString::from_flash(&TEXT1)),
+            State::LoadingX => {
+                canvas.print_xy(Point::new(0, 1), GenericString::from_flash(&TEXT1));
+                delay_ms(1000);
+                lcd::clear();
+                lcd::print("La vai -->");
+                let mut index = 0;
+                for response in self.model.send_all(&self.transport) {}
+                lcd::print("Foi!");
+                delay_ms(2000);
+            }
             State::LoadingY => canvas.print_xy(Point::new(0, 0), GenericString::from_flash(&TEXT2)),
             State::End => {
                 // do nothing
