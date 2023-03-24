@@ -620,25 +620,15 @@ impl<'a> Iterator for SendAllIterator<'a> {
             ),
             31 => Some(
                 transport
-                    .numero_do_canal()
-                    .set(configuracao_de_eixo.numero_do_canal.get().into()),
-            ),
-            32 => Some(
-                transport
-                    .numero_de_pulso_do_giro()
-                    .set(configuracao_de_eixo.numero_de_pulso_do_giro.get().into()),
-            ),
-            33 => Some(
-                transport
                     .janela_de_protecao_do_giro()
                     .set(configuracao_de_eixo.janela_de_protecao_do_giro.get().into()),
             ),
-            34 => Some(
+            32 => Some(
                 transport
                     .deslocamento_giro_do_motor()
                     .set(configuracao_de_eixo.deslocamento_giro_do_motor.get().into()),
             ),
-            35 => Some(
+            33 => Some(
                 transport.giro_com_funcao_de_protecao().set(
                     configuracao_de_eixo
                         .giro_com_funcao_de_protecao
@@ -646,7 +636,7 @@ impl<'a> Iterator for SendAllIterator<'a> {
                         .into(),
                 ),
             ),
-            36 => Some(
+            34 => Some(
                 transport.giro_com_funcao_de_correcao().set(
                     configuracao_de_eixo
                         .giro_com_funcao_de_correcao
@@ -654,12 +644,12 @@ impl<'a> Iterator for SendAllIterator<'a> {
                         .into(),
                 ),
             ),
-            37 => Some(
+            35 => Some(
                 transport
                     .logica_do_start_externo()
                     .set(configuracao_de_eixo.logica_do_start_externo.get().into()),
             ),
-            38 => Some(
+            36 => Some(
                 transport.valor_da_posicao_de_referencia().set(
                     configuracao_de_eixo
                         .valor_da_posicao_de_referencia
@@ -667,17 +657,17 @@ impl<'a> Iterator for SendAllIterator<'a> {
                         .into(),
                 ),
             ),
-            39 => Some(
+            37 => Some(
                 transport
                     .velocidade_para_referencia()
                     .set(configuracao_de_eixo.velocidade_para_referencia.get().into()),
             ),
-            40 => Some(
+            38 => Some(
                 transport
                     .aceleracao_para_referencia()
                     .set(configuracao_de_eixo.aceleracao_para_referencia.get().into()),
             ),
-            41 => Some(
+            39 => Some(
                 transport.reducao_da_corrente_em_repouso().set(
                     configuracao_de_eixo
                         .reducao_da_corrente_em_repouso
@@ -685,18 +675,13 @@ impl<'a> Iterator for SendAllIterator<'a> {
                         .into(),
                 ),
             ),
-            42 => Some(
+            40 => Some(
                 transport.referencia_pelo_start_externo().set(
                     configuracao_de_eixo
                         .referencia_pelo_start_externo
                         .get()
                         .into(),
                 ),
-            ),
-            43 => Some(
-                transport
-                    .modo_turbo()
-                    .set(configuracao_de_eixo.modo_turbo.get().into()),
             ),
             _ => None,
         }

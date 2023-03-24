@@ -989,23 +989,6 @@ impl<'a> TransportLayer<'a> {
         }
     }
 
-    /// TODO: Not implemented yet, this is fake implementation
-    pub fn numero_do_canal(&self) -> WordManipulator<__Temp> {
-        WordManipulator {
-            transport: self,
-            address: 0xFF.into(),
-            phantom: core::marker::PhantomData,
-        }
-    }
-
-    /// TODO: Not implemented yet, this is fake implementation
-    pub fn numero_de_pulso_do_giro(&self) -> WordManipulator<Adimensional> {
-        WordManipulator {
-            transport: self,
-            address: 0xFF.into(),
-            phantom: core::marker::PhantomData,
-        }
-    }
     pub fn janela_de_protecao_do_giro(&self) -> WordManipulator<Adimensional> {
         WordManipulator {
             transport: self,
@@ -1090,19 +1073,6 @@ impl<'a> TransportLayer<'a> {
             address: BitAddress {
                 word_address: ((Self::X + 0x20) / 2).into(),
                 bit_position: BitPosition::D7,
-            },
-            phanton: core::marker::PhantomData,
-        }
-    }
-
-    /// TODO: remove this parameter in the beta version while I confirm if it in fact exists in the cmpp
-    /// device.
-    pub fn modo_turbo(&self) -> BinaryManipulator<ActivationState> {
-        BinaryManipulator {
-            transport: self,
-            address: BitAddress {
-                word_address: 0xFF.into(),
-                bit_position: BitPosition::D12,
             },
             phanton: core::marker::PhantomData,
         }
