@@ -11,7 +11,7 @@ pub struct Options;
 
 impl Options {
     pub fn ligado_desligado() -> OptionsBuffer {
-        make_options_buffer_from_array([FlashString::new(&LIGADO), FlashString::new(&DESLIGADO)])
+        make_options_buffer_from_array([FlashString::new(&DESLIGADO), FlashString::new(&LIGADO)])
     }
 
     pub fn continuo_passo_a_passo() -> OptionsBuffer {
