@@ -1,15 +1,13 @@
 use avr_progmem::progmem;
-use lib_1::protocol::datalink::datalink::word16::Word16;
-use lib_1::protocol::datalink::datalink::{Datalink, Direction, Status};
+
+use lib_1::protocol::datalink::datalink::Datalink;
 use lib_1::protocol::transport::channel::Channel;
 use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
-use lib_1::protocol::transport::transport_layer::memory_map::{
-    BitAddress, BitPosition, WordAddress,
-};
+
 use lib_1::protocol::transport::transport_layer::new_proposal::{
-    Acceleration, ActivationState, Displacement, Velocity, __Temp,
+    Acceleration, Displacement, Velocity,
 };
-use lib_1::protocol::transport::transport_layer::{TLError, TransportLayer};
+use lib_1::protocol::transport::transport_layer::TransportLayer;
 use lib_1::utils::common::usize_to_u8_clamper;
 
 use super::model::MachineModel;
@@ -108,7 +106,7 @@ pub fn development_entry_point() -> ! {
 
     let menu_manual = ManualModeMenu::new();
     let menu_execucao = MenuExecucao::new();
-    let mut main_menu = MainMenu::new(menu_manual, menu_execucao);
+    let _main_menu = MainMenu::new(menu_manual, menu_execucao);
 
     ///////
 

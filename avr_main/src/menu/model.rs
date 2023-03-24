@@ -2,7 +2,7 @@ use core::cell::Cell;
 
 use lib_1::{
     protocol::{
-        datalink::datalink::{word16::Word16, Status},
+        datalink::datalink::Status,
         transport::transport_layer::{TLError, TransportLayer},
     },
     utils::cursor::Cursor,
@@ -410,18 +410,18 @@ impl MachineModel {
     }
 
     pub fn save_to_eeprom(&self) {
-        let (next, size) = self
+        let (next, _size) = self
             .arquivo_de_eixo_x
             .save_into_eeprom(Self::INITIAL_ADDRESS);
 
-        let (next, size) = self.configuracao_do_eixo_x.save_into_eeprom(next);
+        let (_next, _size) = self.configuracao_do_eixo_x.save_into_eeprom(next);
     }
 
     pub fn load_from_eeprom(&mut self) {
-        let (next, address) = self
+        let (next, _address) = self
             .arquivo_de_eixo_x
             .load_from_eeprom(Self::INITIAL_ADDRESS);
-        let (next, size) = self.configuracao_do_eixo_x.load_from_eeprom(next);
+        let (_next, _size) = self.configuracao_do_eixo_x.load_from_eeprom(next);
     }
 }
 

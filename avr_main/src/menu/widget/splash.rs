@@ -1,7 +1,5 @@
 use avr_progmem::progmem;
-use lib_1::{
-    protocol::transport::transport_layer::TransportLayer, utils::common::usize_to_u8_clamper,
-};
+use lib_1::protocol::transport::transport_layer::TransportLayer;
 
 use crate::{
     board::{keyboard::KeyCode, lcd},
@@ -10,10 +8,7 @@ use crate::{
     utils::generic_string::GenericString,
 };
 
-use super::{
-    main_menu::MainMenu,
-    widget::{IWidget, Widget},
-};
+use super::widget::Widget;
 
 progmem! {
     static progmem string TEXT0 = "Posijet Industria e Comercio Ltda.";
@@ -100,7 +95,7 @@ impl<'a> Splash<'a> {
 }
 
 impl Widget for Splash<'_> {
-    fn send_key(&mut self, key: KeyCode) {
+    fn send_key(&mut self, _key: KeyCode) {
         // do nothing
     }
 
@@ -115,7 +110,7 @@ impl Widget for Splash<'_> {
         }
     }
 
-    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
+    fn draw(&self, canvas: &mut Canvas, _start_point: Point) {
         canvas.clear();
         match self.current_state {
             State::Initial => {}
@@ -127,8 +122,8 @@ impl Widget for Splash<'_> {
                 delay_ms(1000);
                 lcd::clear();
                 lcd::print("La vai -->");
-                let mut index = 0;
-                for response in self.model.send_all(&self.transport) {}
+                let _index = 0;
+                for _response in self.model.send_all(&self.transport) {}
                 lcd::print("Foi!");
                 delay_ms(2000);
             }

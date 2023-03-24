@@ -1151,7 +1151,7 @@ impl<'a> TransportLayer<'a> {
         }
     }
 
-    // Compound Methods
+    // Compound Methods API
 
     /// Obtem o Status da placa cmpp
     ///
