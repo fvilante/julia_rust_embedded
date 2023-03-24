@@ -172,7 +172,7 @@ pub fn development_entry_point() -> ! {
                 canvas.clear();
                 canvas.print_flash_str(FlashString::new(&TEXT));
                 canvas.render();
-                transport.force_reference(None, None);
+                transport.start();
                 //transport.start();
                 delay_ms(500);
             }
