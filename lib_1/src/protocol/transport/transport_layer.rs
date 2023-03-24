@@ -198,11 +198,6 @@ pub mod new_proposal {
 
     pub struct Displacement(pub u16);
 
-    pub struct DisplacementManipulator<'a> {
-        pub transport: &'a TransportLayer<'a>,
-        pub address: WordAddress,
-    }
-
     impl From<u16> for Displacement {
         fn from(value: u16) -> Self {
             Displacement(value)
@@ -251,11 +246,6 @@ pub mod new_proposal {
         }
     }
 
-    pub struct VelocityManipulator<'a> {
-        pub transport: &'a TransportLayer<'a>,
-        pub address: WordAddress,
-    }
-
     //  ///////////////////////////////////////////////////////////////////////////////////
     //
     //      ACCELERATION
@@ -282,11 +272,6 @@ pub mod new_proposal {
         fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
             self.0
         }
-    }
-
-    pub struct AccelerationManipulator<'a> {
-        pub transport: &'a TransportLayer<'a>,
-        pub address: WordAddress,
     }
 
     //  ///////////////////////////////////////////////////////////////////////////////////
