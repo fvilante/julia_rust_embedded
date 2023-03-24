@@ -11,7 +11,7 @@ use self::{
     memory_map::{BitAddress, BitPosition, WordAddress},
     new_proposal::{
         Acceleration, ActivationState, Adimensional, AxisMode, BinaryManipulator, Displacement,
-        SignalLogic, Velocity, WordManipulator, __Temp,
+        SignalLogic, Time, Velocity, WordManipulator, __Temp,
     },
 };
 
@@ -268,6 +268,34 @@ pub mod new_proposal {
     }
 
     impl ToCmpp<u16> for Acceleration {
+        ///TODO: Fake implementation, not performing physical convertion
+        fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
+            self.0
+        }
+    }
+
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //      TIME
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
+
+    pub struct Time(pub u16);
+
+    impl From<u16> for Time {
+        fn from(value: u16) -> Self {
+            Time(value)
+        }
+    }
+
+    impl FromCmpp<u16> for Time {
+        ///TODO: Fake implementation, not performing physical convertion
+        fn from_cmpp(value: u16, context: MechanicalProperties) -> Self {
+            Self(value)
+        }
+    }
+
+    impl ToCmpp<u16> for Time {
         ///TODO: Fake implementation, not performing physical convertion
         fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
             self.0
@@ -801,7 +829,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn largura_do_sinal_de_impressao(&self) -> WordManipulator<__Temp> {
+    pub fn largura_do_sinal_de_impressao(&self) -> WordManipulator<Time> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x16) / 2).into(),
@@ -828,14 +856,14 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn retardo_no_start_automatico(&self) -> WordManipulator<__Temp> {
+    pub fn retardo_no_start_automatico(&self) -> WordManipulator<Time> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x18) / 2).into(),
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn retardo_no_start_externo(&self) -> WordManipulator<__Temp> {
+    pub fn retardo_no_start_externo(&self) -> WordManipulator<Time> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x1A) / 2).into(),
@@ -909,7 +937,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn retardo_do_start_entre_eixos(&self) -> WordManipulator<__Temp> {
+    pub fn retardo_do_start_entre_eixos(&self) -> WordManipulator<Time> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x1E) / 2).into(),
@@ -926,14 +954,14 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn retardo_no_sinal_de_impressao(&self) -> WordManipulator<__Temp> {
+    pub fn retardo_no_sinal_de_impressao(&self) -> WordManipulator<Time> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x22) / 2).into(),
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn retardo_no_start_passo_a_passo(&self) -> WordManipulator<__Temp> {
+    pub fn retardo_no_start_passo_a_passo(&self) -> WordManipulator<Time> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x1E) / 2).into(),
@@ -971,14 +999,14 @@ impl<'a> TransportLayer<'a> {
     }
 
     /// TODO: Not implemented yet, this is fake implementation
-    pub fn numero_de_pulso_do_giro(&self) -> WordManipulator<__Temp> {
+    pub fn numero_de_pulso_do_giro(&self) -> WordManipulator<Adimensional> {
         WordManipulator {
             transport: self,
             address: 0xFF.into(),
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn janela_de_protecao_do_giro(&self) -> WordManipulator<__Temp> {
+    pub fn janela_de_protecao_do_giro(&self) -> WordManipulator<Adimensional> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x26) / 2).into(),
@@ -1066,6 +1094,8 @@ impl<'a> TransportLayer<'a> {
         }
     }
 
+    /// TODO: remove this parameter in the beta version while I confirm if it in fact exists in the cmpp
+    /// device.
     pub fn modo_turbo(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
