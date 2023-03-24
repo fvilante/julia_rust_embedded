@@ -1015,7 +1015,8 @@ impl<'a> TransportLayer<'a> {
     }
 
     /// Numero de pulsos por giro do motor
-    pub fn deslocamento_giro_do_motor(&self) -> WordManipulator<__Temp> {
+    /// TODO: When possible make this parameter optional
+    pub fn deslocamento_giro_do_motor(&self) -> WordManipulator<Adimensional> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x28) / 2).into(),

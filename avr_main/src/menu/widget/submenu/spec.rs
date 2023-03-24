@@ -745,9 +745,9 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
 
             3 => Some(
                 MenuItemBuilder::from_text(&DESLOCAMENTO_GIRO_DO_MOTOR_X)
-                    .add_optional_variable(
+                    .add_numerical_variable(
                         &self.model.configuracao_do_eixo_x.deslocamento_giro_do_motor,
-                        Options::ligado_desligado(),
+                        Some(0..0xFFFF),
                         30,
                     )
                     .build(),

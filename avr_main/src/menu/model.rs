@@ -255,7 +255,7 @@ pub struct ConfiguracaoDoEixo {
     pub numero_do_canal: Cell<u16>,
     pub numero_de_pulso_do_giro: Cell<u16>,
     pub janela_de_protecao_do_giro: Cell<u16>,
-    pub deslocamento_giro_do_motor: Cell<Cursor>,
+    pub deslocamento_giro_do_motor: Cell<u16>,
     pub giro_com_funcao_de_protecao: Cell<Cursor>,
     pub giro_com_funcao_de_correcao: Cell<Cursor>,
     pub logica_do_start_externo: Cell<Cursor>,
@@ -278,7 +278,7 @@ impl ConfiguracaoDoEixo {
             .write_u16(self.numero_do_canal.get())
             .write_u16(self.numero_de_pulso_do_giro.get())
             .write_u16(self.janela_de_protecao_do_giro.get())
-            .write_cursor(self.deslocamento_giro_do_motor.get())
+            .write_u16(self.deslocamento_giro_do_motor.get())
             .write_cursor(self.giro_com_funcao_de_protecao.get())
             .write_cursor(self.giro_com_funcao_de_correcao.get())
             .write_cursor(self.logica_do_start_externo.get())
@@ -312,7 +312,7 @@ impl ConfiguracaoDoEixo {
             let (value, next) = next.read_u16();
             self.janela_de_protecao_do_giro.set(value);
 
-            let (value, next) = next.read_cursor();
+            let (value, next) = next.read_u16();
             self.deslocamento_giro_do_motor.set(value);
 
             let (value, next) = next.read_cursor();
