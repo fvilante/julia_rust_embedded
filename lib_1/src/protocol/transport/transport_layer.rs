@@ -1039,21 +1039,21 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn valor_da_posicao_de_referencia(&self) -> WordManipulator<__Temp> {
+    pub fn valor_da_posicao_de_referencia(&self) -> WordManipulator<Adimensional> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x2A) / 2).into(),
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn velocidade_para_referencia(&self) -> WordManipulator<__Temp> {
+    pub fn velocidade_para_referencia(&self) -> WordManipulator<Adimensional> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x2A) / 2).into(),
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn aceleracao_para_referencia(&self) -> WordManipulator<__Temp> {
+    pub fn aceleracao_para_referencia(&self) -> WordManipulator<Adimensional> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x2C) / 2).into(),
@@ -1227,14 +1227,14 @@ impl<'a> TransportLayer<'a> {
 
     pub fn force_reference(
         &self,
-        velocidade: Option<__Temp>,
-        aceleracao: Option<__Temp>,
+        velocidade: Option<Adimensional>,
+        aceleracao: Option<Adimensional>,
     ) -> Result<(), TLError> {
         self.force_loose_reference()?;
         self.velocidade_para_referencia()
-            .set(velocidade.unwrap_or(__Temp(600)))?;
+            .set(velocidade.unwrap_or(Adimensional(600)))?;
         self.aceleracao_para_referencia()
-            .set(aceleracao.unwrap_or(__Temp(5000)))?;
+            .set(aceleracao.unwrap_or(Adimensional(5000)))?;
         self.pausa_serial().set(__ActivationState::Deactivated)?;
         self.start_serial().set(__ActivationState::Activated)?;
         while self.is_referenced()? == false {
