@@ -10,8 +10,8 @@ use self::{
     manipulator::WordSetter,
     memory_map::{BitAddress, BitPosition, WordAddress},
     new_proposal::{
-        Acceleration, Adimensional, BinaryManipulator, Displacement, Velocity, WordManipulator,
-        __ActivationState, __AxisMode, __SignalLogic, __Temp,
+        Acceleration, ActivationState, Adimensional, AxisMode, BinaryManipulator, Displacement,
+        SignalLogic, Velocity, WordManipulator, __Temp,
     },
 };
 
@@ -358,34 +358,34 @@ pub mod new_proposal {
     //  ///////////////////////////////////////////////////////////////////////////////////
 
     #[repr(u8)]
-    pub enum __ActivationState {
+    pub enum ActivationState {
         Deactivated = 0,
         Activated = 1,
     }
 
-    impl From<bool> for __ActivationState {
+    impl From<bool> for ActivationState {
         fn from(value: bool) -> Self {
             match value {
-                true => __ActivationState::Activated,
-                false => __ActivationState::Deactivated,
+                true => ActivationState::Activated,
+                false => ActivationState::Deactivated,
             }
         }
     }
 
-    impl Into<bool> for __ActivationState {
+    impl Into<bool> for ActivationState {
         fn into(self) -> bool {
             match self {
-                __ActivationState::Activated => false,
-                __ActivationState::Deactivated => true,
+                ActivationState::Activated => false,
+                ActivationState::Deactivated => true,
             }
         }
     }
 
-    impl From<Cursor> for __ActivationState {
+    impl From<Cursor> for ActivationState {
         fn from(value: Cursor) -> Self {
             match value.get_current() {
-                0 => __ActivationState::Deactivated,
-                1 => __ActivationState::Activated,
+                0 => ActivationState::Deactivated,
+                1 => ActivationState::Activated,
                 // TODO: Ideally instead of Cursor we should use an BinaryCursor (that has just two possible options at compile-time)
                 // Below error means that you are using a Cursor with more then 2 options, which are not currently supported
                 _ => unreachable!("E23"),
@@ -393,11 +393,11 @@ pub mod new_proposal {
         }
     }
 
-    impl Into<Cursor> for __ActivationState {
+    impl Into<Cursor> for ActivationState {
         fn into(self) -> Cursor {
             let current: u8 = match self {
-                __ActivationState::Activated => 1,
-                __ActivationState::Deactivated => 0,
+                ActivationState::Activated => 1,
+                ActivationState::Deactivated => 0,
             };
             Cursor::new(0, 2, current)
         }
@@ -410,34 +410,34 @@ pub mod new_proposal {
     //  ///////////////////////////////////////////////////////////////////////////////////
 
     #[repr(u8)]
-    pub enum __SignalLogic {
+    pub enum SignalLogic {
         Closed = 0,
         Open = 1,
     }
 
-    impl From<bool> for __SignalLogic {
+    impl From<bool> for SignalLogic {
         fn from(value: bool) -> Self {
             match value {
-                true => __SignalLogic::Open,
-                false => __SignalLogic::Closed,
+                true => SignalLogic::Open,
+                false => SignalLogic::Closed,
             }
         }
     }
 
-    impl Into<bool> for __SignalLogic {
+    impl Into<bool> for SignalLogic {
         fn into(self) -> bool {
             match self {
-                __SignalLogic::Open => false,
-                __SignalLogic::Closed => true,
+                SignalLogic::Open => false,
+                SignalLogic::Closed => true,
             }
         }
     }
 
-    impl From<Cursor> for __SignalLogic {
+    impl From<Cursor> for SignalLogic {
         fn from(value: Cursor) -> Self {
             match value.get_current() {
-                0 => __SignalLogic::Closed,
-                1 => __SignalLogic::Open,
+                0 => SignalLogic::Closed,
+                1 => SignalLogic::Open,
                 // TODO: Ideally instead of Cursor we should use an BinaryCursor (that has just two possible options at compile-time)
                 // Below error means that you are using a Cursor with more then 2 options, which are not currently supported
                 _ => unreachable!("E23"),
@@ -445,11 +445,11 @@ pub mod new_proposal {
         }
     }
 
-    impl Into<Cursor> for __SignalLogic {
+    impl Into<Cursor> for SignalLogic {
         fn into(self) -> Cursor {
             let current: u8 = match self {
-                __SignalLogic::Open => 1,
-                __SignalLogic::Closed => 0,
+                SignalLogic::Open => 1,
+                SignalLogic::Closed => 0,
             };
             Cursor::new(0, 2, current)
         }
@@ -462,34 +462,34 @@ pub mod new_proposal {
     //  ///////////////////////////////////////////////////////////////////////////////////
 
     #[repr(u8)]
-    pub enum __AxisMode {
+    pub enum AxisMode {
         Continuous = 0,
         StepToStep = 1,
     }
 
-    impl From<bool> for __AxisMode {
+    impl From<bool> for AxisMode {
         fn from(value: bool) -> Self {
             match value {
-                false => __AxisMode::Continuous,
-                true => __AxisMode::StepToStep,
+                false => AxisMode::Continuous,
+                true => AxisMode::StepToStep,
             }
         }
     }
 
-    impl Into<bool> for __AxisMode {
+    impl Into<bool> for AxisMode {
         fn into(self) -> bool {
             match self {
-                __AxisMode::Continuous => false,
-                __AxisMode::StepToStep => true,
+                AxisMode::Continuous => false,
+                AxisMode::StepToStep => true,
             }
         }
     }
 
-    impl From<Cursor> for __AxisMode {
+    impl From<Cursor> for AxisMode {
         fn from(value: Cursor) -> Self {
             match value.get_current() {
-                0 => __AxisMode::Continuous,
-                1 => __AxisMode::StepToStep,
+                0 => AxisMode::Continuous,
+                1 => AxisMode::StepToStep,
                 // TODO: Ideally instead of Cursor we should use an BinaryCursor (that has just two possible options at compile-time)
                 // Below error means that you are using a Cursor with more then 2 options, which are not currently supported
                 _ => unreachable!("E23"),
@@ -497,11 +497,11 @@ pub mod new_proposal {
         }
     }
 
-    impl Into<Cursor> for __AxisMode {
+    impl Into<Cursor> for AxisMode {
         fn into(self) -> Cursor {
             let current: u8 = match self {
-                __AxisMode::Continuous => 0,
-                __AxisMode::StepToStep => 1,
+                AxisMode::Continuous => 0,
+                AxisMode::StepToStep => 1,
             };
             Cursor::new(0, 2, current)
         }
@@ -795,7 +795,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn logica_do_sinal_de_impressao(&self) -> BinaryManipulator<__SignalLogic> {
+    pub fn logica_do_sinal_de_impressao(&self) -> BinaryManipulator<SignalLogic> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -806,7 +806,7 @@ impl<'a> TransportLayer<'a> {
         }
     }
 
-    pub fn logica_do_sinal_de_reversao(&self) -> BinaryManipulator<__SignalLogic> {
+    pub fn logica_do_sinal_de_reversao(&self) -> BinaryManipulator<SignalLogic> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -823,7 +823,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn reversao_de_mensagem_via_serial(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn reversao_de_mensagem_via_serial(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -833,7 +833,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn selecao_de_mensagem_via_serial(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn selecao_de_mensagem_via_serial(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -857,7 +857,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn start_automatico_no_avanco(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn start_automatico_no_avanco(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -867,7 +867,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn start_automatico_no_retorno(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn start_automatico_no_retorno(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -877,7 +877,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn modo_de_trabalho_do_eixo(&self) -> BinaryManipulator<__AxisMode> {
+    pub fn modo_de_trabalho_do_eixo(&self) -> BinaryManipulator<AxisMode> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -894,7 +894,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn saida_de_start_no_avaco(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn saida_de_start_no_avaco(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -904,7 +904,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn saida_de_start_no_retorno(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn saida_de_start_no_retorno(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -914,7 +914,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn entrada_de_start_entre_eixos(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn entrada_de_start_entre_eixos(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -931,7 +931,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn start_pelo_teclado_e_externo(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn start_pelo_teclado_e_externo(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -955,7 +955,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn start_automatico_passo_a_passo(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn start_automatico_passo_a_passo(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -965,7 +965,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn saida_de_start_passo_a_passo(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn saida_de_start_passo_a_passo(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1009,7 +1009,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn giro_com_funcao_de_protecao(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn giro_com_funcao_de_protecao(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1019,7 +1019,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn giro_com_funcao_de_correcao(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn giro_com_funcao_de_correcao(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1029,7 +1029,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn logica_do_start_externo(&self) -> BinaryManipulator<__SignalLogic> {
+    pub fn logica_do_start_externo(&self) -> BinaryManipulator<SignalLogic> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1060,7 +1060,7 @@ impl<'a> TransportLayer<'a> {
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn reducao_da_corrente_em_repouso(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn reducao_da_corrente_em_repouso(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1070,7 +1070,7 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn referencia_pelo_start_externo(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn referencia_pelo_start_externo(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1081,7 +1081,7 @@ impl<'a> TransportLayer<'a> {
         }
     }
 
-    pub fn modo_turbo(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn modo_turbo(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1095,7 +1095,7 @@ impl<'a> TransportLayer<'a> {
     // Controle via serial
 
     /// TODO: Make the manipulator only write this value
-    pub fn start_serial(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn start_serial(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1107,7 +1107,7 @@ impl<'a> TransportLayer<'a> {
     }
 
     /// TODO: Make the manipulator only write this value
-    pub fn stop_serial(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn stop_serial(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1119,7 +1119,7 @@ impl<'a> TransportLayer<'a> {
     }
 
     /// TODO: Make the manipulator only write this value
-    pub fn pausa_serial(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn pausa_serial(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1131,7 +1131,7 @@ impl<'a> TransportLayer<'a> {
     }
 
     /// TODO: Make the manipulator only write this value
-    pub fn modo_manual_serial(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn modo_manual_serial(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1143,7 +1143,7 @@ impl<'a> TransportLayer<'a> {
     }
 
     /// TODO: Make the manipulator only write this value
-    pub fn teste_de_impressao_serial(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn teste_de_impressao_serial(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1155,7 +1155,7 @@ impl<'a> TransportLayer<'a> {
     }
 
     /// TODO: Prabably I would create a manipulator specific for this method
-    pub fn grava_eeprom2(&self) -> BinaryManipulator<__ActivationState> {
+    pub fn grava_eeprom2(&self) -> BinaryManipulator<ActivationState> {
         BinaryManipulator {
             transport: self,
             address: BitAddress {
@@ -1215,10 +1215,9 @@ impl<'a> TransportLayer<'a> {
     pub fn force_loose_reference(&self) -> Result<(), TLError> {
         let is_referenced = self.is_referenced()?;
         if is_referenced {
-            self.modo_manual_serial()
-                .set(__ActivationState::Activated)?;
-            self.stop_serial().set(__ActivationState::Activated)?;
-            self.pausa_serial().set(__ActivationState::Activated)?;
+            self.modo_manual_serial().set(ActivationState::Activated)?;
+            self.stop_serial().set(ActivationState::Activated)?;
+            self.pausa_serial().set(ActivationState::Activated)?;
         } else {
             // already deferenced so do nothing
         };
@@ -1235,8 +1234,8 @@ impl<'a> TransportLayer<'a> {
             .set(velocidade.unwrap_or(Adimensional(600)))?;
         self.aceleracao_para_referencia()
             .set(aceleracao.unwrap_or(Adimensional(5000)))?;
-        self.pausa_serial().set(__ActivationState::Deactivated)?;
-        self.start_serial().set(__ActivationState::Activated)?;
+        self.pausa_serial().set(ActivationState::Deactivated)?;
+        self.start_serial().set(ActivationState::Activated)?;
         while self.is_referenced()? == false {
             // TODO: Set a timeout here
         }
@@ -1252,7 +1251,7 @@ impl<'a> TransportLayer<'a> {
     }
 
     pub fn start(&self) -> Result<Status, TLError> {
-        self.start_serial().set(__ActivationState::Activated)
+        self.start_serial().set(ActivationState::Activated)
     }
 }
 

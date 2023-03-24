@@ -7,7 +7,7 @@ use lib_1::protocol::transport::transport_layer::memory_map::{
     BitAddress, BitPosition, WordAddress,
 };
 use lib_1::protocol::transport::transport_layer::new_proposal::{
-    Acceleration, Displacement, Velocity, __ActivationState, __Temp,
+    Acceleration, ActivationState, Displacement, Velocity, __Temp,
 };
 use lib_1::protocol::transport::transport_layer::{TLError, TransportLayer};
 use lib_1::utils::common::usize_to_u8_clamper;
