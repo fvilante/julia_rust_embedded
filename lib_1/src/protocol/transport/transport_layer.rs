@@ -10,8 +10,8 @@ use self::{
     manipulator::WordSetter,
     memory_map::{BitAddress, BitPosition, BytePosition, WordAddress},
     new_proposal::{
-        Acceleration, ActivationState, Adimensional16, Adimensional8, AxisMode, BinaryManipulator,
-        ByteManipulator, Displacement, SignalLogic, Time, Velocity, WordManipulator, __Temp,
+        Acceleration, ActivationState, Adimensional, AxisMode, BinaryManipulator, ByteManipulator,
+        Displacement, SignalLogic, Time, Velocity, WordManipulator, __Temp,
     },
 };
 
@@ -344,60 +344,39 @@ pub mod new_proposal {
     //
     //  ///////////////////////////////////////////////////////////////////////////////////
 
-    pub struct Adimensional16(pub u16);
+    pub struct Adimensional(pub u16);
 
-    impl From<u16> for Adimensional16 {
+    impl From<u16> for Adimensional {
         fn from(value: u16) -> Self {
-            Adimensional16(value)
+            Adimensional(value)
         }
     }
 
-    impl FromCmpp<u16> for Adimensional16 {
+    impl FromCmpp<u16> for Adimensional {
         ///TODO: Fake implementation, not performing physical convertion
         fn from_cmpp(value: u16, context: MechanicalProperties) -> Self {
             Self(value)
         }
     }
 
-    impl ToCmpp<u16> for Adimensional16 {
+    impl ToCmpp<u16> for Adimensional {
         ///TODO: Fake implementation, not performing physical convertion
         fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
             self.0
         }
     }
 
-    //  ///////////////////////////////////////////////////////////////////////////////////
-    //
-    //      Adimensional8
-    //
-    //  ///////////////////////////////////////////////////////////////////////////////////
-
-    /// TODO: Check if this type is really necessary and whether it can be joined with Adimensional16
-    pub struct Adimensional8(pub u8);
-
-    impl From<u8> for Adimensional8 {
-        fn from(value: u8) -> Self {
-            Adimensional8(value)
-        }
-    }
-
-    impl FromCmpp<u8> for Adimensional8 {
+    impl FromCmpp<u8> for Adimensional {
         ///TODO: Fake implementation, not performing physical convertion
         fn from_cmpp(value: u8, context: MechanicalProperties) -> Self {
-            Self(value)
+            Self(value as u16)
         }
     }
 
-    impl ToCmpp<u8> for Adimensional8 {
+    impl ToCmpp<u8> for Adimensional {
         ///TODO: Fake implementation, not performing physical convertion
         fn to_cmpp(&self, context: MechanicalProperties) -> u8 {
-            self.0
-        }
-    }
-
-    impl From<u16> for Adimensional8 {
-        fn from(value: u16) -> Self {
-            Self(value as u8)
+            self.0 as u8
         }
     }
 
@@ -859,7 +838,7 @@ impl<'a> TransportLayer<'a> {
     }
 
     /// TODO: This should be a ByteManipulator instead of WordManipulator
-    pub fn numero_de_mensagem_no_avanco(&self) -> ByteManipulator<Adimensional8> {
+    pub fn numero_de_mensagem_no_avanco(&self) -> ByteManipulator<Adimensional> {
         ByteManipulator {
             transport: self,
             address: ((Self::X + 0x0C) / 2).into(),
@@ -869,7 +848,7 @@ impl<'a> TransportLayer<'a> {
     }
 
     /// TODO: This should be a ByteManipulator instead of WordManipulator
-    pub fn numero_de_mensagem_no_retorno(&self) -> ByteManipulator<Adimensional8> {
+    pub fn numero_de_mensagem_no_retorno(&self) -> ByteManipulator<Adimensional> {
         ByteManipulator {
             transport: self,
             address: ((Self::X + 0x0C) / 2).into(),
@@ -1086,7 +1065,7 @@ impl<'a> TransportLayer<'a> {
         }
     }
 
-    pub fn janela_de_protecao_do_giro(&self) -> WordManipulator<Adimensional16> {
+    pub fn janela_de_protecao_do_giro(&self) -> WordManipulator<Adimensional> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x26) / 2).into(),
@@ -1096,7 +1075,7 @@ impl<'a> TransportLayer<'a> {
 
     /// Numero de pulsos por giro do motor
     /// TODO: When possible make this parameter optional
-    pub fn deslocamento_giro_do_motor(&self) -> WordManipulator<Adimensional16> {
+    pub fn deslocamento_giro_do_motor(&self) -> WordManipulator<Adimensional> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x28) / 2).into(),
@@ -1133,21 +1112,21 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn valor_da_posicao_de_referencia(&self) -> WordManipulator<Adimensional16> {
+    pub fn valor_da_posicao_de_referencia(&self) -> WordManipulator<Adimensional> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x2A) / 2).into(),
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn velocidade_para_referencia(&self) -> WordManipulator<Adimensional16> {
+    pub fn velocidade_para_referencia(&self) -> WordManipulator<Adimensional> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x2A) / 2).into(),
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn aceleracao_para_referencia(&self) -> WordManipulator<Adimensional16> {
+    pub fn aceleracao_para_referencia(&self) -> WordManipulator<Adimensional> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x2C) / 2).into(),
@@ -1309,14 +1288,14 @@ impl<'a> TransportLayer<'a> {
 
     pub fn force_reference(
         &self,
-        velocidade: Option<Adimensional16>,
-        aceleracao: Option<Adimensional16>,
+        velocidade: Option<Adimensional>,
+        aceleracao: Option<Adimensional>,
     ) -> Result<(), TLError> {
         self.force_loose_reference()?;
         self.velocidade_para_referencia()
-            .set(velocidade.unwrap_or(Adimensional16(600)))?;
+            .set(velocidade.unwrap_or(Adimensional(600)))?;
         self.aceleracao_para_referencia()
-            .set(aceleracao.unwrap_or(Adimensional16(5000)))?;
+            .set(aceleracao.unwrap_or(Adimensional(5000)))?;
         self.pausa_serial().set(ActivationState::Deactivated)?;
         self.start_serial().set(ActivationState::Activated)?;
         while self.is_referenced()? == false {
