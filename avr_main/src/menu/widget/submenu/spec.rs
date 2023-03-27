@@ -188,56 +188,14 @@ impl SubmenuLayout for MenuPrograma<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => Some(
-                MenuItemBuilder::from_text(&NUMERO_DO_PROGRAMA_PARA_EDICAO)
+                MenuItemBuilder::from_text(&EDITAR_PROGRAMA_EIXO_X)
                     .add_conection_to_submenu(SubMenuHandle::MenuArquivoDeEixo)
                     .build(),
             ),
 
             1 => Some(
-                MenuItemBuilder::from_text(&NUMERO_DO_PROGRAMA_DO_EIXO_X)
-                    .add_conection_to_submenu(SubMenuHandle::MenuArquivoDeEixo)
-                    .build(),
-            ),
-
-            2 => Some(
-                MenuItemBuilder::from_text(&NUMERO_DO_PROGRAMA_DO_EIXO_Y)
-                    .add_conection_to_submenu(SubMenuHandle::MenuArquivoDeEixo)
-                    .build(),
-            ),
-
-            3 => Some(
-                MenuItemBuilder::from_text(&COPIAR_O_PROGRAMA_NUMERO)
-                    .add_conection_to_submenu(SubMenuHandle::MenuPrograma)
-                    .build(),
-            ),
-
-            4 => Some(
-                MenuItemBuilder::from_text(&TROCA_DE_NIVEL_DE_ACCESSO)
-                    .add_conection_to_submenu(SubMenuHandle::MenuPrograma)
-                    .build(),
-            ),
-
-            5 => Some(
-                MenuItemBuilder::from_text(&CONFIGURACAO_DO_EIXO_X)
+                MenuItemBuilder::from_text(&CONFIGURACAO_EIXO_X)
                     .add_conection_to_submenu(SubMenuHandle::MenuConfiguracaoDeEixo)
-                    .build(),
-            ),
-
-            6 => Some(
-                MenuItemBuilder::from_text(&CONFIGURACAO_DO_EIXO_Y)
-                    .add_conection_to_submenu(SubMenuHandle::MenuConfiguracaoDeEixo)
-                    .build(),
-            ),
-
-            7 => Some(
-                MenuItemBuilder::from_text(&CONFIGURACAO_DO_EQUIPAMENTO)
-                    .add_conection_to_submenu(SubMenuHandle::MenuPrograma)
-                    .build(),
-            ),
-
-            8 => Some(
-                MenuItemBuilder::from_text(&ROTINAS_DE_TESTES_E_VERIFICACAO)
-                    .add_conection_to_submenu(SubMenuHandle::MenuPrograma)
                     .build(),
             ),
 
