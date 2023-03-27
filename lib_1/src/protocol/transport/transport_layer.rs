@@ -8,10 +8,10 @@ use crate::protocol::datalink::datalink::{
 use self::{
     cmpp_value::{Bit, MechanicalProperties},
     manipulator::WordSetter,
-    memory_map::{BitAddress, BitPosition, WordAddress},
+    memory_map::{BitAddress, BitPosition, BytePosition, WordAddress},
     new_proposal::{
-        Acceleration, ActivationState, Adimensional, AxisMode, BinaryManipulator, Displacement,
-        SignalLogic, Time, Velocity, WordManipulator, __Temp,
+        Acceleration, ActivationState, Adimensional16, Adimensional8, AxisMode, BinaryManipulator,
+        ByteManipulator, Displacement, SignalLogic, Time, Velocity, WordManipulator, __Temp,
     },
 };
 
@@ -76,6 +76,8 @@ pub mod memory_map {
         }
     }
 
+    /// TODO: Probably this type should be moved to another place. But I'm not sure right now where.
+    #[derive(Clone, Copy)]
     pub enum BytePosition {
         ByteLow,
         ByteHigh,
@@ -186,7 +188,7 @@ pub mod new_proposal {
 
     use super::{
         cmpp_value::{Bit, MechanicalProperties},
-        memory_map::{BitAddress, BitPosition, WordAddress},
+        memory_map::{BitAddress, BitPosition, BytePosition, WordAddress},
         TLError, TransportLayer,
     };
 
@@ -338,29 +340,64 @@ pub mod new_proposal {
 
     //  ///////////////////////////////////////////////////////////////////////////////////
     //
-    //      Adimensional
+    //      Adimensional16
     //
     //  ///////////////////////////////////////////////////////////////////////////////////
 
-    pub struct Adimensional(pub u16);
+    pub struct Adimensional16(pub u16);
 
-    impl From<u16> for Adimensional {
+    impl From<u16> for Adimensional16 {
         fn from(value: u16) -> Self {
-            Adimensional(value)
+            Adimensional16(value)
         }
     }
 
-    impl FromCmpp<u16> for Adimensional {
+    impl FromCmpp<u16> for Adimensional16 {
         ///TODO: Fake implementation, not performing physical convertion
         fn from_cmpp(value: u16, context: MechanicalProperties) -> Self {
             Self(value)
         }
     }
 
-    impl ToCmpp<u16> for Adimensional {
+    impl ToCmpp<u16> for Adimensional16 {
         ///TODO: Fake implementation, not performing physical convertion
         fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
             self.0
+        }
+    }
+
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //      Adimensional8
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
+
+    /// TODO: Check if this type is really necessary and whether it can be joined with Adimensional16
+    pub struct Adimensional8(pub u8);
+
+    impl From<u8> for Adimensional8 {
+        fn from(value: u8) -> Self {
+            Adimensional8(value)
+        }
+    }
+
+    impl FromCmpp<u8> for Adimensional8 {
+        ///TODO: Fake implementation, not performing physical convertion
+        fn from_cmpp(value: u8, context: MechanicalProperties) -> Self {
+            Self(value)
+        }
+    }
+
+    impl ToCmpp<u8> for Adimensional8 {
+        ///TODO: Fake implementation, not performing physical convertion
+        fn to_cmpp(&self, context: MechanicalProperties) -> u8 {
+            self.0
+        }
+    }
+
+    impl From<u16> for Adimensional8 {
+        fn from(value: u16) -> Self {
+            Self(value as u8)
         }
     }
 
@@ -522,7 +559,7 @@ pub mod new_proposal {
 
     //  ///////////////////////////////////////////////////////////////////////////////////
     //
-    //      Word Manipulator
+    //      Convertion Trais
     //
     //  ///////////////////////////////////////////////////////////////////////////////////
 
@@ -533,6 +570,12 @@ pub mod new_proposal {
     pub trait FromCmpp<T> {
         fn from_cmpp(value: T, context: MechanicalProperties) -> Self;
     }
+
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //      Word Manipulator
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
 
     pub struct WordManipulator<'a, T: ToCmpp<u16> + FromCmpp<u16>> {
         pub transport: &'a TransportLayer<'a>,
@@ -557,6 +600,58 @@ pub mod new_proposal {
                 .get_word16(word_address.into())
                 .map(|word| T::from_cmpp(word.to_u16(), context));
             response
+        }
+    }
+
+    //  ///////////////////////////////////////////////////////////////////////////////////
+    //
+    //      Byte Manipulator
+    //
+    //  ///////////////////////////////////////////////////////////////////////////////////
+
+    pub struct ByteManipulator<'a, T: ToCmpp<u8> + FromCmpp<u8>> {
+        pub transport: &'a TransportLayer<'a>,
+        pub address: WordAddress,
+        pub byte_position: BytePosition,
+        pub phantom: PhantomData<T>,
+    }
+
+    impl<'a, T: ToCmpp<u8> + FromCmpp<u8>> ByteManipulator<'a, T> {
+        pub fn set(&self, user_value: T) -> Result<Status, TLError> {
+            let context = self.transport.get_mechanical_properties();
+            let byte_value = user_value.to_cmpp(context);
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            let byte_position = self.byte_position;
+            // read current word at the specified position
+            /// TODO: In future should exist a ManipulatorError type which contains TLError
+            let current_word = datalink.get_word16(word_address.into())?;
+            // change desired byte position in the word
+            let (byte_low, byte_high) = current_word.split_bytes();
+            let new_word = match byte_position {
+                BytePosition::ByteLow => Word16::from_bytes(byte_value, byte_high),
+                BytePosition::ByteHigh => Word16::from_bytes(byte_low, byte_value),
+            };
+            // resend the word with the modification
+            datalink.set_word16(new_word, word_address.into())
+        }
+
+        pub fn get(&self) -> Result<T, TLError> {
+            let context = self.transport.mechanical_properties;
+            let datalink = self.transport.safe_datalink();
+            let word_address = self.address.word_address;
+            let byte_position = self.byte_position;
+            // reads the word
+            let word_value = datalink.get_word16(word_address.into())?;
+            // clamp from word to byte
+            let (byte_low, byte_high) = word_value.split_bytes();
+            let fetched_byte = match byte_position {
+                BytePosition::ByteLow => byte_low,
+                BytePosition::ByteHigh => byte_high,
+            };
+            // convert from cmpp to user data
+            let result_value = T::from_cmpp(fetched_byte, context);
+            Ok(result_value)
         }
     }
 
@@ -764,19 +859,21 @@ impl<'a> TransportLayer<'a> {
     }
 
     /// TODO: This should be a ByteManipulator instead of WordManipulator
-    pub fn numero_de_mensagem_no_avanco(&self) -> WordManipulator<Adimensional> {
-        WordManipulator {
+    pub fn numero_de_mensagem_no_avanco(&self) -> ByteManipulator<Adimensional8> {
+        ByteManipulator {
             transport: self,
             address: ((Self::X + 0x0C) / 2).into(),
+            byte_position: BytePosition::ByteLow,
             phantom: core::marker::PhantomData,
         }
     }
 
     /// TODO: This should be a ByteManipulator instead of WordManipulator
-    pub fn numero_de_mensagem_no_retorno(&self) -> WordManipulator<Adimensional> {
-        WordManipulator {
+    pub fn numero_de_mensagem_no_retorno(&self) -> ByteManipulator<Adimensional8> {
+        ByteManipulator {
             transport: self,
             address: ((Self::X + 0x0C) / 2).into(),
+            byte_position: BytePosition::ByteHigh,
             phantom: core::marker::PhantomData,
         }
     }
@@ -989,7 +1086,7 @@ impl<'a> TransportLayer<'a> {
         }
     }
 
-    pub fn janela_de_protecao_do_giro(&self) -> WordManipulator<Adimensional> {
+    pub fn janela_de_protecao_do_giro(&self) -> WordManipulator<Adimensional16> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x26) / 2).into(),
@@ -999,7 +1096,7 @@ impl<'a> TransportLayer<'a> {
 
     /// Numero de pulsos por giro do motor
     /// TODO: When possible make this parameter optional
-    pub fn deslocamento_giro_do_motor(&self) -> WordManipulator<Adimensional> {
+    pub fn deslocamento_giro_do_motor(&self) -> WordManipulator<Adimensional16> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x28) / 2).into(),
@@ -1036,21 +1133,21 @@ impl<'a> TransportLayer<'a> {
             phanton: core::marker::PhantomData,
         }
     }
-    pub fn valor_da_posicao_de_referencia(&self) -> WordManipulator<Adimensional> {
+    pub fn valor_da_posicao_de_referencia(&self) -> WordManipulator<Adimensional16> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x2A) / 2).into(),
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn velocidade_para_referencia(&self) -> WordManipulator<Adimensional> {
+    pub fn velocidade_para_referencia(&self) -> WordManipulator<Adimensional16> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x2A) / 2).into(),
             phantom: core::marker::PhantomData,
         }
     }
-    pub fn aceleracao_para_referencia(&self) -> WordManipulator<Adimensional> {
+    pub fn aceleracao_para_referencia(&self) -> WordManipulator<Adimensional16> {
         WordManipulator {
             transport: self,
             address: ((Self::X + 0x2C) / 2).into(),
@@ -1212,14 +1309,14 @@ impl<'a> TransportLayer<'a> {
 
     pub fn force_reference(
         &self,
-        velocidade: Option<Adimensional>,
-        aceleracao: Option<Adimensional>,
+        velocidade: Option<Adimensional16>,
+        aceleracao: Option<Adimensional16>,
     ) -> Result<(), TLError> {
         self.force_loose_reference()?;
         self.velocidade_para_referencia()
-            .set(velocidade.unwrap_or(Adimensional(600)))?;
+            .set(velocidade.unwrap_or(Adimensional16(600)))?;
         self.aceleracao_para_referencia()
-            .set(aceleracao.unwrap_or(Adimensional(5000)))?;
+            .set(aceleracao.unwrap_or(Adimensional16(5000)))?;
         self.pausa_serial().set(ActivationState::Deactivated)?;
         self.start_serial().set(ActivationState::Activated)?;
         while self.is_referenced()? == false {

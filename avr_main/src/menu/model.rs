@@ -19,8 +19,8 @@ pub struct ArquivoDeEixo {
     pub velocidade_de_avanco: Cell<u16>,
     pub velocidade_de_retorno: Cell<u16>,
     // PARAMETROS DE IMPRESSAO
-    pub numero_de_mensagem_no_avanco: Cell<u16>,
-    pub numero_de_mensagem_no_retorno: Cell<u16>,
+    pub numero_de_mensagem_no_avanco: Cell<u16>, // TODO: When possible may change to u8
+    pub numero_de_mensagem_no_retorno: Cell<u16>, // TODO: When possible may change to u8
     pub primeira_mensagem_no_avanco: Cell<u16>,
     pub ultima_mensagem_no_avanco: Cell<u16>,
     pub primeira_mensagem_no_retorno: Cell<u16>,
