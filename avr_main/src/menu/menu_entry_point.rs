@@ -104,9 +104,13 @@ pub fn development_entry_point() -> ! {
 
     //////
 
+    let menu_storage: MenuStorage = MenuStorage::new(&machine_model);
+    let menu_root = SubMenuHandle::MenuPrograma;
+    let mut menu_programa = SubMenuRender::new(menu_root, &menu_storage);
+
     let menu_manual = ManualModeMenu::new();
     let menu_execucao = MenuExecucao::new();
-    let _main_menu = MainMenu::new(menu_manual, menu_execucao);
+    let mut main_menu = MainMenu::new(menu_manual, menu_execucao, menu_programa);
 
     ///////
 
@@ -124,12 +128,6 @@ pub fn development_entry_point() -> ! {
     }
 
     ///////
-
-    let menu_storage: MenuStorage = MenuStorage::new(&machine_model);
-
-    let menu_root = SubMenuHandle::MenuPrograma;
-
-    let mut submenu = SubMenuRender::new(menu_root, &menu_storage);
 
     let fps = 30; // frames_per_second
     let mut next_frame: u16 = now() + (1000 / fps);
@@ -176,13 +174,13 @@ pub fn development_entry_point() -> ! {
                 //transport.start();
                 delay_ms(500);
             }
-            submenu.send_key(key);
+            main_menu.send_key(key);
         }
 
         if now() > next_frame {
             next_frame = now() + (1000 / fps);
-            submenu.update();
-            submenu.draw(&mut canvas);
+            main_menu.update();
+            main_menu.draw(&mut canvas, Point::new(0, 0));
             canvas.render();
         }
     }

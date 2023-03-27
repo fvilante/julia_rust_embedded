@@ -8,6 +8,7 @@ use crate::{
 use super::{
     execucao::MenuExecucao,
     manual_mode::{ManualModeMenu, ManualModeState},
+    submenu::render::SubMenuRender,
     widget::Widget,
 };
 
@@ -25,19 +26,25 @@ pub enum State {
     Programa,
 }
 
-pub struct MainMenu {
+pub struct MainMenu<'a> {
     current_state: State,
     menu_manual: ManualModeMenu,
     menu_execucao: MenuExecucao,
+    menu_programa: SubMenuRender<'a>,
     //program_mode: IWidget,
 }
 
-impl MainMenu {
-    pub fn new(menu_manual: ManualModeMenu, menu_execucao: MenuExecucao) -> Self {
+impl<'a> MainMenu<'a> {
+    pub fn new(
+        menu_manual: ManualModeMenu,
+        menu_execucao: MenuExecucao,
+        menu_programa: SubMenuRender<'a>,
+    ) -> Self {
         Self {
             current_state: State::MainMenu,
             menu_manual,
             menu_execucao,
+            menu_programa,
         }
     }
 
@@ -63,8 +70,8 @@ impl MainMenu {
     }
 }
 
-impl Widget for MainMenu {
-    fn send_key(&mut self, key: KeyCode) {
+impl<'a> MainMenu<'a> {
+    pub fn send_key(&mut self, key: KeyCode) {
         match self.current_state {
             State::MainMenu => match key {
                 KeyCode::KEY_MANUAL => self.current_state = State::Manual,
@@ -80,11 +87,13 @@ impl Widget for MainMenu {
                     // do nothing
                 }
             }
-            State::Programa => todo!(),
+            State::Programa => {
+                self.menu_programa.send_key(key) // TODO: How can I do to return from `menu programa`
+            }
         }
     }
 
-    fn update(&mut self) {
+    pub fn update(&mut self) {
         match self.current_state {
             State::MainMenu => {}
             State::Manual => {
@@ -96,16 +105,16 @@ impl Widget for MainMenu {
                 }
             }
             State::Execucao => self.menu_execucao.update(),
-            State::Programa => todo!(),
+            State::Programa => self.menu_programa.update(),
         }
     }
 
-    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
+    pub fn draw(&mut self, canvas: &mut Canvas, start_point: Point) {
         match self.current_state {
             State::MainMenu => self.draw_main_menu(canvas),
             State::Manual => self.menu_manual.draw(canvas, start_point),
             State::Execucao => self.menu_execucao.draw(canvas, start_point),
-            State::Programa => todo!(),
+            State::Programa => self.menu_programa.draw(canvas),
         }
     }
 }

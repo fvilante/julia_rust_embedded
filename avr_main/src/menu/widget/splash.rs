@@ -84,7 +84,7 @@ impl<'a> Splash<'a> {
             State::Initial => 0,
             State::BrandName => 2000,
             State::LoadingX => 2000,
-            State::LoadingY => 2000,
+            State::LoadingY => 0,
             State::End => 0,
         }
     }
@@ -119,13 +119,7 @@ impl Widget for Splash<'_> {
             }
             State::LoadingX => {
                 canvas.print_xy(Point::new(0, 1), GenericString::from_flash(&TEXT1));
-                delay_ms(1000);
-                lcd::clear();
-                lcd::print("La vai -->");
-                let _index = 0;
                 for _response in self.model.send_all(&self.transport) {}
-                lcd::print("Foi!");
-                delay_ms(2000);
             }
             State::LoadingY => canvas.print_xy(Point::new(0, 0), GenericString::from_flash(&TEXT2)),
             State::End => {
