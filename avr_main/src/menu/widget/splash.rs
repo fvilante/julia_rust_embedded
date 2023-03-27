@@ -12,7 +12,7 @@ use super::widget::Widget;
 
 progmem! {
     static progmem string TEXT0 = "Posijet Industria e Comercio Ltda.";
-    static progmem string TEXT1 = "Por favor aguarde a carga do programa X";
+    pub static progmem string POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X = "Por favor aguarde a carga do programa X";
     static progmem string TEXT2 = "Por favor aguarde a carga do programa Y";
 }
 
@@ -118,7 +118,11 @@ impl Widget for Splash<'_> {
                 canvas.print_xy(Point::new(4, 0), GenericString::from_flash(&TEXT0))
             }
             State::LoadingX => {
-                canvas.print_xy(Point::new(0, 1), GenericString::from_flash(&TEXT1));
+                canvas.print_xy(
+                    Point::new(0, 1),
+                    GenericString::from_flash(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X),
+                );
+                // TODO: Move this effect to `update` method when possible
                 for _response in self.model.send_all(&self.transport) {}
             }
             State::LoadingY => canvas.print_xy(Point::new(0, 0), GenericString::from_flash(&TEXT2)),

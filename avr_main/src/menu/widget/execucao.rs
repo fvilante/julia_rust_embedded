@@ -1,9 +1,10 @@
 //menu "execucao"
 
 use avr_progmem::progmem;
+use lib_1::protocol::transport::transport_layer::TransportLayer;
 
 use crate::{
-    board::keyboard::KeyCode,
+    board::{keyboard::KeyCode, lcd},
     menu::{canvas::Canvas, flash::FlashString, point::Point},
 };
 
@@ -15,11 +16,13 @@ progmem! {
     static progmem string LINE1 = "X=${nnnn}    Y=${nnnn}";
 }
 
-pub struct MenuExecucao;
+pub struct MenuExecucao<'a> {
+    transport: &'a TransportLayer<'a>,
+}
 
-impl MenuExecucao {
-    pub fn new() -> Self {
-        Self {}
+impl<'a> MenuExecucao<'a> {
+    pub fn new(transport: &'a TransportLayer<'a>) -> Self {
+        Self { transport }
     }
 
     fn get_line_helper(line_number: u8) -> (Point, FlashString) {
@@ -35,8 +38,12 @@ impl MenuExecucao {
     }
 }
 
-impl Widget for MenuExecucao {
-    fn send_key(&mut self, _key: KeyCode) {}
+impl<'a> Widget for MenuExecucao<'a> {
+    fn send_key(&mut self, key: KeyCode) {
+        if key == KeyCode::KEY_START {
+            self.transport.start();
+        }
+    }
 
     fn update(&mut self) {}
 

@@ -1,8 +1,9 @@
 use avr_progmem::progmem;
+use lib_1::protocol::transport::transport_layer::TransportLayer;
 
 use crate::{
-    board::keyboard::KeyCode,
-    menu::{canvas::Canvas, flash::FlashString, point::Point},
+    board::{keyboard::KeyCode, lcd},
+    menu::{canvas::Canvas, flash::FlashString, model::MachineModel, point::Point},
 };
 
 use super::{
@@ -29,22 +30,28 @@ pub enum State {
 pub struct MainMenu<'a> {
     current_state: State,
     menu_manual: ManualModeMenu,
-    menu_execucao: MenuExecucao,
+    menu_execucao: MenuExecucao<'a>,
     menu_programa: SubMenuRender<'a>,
+    transport: &'a TransportLayer<'a>,
+    model: &'a MachineModel,
     //program_mode: IWidget,
 }
 
 impl<'a> MainMenu<'a> {
     pub fn new(
         menu_manual: ManualModeMenu,
-        menu_execucao: MenuExecucao,
+        menu_execucao: MenuExecucao<'a>,
         menu_programa: SubMenuRender<'a>,
+        transport: &'a TransportLayer<'a>,
+        model: &'a MachineModel,
     ) -> Self {
         Self {
             current_state: State::MainMenu,
             menu_manual,
             menu_execucao,
             menu_programa,
+            transport,
+            model,
         }
     }
 
@@ -84,7 +91,7 @@ impl<'a> MainMenu<'a> {
                 if key == KeyCode::KEY_ESC {
                     self.current_state = State::MainMenu
                 } else {
-                    // do nothing
+                    self.menu_execucao.send_key(key)
                 }
             }
             State::Programa => {
@@ -105,7 +112,20 @@ impl<'a> MainMenu<'a> {
                 }
             }
             State::Execucao => self.menu_execucao.update(),
-            State::Programa => self.menu_programa.update(),
+            State::Programa => {
+                if self.menu_programa.must_return_to_main_menu {
+                    self.current_state = State::MainMenu;
+                    self.menu_programa.must_return_to_main_menu = false;
+                    // send all data to cmpp when transitioning from menu_programa to main_menu
+                    // TODO: Place the below text in the Flash
+                    lcd::clear();
+                    lcd::set_cursor(0, 1);
+                    lcd::print("Por favor aguarde a carga do programa X");
+                    for _response in self.model.send_all(&self.transport) {}
+                } else {
+                    self.menu_programa.update()
+                }
+            }
         }
     }
 

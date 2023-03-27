@@ -10,6 +10,7 @@ use lib_1::protocol::transport::transport_layer::new_proposal::{
 use lib_1::protocol::transport::transport_layer::TransportLayer;
 use lib_1::utils::common::usize_to_u8_clamper;
 
+use super::canvas::Canvas;
 use super::model::MachineModel;
 use super::widget::submenu::render::SubMenuRender;
 
@@ -30,6 +31,7 @@ use crate::microcontroler::delay::delay_ms;
 
 use crate::microcontroler::serial;
 use crate::microcontroler::timer::{self};
+use crate::utils::generic_string::GenericString;
 
 fn example_00(transport: &TransportLayer) {
     lcd::print("ini");
@@ -109,8 +111,14 @@ pub fn development_entry_point() -> ! {
     let mut menu_programa = SubMenuRender::new(menu_root, &menu_storage);
 
     let menu_manual = ManualModeMenu::new();
-    let menu_execucao = MenuExecucao::new();
-    let mut main_menu = MainMenu::new(menu_manual, menu_execucao, menu_programa);
+    let menu_execucao = MenuExecucao::new(&transport);
+    let mut main_menu = MainMenu::new(
+        menu_manual,
+        menu_execucao,
+        menu_programa,
+        &transport,
+        &machine_model,
+    );
 
     ///////
 

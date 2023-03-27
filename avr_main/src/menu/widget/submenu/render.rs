@@ -22,6 +22,11 @@ pub struct SubMenuRender<'a> {
     mounted: [MenuItemWidget<'a>; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
     /// Stores the path of menu jumps that user perform, so you can go back to previous menu
     navigation_path: Vec<SubMenuHandle, 7>,
+    /// Main menu reads this bit, if it is set then it will render the main menu. When menu_menu pass control
+    /// do menu_programa it resets this bit, and then menu_program is responsible to set it when it want to give
+    /// back control to main_menu.
+    /// TODO: Improve this communication
+    pub must_return_to_main_menu: bool,
 }
 
 impl<'a> SubMenuRender<'a> {
@@ -34,6 +39,7 @@ impl<'a> SubMenuRender<'a> {
             ],
             current_menu: submenu_handle,
             navigation_path: Vec::new(),
+            must_return_to_main_menu: false,
         }
     }
 
@@ -135,7 +141,10 @@ impl<'a> SubMenuRender<'a> {
         // pops parent from navigation path
         let parent = match self.navigation_path.pop() {
             Some(parent) => parent,
-            None => self.current_menu,
+            None => {
+                self.must_return_to_main_menu = true;
+                self.current_menu
+            }
         };
         // go to parent
         self.go_to_submenu(parent)
