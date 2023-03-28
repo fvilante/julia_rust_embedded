@@ -1,11 +1,12 @@
 //menu "execucao"
 
 use avr_progmem::progmem;
-use lib_1::protocol::transport::transport_layer::TransportLayer;
+use lib_1::protocol::transport::transport_layer::{new_proposal::Displacement, TransportLayer};
 
 use crate::{
     board::{keyboard::KeyCode, lcd},
     menu::{canvas::Canvas, flash::FlashString, point::Point},
+    microcontroler::delay::delay_ms,
 };
 
 use super::widget::Widget;
@@ -13,7 +14,7 @@ use super::widget::Widget;
 progmem! {
     //                             1234567890123456789012345678901234567890
     static progmem string LINE0 = "Posicao atual:";
-    static progmem string LINE1 = "X=${nnnn}    Y=${nnnn}";
+    static progmem string LINE1 = "X =      "; //"${nnnn}    Y=${nnnn}";
 }
 
 pub struct MenuExecucao<'a> {
@@ -49,10 +50,17 @@ impl<'a> Widget for MenuExecucao<'a> {
 
     fn draw(&self, canvas: &mut Canvas, _start_point: Point) {
         canvas.clear();
+        // draw screen frame
         for line_number in 0..2 {
             let (point, flash_string) = Self::get_line_helper(line_number);
             canvas.set_cursor(point);
             canvas.print_flash_str(flash_string);
+        }
+        // draw current position
+        let posicao_atual = self.transport.posicao_atual();
+        if let Ok(Displacement(posicao_atual)) = posicao_atual {
+            canvas.set_cursor(Point::new(20, 1));
+            canvas.print_u16(posicao_atual);
         }
     }
 }

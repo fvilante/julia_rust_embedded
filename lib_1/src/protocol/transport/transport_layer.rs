@@ -11,7 +11,7 @@ use self::{
     memory_map::{BitAddress, BitPosition, BytePosition, WordAddress},
     new_proposal::{
         Acceleration, ActivationState, Adimensional, AxisMode, BinaryManipulator, ByteManipulator,
-        Displacement, SignalLogic, Time, Velocity, WordManipulator, __Temp,
+        Displacement, FromCmpp, SignalLogic, Time, Velocity, WordManipulator, __Temp,
     },
 };
 
@@ -1314,6 +1314,15 @@ impl<'a> TransportLayer<'a> {
 
     pub fn start(&self) -> Result<Status, TLError> {
         self.start_serial().set(ActivationState::Activated)
+    }
+
+    pub fn posicao_atual(&self) -> Result<Displacement, TLError> {
+        let context = self.mechanical_properties;
+        let word_address = 0x60 / 2;
+        // unit of measurement convertion from cmpp_value to user_value
+        let pos_atual_cmpp_value = self.safe_datalink().get_word16(word_address.into())?;
+        let pos_atual_user_value = Displacement::from_cmpp(pos_atual_cmpp_value.to_u16(), context);
+        Ok(pos_atual_user_value)
     }
 }
 

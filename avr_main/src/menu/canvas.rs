@@ -1,4 +1,5 @@
 use heapless::String;
+use lib_1::utils::common::convert_u16_to_string_decimal;
 
 use super::{flash::FlashString, point::Point};
 use crate::{board::lcd, utils::generic_string::GenericString};
@@ -128,6 +129,13 @@ impl Canvas {
     pub fn print_generic_string(&mut self, string: GenericString) {
         for byte in string.iter() {
             self.print_char(byte as char)
+        }
+    }
+
+    pub fn print_u16(&mut self, value: u16) {
+        let string = convert_u16_to_string_decimal(value);
+        for current_char in string.chars() {
+            self.print_char(current_char)
         }
     }
 
