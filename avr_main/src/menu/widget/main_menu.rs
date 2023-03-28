@@ -122,6 +122,8 @@ impl<'a> MainMenu<'a> {
                     lcd::set_cursor(0, 1);
                     lcd::print("Por favor aguarde a carga do programa X");
                     for _response in self.model.send_all(&self.transport) {}
+                    // saves data into the eeprom
+                    self.model.save_to_eeprom();
                 } else {
                     self.menu_programa.update()
                 }
