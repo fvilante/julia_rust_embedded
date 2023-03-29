@@ -18,9 +18,9 @@ progmem! {
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum ManualModeState {
-    Resting, // Client is responsible to changes to FirstScreeen state
-    FirstScreen,
-    LastScreen, // Server is responsible to changes to Resting state
+    Resting,     // client is responsible to change from Rsting to FirstScreen state
+    FirstScreen, // start screen
+    LastScreen,  // Server is responsible to changes to Resting state
 }
 
 pub struct ManualModeMenu {

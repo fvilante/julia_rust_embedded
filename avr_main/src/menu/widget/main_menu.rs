@@ -105,7 +105,7 @@ impl<'a> MainMenu<'a> {
             State::MainMenu => {}
             State::Manual => {
                 if self.menu_manual.current_state == ManualModeState::Resting {
-                    self.menu_manual.current_state = ManualModeState::FirstScreen;
+                    self.menu_manual.current_state = ManualModeState::FirstScreen; // reset state
                     self.current_state = State::MainMenu
                 } else {
                     self.menu_manual.update()
