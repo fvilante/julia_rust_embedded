@@ -1,4 +1,5 @@
 use avr_progmem::progmem;
+use lib_1::protocol::transport::transport_layer::{new_proposal::ActivationState, TransportLayer};
 
 use crate::{
     board::keyboard::KeyCode,
@@ -23,30 +24,30 @@ pub enum ManualModeState {
     LastScreen,  // Server is responsible to changes to Resting state
 }
 
-pub struct ManualModeMenu {
+pub struct ManualModeMenu<'a> {
     pub current_state: ManualModeState,
+    transport: &'a TransportLayer<'a>,
 }
 
-impl ManualModeMenu {
-    pub fn new() -> Self {
+impl<'a> ManualModeMenu<'a> {
+    pub fn new(transport: &'a TransportLayer<'a>) -> Self {
         Self {
             current_state: ManualModeState::FirstScreen,
+            transport,
         }
     }
 }
 
-impl Widget for ManualModeMenu {
+impl Widget for ManualModeMenu<'_> {
     fn send_key(&mut self, key: KeyCode) {
         match self.current_state {
             ManualModeState::Resting => {}
             ManualModeState::FirstScreen => {
                 if key == KeyCode::KEY_ESC {
-                    //back
+                    //Esc pressed, then go back
                     self.current_state = ManualModeState::Resting;
-                } else
-                /* Non_ESC key */
-                {
-                    //continue
+                } else {
+                    //else continue
                     self.current_state = ManualModeState::LastScreen;
                 }
             }
@@ -59,51 +60,23 @@ impl Widget for ManualModeMenu {
     fn update(&mut self) {}
 
     fn draw(&self, canvas: &mut Canvas, _start_point: Point) {
-        fn helper_get_first_screen(line_number: u8) -> (Point, FlashString) {
-            if line_number == 0 {
-                let line0 = FlashString::new(&LINE0);
-                let col0 = ((40 - line0.len()) / 2).try_into().unwrap_or(0);
-                (Point::new(col0, 0), line0)
-            } else {
-                let line1 = FlashString::new(&LINE1);
-                let col1 = ((40 - line1.len()) / 2).try_into().unwrap_or(0);
-                (Point::new(col1, 1), line1)
-            }
-        }
-
-        fn helper_get_last_screen(line_number: u8) -> (Point, FlashString) {
-            if line_number == 0 {
-                let line0 = FlashString::new(&LINE2);
-                let col0 = ((40 - line0.len()) / 2).try_into().unwrap_or(0);
-                (Point::new(col0, 0), line0)
-            } else {
-                let line1 = FlashString::new(&LINE3);
-                let col1 = ((40 - line1.len()) / 2).try_into().unwrap_or(0);
-                (Point::new(col1, 1), line1)
-            }
-        }
-        fn draw1(canvas: &mut Canvas) {
-            canvas.clear();
-            for line_number in 0..2 {
-                let (point, flash_string) = helper_get_first_screen(line_number);
-                canvas.set_cursor(point);
-                canvas.print_flash_str(flash_string);
-            }
-        }
-
-        fn draw2(canvas: &mut crate::menu::canvas::Canvas) {
-            canvas.clear();
-            for line_number in 0..2 {
-                let (point, flash_string) = helper_get_last_screen(line_number);
-                canvas.set_cursor(point);
-                canvas.print_flash_str(flash_string);
-            }
-        }
-
         if self.current_state == ManualModeState::FirstScreen {
-            draw1(canvas);
+            canvas.clear();
+            canvas.set_cursor(Point::new(0, 0));
+            canvas.print_flash_str(FlashString::new(&LINE0));
+            canvas.set_cursor(Point::new(0, 1));
+            canvas.print_flash_str(FlashString::new(&LINE1));
         } else if self.current_state == ManualModeState::LastScreen {
-            draw2(canvas);
+            canvas.clear();
+            canvas.set_cursor(Point::new(0, 0));
+            canvas.print_flash_str(FlashString::new(&LINE2));
+            canvas.set_cursor(Point::new(0, 1));
+            canvas.print_flash_str(FlashString::new(&LINE3));
+            //TODO: below effect should be in `update` and not in `draw` method
+            self.transport.stop_serial().set(ActivationState::Activated);
+            self.transport
+                .pausa_serial()
+                .set(ActivationState::Activated);
         }
     }
 }

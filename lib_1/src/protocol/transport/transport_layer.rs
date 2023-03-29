@@ -1313,6 +1313,7 @@ impl<'a> TransportLayer<'a> {
     }
 
     pub fn start(&self) -> Result<Status, TLError> {
+        self.pausa_serial().set(ActivationState::Deactivated)?;
         self.start_serial().set(ActivationState::Activated)
     }
 

@@ -110,7 +110,7 @@ pub fn development_entry_point() -> ! {
     let menu_root = SubMenuHandle::MenuPrograma;
     let mut menu_programa = SubMenuRender::new(menu_root, &menu_storage);
 
-    let menu_manual = ManualModeMenu::new();
+    let menu_manual = ManualModeMenu::new(&transport);
     let menu_execucao = MenuExecucao::new(&transport);
     let mut main_menu = MainMenu::new(
         menu_manual,

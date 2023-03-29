@@ -29,7 +29,7 @@ pub enum State {
 
 pub struct MainMenu<'a> {
     current_state: State,
-    menu_manual: ManualModeMenu,
+    menu_manual: ManualModeMenu<'a>,
     menu_execucao: MenuExecucao<'a>,
     menu_programa: SubMenuRender<'a>,
     transport: &'a TransportLayer<'a>,
@@ -39,7 +39,7 @@ pub struct MainMenu<'a> {
 
 impl<'a> MainMenu<'a> {
     pub fn new(
-        menu_manual: ManualModeMenu,
+        menu_manual: ManualModeMenu<'a>,
         menu_execucao: MenuExecucao<'a>,
         menu_programa: SubMenuRender<'a>,
         transport: &'a TransportLayer<'a>,
