@@ -216,12 +216,12 @@ impl ArquivoDeEixo {
 impl Default for ArquivoDeEixo {
     fn default() -> Self {
         Self {
-            posicao_inicial: Cell::new(100),
+            posicao_inicial: Cell::new(50),
             posicao_final: Cell::new(500),
             aceleracao_de_avanco: Cell::new(5000),
             aceleracao_de_retorno: Cell::new(5000),
             velocidade_de_avanco: Cell::new(500),
-            velocidade_de_retorno: Cell::new(500),
+            velocidade_de_retorno: Cell::new(700),
             numero_de_mensagem_no_avanco: Cell::new(3),
             numero_de_mensagem_no_retorno: Cell::new(3),
             primeira_mensagem_no_avanco: Cell::new(200),
@@ -232,7 +232,7 @@ impl Default for ArquivoDeEixo {
             largura_do_sinal_de_impressao: Cell::new(10),
             reversao_de_mensagem_via_serial: Default::default(),
             selecao_de_mensagem_via_serial: Default::default(),
-            retardo_no_start_automatico: Cell::new(10),
+            retardo_no_start_automatico: Cell::new(1000),
             retardo_no_start_externo: Cell::new(10),
             start_automatico_no_avanco: Cell::new(Cursor::new(0, 2, 1)),
             start_automatico_no_retorno: Cell::new(Cursor::new(0, 2, 1)),
