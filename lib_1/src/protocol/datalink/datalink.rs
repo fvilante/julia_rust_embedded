@@ -71,6 +71,10 @@ impl Status {
         Self { low: byte_low }
     }
 
+    pub fn get_raw_data(&self) -> u8 {
+        self.low
+    }
+
     pub fn from_byte_low(byte_low: u8) -> Self {
         Self { low: byte_low }
     }
