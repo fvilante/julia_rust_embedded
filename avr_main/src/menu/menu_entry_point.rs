@@ -64,6 +64,7 @@ pub fn development_entry_point() -> ! {
         static progmem string BAR = "X";
         static progmem string JUCA = "j";
         static progmem string NEGO = "N";
+        static progmem string MARCOS = "M";
 
     }
 
@@ -80,6 +81,7 @@ pub fn development_entry_point() -> ! {
     imprime_texto(&BAR);
     imprime_texto(&JUCA);
     imprime_texto(&NEGO);
+    imprime_texto(&MARCOS);
 
     loop {}
 
