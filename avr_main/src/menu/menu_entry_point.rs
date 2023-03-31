@@ -70,18 +70,17 @@ pub fn development_entry_point() -> ! {
 
     lcd::lcd_initialize();
 
-    fn imprime_texto<const N: usize>(text: &PmString<N>) {
-        let string = FlashString::new(text);
+    fn imprime_texto(string: FlashString) {
         for (char, index) in string.chars_indices() {
             lcd::print_char(char as char);
         }
     }
 
-    imprime_texto(&TEXT_FOO);
-    imprime_texto(&BAR);
-    imprime_texto(&JUCA);
-    imprime_texto(&NEGO);
-    imprime_texto(&MARCOS);
+    imprime_texto(FlashString::new(&TEXT_FOO));
+    imprime_texto(FlashString::new(&BAR));
+    imprime_texto(FlashString::new(&JUCA));
+    imprime_texto(FlashString::new(&NEGO));
+    imprime_texto(FlashString::new(&MARCOS));
 
     loop {}
 
