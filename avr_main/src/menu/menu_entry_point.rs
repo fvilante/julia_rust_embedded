@@ -59,6 +59,7 @@ pub fn development_entry_point() -> ! {
     ///////////////////
 
     lcd::lcd_initialize();
+    lcd::print("Oi6");
     loop {}
 
     ///////////////////
