@@ -1317,6 +1317,13 @@ impl<'a> TransportLayer<'a> {
         self.start_serial().set(ActivationState::Activated)
     }
 
+    pub fn stop(&self) -> Result<Status, TLError> {
+        self.stop_serial().set(ActivationState::Activated)?;
+        self.pausa_serial().set(ActivationState::Activated)?;
+        self.wait_to_stop()?;
+        self.get_status()
+    }
+
     pub fn posicao_atual(&self) -> Result<Displacement, TLError> {
         let context = self.mechanical_properties;
         let word_address = 0x60 / 2;

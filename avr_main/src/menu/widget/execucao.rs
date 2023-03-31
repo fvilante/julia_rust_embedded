@@ -8,8 +8,12 @@ use crate::{
     menu::{canvas::Canvas, flash::FlashString, point::Point},
     microcontroler::delay::delay_ms,
 };
+use avr_progmem::progmem;
+use lib_1::protocol::transport::transport_layer::{new_proposal::Displacement, TransportLayer};
 
 use super::widget::Widget;
+
+use lib_1::protocol::transport::transport_layer::new_proposal::ToCmpp;
 
 progmem! {
     //                             1234567890123456789012345678901234567890
@@ -41,8 +45,17 @@ impl<'a> MenuExecucao<'a> {
 
 impl<'a> Widget for MenuExecucao<'a> {
     fn send_key(&mut self, key: KeyCode) {
-        if key == KeyCode::KEY_START {
-            self.transport.start();
+        match key {
+            KeyCode::KEY_START => {
+                self.transport.start();
+            }
+            KeyCode::KEY_STOP => {
+                //lcd::clear();
+                //lcd::print("Juca");
+                self.transport.stop();
+                //loop { }
+            }
+            _ => {}
         }
     }
 
