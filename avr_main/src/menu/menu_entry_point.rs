@@ -58,9 +58,8 @@ fn example_00(transport: &TransportLayer) {
 pub fn development_entry_point() -> ! {
     ///////////////////
 
-    loop {}
-
     lcd::lcd_initialize();
+    loop {}
 
     ///////////////////
 
