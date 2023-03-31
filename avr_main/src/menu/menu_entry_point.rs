@@ -58,6 +58,12 @@ fn example_00(transport: &TransportLayer) {
 pub fn development_entry_point() -> ! {
     ///////////////////
 
+    loop {}
+
+    lcd::lcd_initialize();
+
+    ///////////////////
+
     let channel = Channel::from_u8(0).unwrap();
     fn now() -> u16 {
         timer::now() as u16
@@ -83,6 +89,17 @@ pub fn development_entry_point() -> ! {
         try_tx,
         debug_reception: None,
     };
+
+    loop {
+        for waddr in 0..0xFF {
+            let Ok(Ok(pacote_retorno)) = datalink.get_word16(waddr.into()) else {
+                loop {}
+            };
+            let word = pacote_retorno.data;
+            lcd::clear();
+            lcd::print_u16_in_hex(word.to_u16());
+        }
+    }
 
     let mechanical_properties = MechanicalProperties {
         pulses_per_motor_revolution: 400,
