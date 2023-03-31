@@ -60,19 +60,16 @@ pub fn development_entry_point() -> ! {
     ///////////////////
 
     progmem! {
-        static progmem string TEXT_FOO = "Oi6AB0123456789ABC";
-        //static progmem string BAR = "";
-    }
+        static progmem string TEXT_FOO = "Oi6";
 
-    fn print_flash_string<const N: usize>(text: &PmString<N>) {
-        let string = FlashString::new(&text);
-        for (char, index) in string.chars_indices() {
-            lcd::print_char(char as char);
-        }
     }
 
     lcd::lcd_initialize();
-    print_flash_string(&TEXT_FOO);
+
+    let string = FlashString::new(&TEXT_FOO);
+    for (char, index) in string.chars_indices() {
+        lcd::print_char(char as char);
+    }
 
     loop {}
 
