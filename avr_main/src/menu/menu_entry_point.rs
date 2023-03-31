@@ -58,8 +58,15 @@ fn example_00(transport: &TransportLayer) {
 pub fn development_entry_point() -> ! {
     ///////////////////
 
+    progmem! {
+        static progmem string TEXT_FOO = "Oi";
+    }
+
     lcd::lcd_initialize();
-    lcd::print("Oi6");
+    let string = FlashString::new(&TEXT_FOO);
+    for (char, index) in string.chars_indices() {
+        lcd::print_char(char as char);
+    }
     loop {}
 
     ///////////////////
