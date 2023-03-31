@@ -61,6 +61,7 @@ pub fn development_entry_point() -> ! {
 
     progmem! {
         static progmem string TEXT_FOO = "Oi6AB12345678901234567890";
+        static progmem string BAR = "";
 
     }
 
@@ -74,6 +75,7 @@ pub fn development_entry_point() -> ! {
     }
 
     imprime_texto(&TEXT_FOO);
+    imprime_texto(&BAR);
 
     loop {}
 
