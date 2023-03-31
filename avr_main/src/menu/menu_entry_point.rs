@@ -1,5 +1,6 @@
 use avr_progmem::progmem;
 
+use avr_progmem::string::PmString;
 use lib_1::protocol::datalink::datalink::Datalink;
 use lib_1::protocol::transport::channel::Channel;
 use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
@@ -59,14 +60,20 @@ pub fn development_entry_point() -> ! {
     ///////////////////
 
     progmem! {
-        static progmem string TEXT_FOO = "Oi";
+        static progmem string TEXT_FOO = "Oi6AB0123456789ABC";
+        //static progmem string BAR = "";
+    }
+
+    fn print_flash_string<const N: usize>(text: &PmString<N>) {
+        let string = FlashString::new(&text);
+        for (char, index) in string.chars_indices() {
+            lcd::print_char(char as char);
+        }
     }
 
     lcd::lcd_initialize();
-    let string = FlashString::new(&TEXT_FOO);
-    for (char, index) in string.chars_indices() {
-        lcd::print_char(char as char);
-    }
+    print_flash_string(&TEXT_FOO);
+
     loop {}
 
     ///////////////////
