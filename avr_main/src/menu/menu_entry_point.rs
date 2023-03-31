@@ -70,7 +70,7 @@ pub fn development_entry_point() -> ! {
 
     lcd::lcd_initialize();
 
-    #[inline(never)]
+    #[inline(always)]
     fn imprime_texto(string: FlashString) {
         for (char, index) in string.chars_indices() {
             lcd::print_char(char as char);
