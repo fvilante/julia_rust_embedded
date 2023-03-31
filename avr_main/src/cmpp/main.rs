@@ -69,7 +69,8 @@ pub fn development_entry_point() {
 
     let mechanical_properties = MechanicalProperties {
         pulses_per_motor_revolution: 400,
-        linear_displacement_per_tooth_belt: 828,
+        linear_displacement_per_tooth_belt_mult_by_100: 508,
+        number_of_tooths_of_motor_pulley: 16,
     };
 
     let transport = TransportLayer::new(datalink, mechanical_properties);

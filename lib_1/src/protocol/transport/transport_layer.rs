@@ -20,8 +20,21 @@ pub mod cmpp_value {
 
     #[derive(Clone, Copy)]
     pub struct MechanicalProperties {
-        pub pulses_per_motor_revolution: u16,
-        pub linear_displacement_per_tooth_belt: u16, // unit centh of milimeter
+        pub pulses_per_motor_revolution: u16, // NPM = Numero de pulsos por volta do motor
+        // TODO: Improve doc for this "fixed point in disguise" calculation
+        pub linear_displacement_per_tooth_belt_mult_by_100: u16, // unit: milimeters multiplied by 1000 (normally=508 centh of milimeters); PC=Passo da correia dentada
+        pub number_of_tooths_of_motor_pulley: u8, // NDP = numero de dentes da polia motora
+    }
+
+    impl MechanicalProperties {
+        /// TODO: Improve doc for this "fixed point in disguise" calculation
+        pub fn get_pulses_per_milimeters_mult_by_100(&self) -> u16 {
+            let npm = self.pulses_per_motor_revolution;
+            let ndp = self.number_of_tooths_of_motor_pulley as u16;
+            let pc = self.linear_displacement_per_tooth_belt_mult_by_100;
+            let value: u32 = (npm as u32 / ndp as u32) * 100 * 100 / pc as u32;
+            value as u16
+        }
     }
 
     pub trait IntoCmppValue<T> {
@@ -207,16 +220,23 @@ pub mod new_proposal {
     }
 
     impl FromCmpp<u16> for Displacement {
-        ///TODO: Fake implementation, not performing physical convertion
-        fn from_cmpp(value: u16, context: MechanicalProperties) -> Self {
-            Self(value)
+        fn from_cmpp(cmpp_value: u16, context: MechanicalProperties) -> Self {
+            //TODO: Check if the division is truncating de fractional part instead of rounding it.
+            const const_value: u32 = 512;
+            let factor: u32 = context.get_pulses_per_milimeters_mult_by_100().into();
+            let user_value = (((cmpp_value as u32 - const_value) * 100) / factor);
+            Self(user_value as u16)
         }
     }
 
     impl ToCmpp<u16> for Displacement {
-        ///TODO: Fake implementation, not performing physical convertion
         fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
-            self.0
+            //TODO: Check if the division is truncating de fractional part instead of rounding it.
+            const const_value: u32 = 512;
+            let factor: u32 = context.get_pulses_per_milimeters_mult_by_100().into();
+            let user_value = self.0 as u32;
+            let cmpp_value = ((user_value * factor) / 100) + const_value;
+            cmpp_value as u16
         }
     }
 
@@ -235,16 +255,24 @@ pub mod new_proposal {
     }
 
     impl FromCmpp<u16> for Velocity {
-        ///TODO: Fake implementation, not performing physical convertion
         fn from_cmpp(value: u16, context: MechanicalProperties) -> Self {
-            Self(value)
+            const T: u32 = 1024; // See: CMPP's protocol documentation
+                                 // reuse displacement's convertion algorithm
+                                 // TODO: make this algorithm clearer
+            let temp = Displacement::from_cmpp(value, context).0;
+            let user_value: u32 = (temp as u32 * T) / 1000;
+            Self(user_value as u16)
         }
     }
 
     impl ToCmpp<u16> for Velocity {
-        ///TODO: Fake implementation, not performing physical convertion
         fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
-            self.0
+            const T: u32 = 1024; // See: CMPP's protocol documentation
+                                 // reuse displacement's convertion algorithm
+                                 // TODO: make this algorithm clearer
+            let temp = Displacement(self.0).to_cmpp(context);
+            let cmpp_value: u32 = ((temp as u32 * 1000) / T);
+            cmpp_value as u16
         }
     }
 
@@ -263,16 +291,24 @@ pub mod new_proposal {
     }
 
     impl FromCmpp<u16> for Acceleration {
-        ///TODO: Fake implementation, not performing physical convertion
         fn from_cmpp(value: u16, context: MechanicalProperties) -> Self {
-            Self(value)
+            const T: u32 = 1024; // See: CMPP's protocol documentation
+                                 // reuse displacement's convertion algorithm
+                                 // TODO: make this algorithm clearer
+            let temp = Displacement::from_cmpp(value, context).0;
+            let user_value: u32 = (((temp as u32 * T) / 1000) * T) / 1000;
+            Self(user_value as u16)
         }
     }
 
     impl ToCmpp<u16> for Acceleration {
-        ///TODO: Fake implementation, not performing physical convertion
         fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
-            self.0
+            const T: u32 = 1024; // See: CMPP's protocol documentation
+                                 // reuse displacement's convertion algorithm
+                                 // TODO: make this algorithm clearer
+            let temp = Displacement(self.0).to_cmpp(context);
+            let cmpp_value: u32 = (((temp as u32 * 1000) / T) * 1000) / T;
+            cmpp_value as u16
         }
     }
 
@@ -291,15 +327,18 @@ pub mod new_proposal {
     }
 
     impl FromCmpp<u16> for Time {
-        ///TODO: Fake implementation, not performing physical convertion
-        fn from_cmpp(value: u16, context: MechanicalProperties) -> Self {
-            Self(value)
+        fn from_cmpp(cmpp_value: u16, context: MechanicalProperties) -> Self {
+            const T: u32 = 1024; // See: CMPP's protocol documentation
+            let user_value: u32 = (cmpp_value as u32 * T) / 1000;
+            Self(user_value as u16)
         }
     }
 
     impl ToCmpp<u16> for Time {
-        ///TODO: Fake implementation, not performing physical convertion
         fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
+            const T: u32 = 1024; // See: CMPP's protocol documentation
+            let user_value = self.0;
+            let cmpp_value: u32 = (user_value as u32 * 1000) / T;
             self.0
         }
     }
@@ -1359,8 +1398,9 @@ mod tests {
     use super::{memory_map::WordAddress, *};
 
     const MECHANICAL_PROPERTIES: MechanicalProperties = MechanicalProperties {
-        linear_displacement_per_tooth_belt: 1234,
-        pulses_per_motor_revolution: 2345,
+        linear_displacement_per_tooth_belt_mult_by_100: 508,
+        pulses_per_motor_revolution: 400,
+        number_of_tooths_of_motor_pulley: 16,
     };
 
     #[test]
