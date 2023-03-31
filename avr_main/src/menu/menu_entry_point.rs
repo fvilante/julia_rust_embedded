@@ -60,7 +60,7 @@ pub fn development_entry_point() -> ! {
     ///////////////////
 
     progmem! {
-        static progmem string TEXT_FOO = "Oi6AB";
+        static progmem string TEXT_FOO = "Oi6AB12345678901234567890";
 
     }
 
