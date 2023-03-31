@@ -64,12 +64,13 @@ pub fn development_entry_point() -> ! {
         static progmem string BAR = "X";
         static progmem string JUCA = "j";
         static progmem string NEGO = "N";
-        static progmem string MARCOS = "M";
+        //static progmem string MARCOS = "M";
 
     }
 
     lcd::lcd_initialize();
 
+    //#[inline]
     fn imprime_texto(string: FlashString) {
         for (char, index) in string.chars_indices() {
             lcd::print_char(char as char);
@@ -80,7 +81,7 @@ pub fn development_entry_point() -> ! {
     imprime_texto(FlashString::new(&BAR));
     imprime_texto(FlashString::new(&JUCA));
     imprime_texto(FlashString::new(&NEGO));
-    imprime_texto(FlashString::new(&MARCOS));
+    //imprime_texto(FlashString::new(&MARCOS));
 
     loop {}
 
