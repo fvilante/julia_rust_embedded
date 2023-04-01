@@ -97,14 +97,6 @@ pub fn development_entry_point() -> ! {
 
     let transport = TransportLayer::new(datalink, mechanical_properties);
 
-    loop {
-        let Ok(status) = transport.posicao_inicial().set(Displacement(100)) else {
-            loop {}
-        };
-        lcd::clear();
-        lcd::print_u16_in_hex(status.get_raw_data() as u16);
-    }
-
     ///////////////////
 
     let SystemEnviroment {
@@ -113,7 +105,27 @@ pub fn development_entry_point() -> ! {
         ..
     } = SystemEnviroment::new();
 
-    ///////////////////
+    ////////////////////
+
+    let mut counter: u16 = 0;
+
+    loop {
+        if let Some(key) = keyboard.get_key() {
+            if key == KeyCode::KEY_ESC {
+                canvas.clear();
+                canvas.print_u16(counter);
+                counter = counter + 1;
+            }
+        }
+
+        let Ok(status) = transport.posicao_inicial().set(Displacement(100)) else {
+            loop {}
+        };
+        lcd::clear();
+        lcd::print_u16_in_hex(status.get_raw_data() as u16);
+    }
+
+    ////
 
     let mut machine_model = MachineModel::new();
     machine_model.load_from_eeprom();
