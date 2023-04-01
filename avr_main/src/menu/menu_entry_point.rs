@@ -107,6 +107,11 @@ pub fn development_entry_point() -> ! {
 
     ////////////////////
 
+    let mut machine_model = MachineModel::new();
+    machine_model.load_from_eeprom();
+
+    //////
+
     let mut counter: u16 = 0;
 
     loop {
@@ -123,12 +128,8 @@ pub fn development_entry_point() -> ! {
         };
         lcd::clear();
         lcd::print_u16_in_hex(status.get_raw_data() as u16);
+        machine_model.send_all(&transport);
     }
-
-    ////
-
-    let mut machine_model = MachineModel::new();
-    machine_model.load_from_eeprom();
 
     //////
 
