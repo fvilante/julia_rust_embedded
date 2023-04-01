@@ -112,27 +112,6 @@ pub fn development_entry_point() -> ! {
 
     //////
 
-    let mut counter: u16 = 0;
-
-    loop {
-        if let Some(key) = keyboard.get_key() {
-            if key == KeyCode::KEY_ESC {
-                canvas.clear();
-                canvas.print_u16(counter);
-                counter = counter + 1;
-            }
-        }
-
-        let Ok(status) = transport.posicao_inicial().set(Displacement(100)) else {
-            loop {}
-        };
-        lcd::clear();
-        lcd::print_u16_in_hex(status.get_raw_data() as u16);
-        machine_model.send_all(&transport);
-    }
-
-    //////
-
     let menu_storage: MenuStorage = MenuStorage::new(&machine_model);
     let menu_root = SubMenuHandle::MenuPrograma;
     let mut menu_programa = SubMenuRender::new(menu_root, &menu_storage);
