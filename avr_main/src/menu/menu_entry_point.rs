@@ -148,46 +148,6 @@ pub fn development_entry_point() -> ! {
 
     loop {
         if let Some(key) = keyboard.get_key() {
-            if key == KeyCode::KEY_F4 {
-                lcd::clear();
-                lcd::print("Enviando");
-                for (index, _response) in machine_model.send_all(&transport).enumerate() {
-                    let index = usize_to_u8_clamper(index);
-                    lcd::clear();
-                    lcd::print_u8_in_hex(index);
-                }
-            }
-            if key == KeyCode::KEY_F3 {
-                progmem! {
-                    static progmem string TEXT = "Gravando na EEPROM...";
-                }
-                canvas.clear();
-                canvas.print_flash_str(FlashString::new(&TEXT));
-                canvas.render();
-                machine_model.save_to_eeprom();
-                delay_ms(2000);
-            }
-            if key == KeyCode::KEY_F2 {
-                progmem! {
-                    static progmem string TEXT = "Enviando dados para cmpp";
-                }
-                canvas.clear();
-                canvas.print_flash_str(FlashString::new(&TEXT));
-                canvas.render();
-                for _ in machine_model.send_all(&transport) {}
-                delay_ms(500);
-            }
-            if key == KeyCode::KEY_F1 {
-                progmem! {
-                    static progmem string TEXT = "Enviando start para cmpp";
-                }
-                canvas.clear();
-                canvas.print_flash_str(FlashString::new(&TEXT));
-                canvas.render();
-                transport.start();
-                //transport.start();
-                delay_ms(500);
-            }
             main_menu.send_key(key);
         }
 
