@@ -89,17 +89,6 @@ pub fn development_entry_point() -> ! {
         debug_reception: None,
     };
 
-    loop {
-        for waddr in 0..0xFF {
-            let Ok(Ok(pacote_retorno)) = datalink.get_word16(waddr.into()) else {
-                loop {}
-            };
-            let word = pacote_retorno.data;
-            lcd::clear();
-            lcd::print_u16_in_hex(word.to_u16());
-        }
-    }
-
     let mechanical_properties = MechanicalProperties {
         pulses_per_motor_revolution: 400,
         linear_displacement_per_tooth_belt_mult_by_100: 508,
@@ -107,6 +96,14 @@ pub fn development_entry_point() -> ! {
     };
 
     let transport = TransportLayer::new(datalink, mechanical_properties);
+
+    loop {
+        let Ok(status) = transport.posicao_inicial().set(Displacement(100)) else {
+            loop {}
+        };
+        lcd::clear();
+        lcd::print_u16_in_hex(status.get_raw_data() as u16);
+    }
 
     ///////////////////
 
