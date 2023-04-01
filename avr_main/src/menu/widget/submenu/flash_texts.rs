@@ -101,7 +101,7 @@ progmem! {
     pub static progmem string CONTINUO = "Contin";
     pub static progmem string PASSO_A_PASSO = "PasPas";
     pub static progmem string ABERTO = "Aberto";
-    pub static progmem string FECHADO = "fechado";
+    pub static progmem string FECHADO = "Fechado";
 
 
     //NOTE: it is possible to load any type in progmem not only strings
