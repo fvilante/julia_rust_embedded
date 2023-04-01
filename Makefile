@@ -83,6 +83,9 @@ upload_slow:
 upload_fast:
 	avrdude  -V -v -F -c usbasp -p m328p -Uflash:w:target/avr-atmega328p/release/avr_main.elf -U lfuse:w:0xFF:m -U hfuse:w:0xDE:m -U efuse:w:0xFD:m  
 
+# produces assembly from .elf file
+assembly_code:
+	avr-objdump -S ./target/avr-atmega328p/release/avr_main.elf > ./target/avr-atmega328p/release/avr_main.asm
 
 size:
 	@$(AVR_SIZE) --format=sysv $(BUILD_DIR)/avr_main.elf
