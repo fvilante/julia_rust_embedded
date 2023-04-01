@@ -48,6 +48,7 @@ impl FlashString {
     }
 
     /// Returns the chars indices of this [`FlashString`].
+    /// returns (Char, CharIndex)
     pub fn chars_indices(&self) -> FlashStringIterator {
         FlashStringIterator {
             flash_string: self.clone(),
@@ -136,6 +137,7 @@ type CharIndex = u8;
 impl Iterator for FlashStringIterator {
     type Item = (Char, CharIndex);
 
+    /// returns (Char, CharIndex)
     fn next(&mut self) -> Option<Self::Item> {
         let is_running = self.counter < self.flash_string.length;
         if is_running {
