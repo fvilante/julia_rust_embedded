@@ -1,5 +1,6 @@
 use avr_progmem::progmem;
 
+use avr_progmem::string::PmString;
 use lib_1::protocol::datalink::datalink::Datalink;
 use lib_1::protocol::transport::channel::Channel;
 use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
@@ -58,6 +59,10 @@ fn example_00(transport: &TransportLayer) {
 pub fn development_entry_point() -> ! {
     ///////////////////
 
+    lcd::lcd_initialize();
+
+    ///////////////////
+
     let channel = Channel::from_u8(0).unwrap();
     fn now() -> u16 {
         timer::now() as u16
@@ -100,7 +105,7 @@ pub fn development_entry_point() -> ! {
         ..
     } = SystemEnviroment::new();
 
-    ///////////////////
+    ////////////////////
 
     let mut machine_model = MachineModel::new();
     machine_model.load_from_eeprom();
@@ -143,46 +148,6 @@ pub fn development_entry_point() -> ! {
 
     loop {
         if let Some(key) = keyboard.get_key() {
-            if key == KeyCode::KEY_F4 {
-                lcd::clear();
-                lcd::print("Enviando");
-                for (index, _response) in machine_model.send_all(&transport).enumerate() {
-                    let index = usize_to_u8_clamper(index);
-                    lcd::clear();
-                    lcd::print_u8_in_hex(index);
-                }
-            }
-            if key == KeyCode::KEY_F3 {
-                progmem! {
-                    static progmem string TEXT = "Gravando na EEPROM...";
-                }
-                canvas.clear();
-                canvas.print_flash_str(FlashString::new(&TEXT));
-                canvas.render();
-                machine_model.save_to_eeprom();
-                delay_ms(2000);
-            }
-            if key == KeyCode::KEY_F2 {
-                progmem! {
-                    static progmem string TEXT = "Enviando dados para cmpp";
-                }
-                canvas.clear();
-                canvas.print_flash_str(FlashString::new(&TEXT));
-                canvas.render();
-                for _ in machine_model.send_all(&transport) {}
-                delay_ms(500);
-            }
-            if key == KeyCode::KEY_F1 {
-                progmem! {
-                    static progmem string TEXT = "Enviando start para cmpp";
-                }
-                canvas.clear();
-                canvas.print_flash_str(FlashString::new(&TEXT));
-                canvas.render();
-                transport.start();
-                //transport.start();
-                delay_ms(500);
-            }
             main_menu.send_key(key);
         }
 
