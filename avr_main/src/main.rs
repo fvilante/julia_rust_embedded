@@ -1,8 +1,9 @@
 #![no_std]
 #![no_main]
 #![feature(abi_avr_interrupt)]
-#![feature(alloc_error_handler)] // necessary to execute file ./custom_alloc/alloc_error_handler.rs
-#![feature(panic_info_message)]
+#![feature(alloc_error_handler)]
+// necessary to execute file ./custom_alloc/alloc_error_handler.rs
+//#![feature(panic_info_message)] // necessary only if you use `PanicInfo::message`
 #![feature(exclusive_range_pattern)]
 // necessary to send error messages to the panic_handler
 //#![allow(warnings)] // TODO: remove this on future
