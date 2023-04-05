@@ -25,20 +25,13 @@ Before start building, enter terminal go to the directory project and type:
 > rustup install nightly-2022-12-04
 ```
 
-Then type:
-
-```
-> rustup override set nightly-2022-12-04
-```
-
-Below lines will configure rust to use a particular version.
+This will install the specified version of the rust toolchain.
 
 Finally tpe:
 
 ```
 > make
 ``` 
-
 
 The `make` command will run the Makefile rules that compile, upload code to the board and show the total size of your compiled program.
  
