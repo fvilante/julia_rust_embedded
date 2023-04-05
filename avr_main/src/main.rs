@@ -9,6 +9,9 @@
 
 extern crate alloc;
 
+#[lang = "eh_personality"]
+extern "C" fn eh_personality() {}
+
 mod board;
 mod cmpp;
 mod custom_alloc;
