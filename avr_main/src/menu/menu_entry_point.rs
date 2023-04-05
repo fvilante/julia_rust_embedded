@@ -34,28 +34,6 @@ use crate::microcontroler::timer::init_timer;
 use crate::microcontroler::{serial, timer};
 use crate::utils::generic_string::GenericString;
 
-fn example_00(transport: &TransportLayer) {
-    lcd::print("ini");
-    transport.force_reference(None, None);
-    transport.wait_to_stop();
-    transport.posicao_inicial().set(Displacement(500));
-    transport.posicao_final().set(Displacement(2500));
-    transport.velocidade_de_avanco().set(Velocity(5000));
-    transport.aceleracao_de_avanco().set(Acceleration(5000));
-
-    for _ in 0..5 {
-        transport.start();
-        transport.wait_to_stop();
-    }
-
-    transport.start();
-    transport.start();
-
-    lcd::print("Fim");
-}
-
-///
-
 pub fn development_entry_point() -> ! {
     //////////////////////////////////////////
     /// Start Peripherals
