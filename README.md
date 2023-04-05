@@ -1,17 +1,17 @@
-# blink
 
-A small Hello World Rust application for the AVR.
+# Introduction
 
-The program itself toggles a LED on PORTB periodically.
+> NOTE: This document is a working in progress, feel free to add or modify information in it to make it more up-to-date.
 
-Designed for the ATmega328p.
+This source code is used to control the Circuit Board `Julia PCI`(version 1.10).
 
-[The AVR-Rust Book](https://book.avr-rust.com/)
+But the code is design with the concept of multi-platform in mind, and it is can run in Windows or in another microcontrolers manufactors or another AVR familly chip.
 
 ## Prerequisites
 
   * A recent version of the nightly Rust compiler. Anything including or
     greater than `rustc 1.63.0-nightly (fee3a459d 2022-06-05)` can be used.
+    > for example this version is known to work: `rustc 1.67.0-nightly (53e4b9dd7 2022-12-04)`
   * The rust-src rustup component - `$ rustup component add rust-src`
   * AVR-GCC on the system for linking
   * AVR-Libc on the system for support libraries
@@ -19,11 +19,32 @@ Designed for the ATmega328p.
 
 ## Usage
 
-Before start building, enter terminal go to the directory project and type `rustup override set nightly`.
+Before start building, enter terminal go to the directory project and type: 
 
-Then type `make`. This command will run the Makefile rules that compile, upload code to the board and show the total size of your compiled program.
+```
+> rustup install nightly-2022-12-04
+```
+
+Then type:
+
+```
+> rustup override set nightly-2022-12-04
+```
+
+Below lines will configure rust to use a particular version.
+
+Finally tpe:
+
+```
+> make
+``` 
+
+
+The `make` command will run the Makefile rules that compile, upload code to the board and show the total size of your compiled program.
  
-You can also type `make build upload size`, or if you prefer type only parts of this rules, exemple: `make upload` to just upload without compiling code, or `make build` to just compile code without upload it, etc. 
+You can also type `make build upload size`, or if you prefer type only parts of this rules, exemple: `make upload` to just upload without compiling code, or `make build` to just compile code without upload it, etc.
+
+To see all rules available see the `Makefile` in the project's main directory.
 
 
 # Building manually (details)
