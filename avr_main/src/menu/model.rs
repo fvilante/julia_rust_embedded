@@ -377,14 +377,14 @@ impl Default for ConfiguracaoDoEixo {
 
 ///
 
-pub struct MachineModel {
+pub struct DataStorage {
     pub arquivo_de_eixo_x: ArquivoDeEixo,
     //pub arquivo_de_eixo_y: ArquivoDeEixo,
     pub configuracao_do_eixo_x: ConfiguracaoDoEixo,
     //pub configuracao_do_eixo_y: ConfiguracaoDoEixo,
 }
 
-impl MachineModel {
+impl DataStorage {
     const ADDR_LOW: u8 = 0x00;
     const ADDR_HIGH: u8 = 0x01;
 

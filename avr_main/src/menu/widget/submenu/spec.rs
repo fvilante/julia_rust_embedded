@@ -2,7 +2,7 @@ use core::{cell::Cell, u8};
 
 use super::{
     super::super::{
-        model::MachineModel,
+        model::DataStorage,
         widget::{menu_item::builder::MenuItemBuilder, menu_item::menu_item::MenuItemWidget},
     },
     core::SubmenuLayout,
@@ -22,7 +22,7 @@ use super::flash_texts::*;
 ///
 /// TODO: Rename to `MenuStorageIndex`
 #[derive(Copy, Clone, PartialEq)]
-pub enum SubMenuHandle {
+pub enum SubmenuProgramaHandle {
     MenuPrograma,
     MenuArquivoDeEixo,
     MenuParametrosDeMovimento,
@@ -65,7 +65,7 @@ impl<T: SubmenuLayout> SubmenuLayout for Register<T> {
 /// The storage for all sub menus inside the submenu 'Programa'. If you create a new sub menu you must put it here.
 /// TODO: May change name to `MenuRegister`
 pub struct SubmenuProgramaStorage<'a> {
-    model: &'a MachineModel,
+    model: &'a DataStorage,
 
     pub MenuPrograma: Register<MenuPrograma<'a>>,
 
@@ -82,7 +82,7 @@ pub struct SubmenuProgramaStorage<'a> {
 
 impl<'a> SubmenuProgramaStorage<'a> {
     /// Constructs all the menus and initializes its internal state
-    pub fn new(model: &'a MachineModel) -> Self {
+    pub fn new(model: &'a DataStorage) -> Self {
         Self {
             model,
             MenuPrograma: Register::from_menu(MenuPrograma::new(model)),
@@ -102,56 +102,69 @@ impl<'a> SubmenuProgramaStorage<'a> {
 
     /// Retrieves an menu item given the sub menu and the index number of the menu item.
     /// If index is out of range than returns None
-    pub fn get_item(&self, submenu_handle: SubMenuHandle, index: usize) -> Option<MenuItemWidget> {
+    pub fn get_item(
+        &self,
+        submenu_handle: SubmenuProgramaHandle,
+        index: usize,
+    ) -> Option<MenuItemWidget> {
         match submenu_handle {
-            SubMenuHandle::MenuPrograma => self.MenuPrograma.get_item(index),
-            SubMenuHandle::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_item(index),
-            SubMenuHandle::MenuParametrosDeMovimento => {
+            SubmenuProgramaHandle::MenuPrograma => self.MenuPrograma.get_item(index),
+            SubmenuProgramaHandle::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_item(index),
+            SubmenuProgramaHandle::MenuParametrosDeMovimento => {
                 self.MenuParametrosDeMovimento.get_item(index)
             }
 
-            SubMenuHandle::MenuParametrosDeImpressao => {
+            SubmenuProgramaHandle::MenuParametrosDeImpressao => {
                 self.MenuParametrosDeImpressao.get_item(index)
             }
 
-            SubMenuHandle::MenuParametrosDeCiclo => self.MenuParametrosDeCiclo.get_item(index),
-            SubMenuHandle::MenuConfiguracaoDaImpressora => {
+            SubmenuProgramaHandle::MenuParametrosDeCiclo => {
+                self.MenuParametrosDeCiclo.get_item(index)
+            }
+            SubmenuProgramaHandle::MenuConfiguracaoDaImpressora => {
                 self.MenuConfiguracaoDaImpressora.get_item(index)
             }
 
-            SubMenuHandle::MenuIntertravamentoParaDoisEixos => {
+            SubmenuProgramaHandle::MenuIntertravamentoParaDoisEixos => {
                 self.MenuIntertravamentoParaDoisEixos.get_item(index)
             }
-            SubMenuHandle::MenuConfiguracaoDeEixo => self.MenuConfiguracaoDoEixo.get_item(index),
+            SubmenuProgramaHandle::MenuConfiguracaoDeEixo => {
+                self.MenuConfiguracaoDoEixo.get_item(index)
+            }
         }
     }
 
     /// Gets the navigation state of the submenu
     /// TODO: Simplify this function implementation reusing self.get_item which has a similar implementation
-    pub fn get_navigation_state(&self, submenu_handle: SubMenuHandle) -> &Cell<NavigationState> {
+    pub fn get_navigation_state(
+        &self,
+        submenu_handle: SubmenuProgramaHandle,
+    ) -> &Cell<NavigationState> {
         match submenu_handle {
-            SubMenuHandle::MenuPrograma => self.MenuPrograma.get_navigation_state(),
-            SubMenuHandle::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_navigation_state(),
-            SubMenuHandle::MenuParametrosDeMovimento => {
+            SubmenuProgramaHandle::MenuPrograma => self.MenuPrograma.get_navigation_state(),
+            SubmenuProgramaHandle::MenuArquivoDeEixo => {
+                self.MenuArquivoDeEixo.get_navigation_state()
+            }
+            SubmenuProgramaHandle::MenuParametrosDeMovimento => {
                 self.MenuParametrosDeMovimento.get_navigation_state()
             }
 
-            SubMenuHandle::MenuParametrosDeImpressao => {
+            SubmenuProgramaHandle::MenuParametrosDeImpressao => {
                 self.MenuParametrosDeImpressao.get_navigation_state()
             }
 
-            SubMenuHandle::MenuParametrosDeCiclo => {
+            SubmenuProgramaHandle::MenuParametrosDeCiclo => {
                 self.MenuParametrosDeCiclo.get_navigation_state()
             }
-            SubMenuHandle::MenuConfiguracaoDaImpressora => {
+            SubmenuProgramaHandle::MenuConfiguracaoDaImpressora => {
                 self.MenuConfiguracaoDaImpressora.get_navigation_state()
             }
 
-            SubMenuHandle::MenuIntertravamentoParaDoisEixos => {
+            SubmenuProgramaHandle::MenuIntertravamentoParaDoisEixos => {
                 self.MenuIntertravamentoParaDoisEixos.get_navigation_state()
             }
 
-            SubMenuHandle::MenuConfiguracaoDeEixo => {
+            SubmenuProgramaHandle::MenuConfiguracaoDeEixo => {
                 self.MenuConfiguracaoDoEixo.get_navigation_state()
             }
         }
@@ -162,7 +175,7 @@ impl<'a> SubmenuProgramaStorage<'a> {
     /// TODO: This algoritm may be highly optimized, because the length currently is obtained instantiating &
     /// throwing away all the menu items in memory. A better option may be to restructure datastructures
     /// to calculate this size in static time.
-    pub fn len(&self, submenu_handle: SubMenuHandle) -> usize {
+    pub fn len(&self, submenu_handle: SubmenuProgramaHandle) -> usize {
         for index in 0..u8::MAX {
             if let None = self.get_item(submenu_handle, index as usize) {
                 return index as usize;
@@ -175,11 +188,11 @@ impl<'a> SubmenuProgramaStorage<'a> {
 ////////////////////////////////////////////////////
 
 pub struct MenuPrograma<'a> {
-    model: &'a MachineModel,
+    model: &'a DataStorage,
 }
 
 impl<'a> MenuPrograma<'a> {
-    pub const fn new(model: &'a MachineModel) -> Self {
+    pub const fn new(model: &'a DataStorage) -> Self {
         Self { model }
     }
 }
@@ -189,13 +202,13 @@ impl SubmenuLayout for MenuPrograma<'_> {
         match index {
             0 => Some(
                 MenuItemBuilder::from_text(&EDITAR_PROGRAMA_EIXO_X)
-                    .add_conection_to_submenu(SubMenuHandle::MenuArquivoDeEixo)
+                    .add_conection_to_submenu(SubmenuProgramaHandle::MenuArquivoDeEixo)
                     .build(),
             ),
 
             1 => Some(
                 MenuItemBuilder::from_text(&CONFIGURACAO_EIXO_X)
-                    .add_conection_to_submenu(SubMenuHandle::MenuConfiguracaoDeEixo)
+                    .add_conection_to_submenu(SubmenuProgramaHandle::MenuConfiguracaoDeEixo)
                     .build(),
             ),
 
@@ -209,11 +222,11 @@ impl SubmenuLayout for MenuPrograma<'_> {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 pub struct MenuArquivoDeEixo<'a> {
-    model: &'a MachineModel,
+    model: &'a DataStorage,
 }
 
 impl<'a> MenuArquivoDeEixo<'a> {
-    pub const fn new(model: &'a MachineModel) -> Self {
+    pub const fn new(model: &'a DataStorage) -> Self {
         Self { model }
     }
 }
@@ -223,31 +236,33 @@ impl SubmenuLayout for MenuArquivoDeEixo<'_> {
         match index {
             0 => Some(
                 MenuItemBuilder::from_text(&PARAMETROS_DE_MOVIMENTO)
-                    .add_conection_to_submenu(SubMenuHandle::MenuParametrosDeMovimento)
+                    .add_conection_to_submenu(SubmenuProgramaHandle::MenuParametrosDeMovimento)
                     .build(),
             ),
 
             1 => Some(
                 MenuItemBuilder::from_text(&PARAMETROS_DE_IMPRESSAO)
-                    .add_conection_to_submenu(SubMenuHandle::MenuParametrosDeImpressao)
+                    .add_conection_to_submenu(SubmenuProgramaHandle::MenuParametrosDeImpressao)
                     .build(),
             ),
 
             2 => Some(
                 MenuItemBuilder::from_text(&CONFIGURACAO_DO_CICLO)
-                    .add_conection_to_submenu(SubMenuHandle::MenuParametrosDeCiclo)
+                    .add_conection_to_submenu(SubmenuProgramaHandle::MenuParametrosDeCiclo)
                     .build(),
             ),
 
             3 => Some(
                 MenuItemBuilder::from_text(&CONFIGURACAO_DA_IMPRESSORA)
-                    .add_conection_to_submenu(SubMenuHandle::MenuConfiguracaoDaImpressora)
+                    .add_conection_to_submenu(SubmenuProgramaHandle::MenuConfiguracaoDaImpressora)
                     .build(),
             ),
 
             4 => Some(
                 MenuItemBuilder::from_text(&INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO)
-                    .add_conection_to_submenu(SubMenuHandle::MenuIntertravamentoParaDoisEixos)
+                    .add_conection_to_submenu(
+                        SubmenuProgramaHandle::MenuIntertravamentoParaDoisEixos,
+                    )
                     .build(),
             ),
 
@@ -259,11 +274,11 @@ impl SubmenuLayout for MenuArquivoDeEixo<'_> {
 ////////////////////////////////////////////////////
 
 pub struct MenuParametrosDeMovimento<'a> {
-    model: &'a MachineModel,
+    model: &'a DataStorage,
 }
 
 impl<'a> MenuParametrosDeMovimento<'a> {
-    pub const fn new(model: &'a MachineModel) -> Self {
+    pub const fn new(model: &'a DataStorage) -> Self {
         Self { model }
     }
 }
@@ -337,11 +352,11 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
 ////////////////////////////////////////////////////
 
 pub struct MenuParametrosDeImpressao<'a> {
-    model: &'a MachineModel,
+    model: &'a DataStorage,
 }
 
 impl<'a> MenuParametrosDeImpressao<'a> {
-    pub const fn new(model: &'a MachineModel) -> Self {
+    pub const fn new(model: &'a DataStorage) -> Self {
         Self { model }
     }
 }
@@ -417,11 +432,11 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
 ////////////////////////////////////////////////////
 
 pub struct MenuParametrosDeCiclo<'a> {
-    model: &'a MachineModel,
+    model: &'a DataStorage,
 }
 
 impl<'a> MenuParametrosDeCiclo<'a> {
-    pub const fn new(model: &'a MachineModel) -> Self {
+    pub const fn new(model: &'a DataStorage) -> Self {
         Self { model }
     }
 }
@@ -487,11 +502,11 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
 ////////////////////////////////////////////////////
 
 pub struct MenuConfiguracaoDaImpressora<'a> {
-    model: &'a MachineModel,
+    model: &'a DataStorage,
 }
 
 impl<'a> MenuConfiguracaoDaImpressora<'a> {
-    pub const fn new(model: &'a MachineModel) -> Self {
+    pub const fn new(model: &'a DataStorage) -> Self {
         Self { model }
     }
 }
@@ -547,11 +562,11 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
 ////////////////////////////////////////////////////
 
 pub struct MenuIntertravamentoParaDoisEixos<'a> {
-    model: &'a MachineModel,
+    model: &'a DataStorage,
 }
 
 impl<'a> MenuIntertravamentoParaDoisEixos<'a> {
-    pub const fn new(model: &'a MachineModel) -> Self {
+    pub const fn new(model: &'a DataStorage) -> Self {
         Self { model }
     }
 }
@@ -659,11 +674,11 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 pub struct MenuConfiguracaoDeEixo<'a> {
-    model: &'a MachineModel,
+    model: &'a DataStorage,
 }
 
 impl<'a> MenuConfiguracaoDeEixo<'a> {
-    pub const fn new(model: &'a MachineModel) -> Self {
+    pub const fn new(model: &'a DataStorage) -> Self {
         Self { model }
     }
 }

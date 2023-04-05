@@ -1,4 +1,4 @@
-use crate::menu::widget::submenu::spec::SubMenuHandle;
+use crate::menu::widget::submenu::spec::SubmenuProgramaHandle;
 use crate::menu::{flash::FlashString, point::Point1d};
 
 use super::{
@@ -15,7 +15,7 @@ struct Base {
     point1: u8,
     point2: Option<u8>, // only used if has numerical or optional field
     text: FlashString,
-    child: Option<SubMenuHandle>,
+    child: Option<SubmenuProgramaHandle>,
 }
 
 impl Default for Base {
@@ -64,7 +64,7 @@ impl<'a> MenuItemBuilder<'a> {
         }
     }
 
-    pub fn add_conection_to_submenu(&mut self, handle: SubMenuHandle) -> &mut Self {
+    pub fn add_conection_to_submenu(&mut self, handle: SubmenuProgramaHandle) -> &mut Self {
         self.base.child = Some(handle);
         self
     }

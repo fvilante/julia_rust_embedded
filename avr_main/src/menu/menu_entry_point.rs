@@ -12,8 +12,8 @@ use lib_1::protocol::transport::transport_layer::TransportLayer;
 use lib_1::utils::common::usize_to_u8_clamper;
 
 use super::canvas::Canvas;
-use super::model::MachineModel;
-use super::widget::submenu::render::SubMenuRender;
+use super::model::DataStorage;
+use super::widget::submenu::render::SubmenuProgramaRender;
 
 use crate::board::keyboard::KeyCode;
 use crate::board::lcd;
@@ -23,15 +23,15 @@ use crate::menu::widget::execucao::MenuExecucao;
 use crate::menu::widget::main_menu::MainMenu;
 use crate::menu::widget::manual_mode::ManualModeMenu;
 use crate::menu::widget::splash::Splash;
-use crate::menu::widget::submenu::spec::{SubMenuHandle, SubmenuProgramaStorage};
+use crate::menu::widget::submenu::spec::{SubmenuProgramaHandle, SubmenuProgramaStorage};
 
 use crate::menu::widget::widget::Widget;
 use crate::menu::widget::widget_tests::SystemEnviroment;
 
 use crate::microcontroler::delay::delay_ms;
 
-use crate::microcontroler::serial;
-use crate::microcontroler::timer::{self};
+use crate::microcontroler::timer::init_timer;
+use crate::microcontroler::{serial, timer};
 use crate::utils::generic_string::GenericString;
 
 fn example_00(transport: &TransportLayer) {
@@ -57,12 +57,26 @@ fn example_00(transport: &TransportLayer) {
 ///
 
 pub fn development_entry_point() -> ! {
-    ///////////////////
+    //////////////////////////////////////////
+    /// Start Peripherals
+    //////////////////////////////////////////
+    ///
+    // initialize timer couting (1khz)
+    serial::init(BAUD_RATE);
 
-    lcd::lcd_initialize();
+    init_timer();
 
-    ///////////////////
+    // initialize display and keyboard
+    let SystemEnviroment {
+        mut canvas,
+        mut keyboard,
+        ..
+    } = SystemEnviroment::new();
 
+    //////////////////////////////////////////
+    /// Start comunication infrastructure
+    //////////////////////////////////////////
+    ///
     let channel = Channel::from_u8(0).unwrap();
     fn now() -> u16 {
         timer::now() as u16
@@ -70,7 +84,6 @@ pub fn development_entry_point() -> ! {
     const TIMEOUT_MS: u16 = 1000; // TODO: Maybe in future be calculated as a function of the connection baud rate
 
     const BAUD_RATE: u32 = 9600; // FIX: 2400 is not working, the problem seems to be in the register's port setup configuration
-    let _serial = serial::init(BAUD_RATE);
 
     fn try_rx() -> Result<Option<u8>, ()> {
         Ok(serial::try_receive())
@@ -97,24 +110,22 @@ pub fn development_entry_point() -> ! {
 
     let transport = TransportLayer::new(datalink, mechanical_properties);
 
-    ///////////////////
+    //////////////////////////////////////////
+    /// Data Storage
+    //////////////////////////////////////////
+    ///
+    let mut data_storage = DataStorage::new();
+    data_storage.load_from_eeprom();
 
-    let SystemEnviroment {
-        mut canvas,
-        mut keyboard,
-        ..
-    } = SystemEnviroment::new();
-
-    ////////////////////
-
-    let mut machine_model = MachineModel::new();
-    machine_model.load_from_eeprom();
-
-    //////
-
-    let menu_storage: SubmenuProgramaStorage = SubmenuProgramaStorage::new(&machine_model);
-    let menu_root = SubMenuHandle::MenuPrograma;
-    let mut menu_programa = SubMenuRender::new(menu_root, &menu_storage);
+    //////////////////////////////////////////
+    /// Main Menu Mounting
+    //////////////////////////////////////////
+    ///
+    let submenu_programa_storage: SubmenuProgramaStorage =
+        SubmenuProgramaStorage::new(&data_storage);
+    let submenu_programa_handle = SubmenuProgramaHandle::MenuPrograma;
+    let mut menu_programa =
+        SubmenuProgramaRender::new(submenu_programa_handle, &submenu_programa_storage);
 
     let menu_manual = ManualModeMenu::new(&transport);
     let menu_execucao = MenuExecucao::new(&transport);
@@ -123,12 +134,14 @@ pub fn development_entry_point() -> ! {
         menu_execucao,
         menu_programa,
         &transport,
-        &machine_model,
+        &data_storage,
     );
 
-    ///////
-
-    let mut splash_window = Splash::new(&machine_model, &transport);
+    //////////////////////////////////////////
+    /// Show Initial Splash Window
+    //////////////////////////////////////////
+    ///
+    let mut splash_window = Splash::new(&data_storage, &transport);
 
     while splash_window.is_running() {
         if let Some(key) = keyboard.get_key() {
@@ -141,9 +154,11 @@ pub fn development_entry_point() -> ! {
         canvas.render();
     }
 
-    ///////
-
-    let fps = 30; // frames_per_second
+    //////////////////////////////////////////
+    /// Main Loop
+    //////////////////////////////////////////
+    ///
+    let fps = 30;
     let mut next_frame: u16 = now() + (1000 / fps);
 
     loop {

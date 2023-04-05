@@ -28,15 +28,12 @@ mod panic;
 mod utils;
 
 use lib_1;
-use microcontroler::timer::init_timer;
 
 #[no_mangle]
 #[arduino_hal::entry]
 fn main() -> ! {
     //protocol::datalink_comm::development_entry_point();
     //board::lcd::example_01();
-
-    init_timer(); // initialize timer couting (1khz)
 
     //
 

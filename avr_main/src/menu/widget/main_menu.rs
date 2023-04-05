@@ -3,13 +3,13 @@ use lib_1::protocol::transport::transport_layer::TransportLayer;
 
 use crate::{
     board::{keyboard::KeyCode, lcd},
-    menu::{canvas::Canvas, flash::FlashString, model::MachineModel, point::Point},
+    menu::{canvas::Canvas, flash::FlashString, model::DataStorage, point::Point},
 };
 
 use super::{
     execucao::MenuExecucao,
     manual_mode::{ManualModeMenu, ManualModeState},
-    submenu::render::SubMenuRender,
+    submenu::render::SubmenuProgramaRender,
     widget::Widget,
 };
 
@@ -31,9 +31,9 @@ pub struct MainMenu<'a> {
     current_state: State,
     menu_manual: ManualModeMenu<'a>,
     menu_execucao: MenuExecucao<'a>,
-    menu_programa: SubMenuRender<'a>,
+    menu_programa: SubmenuProgramaRender<'a>,
     transport: &'a TransportLayer<'a>,
-    model: &'a MachineModel,
+    model: &'a DataStorage,
     //program_mode: IWidget,
 }
 
@@ -41,9 +41,9 @@ impl<'a> MainMenu<'a> {
     pub fn new(
         menu_manual: ManualModeMenu<'a>,
         menu_execucao: MenuExecucao<'a>,
-        menu_programa: SubMenuRender<'a>,
+        menu_programa: SubmenuProgramaRender<'a>,
         transport: &'a TransportLayer<'a>,
-        model: &'a MachineModel,
+        model: &'a DataStorage,
     ) -> Self {
         Self {
             current_state: State::MainMenu,

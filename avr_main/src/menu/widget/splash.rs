@@ -3,7 +3,7 @@ use lib_1::protocol::transport::transport_layer::TransportLayer;
 
 use crate::{
     board::{keyboard::KeyCode, lcd},
-    menu::{canvas::Canvas, model::MachineModel, point::Point},
+    menu::{canvas::Canvas, model::DataStorage, point::Point},
     microcontroler::{delay::delay_ms, timer::now},
     utils::generic_string::GenericString,
 };
@@ -63,12 +63,12 @@ impl State {
 pub struct Splash<'a> {
     current_state: State,
     next_state_time_point: u32,
-    model: &'a MachineModel,
+    model: &'a DataStorage,
     transport: &'a TransportLayer<'a>,
 }
 
 impl<'a> Splash<'a> {
-    pub fn new(model: &'a MachineModel, transport: &'a TransportLayer<'a>) -> Self {
+    pub fn new(model: &'a DataStorage, transport: &'a TransportLayer<'a>) -> Self {
         let initial_state = State::Initial;
         Self {
             current_state: initial_state,
