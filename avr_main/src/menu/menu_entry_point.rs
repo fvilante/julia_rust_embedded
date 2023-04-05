@@ -23,7 +23,7 @@ use crate::menu::widget::execucao::MenuExecucao;
 use crate::menu::widget::main_menu::MainMenu;
 use crate::menu::widget::manual_mode::ManualModeMenu;
 use crate::menu::widget::splash::Splash;
-use crate::menu::widget::submenu::spec::{MenuStorage, SubMenuHandle};
+use crate::menu::widget::submenu::spec::{SubMenuHandle, SubmenuProgramaStorage};
 
 use crate::menu::widget::widget::Widget;
 use crate::menu::widget::widget_tests::SystemEnviroment;
@@ -112,7 +112,7 @@ pub fn development_entry_point() -> ! {
 
     //////
 
-    let menu_storage: MenuStorage = MenuStorage::new(&machine_model);
+    let menu_storage: SubmenuProgramaStorage = SubmenuProgramaStorage::new(&machine_model);
     let menu_root = SubMenuHandle::MenuPrograma;
     let mut menu_programa = SubMenuRender::new(menu_root, &menu_storage);
 

@@ -62,9 +62,9 @@ impl<T: SubmenuLayout> SubmenuLayout for Register<T> {
     }
 }
 
-/// The storage for all sub menus. If you create a new sub menu you must put it here.
+/// The storage for all sub menus inside the submenu 'Programa'. If you create a new sub menu you must put it here.
 /// TODO: May change name to `MenuRegister`
-pub struct MenuStorage<'a> {
+pub struct SubmenuProgramaStorage<'a> {
     model: &'a MachineModel,
 
     pub MenuPrograma: Register<MenuPrograma<'a>>,
@@ -80,7 +80,7 @@ pub struct MenuStorage<'a> {
     pub MenuConfiguracaoDoEixo: Register<MenuConfiguracaoDeEixo<'a>>,
 }
 
-impl<'a> MenuStorage<'a> {
+impl<'a> SubmenuProgramaStorage<'a> {
     /// Constructs all the menus and initializes its internal state
     pub fn new(model: &'a MachineModel) -> Self {
         Self {

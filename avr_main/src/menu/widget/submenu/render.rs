@@ -6,7 +6,7 @@ use crate::{
     menu::{
         canvas::Canvas,
         point::Point,
-        widget::submenu::spec::{MenuStorage, SubMenuHandle},
+        widget::submenu::spec::{SubMenuHandle, SubmenuProgramaStorage},
     },
 };
 use heapless::Vec;
@@ -16,7 +16,7 @@ use lib_1::utils::common::usize_to_u8_clamper;
 
 pub struct SubMenuRender<'a> {
     /// List of all submenu items.
-    menu_storage: &'a MenuStorage<'a>,
+    menu_storage: &'a SubmenuProgramaStorage<'a>,
     current_menu: SubMenuHandle,
     /// State of widgets which are currently mounted on screen.
     mounted: [MenuItemWidget<'a>; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
@@ -30,7 +30,7 @@ pub struct SubMenuRender<'a> {
 }
 
 impl<'a> SubMenuRender<'a> {
-    pub fn new(submenu_handle: SubMenuHandle, menu_storage: &'a MenuStorage) -> Self {
+    pub fn new(submenu_handle: SubMenuHandle, menu_storage: &'a SubmenuProgramaStorage) -> Self {
         Self {
             menu_storage,
             mounted: [
