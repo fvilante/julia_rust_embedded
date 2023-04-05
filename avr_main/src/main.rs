@@ -1,18 +1,11 @@
 #![no_std]
 #![no_main]
 #![feature(abi_avr_interrupt)]
-#![feature(alloc_error_handler)]
-// necessary to execute file ./custom_alloc/alloc_error_handler.rs
-//#![feature(panic_info_message)] // necessary only if you use `PanicInfo::message`
+#![feature(alloc_error_handler)] // necessary to execute file ./custom_alloc/alloc_error_handler.rs
 #![feature(exclusive_range_pattern)]
-// necessary to send error messages to the panic_handler
-//#![allow(warnings)] // TODO: remove this on future
-//#![allow(unused_imports)]
 #![allow(non_snake_case)] // remove this line when possible
 #![allow(dead_code)]
-#![feature(lang_items)] // Necessary to eh_personality and to run "cargo fix" on the code.
 #![feature(unchecked_math)]
-// Used in EepromAddress::{ read_u16, write_u16 } // TODO: Remove when possible
 
 extern crate alloc;
 
@@ -30,24 +23,6 @@ use lib_1;
 #[no_mangle]
 #[arduino_hal::entry]
 fn main() -> ! {
-    //protocol::datalink_comm::development_entry_point();
-    //board::lcd::example_01();
-
-    //
-
-    // Entry point for TL and DL
-    //cmpp::main::development_entry_point();
-
-    //crate::enviroment::front_panel::development_entry_point();
-
-    // Entry point for menu system
+    // Entry point
     menu::menu_entry_point::development_entry_point()
-
-    //loop {
-
-    //lcd::clear();
-    //lcd::print_u16_in_hex(microcontroler::timer::now().try_into().unwrap());
-    // infinite loop waiting for timer interruptions to occur
-    // see function TIMER1_COMPA() in crate::microcontroler::timer
-    //}
 }
