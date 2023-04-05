@@ -8,7 +8,6 @@ edition = "2021"
 
 [dependencies]
 lib_1= { path = "../lib_1" }
-#avr-std-stub = "1.0.3"
 # ruduino "default-features = false" meaning => to disable the dependency of avr-std-stub inside ruduino which implements a default panic_handler. 
 #We want to abort the use of this handler, because we want our own panic_handler.
 ruduino = {  git = "https://github.com/avr-rust/ruduino", rev = "c057499", default-features = false }
