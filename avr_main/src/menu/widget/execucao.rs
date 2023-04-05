@@ -15,7 +15,7 @@ use lib_1::protocol::transport::transport_layer::new_proposal::ToCmpp;
 progmem! {
     //                             1234567890123456789012345678901234567890
     static progmem string LINE0 = "Posicao atual:";
-    static progmem string LINE1 = "X =      "; //"${nnnn}    Y=${nnnn}";
+    static progmem string LINE1 = "X =       mm"; //"${nnnn}    Y=${nnnn}";
 }
 
 pub struct MenuExecucao<'a> {
@@ -69,7 +69,7 @@ impl<'a> Widget for MenuExecucao<'a> {
         // draw current position
         let posicao_atual = self.transport.posicao_atual();
         if let Ok(Displacement(posicao_atual)) = posicao_atual {
-            canvas.set_cursor(Point::new(20, 1));
+            canvas.set_cursor(Point::new(18, 1));
             canvas.print_u16(posicao_atual);
         }
     }
