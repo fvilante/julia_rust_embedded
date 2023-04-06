@@ -1,6 +1,5 @@
 use super::model::DataStorage;
 use super::widget::submenu::render::SubmenuProgramaRender;
-
 use crate::menu::point::Point;
 use crate::menu::widget::execucao::MenuExecucao;
 use crate::menu::widget::main_menu::MainMenu;
@@ -9,10 +8,7 @@ use crate::menu::widget::splash::Splash;
 use crate::menu::widget::submenu::spec::{SubmenuProgramaHandle, SubmenuProgramaStorage};
 use crate::menu::widget::widget::Widget;
 use crate::menu::widget::widget_tests::SystemEnviroment;
-
-use crate::microcontroler::timer::init_timer;
 use crate::microcontroler::{serial, timer};
-
 use lib_1::protocol::datalink::datalink::Datalink;
 use lib_1::protocol::transport::channel::Channel;
 use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
@@ -20,20 +16,14 @@ use lib_1::protocol::transport::transport_layer::TransportLayer;
 
 pub fn development_entry_point() -> ! {
     // ////////////////////////////////////////
-    // Start Peripherals
+    // Initialize System
     // ////////////////////////////////////////
     //
-    // initialize timer couting (1khz)
-    serial::init(BAUD_RATE);
-
-    init_timer();
-
-    // initialize display and keyboard
     let SystemEnviroment {
         mut canvas,
         mut keyboard,
         ..
-    } = SystemEnviroment::new();
+    } = SystemEnviroment::new(BAUD_RATE);
 
     // ////////////////////////////////////////
     // Start comunication infrastructure

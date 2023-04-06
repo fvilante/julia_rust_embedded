@@ -2,6 +2,7 @@ use crate::{
     board::{lcd, output_expander::OutputExpander},
     enviroment::front_panel::FrontPanel,
     menu::{canvas::Canvas, keyboard::Keyboard},
+    microcontroler::{serial, timer::init_timer},
 };
 use avr_progmem::progmem;
 
@@ -12,13 +13,28 @@ pub struct SystemEnviroment {
 }
 
 impl SystemEnviroment {
-    pub fn new() -> Self {
+    /// Initialize system peripherals:
+    /// * timer interruption (at 1khz)
+    /// * serial port
+    /// * lcd display
+    /// * keyboard
+    /// * general I/O and canvas
+    /// * front panel leds
+    pub fn new(baud_rate: u32) -> Self {
+        // initialize timer couting (1khz)
+        init_timer();
+        // serial port
+        serial::init(baud_rate);
+        // lcd display
         lcd::lcd_initialize();
+        // general I/O
         let output_expander = OutputExpander::new();
+        // keyboard
         let beep = |on: bool| {
             OutputExpander::new().BUZZER(on).commit();
         };
         let keyboard = Keyboard::new(beep);
+        // canvas
         let canvas = Canvas::new();
         Self {
             output_expander,
@@ -27,6 +43,7 @@ impl SystemEnviroment {
         }
     }
 
+    /// Give access to front panel leds
     pub fn get_front_panel<'a>(&'a mut self) -> FrontPanel<'a> {
         let front_panel: FrontPanel<'a> = FrontPanel::new(&mut self.output_expander);
         front_panel
