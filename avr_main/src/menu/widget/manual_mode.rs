@@ -73,8 +73,10 @@ impl Widget for ManualModeMenu<'_> {
             canvas.set_cursor(Point::new(0, 1));
             canvas.print_flash_str(FlashString::new(&LINE3));
             //TODO: below effect should be in `update` and not in `draw` method
-            self.transport.stop_serial().set(ActivationState::Activated);
-            self.transport
+            //TODO: The use of `.unwrap` method is provoking flash size explosion, check why
+            let _unwrap = self.transport.stop_serial().set(ActivationState::Activated);
+            let _unwrap = self
+                .transport
                 .pausa_serial()
                 .set(ActivationState::Activated);
         }

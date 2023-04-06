@@ -41,13 +41,10 @@ impl<'a> Widget for MenuExecucao<'a> {
     fn send_key(&mut self, key: KeyCode) {
         match key {
             KeyCode::KEY_START => {
-                self.transport.start();
+                let _unwrap = self.transport.start(); // TODO: The use of `.unwrap` method is provoking flash size explosion, check why
             }
             KeyCode::KEY_STOP => {
-                //lcd::clear();
-                //lcd::print("Juca");
-                self.transport.stop();
-                //loop { }
+                let _unwrap = self.transport.stop(); // TODO: The use of `.unwrap` method is provoking flash size explosion, check why
             }
             _ => {}
         }
