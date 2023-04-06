@@ -719,7 +719,7 @@ pub mod emulated {
     };
 
     /// Does never timeout ;)! Because time does not pass :D !
-    pub fn lazy_now() -> u64 {
+    pub fn lazy_now() -> u16 {
         0
     }
 
