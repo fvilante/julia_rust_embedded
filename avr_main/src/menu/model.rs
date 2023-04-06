@@ -409,6 +409,7 @@ impl DataStorage {
         SendAllIterator::new(cmpp_data, transport)
     }
 
+    /// Saves data to EEPROM
     pub fn save_to_eeprom(&self) {
         let (next, _size) = self
             .arquivo_de_eixo_x
@@ -417,6 +418,7 @@ impl DataStorage {
         let (_next, _size) = self.configuracao_do_eixo_x.save_into_eeprom(next);
     }
 
+    /// loads data from EEPROM
     pub fn load_from_eeprom(&mut self) {
         let (next, _address) = self
             .arquivo_de_eixo_x
