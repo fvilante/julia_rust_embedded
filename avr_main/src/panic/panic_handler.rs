@@ -1,4 +1,3 @@
-use arduino_hal::delay_ms;
 use core::panic::PanicInfo;
 
 use crate::board::lcd;
@@ -6,12 +5,12 @@ use crate::board::lcd;
 // PANIC HANDLER {{{
 // =============
 #[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    /// TODO: I noticed that using `PanicInfo::message` consumes a lot of memory (about 15% of total Flash, and 40% of total Ram)
-    /// So I'm disable it here and given just a simple implamentation of error. The solution should be to use a global
-    /// string to containg the error message, and this global string is setted before panic!() is colled, then here in
-    /// this panic handler we can present this string.
-    /// Code below exists just for reference, when the solution was implemented please delete it.
+fn panic(_info: &PanicInfo) -> ! {
+    // TODO: I noticed that using `PanicInfo::message` consumes a lot of memory (about 15% of total Flash, and 40% of total Ram)
+    // So I'm disable it here and given just a simple implamentation of error. The solution should be to use a global
+    // string to containg the error message, and this global string is setted before panic!() is colled, then here in
+    // this panic handler we can present this string.
+    // Code below exists just for reference, when the solution was implemented please delete it.
     /*
     let NO_MESSAGE1 = "NO_MESSAGE_1";
     let NO_MESSAGE2 = "NO_MESSAGE_2";

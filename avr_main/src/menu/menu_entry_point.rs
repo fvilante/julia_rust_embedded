@@ -1,44 +1,28 @@
-use avr_progmem::progmem;
-
-use avr_progmem::string::PmString;
-use lib_1::protocol::datalink::datalink::Datalink;
-use lib_1::protocol::transport::channel::Channel;
-use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
-
-use lib_1::protocol::transport::transport_layer::new_proposal::{
-    Acceleration, Displacement, FromCmpp, ToCmpp, Velocity,
-};
-use lib_1::protocol::transport::transport_layer::TransportLayer;
-use lib_1::utils::common::usize_to_u8_clamper;
-
-use super::canvas::Canvas;
 use super::model::DataStorage;
 use super::widget::submenu::render::SubmenuProgramaRender;
 
-use crate::board::keyboard::KeyCode;
-use crate::board::lcd;
-use crate::menu::flash::FlashString;
 use crate::menu::point::Point;
 use crate::menu::widget::execucao::MenuExecucao;
 use crate::menu::widget::main_menu::MainMenu;
 use crate::menu::widget::manual_mode::ManualModeMenu;
 use crate::menu::widget::splash::Splash;
 use crate::menu::widget::submenu::spec::{SubmenuProgramaHandle, SubmenuProgramaStorage};
-
 use crate::menu::widget::widget::Widget;
 use crate::menu::widget::widget_tests::SystemEnviroment;
 
-use crate::microcontroler::delay::delay_ms;
-
 use crate::microcontroler::timer::init_timer;
 use crate::microcontroler::{serial, timer};
-use crate::utils::generic_string::GenericString;
+
+use lib_1::protocol::datalink::datalink::Datalink;
+use lib_1::protocol::transport::channel::Channel;
+use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
+use lib_1::protocol::transport::transport_layer::TransportLayer;
 
 pub fn development_entry_point() -> ! {
-    //////////////////////////////////////////
-    /// Start Peripherals
-    //////////////////////////////////////////
-    ///
+    // ////////////////////////////////////////
+    // Start Peripherals
+    // ////////////////////////////////////////
+    //
     // initialize timer couting (1khz)
     serial::init(BAUD_RATE);
 
@@ -51,10 +35,10 @@ pub fn development_entry_point() -> ! {
         ..
     } = SystemEnviroment::new();
 
-    //////////////////////////////////////////
-    /// Start comunication infrastructure
-    //////////////////////////////////////////
-    ///
+    // ////////////////////////////////////////
+    // Start comunication infrastructure
+    // ////////////////////////////////////////
+    //
     let channel = Channel::from_u8(0).unwrap();
     fn now() -> u16 {
         timer::now() as u16
@@ -88,21 +72,21 @@ pub fn development_entry_point() -> ! {
 
     let transport = TransportLayer::new(datalink, mechanical_properties);
 
-    //////////////////////////////////////////
-    /// Data Storage
-    //////////////////////////////////////////
-    ///
+    // ////////////////////////////////////////
+    //  Data Storage
+    // ////////////////////////////////////////
+    //
     let mut data_storage = DataStorage::new();
     data_storage.load_from_eeprom();
 
-    //////////////////////////////////////////
-    /// Main Menu Mounting
-    //////////////////////////////////////////
-    ///
+    // ///////////////////////////////////////
+    //  Main Menu Mounting
+    // ///////////////////////////////////////
+    //
     let submenu_programa_storage: SubmenuProgramaStorage =
         SubmenuProgramaStorage::new(&data_storage);
     let submenu_programa_handle = SubmenuProgramaHandle::MenuPrograma;
-    let mut menu_programa =
+    let menu_programa =
         SubmenuProgramaRender::new(submenu_programa_handle, &submenu_programa_storage);
 
     let menu_manual = ManualModeMenu::new(&transport);
@@ -115,10 +99,10 @@ pub fn development_entry_point() -> ! {
         &data_storage,
     );
 
-    //////////////////////////////////////////
-    /// Show Initial Splash Window
-    //////////////////////////////////////////
-    ///
+    // ///////////////////////////////////////
+    //  Show Initial Splash Window
+    // ///////////////////////////////////////
+    //
     let mut splash_window = Splash::new(&data_storage, &transport);
 
     while splash_window.is_running() {
@@ -132,10 +116,10 @@ pub fn development_entry_point() -> ! {
         canvas.render();
     }
 
-    //////////////////////////////////////////
-    /// Main Loop
-    //////////////////////////////////////////
-    ///
+    // ///////////////////////////////////////
+    //  Main Loop
+    // ///////////////////////////////////////
+    //
     let fps = 30;
     let mut next_frame: u16 = now() + (1000 / fps);
 

@@ -2,9 +2,9 @@ use avr_progmem::progmem;
 use lib_1::protocol::transport::transport_layer::TransportLayer;
 
 use crate::{
-    board::{keyboard::KeyCode, lcd},
+    board::keyboard::KeyCode,
     menu::{canvas::Canvas, model::DataStorage, point::Point},
-    microcontroler::{delay::delay_ms, timer::now},
+    microcontroler::timer::now,
     utils::generic_string::GenericString,
 };
 

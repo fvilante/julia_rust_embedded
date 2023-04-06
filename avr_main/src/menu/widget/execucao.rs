@@ -1,16 +1,13 @@
 //menu "execucao"
 
 use crate::{
-    board::{keyboard::KeyCode, lcd},
+    board::keyboard::KeyCode,
     menu::{canvas::Canvas, flash::FlashString, point::Point},
-    microcontroler::delay::delay_ms,
 };
 use avr_progmem::progmem;
 use lib_1::protocol::transport::transport_layer::{new_proposal::Displacement, TransportLayer};
 
 use super::widget::Widget;
-
-use lib_1::protocol::transport::transport_layer::new_proposal::ToCmpp;
 
 progmem! {
     //                             1234567890123456789012345678901234567890
