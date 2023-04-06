@@ -19,13 +19,15 @@ pub struct SubmenuProgramaRender<'a> {
     menu_storage: &'a SubmenuProgramaStorage<'a>,
     current_menu: SubmenuProgramaHandle,
     /// State of widgets which are currently mounted on screen.
+    /// TODO: Is not necessary to have two MenuItemWidget states on memory but just one. Introduce some logic when possible
+    /// to optimize this.
     mounted: [MenuItemWidget<'a>; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
     /// Stores the path of menu jumps that user perform, so you can go back to previous menu
     navigation_path: Vec<SubmenuProgramaHandle, 7>,
     /// Main menu reads this bit, if it is set then it will render the main menu. When menu_menu pass control
     /// do menu_programa it resets this bit, and then menu_program is responsible to set it when it want to give
     /// back control to main_menu.
-    /// TODO: Improve this communication
+    /// TODO: Improve this communication methodology
     pub must_return_to_main_menu: bool,
 }
 
