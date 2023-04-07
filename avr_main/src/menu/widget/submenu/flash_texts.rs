@@ -2,6 +2,14 @@ use avr_progmem::progmem;
 
 progmem! {
 
+    // UNITS OF MEASUREMENT (UOM)
+    pub static progmem string MILIMETROS = "mm";
+    //pub static progmem string SEGUNDOS = "s";
+    pub static progmem string MILI_SEGUNDOS = "ms";
+    pub static progmem string MILIMETROS_POR_SEGUNDO = "mm/s";
+    pub static progmem string MILIMETROS_POR_SEGUNDO_AO_QUADRADO = "mm/s2";
+
+
     // MENU PROGRAMA
 
     //pub static progmem string NUMERO_DO_PROGRAMA_PARA_EDICAO =  "Numero do programa para edicao  : ##";

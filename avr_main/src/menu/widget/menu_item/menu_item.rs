@@ -22,6 +22,7 @@ pub struct MenuItemWidget<'a> {
     point_and_caption: (Point1d, Caption),
     point_and_field: Option<(Point1d, Field<'a>)>,
     pub child: Option<SubmenuProgramaHandle>,
+    unit_of_measurement: Option<(Point1d, Caption)>,
 }
 
 impl<'a> MenuItemWidget<'a> {
@@ -31,12 +32,19 @@ impl<'a> MenuItemWidget<'a> {
         point_and_text: (Point1d, FlashString),
         point_and_field: Option<(Point1d, Field<'a>)>,
         child: Option<SubmenuProgramaHandle>,
+        unit_of_measurement: Option<(Point1d, FlashString)>,
     ) -> Self {
         let (point_a, text) = point_and_text;
+        let unit_of_measurement = if let Some((point3, uom)) = unit_of_measurement {
+            Some((point3, Caption::new(uom)))
+        } else {
+            None
+        };
         Self {
             point_and_caption: (point_a, Caption::new(text)),
             point_and_field,
             child,
+            unit_of_measurement,
         }
     }
 }
@@ -95,6 +103,10 @@ impl MenuItemWidget<'_> {
         if let Some((point2, field)) = &self.point_and_field {
             let point2: Point<u8> = Point::new(point2.pos, line);
             field.draw(canvas, point2);
+        };
+        if let Some((point3, uom)) = &self.unit_of_measurement {
+            let point3: Point<u8> = Point::new(point3.pos, line);
+            uom.draw(canvas, point3);
         };
     }
 }

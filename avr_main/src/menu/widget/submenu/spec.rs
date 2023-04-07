@@ -1,5 +1,7 @@
 use core::{cell::Cell, u8};
 
+use crate::menu::flash::FlashString;
+
 use super::{
     super::super::{
         model::DataStorage,
@@ -291,7 +293,8 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
                     .add_numerical_variable(
                         &self.model.arquivo_de_eixo_x.posicao_inicial,
                         Some(0..9999),
-                        33,
+                        30,
+                        Some((35, FlashString::new(&MILIMETROS))),
                     )
                     .build(),
             ),
@@ -301,7 +304,8 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
                     .add_numerical_variable(
                         &self.model.arquivo_de_eixo_x.posicao_final,
                         Some(0..9999),
-                        33,
+                        30,
+                        Some((35, FlashString::new(&MILIMETROS))),
                     )
                     .build(),
             ),
@@ -311,7 +315,8 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
                     .add_numerical_variable(
                         &self.model.arquivo_de_eixo_x.aceleracao_de_avanco,
                         Some(0..9999),
-                        33,
+                        30,
+                        Some((35, FlashString::new(&MILIMETROS_POR_SEGUNDO_AO_QUADRADO))),
                     )
                     .build(),
             ),
@@ -321,7 +326,8 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
                     .add_numerical_variable(
                         &self.model.arquivo_de_eixo_x.aceleracao_de_retorno,
                         Some(0..9999),
-                        33,
+                        30,
+                        Some((35, FlashString::new(&MILIMETROS_POR_SEGUNDO_AO_QUADRADO))),
                     )
                     .build(),
             ),
@@ -330,7 +336,8 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
                     .add_numerical_variable(
                         &self.model.arquivo_de_eixo_x.velocidade_de_avanco,
                         Some(0..9999),
-                        33,
+                        30,
+                        Some((35, FlashString::new(&MILIMETROS_POR_SEGUNDO))),
                     )
                     .build(),
             ),
@@ -339,7 +346,8 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
                     .add_numerical_variable(
                         &self.model.arquivo_de_eixo_x.velocidade_de_retorno,
                         Some(0..9999),
-                        33,
+                        30,
+                        Some((35, FlashString::new(&MILIMETROS_POR_SEGUNDO))),
                     )
                     .build(),
             ),
@@ -369,7 +377,8 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
                     .add_numerical_variable(
                         &self.model.arquivo_de_eixo_x.numero_de_mensagem_no_avanco,
                         Some(0..99),
-                        33,
+                        35,
+                        None,
                     )
                     .build(),
             ),
@@ -379,7 +388,8 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
                     .add_numerical_variable(
                         &self.model.arquivo_de_eixo_x.numero_de_mensagem_no_retorno,
                         Some(0..99),
-                        33,
+                        35,
+                        None,
                     )
                     .build(),
             ),
@@ -390,6 +400,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
                         &self.model.arquivo_de_eixo_x.primeira_mensagem_no_avanco,
                         Some(0..9999),
                         33,
+                        Some((38, FlashString::new(&MILIMETROS))),
                     )
                     .build(),
             ),
@@ -400,6 +411,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
                         &self.model.arquivo_de_eixo_x.primeira_mensagem_no_retorno,
                         Some(0..9999),
                         33,
+                        Some((38, FlashString::new(&MILIMETROS))),
                     )
                     .build(),
             ),
@@ -410,6 +422,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
                         &self.model.arquivo_de_eixo_x.ultima_mensagem_no_avanco,
                         Some(0..9999),
                         33,
+                        Some((38, FlashString::new(&MILIMETROS))),
                     )
                     .build(),
             ),
@@ -420,6 +433,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
                         &self.model.arquivo_de_eixo_x.ultima_mensagem_no_retorno,
                         Some(0..9999),
                         33,
+                        Some((38, FlashString::new(&MILIMETROS))),
                     )
                     .build(),
             ),
@@ -450,6 +464,7 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
                         &self.model.arquivo_de_eixo_x.retardo_no_start_automatico,
                         Some(0..9999),
                         33,
+                        Some((38, FlashString::new(&MILI_SEGUNDOS))),
                     )
                     .build(),
             ),
@@ -460,6 +475,7 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
                         &self.model.arquivo_de_eixo_x.retardo_no_start_externo,
                         Some(0..9999),
                         33,
+                        Some((38, FlashString::new(&MILI_SEGUNDOS))),
                     )
                     .build(),
             ),
@@ -469,7 +485,7 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
                     .add_optional_variable(
                         &self.model.arquivo_de_eixo_x.start_automatico_no_avanco,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -479,7 +495,7 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
                     .add_optional_variable(
                         &self.model.arquivo_de_eixo_x.start_automatico_no_retorno,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -489,7 +505,7 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
                     .add_optional_variable(
                         &self.model.arquivo_de_eixo_x.modo_de_trabalho_do_eixo,
                         Options::continuo_passo_a_passo(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -519,7 +535,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
                     .add_optional_variable(
                         &self.model.arquivo_de_eixo_x.logica_do_sinal_de_impressao,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -530,6 +546,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
                         &self.model.arquivo_de_eixo_x.largura_do_sinal_de_impressao,
                         Some(0..9999),
                         33,
+                        Some((38, FlashString::new(&MILI_SEGUNDOS))),
                     )
                     .build(),
             ),
@@ -539,7 +556,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
                     .add_optional_variable(
                         &self.model.arquivo_de_eixo_x.reversao_de_mensagem_via_serial,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -549,7 +566,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
                     .add_optional_variable(
                         &self.model.arquivo_de_eixo_x.selecao_de_mensagem_via_serial,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -580,6 +597,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                         &self.model.arquivo_de_eixo_x.antecipacao_da_saida_de_start,
                         Some(0..9999),
                         33,
+                        Some((38, FlashString::new(&MILIMETROS))),
                     )
                     .build(),
             ),
@@ -589,7 +607,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     .add_optional_variable(
                         &self.model.arquivo_de_eixo_x.saida_de_start_no_avaco,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -599,7 +617,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     .add_optional_variable(
                         &self.model.arquivo_de_eixo_x.saida_de_start_no_retorno,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -609,7 +627,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     .add_optional_variable(
                         &self.model.arquivo_de_eixo_x.entrada_de_start_entre_eixos,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -620,6 +638,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                         &self.model.arquivo_de_eixo_x.retardo_do_start_entre_eixos,
                         Some(0..9999),
                         33,
+                        Some((38, FlashString::new(&MILI_SEGUNDOS))),
                     )
                     .build(),
             ),
@@ -629,7 +648,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     .add_optional_variable(
                         &self.model.arquivo_de_eixo_x.start_pelo_teclado_e_externo,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -640,6 +659,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                         &self.model.arquivo_de_eixo_x.retardo_no_start_passo_a_passo,
                         Some(0..9999),
                         33,
+                        Some((38, FlashString::new(&MILI_SEGUNDOS))),
                     )
                     .build(),
             ),
@@ -649,7 +669,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     .add_optional_variable(
                         &self.model.arquivo_de_eixo_x.start_automatico_passo_a_passo,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -659,7 +679,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     .add_optional_variable(
                         &self.model.arquivo_de_eixo_x.saida_de_start_passo_a_passo,
                         Options::continuo_passo_a_passo(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -692,6 +712,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                         &self.model.configuracao_do_eixo_x.numero_do_canal,
                         Some(0..99),
                         33,
+                        None,
                     )
                     .build(),
             ),
@@ -702,6 +723,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                         &self.model.configuracao_do_eixo_x.numero_de_pulso_do_giro,
                         Some(0..999),
                         33,
+                        None,
                     )
                     .build(),
             ),
@@ -712,6 +734,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                         &self.model.configuracao_do_eixo_x.janela_de_protecao_do_giro,
                         Some(0..9999),
                         33,
+                        None,
                     )
                     .build(),
             ),
@@ -722,6 +745,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                         &self.model.configuracao_do_eixo_x.deslocamento_giro_do_motor,
                         Some(0..0xFFFF),
                         30,
+                        None,
                     )
                     .build(),
             ),
@@ -771,6 +795,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                             .valor_da_posicao_de_referencia,
                         Some(0..9999),
                         33,
+                        None,
                     )
                     .build(),
             ),
@@ -781,6 +806,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                         &self.model.configuracao_do_eixo_x.velocidade_para_referencia,
                         Some(0..9999),
                         33,
+                        None,
                     )
                     .build(),
             ),
@@ -791,6 +817,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                         &self.model.configuracao_do_eixo_x.aceleracao_para_referencia,
                         Some(0..9999),
                         33,
+                        None,
                     )
                     .build(),
             ),

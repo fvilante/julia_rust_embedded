@@ -33,6 +33,8 @@ impl Default for Base {
 struct Numerical<'a> {
     format: Format,
     variable_u16: &'a Cell<u16>,
+    /// define the position and text for display unit of measurement on screen
+    unit_of_measurement: Option<(u8, FlashString)>,
 }
 
 /// only optional
@@ -41,6 +43,7 @@ struct Optional<'a> {
     options_list: OptionsBuffer,
 }
 
+/// TODO: This entire construction of the menusystem would be refactored when possible
 /// This is a [builder pattern](https://doc.rust-lang.org/1.0.0/style/ownership/builders.html) to construct MenuItems.
 pub struct MenuItemBuilder<'a> {
     base: Base,
@@ -74,6 +77,7 @@ impl<'a> MenuItemBuilder<'a> {
         variable: &'a Cell<u16>,
         valid_range: Option<Range<u16>>,
         point2: u8,
+        unit_of_measurement: Option<(u8, FlashString)>,
     ) -> &mut Self {
         let valid_range = if let Some(valid_range) = valid_range {
             valid_range
@@ -89,6 +93,7 @@ impl<'a> MenuItemBuilder<'a> {
                 initial_cursor_position: 0,
             },
             variable_u16: variable,
+            unit_of_measurement,
         });
         self
     }
@@ -117,10 +122,12 @@ impl<'a> MenuItemBuilder<'a> {
             let point1 = Point1d::new(self.base.point1);
             let point2 = Point1d::new(self.base.point2.unwrap_or(DEFAULT_POSITION_FOR_POINT_2));
             let field = Field::from_numerical(numerical.variable_u16, (numerical.format).clone());
+            let (point3, unit_of_measurement) = numerical.unit_of_measurement.unwrap_or_default();
             let menu_item = MenuItemWidget::new(
                 (point1, self.base.text),
                 Some((point2, field)),
                 self.base.child,
+                Some((Point1d::new(point3), unit_of_measurement)),
             );
             menu_item
         } else if let Some(optional) = &mut self.optional {
@@ -135,6 +142,7 @@ impl<'a> MenuItemBuilder<'a> {
                 (point1, self.base.text),
                 Some((point2, field)),
                 self.base.child,
+                None,
             );
             menu_item
         } else {
@@ -142,7 +150,7 @@ impl<'a> MenuItemBuilder<'a> {
             let point1 = Point1d::new(self.base.point1);
             let text = self.base.text;
             let child = self.base.child;
-            let menu_item = MenuItemWidget::new((point1, text), None, child);
+            let menu_item = MenuItemWidget::new((point1, text), None, child, None);
             menu_item
         }
     }
