@@ -1461,7 +1461,7 @@ mod tests {
 
         //send
 
-        let response = transport.__velocidade_de_avanco().set(Milimeter(10));
+        let response = transport.velocidade_de_avanco().set(Milimeter(10));
 
         let status = response.unwrap();
 
