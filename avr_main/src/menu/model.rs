@@ -217,7 +217,7 @@ impl Default for ArquivoDeEixo {
     fn default() -> Self {
         Self {
             posicao_inicial: Cell::new(50),
-            posicao_final: Cell::new(60),
+            posicao_final: Cell::new(600),
             aceleracao_de_avanco: Cell::new(5000),
             aceleracao_de_retorno: Cell::new(5000),
             velocidade_de_avanco: Cell::new(8),
