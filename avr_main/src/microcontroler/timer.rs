@@ -111,7 +111,7 @@ fn TIMER1_COMPA() {
 //
 
 struct ClockCounter {
-    count: u32,
+    count: u64,
 }
 
 impl ClockCounter {
@@ -123,14 +123,16 @@ impl ClockCounter {
         self.count += 1;
     }
 
-    fn read(&self) -> u32 {
+    fn read(&self) -> u64 {
         self.count.clone()
     }
 }
 
-// expected one tick every 1 milisec. NOTE: Period may change in future implementations.
-// this implemantation is to be considered an initial version.
-pub fn now() -> u32 {
+/// Returns time since power-on
+///
+/// expected one tick every 1 milisec. NOTE: Period may change in future implementations.
+/// this implemantation is to be considered an initial version.
+pub fn now() -> u64 {
     let state = unsafe { &*INTERRUPT_STATE.as_ptr() };
 
     let value = state.clock_counter.read();

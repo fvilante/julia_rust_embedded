@@ -72,7 +72,7 @@ impl<'a> Splash<'a> {
         let initial_state = State::Initial;
         Self {
             current_state: initial_state,
-            next_state_time_point: now() + Self::get_time_to_wait_in(initial_state),
+            next_state_time_point: now() as u32 + Self::get_time_to_wait_in(initial_state),
             model,
             transport,
         }
@@ -102,10 +102,10 @@ impl Widget for Splash<'_> {
     fn update(&mut self) {
         let has_finished = self.current_state == State::End;
         if !has_finished {
-            if now() > self.next_state_time_point {
+            if now() as u32 > self.next_state_time_point {
                 self.current_state = self.current_state.next_state();
                 let time_interval = Self::get_time_to_wait_in(self.current_state.clone());
-                self.next_state_time_point = now() + time_interval;
+                self.next_state_time_point = now() as u32 + time_interval;
             }
         }
     }

@@ -8,6 +8,7 @@ use crate::menu::widget::splash::Splash;
 use crate::menu::widget::submenu::spec::{SubmenuProgramaHandle, SubmenuProgramaStorage};
 use crate::menu::widget::widget::Widget;
 use crate::menu::widget::widget_tests::SystemEnviroment;
+use crate::microcontroler::timer::now;
 use crate::microcontroler::{serial, timer};
 use lib_1::protocol::datalink::datalink::Datalink;
 use lib_1::protocol::transport::channel::Channel;
@@ -30,7 +31,7 @@ pub fn development_entry_point() -> ! {
     // ////////////////////////////////////////
     //
     let channel = Channel::from_u8(0).unwrap();
-    fn now() -> u16 {
+    fn now__() -> u16 {
         timer::now() as u16
     }
     const TIMEOUT_MS: u16 = 1000; // TODO: Maybe in future be calculated as a function of the connection baud rate
@@ -47,7 +48,7 @@ pub fn development_entry_point() -> ! {
 
     let datalink = &Datalink {
         channel,
-        now,
+        now: now__,
         timeout_ms: TIMEOUT_MS,
         try_rx,
         try_tx,
@@ -110,8 +111,8 @@ pub fn development_entry_point() -> ! {
     //  Main Loop
     // ///////////////////////////////////////
     //
-    let fps = 30;
-    let mut next_frame: u16 = now() + (1000 / fps);
+    let fps = 5;
+    let mut next_frame = now() + (1000 / fps);
 
     loop {
         if let Some(key) = keyboard.get_key() {
