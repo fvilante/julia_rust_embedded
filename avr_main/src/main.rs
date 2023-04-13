@@ -1,4 +1,3 @@
-
 #![no_std]
 #![no_main]
 #![feature(abi_avr_interrupt)]
@@ -6,7 +5,6 @@
 #![feature(exclusive_range_pattern)]
 #![allow(non_snake_case)] // remove this line when possible
 #![allow(dead_code)]
-#![feature(unchecked_math)]
 #![feature(lang_items)] // Necessary to eh_personality and to run "cargo fix" on the code.
 
 extern crate alloc;
