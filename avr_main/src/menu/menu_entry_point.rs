@@ -111,7 +111,7 @@ pub fn development_entry_point() -> ! {
     //  Main Loop
     // ///////////////////////////////////////
     //
-    let fps = 5;
+    let fps = 5; // 200 milisecs
     let mut next_frame = now() + (1000 / fps);
 
     loop {

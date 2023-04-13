@@ -5,11 +5,6 @@ members = [
     "lib_1",
 ]
 
-
-
-
-
-
 # Note(fv): Below lines seems to be unecessary. Check if it is possible to remove it in future
 
 # Configure the build for minimal size - AVRs have very little program memory
