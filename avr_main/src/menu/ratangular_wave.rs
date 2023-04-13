@@ -1,18 +1,19 @@
 use crate::microcontroler::timer::now;
 
-type TimePoint = u16;
+type TimePoint = u64;
+type Duration = u16;
 
 /// Generates a non-synchronous assymetric parametrizable retangular wave form
 pub struct RectangularWave {
-    up_interval: TimePoint,
-    down_interval: TimePoint,
+    up_interval: Duration,
+    down_interval: Duration,
     next_time_point: TimePoint,
     current_state: bool,
 }
 
 impl RectangularWave {
     /// interval in miliseconds
-    pub fn new(up_interval: TimePoint, down_interval: TimePoint) -> Self {
+    pub fn new(up_interval: Duration, down_interval: Duration) -> Self {
         let initial_state = true;
         Self {
             up_interval: up_interval.clone(),
