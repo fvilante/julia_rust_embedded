@@ -1,5 +1,6 @@
 use super::model::DataStorage;
 use super::widget::submenu::render::SubmenuProgramaRender;
+use crate::board::lcd;
 use crate::menu::point::Point;
 use crate::menu::widget::execucao::MenuExecucao;
 use crate::menu::widget::main_menu::MainMenu;
@@ -10,10 +11,10 @@ use crate::menu::widget::widget::Widget;
 use crate::menu::widget::widget_tests::SystemEnviroment;
 use crate::microcontroler::timer::now;
 use crate::microcontroler::{serial, timer};
-use lib_1::protocol::datalink::datalink::Datalink;
+use lib_1::protocol::datalink::datalink::{DLError, Datalink};
 use lib_1::protocol::transport::channel::Channel;
 use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
-use lib_1::protocol::transport::transport_layer::TransportLayer;
+use lib_1::protocol::transport::transport_layer::{TLError, TransportLayer};
 
 pub fn development_entry_point() -> ! {
     // ////////////////////////////////////////
@@ -31,6 +32,7 @@ pub fn development_entry_point() -> ! {
     // ////////////////////////////////////////
     //
     let channel = Channel::from_u8(0).unwrap();
+
     fn now__() -> u16 {
         timer::now() as u16
     }
