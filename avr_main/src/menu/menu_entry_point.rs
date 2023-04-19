@@ -1,5 +1,6 @@
 use super::model::DataStorage;
 use super::widget::submenu::render::SubmenuProgramaRender;
+use crate::board::keyboard::KeyCode;
 use crate::board::lcd;
 use crate::menu::point::Point;
 use crate::menu::widget::execucao::MenuExecucao;
@@ -15,6 +16,18 @@ use lib_1::protocol::datalink::datalink::{DLError, Datalink};
 use lib_1::protocol::transport::channel::Channel;
 use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
 use lib_1::protocol::transport::transport_layer::{TLError, TransportLayer};
+
+/// TODO: Implement user interaction with the signal emitted
+fn emit_print_go_signal(transport: &TransportLayer) {
+    match transport.print_go() {
+        Ok(_status) => {
+            // TODO: Inform user that a print signal was successful sent to cmpp board
+        }
+        Err(_error) => {
+            // TODO: Inform user what kind of error happened
+        }
+    }
+}
 
 pub fn development_entry_point() -> ! {
     // ////////////////////////////////////////
@@ -117,12 +130,18 @@ pub fn development_entry_point() -> ! {
     let mut next_frame = now() + (1000 / fps);
 
     loop {
+        // Proccess keystrokes
         if let Some(key) = keyboard.get_key() {
-            main_menu.send_key(key);
+            match key {
+                KeyCode::KEY_F2 => emit_print_go_signal(&transport),
+                _ => main_menu.send_key(key),
+            }
         }
 
+        // Update calculations
         main_menu.update();
 
+        // Render next frame
         if now() > next_frame {
             next_frame = now() + (1000 / fps);
             main_menu.draw(&mut canvas, Point::new(0, 0));

@@ -1363,6 +1363,11 @@ impl<'a> TransportLayer<'a> {
         self.get_status()
     }
 
+    /// Sends a print signal
+    pub fn print_go(&self) -> Result<Status, TLError> {
+        self.teste_de_impressao_serial().set(true.into())
+    }
+
     pub fn posicao_atual(&self) -> Result<Displacement, TLError> {
         let context = self.mechanical_properties;
         let word_address = 0x60 / 2;
