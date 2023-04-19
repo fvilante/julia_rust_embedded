@@ -113,7 +113,7 @@ pub fn development_entry_point() -> ! {
     //  Main Loop
     // ///////////////////////////////////////
     //
-    let fps = 5; // 200 milisecs
+    let fps = 30; // 200 milisecs
     let mut next_frame = now() + (1000 / fps);
 
     loop {
@@ -121,9 +121,10 @@ pub fn development_entry_point() -> ! {
             main_menu.send_key(key);
         }
 
+        main_menu.update();
+
         if now() > next_frame {
             next_frame = now() + (1000 / fps);
-            main_menu.update();
             main_menu.draw(&mut canvas, Point::new(0, 0));
             canvas.render();
         }

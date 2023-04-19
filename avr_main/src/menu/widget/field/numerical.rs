@@ -386,7 +386,7 @@ impl Widget for NumberInputEditorWidget<'_> {
             let mut current_char = digit;
             let is_current_char_over_cursor =
                 position == self.u16_editor.get_current_cursor_index() as usize;
-            let is_time_to_blink = self.blink.read();
+            let is_time_to_blink = !self.blink.read();
             if is_current_char_over_cursor && is_time_to_blink && is_in_edit_mode {
                 current_char = BLINK_CHAR;
             }

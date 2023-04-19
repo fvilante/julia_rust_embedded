@@ -6,6 +6,7 @@ use crate::{
     menu::{
         canvas::Canvas,
         point::Point,
+        ratangular_wave::RectangularWave,
         widget::submenu::spec::{SubmenuProgramaHandle, SubmenuProgramaStorage},
     },
 };
@@ -29,6 +30,8 @@ pub struct SubmenuProgramaRender<'a> {
     /// back control to main_menu.
     /// TODO: Improve this communication methodology
     pub must_return_to_main_menu: bool,
+    /// Blinks navigation cursor the select each item of the menu
+    blink: RectangularWave,
 }
 
 impl<'a> SubmenuProgramaRender<'a> {
@@ -36,6 +39,8 @@ impl<'a> SubmenuProgramaRender<'a> {
         submenu_handle: SubmenuProgramaHandle,
         menu_storage: &'a SubmenuProgramaStorage,
     ) -> Self {
+        const T_ON: u16 = 500;
+        const T_OFF: u16 = 500;
         Self {
             menu_storage,
             mounted: [
@@ -45,6 +50,7 @@ impl<'a> SubmenuProgramaRender<'a> {
             current_menu: submenu_handle,
             navigation_path: Vec::new(),
             must_return_to_main_menu: false,
+            blink: RectangularWave::new(T_ON, T_OFF),
         }
     }
 
@@ -173,6 +179,7 @@ impl<'a> SubmenuProgramaRender<'a> {
     fn draw_menu_item_selector(&mut self, line: LcdLine, canvas: &mut Canvas) {
         const EDITING_CURSOR: char = '*';
         const NAVIGATING_CURSOR: char = '>';
+        const EMPTY_CURSOR: char = ' ';
         // position cursor
         canvas.set_cursor(Point::new(0, line as u8));
         // draw selector char
@@ -181,7 +188,12 @@ impl<'a> SubmenuProgramaRender<'a> {
                 canvas.print_char(EDITING_CURSOR);
             }
             None => {
-                canvas.print_char(NAVIGATING_CURSOR);
+                let is_time_to_blink = self.blink.read();
+                if is_time_to_blink {
+                    canvas.print_char(NAVIGATING_CURSOR);
+                } else {
+                    canvas.print_char(EMPTY_CURSOR)
+                }
             }
         }
     }
@@ -235,6 +247,9 @@ impl SubmenuProgramaRender<'_> {
     }
 
     pub fn update(&mut self) {
+        // updates the blinker
+        self.blink.update();
+        // updates each line
         for line in LcdLine::iterator() {
             self.get_mounted_item_for_line(line).update();
         }
