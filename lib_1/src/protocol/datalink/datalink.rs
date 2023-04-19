@@ -452,8 +452,8 @@ impl PacodeDeRetornoDeSolicitacao {
 /// not accepeted or understood the master request
 #[derive(Debug)]
 pub struct PacoteDeRetornoComErro {
-    byte_de_erro: Result<ByteDeErro, UnknownByteDeErro>,
-    status: Status,
+    pub byte_de_erro: Result<ByteDeErro, UnknownByteDeErro>,
+    pub status: Status,
 }
 
 impl PacoteDeRetornoComErro {
@@ -950,7 +950,7 @@ mod tests {
                 DLError::InvalidChannel(channel) => {
                     assert!(false, "InvalidChannel");
                 }
-                DLError::SerialTransmissionTimeedOut => {
+                DLError::SerialTransmissionTimeedOut(_) => {
                     assert!(false, "SerialTransmissionError");
                 }
                 DLError::DecodingError(segment_error) => {
