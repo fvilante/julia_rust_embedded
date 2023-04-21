@@ -90,6 +90,7 @@ impl<'a> MainMenu<'a> {
                     self.current_state = State::Manual;
                 }
                 KeyCode::KEY_EXECUCAO => {
+                    self.front_panel_leds.LED_EXECUCAO(true);
                     self.current_state = State::Execucao;
                 }
                 KeyCode::KEY_PROGRAMA => {
@@ -124,14 +125,11 @@ impl<'a> MainMenu<'a> {
                     self.menu_manual.current_state = ManualModeState::FirstScreen; // reset state
                     self.current_state = State::MainMenu
                 } else {
-                    self.front_panel_leds.LED_MANUAL(true);
+                    //self.front_panel_leds.LED_MANUAL(true);
                     self.menu_manual.update()
                 }
             }
-            State::Execucao => {
-                self.front_panel_leds.LED_EXECUCAO(true);
-                self.menu_execucao.update()
-            }
+            State::Execucao => self.menu_execucao.update(),
             State::Programa => {
                 if self.menu_programa.must_return_to_main_menu {
                     self.current_state = State::MainMenu;
@@ -145,7 +143,7 @@ impl<'a> MainMenu<'a> {
                     // saves data into the eeprom
                     self.model.save_to_eeprom();
                 } else {
-                    self.front_panel_leds.LED_PROGRAMA(true);
+                    //self.front_panel_leds.LED_PROGRAMA(true);
                     self.menu_programa.update()
                 }
             }
