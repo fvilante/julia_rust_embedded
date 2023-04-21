@@ -60,16 +60,20 @@ pub fn development_entry_point() -> ! {
     // lcd display
     lcd::lcd_initialize();
     // general outputs (PCI Julia on-board low-latency outputs)
-    let mut output_expander = OutputExpander::new();
+    let output_expander = OutputExpander::new();
     // keyboard
     fn beep(on: bool) {
         OutputExpander::new().BUZZER(on).commit();
     };
-    let mut keyboard = Keyboard::new(beep);
+    let mut keyboard = Keyboard::new(beep, &output_expander);
     // canvas
     let mut canvas = Canvas::new();
     // Leds from the frontal panel
-    let mut frontal_panel_leds = FrontPanel::new(&mut output_expander);
+    let mut frontal_panel_leds = FrontPanel::new(&output_expander);
+
+    // intensive test of shift_register output ports
+
+    init_shiftout_pins();
 
     //loop {}
 
