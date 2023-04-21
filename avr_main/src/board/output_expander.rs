@@ -106,6 +106,7 @@ fn getAddress__(signal: OutputExpanderSignal) -> Address {
     }
 }
 
+/// Responsible for send low latency output signals like keyboard, frontal panel leds, buzzer, etc.
 pub struct OutputExpander {
     stage_area: ShiftOutData,
     has_changed: bool,

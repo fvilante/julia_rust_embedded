@@ -69,6 +69,7 @@ impl Debounce {
     }
 }
 
+/// High level function to control keyboard
 pub struct Keyboard {
     pub keypad: Keypad,
     pub beep: fn(bool),

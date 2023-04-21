@@ -2,6 +2,10 @@ use super::model::DataStorage;
 use super::widget::submenu::render::SubmenuProgramaRender;
 use crate::board::keyboard::KeyCode;
 use crate::board::lcd;
+use crate::board::output_expander::OutputExpander;
+use crate::enviroment::front_panel::FrontPanel;
+use crate::menu::canvas::Canvas;
+use crate::menu::keyboard::Keyboard;
 use crate::menu::point::Point;
 use crate::menu::widget::execucao::MenuExecucao;
 use crate::menu::widget::main_menu::MainMenu;
@@ -9,8 +13,8 @@ use crate::menu::widget::manual_mode::ManualModeMenu;
 use crate::menu::widget::splash::Splash;
 use crate::menu::widget::submenu::spec::{SubmenuProgramaHandle, SubmenuProgramaStorage};
 use crate::menu::widget::widget::Widget;
-use crate::menu::widget::widget_tests::SystemEnviroment;
-use crate::microcontroler::timer::now;
+use crate::microcontroler::delay::delay_ms;
+use crate::microcontroler::timer::{init_timer, now};
 use crate::microcontroler::{serial, timer};
 use lib_1::protocol::datalink::datalink::{DLError, Datalink};
 use lib_1::protocol::transport::channel::Channel;
@@ -30,15 +34,43 @@ fn emit_print_go_signal(transport: &TransportLayer) {
 }
 
 pub fn development_entry_point() -> ! {
-    // ////////////////////////////////////////
-    // Initialize System
-    // ////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
+    // Initialize system
+    // ////////////////////////////////////////////////////////////////////
+
+    // ////////////////////////////////////////////////////
     //
-    let SystemEnviroment {
-        mut canvas,
-        mut keyboard,
-        ..
-    } = SystemEnviroment::new(BAUD_RATE);
+    //   Initialize peripherals:
+    //   * timer interruption (at 1khz)
+    //   * serial port
+    //   * lcd display
+    //   * keyboard
+    //   * general I/O and canvas
+    //   * front panel leds
+    //
+    // TODO: Improve the system enviroment construction
+    // ////////////////////////////////////////////////////
+
+    // initialize timer couting (1khz)
+    init_timer();
+    // serial port
+    let baud_rate = 9600;
+    serial::init(baud_rate);
+    // lcd display
+    lcd::lcd_initialize();
+    // general outputs (PCI Julia on-board low-latency outputs)
+    let mut output_expander = OutputExpander::new();
+    // keyboard
+    fn beep(on: bool) {
+        OutputExpander::new().BUZZER(on).commit();
+    };
+    let mut keyboard = Keyboard::new(beep);
+    // canvas
+    let mut canvas = Canvas::new();
+    // Leds from the frontal panel
+    let mut frontal_panel_leds = FrontPanel::new(&mut output_expander);
+
+    let mut time = 10;
 
     // ////////////////////////////////////////
     // Start comunication infrastructure
@@ -103,6 +135,7 @@ pub fn development_entry_point() -> ! {
         menu_programa,
         &transport,
         &data_storage,
+        &mut frontal_panel_leds,
     );
 
     // ///////////////////////////////////////
@@ -122,9 +155,10 @@ pub fn development_entry_point() -> ! {
         canvas.render();
     }
 
-    // ///////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
     //  Main Loop
-    // ///////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////
+
     //
     let fps = 30; // 200 milisecs
     let mut next_frame = now() + (1000 / fps);
