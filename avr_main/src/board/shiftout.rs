@@ -8,7 +8,7 @@ use super::debug::set_led3;
 const HIGH: bool = true;
 const LOW: bool = false;
 
-fn init_shiftout_pins() -> () {
+pub fn init_shiftout_pins() -> () {
     port::B0::set_output();
     port::B2::set_output();
     port::D6::set_output();
@@ -100,9 +100,6 @@ fn shiftout__(data_out: u8) {
 }
 
 pub fn write_shiftout(data: ShiftOutData) -> () {
-    //FIX: When possible make this initialization execute once on first execution.
-    init_shiftout_pins();
-
     //enable chips
     srenab_out(LOW);
 

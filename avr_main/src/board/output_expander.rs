@@ -3,7 +3,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use super::shiftout::ShiftOutData;
+use super::shiftout::{init_shiftout_pins, ShiftOutData};
 
 use crate::microcontroler::delay::delay_ms;
 
@@ -115,6 +115,7 @@ pub struct OutputExpander {
 impl OutputExpander {
     // call this function before all others
     pub fn new() -> Self {
+        init_shiftout_pins();
         OutputExpander {
             stage_area: ShiftOutData {
                 byte0: 0x00,

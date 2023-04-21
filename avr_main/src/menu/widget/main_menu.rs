@@ -5,6 +5,7 @@ use crate::{
     board::{keyboard::KeyCode, lcd},
     enviroment::front_panel::FrontPanel,
     menu::{canvas::Canvas, flash::FlashString, model::DataStorage, point::Point},
+    microcontroler::delay::delay_ms,
 };
 
 use super::{
@@ -90,7 +91,6 @@ impl<'a> MainMenu<'a> {
                     self.current_state = State::Manual;
                 }
                 KeyCode::KEY_EXECUCAO => {
-                    self.front_panel_leds.LED_EXECUCAO(true);
                     self.current_state = State::Execucao;
                 }
                 KeyCode::KEY_PROGRAMA => {
@@ -98,7 +98,10 @@ impl<'a> MainMenu<'a> {
                 }
                 _ => {}
             },
-            State::Manual => self.menu_manual.send_key(key),
+            State::Manual => {
+                self.front_panel_leds.LED_EXECUCAO(true);
+                self.menu_manual.send_key(key);
+            }
             State::Execucao => {
                 if key == KeyCode::KEY_ESC {
                     self.current_state = State::MainMenu;
@@ -114,12 +117,8 @@ impl<'a> MainMenu<'a> {
 
     pub fn update(&mut self) {
         match self.current_state {
-            State::MainMenu => {
-                // reset leds
-                // self.front_panel_leds.LED_MANUAL(false);
-                // self.front_panel_leds.LED_EXECUCAO(false);
-                // self.front_panel_leds.LED_PROGRAMA(false);
-            }
+            State::MainMenu => {}
+
             State::Manual => {
                 if self.menu_manual.current_state == ManualModeState::Resting {
                     self.menu_manual.current_state = ManualModeState::FirstScreen; // reset state

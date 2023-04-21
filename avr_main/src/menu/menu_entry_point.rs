@@ -1,8 +1,9 @@
 use super::model::DataStorage;
 use super::widget::submenu::render::SubmenuProgramaRender;
 use crate::board::keyboard::KeyCode;
-use crate::board::lcd;
 use crate::board::output_expander::OutputExpander;
+use crate::board::shiftout::init_shiftout_pins;
+use crate::board::{lcd, shiftin};
 use crate::enviroment::front_panel::FrontPanel;
 use crate::menu::canvas::Canvas;
 use crate::menu::keyboard::Keyboard;
@@ -70,7 +71,7 @@ pub fn development_entry_point() -> ! {
     // Leds from the frontal panel
     let mut frontal_panel_leds = FrontPanel::new(&mut output_expander);
 
-    let mut time = 10;
+    //loop {}
 
     // ////////////////////////////////////////
     // Start comunication infrastructure
@@ -171,7 +172,6 @@ pub fn development_entry_point() -> ! {
                 _ => main_menu.send_key(key),
             }
         }
-
         // Update calculations
         main_menu.update();
 
