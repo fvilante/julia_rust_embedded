@@ -8,6 +8,7 @@ use super::debug::set_led3;
 const HIGH: bool = true;
 const LOW: bool = false;
 
+// Initialize shift registers
 pub fn init_shiftout_pins() -> () {
     port::B0::set_output();
     port::B2::set_output();

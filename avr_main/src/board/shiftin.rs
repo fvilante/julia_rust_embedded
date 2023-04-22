@@ -11,7 +11,8 @@ use super::shiftout::{write_shiftout, ShiftOutData};
 const HIGH: bool = true;
 const LOW: bool = false;
 
-fn init_shiftin_pins() -> () {
+// Initialize shift registers
+pub fn init_shiftin_pins() -> () {
     port::D2::set_output(); // clk_in       -> PD2
     port::D3::set_output(); // latch_in     -> PD3
     port::D7::set_input(); // serial_in    -> PD7
@@ -68,9 +69,6 @@ fn shiftInA() -> u8 {
 }
 
 pub fn readShiftIn() -> ShiftInData {
-    //FIX: When possible make this initialization execute once on first execution.
-    init_shiftin_pins();
-
     let mut data: ShiftInData = ShiftInData {
         byte0: 0x00,
         byte1: 0x00,

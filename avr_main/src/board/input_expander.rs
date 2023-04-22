@@ -7,7 +7,7 @@ use core::cell::Cell;
 
 use lib_1::utils::common::get_bit_at_as_bool;
 
-use super::shiftin::{readShiftIn, ShiftInData};
+use super::shiftin::{init_shiftin_pins, readShiftIn, ShiftInData};
 
 use crate::board::lcd::{lcd_initialize, print_u8_in_hex};
 
@@ -97,6 +97,7 @@ pub struct InputExpander {
 
 impl InputExpander {
     pub fn new() -> Self {
+        init_shiftin_pins();
         Self {
             cache: Cell::new(ShiftInData {
                 byte0: 0x00,
