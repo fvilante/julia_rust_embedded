@@ -8,7 +8,7 @@ use super::debug::set_led3;
 const HIGH: bool = true;
 const LOW: bool = false;
 
-fn init_shiftout_pins() -> () {
+// Initialize shift registers
     port::B0::set_output();
     port::B2::set_output();
     port::D6::set_output();
@@ -61,6 +61,8 @@ fn srenab_out(value: bool) -> () {
     };
 }
 
+/// Represents the data to placed in the PCI Julia on-board output shift-register circuit.
+/// Each byte to each shift-register integrated circuit.
 #[derive(Copy, Clone)]
 pub struct ShiftOutData {
     pub byte0: u8,
@@ -69,6 +71,7 @@ pub struct ShiftOutData {
     pub byte3: u8,
 }
 
+/// This shifts 8 bits out MSB first, on the rising edge of the clock, clock idles low
 fn shiftout__(data_out: u8) {
     // This shifts 8 bits out MSB first,
     // on the rising edge of the clock,

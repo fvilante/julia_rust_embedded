@@ -3,11 +3,10 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use lib_1::utils::common::get_bit_at_as_bool;
-
-use super::shiftin::{readShiftIn, ShiftInData};
-
+use super::shiftin::{init_shiftin_pins, readShiftIn, ShiftInData};
 use crate::board::lcd::{lcd_initialize, print_u8_in_hex};
+use core::cell::Cell;
+use lib_1::utils::common::get_bit_at_as_bool;
 
 // Represents each of the three CD4021 Integrated Circuit present on the board
 enum ShiftRegister {
@@ -30,6 +29,7 @@ enum Bit {
 // Address of the input signal
 struct Address(ShiftRegister, Bit);
 
+// See board schematic. This represents the electrical signals on the board
 enum InputExpanderSignalRequest {
     START,
     FC_MAIS_1,
@@ -93,6 +93,7 @@ pub struct InputExpander {
 }
 
 impl InputExpander {
+    /// NOTE: Do call this funcition just once in the entire program lifetime
     pub fn new() -> Self {
         Self {
             cache: ShiftInData {
@@ -104,16 +105,16 @@ impl InputExpander {
         }
     }
 
-    // fetch data from the hardware and save it on memory cache
-    pub fn fetch(&mut self) -> &mut Self {
+    /// fetch data from the hardware and save it on memory cache
+    pub fn fetch(&self) -> &Self {
         let data_read = readShiftIn();
         self.cache = data_read;
         self
     }
 
-    // NOTE: If first run fetch data from hardware else from cache.
-    //       To pull data from hardware use 'fetch' method.
-    fn get_signal__(&mut self, signal: InputExpanderSignalRequest) -> bool {
+    /// NOTE: If first run fetch data from hardware else from cache.
+    ///       To pull data from hardware use 'fetch' method.
+    fn get_signal__(&self, signal: InputExpanderSignalRequest) -> bool {
         let cache = {
             if self.is_first_run == true {
                 self.is_first_run = false;

@@ -3,14 +3,13 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use super::shiftout::ShiftOutData;
-
+use super::shiftout::write_shiftout;
+use super::shiftout::{init_shiftout_pins, ShiftOutData};
 use crate::microcontroler::delay::delay_ms;
-
+use core::cell::Cell;
 use lib_1::utils::common::{configure_bit, get_bit_at_as_bool};
 
-use super::shiftout::write_shiftout;
-
+// See board schematic. This represents the electrical signals on the board
 pub enum OutputExpanderSignal {
     KBD_SA,            // OUTPUT_BUS0     KBD-SA                   BIT0 - SHIFT-REGISTER 0 BEGIN
     KBD_SB,            // OUTPUT_BUS1     KBD-SB                   BIT1
@@ -46,7 +45,7 @@ pub enum OutputExpanderSignal {
     LED_MANUAL,        // OUTPUT_BUS31    LED_MANUAL               BIT7
 }
 
-// Represents each of the four 74HC595N Integrated Circuit present on the board
+/// Represents each of the four 74HC595N Integrated Circuit present on the Julia board
 #[derive(Copy, Clone)]
 enum ShiftRegister {
     IC0, // Board descriptor: U110
@@ -106,13 +105,14 @@ fn getAddress__(signal: OutputExpanderSignal) -> Address {
     }
 }
 
+/// Responsible for send low latency output signals like keyboard, frontal panel leds, buzzer, etc.
 pub struct OutputExpander {
     stage_area: ShiftOutData,
     has_changed: bool,
 }
 
 impl OutputExpander {
-    // call this function before all others
+    /// NOTE: Do call this funcition just once in the entire program lifetime
     pub fn new() -> Self {
         OutputExpander {
             stage_area: ShiftOutData {
@@ -125,8 +125,8 @@ impl OutputExpander {
         }
     }
 
-    // send all signais from the staged_area area to hardware if there is something to send
-    pub fn commit(&mut self) -> () {
+    /// send all signais from the staged_area area to hardware if there is something to send
+    pub fn commit(&self) -> () {
         // avoid to send data if nothing has changed
         if self.has_changed {
             write_shiftout(self.stage_area);

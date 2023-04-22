@@ -122,9 +122,10 @@ pub fn development_entry_point() -> ! {
         canvas.render();
     }
 
-    // ///////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
     //  Main Loop
-    // ///////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////
+
     //
     let fps = 30; // 200 milisecs
     let mut next_frame = now() + (1000 / fps);
@@ -137,7 +138,6 @@ pub fn development_entry_point() -> ! {
                 _ => main_menu.send_key(key),
             }
         }
-
         // Update calculations
         main_menu.update();
 

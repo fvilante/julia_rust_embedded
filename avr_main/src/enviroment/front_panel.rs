@@ -1,5 +1,10 @@
 use crate::{board::output_expander::OutputExpander, microcontroler::delay::delay_ms};
 
+/// Controls the leds and the buzzer of the front panel
+///
+/// This is a high-level API over some outputs of the `output shift-register` driver.
+/// These leds and the buzzer is parte of the interface human-machine and has
+/// purpose to inform the user some events, like errors and keypressed.  
 pub struct FrontPanel<'a> {
     output_expander: &'a mut OutputExpander,
 }

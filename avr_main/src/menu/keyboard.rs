@@ -69,8 +69,8 @@ impl Debounce {
     }
 }
 
-pub struct Keyboard {
-    pub keypad: Keypad,
+/// High level function to control keyboard key strokes
+pub struct Keyboard<'a> {
     pub beep: fn(bool),
     pub debouncer: Debounce,
 }

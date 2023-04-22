@@ -165,9 +165,8 @@ impl KeyCode {
 
 //constants
 
-pub struct Keypad {
-    output: OutputExpander,
-    input: InputExpander,
+    /// NOTE: output is a pointer, because it must be shared with the
+    output: &'a OutputExpander,
     //last_keycode_read: KeyCode,
 }
 
@@ -253,7 +252,8 @@ impl Keypad {
         }
     }
 
-    pub fn scan(&mut self) -> KeyCode {
+    /// Performs a hardware scan of the keypad signals and returns the key stroke
+    pub fn scan(&self) -> KeyCode {
         let mut key_code: KeyCode = KeyCode::NO_KEY;
         for collumn in 0..=7 {
             self.set_output(collumn, ACTIVATED);
