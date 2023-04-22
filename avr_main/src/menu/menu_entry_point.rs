@@ -61,14 +61,11 @@ pub fn development_entry_point() -> ! {
     serial::init(baud_rate);
     // Lcd display
     lcd::lcd_initialize();
-    // Initialize IO Expander
+    // Initialize on-board IO Expander
     let output_expander = OutputExpander::new();
     let intput_expander = InputExpander::new();
     // Keyboard
-    fn beep(on: bool) {
-        OutputExpander::new().BUZZER(on).commit();
-    };
-    let mut keyboard = Keyboard::new(beep, &output_expander, &intput_expander);
+    let mut keyboard = Keyboard::new(&output_expander, &intput_expander);
     // Canvas
     let mut canvas = Canvas::new();
     // Leds from the frontal panel

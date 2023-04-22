@@ -22,6 +22,10 @@ impl Debounce {
         }
     }
 
+    /// This routine avoid that key repetition perform too fast
+    ///
+    /// TODO: Explain why we need KeyCode::NO_KEY if we can just return Option::None when
+    /// no key was been pressed. Or else just remove this ambiguity from code.
     pub fn debounce_key(&mut self, current_key: KeyCode) -> Option<KeyCode> {
         let last_key_was_none = self.last_key == KeyCode::NO_KEY;
         let current_key_is_some = current_key != KeyCode::NO_KEY;
@@ -74,25 +78,27 @@ impl Debounce {
 /// High level function to control keyboard key strokes
 pub struct Keyboard<'a> {
     pub keypad: Keypad<'a>,
-    pub beep: fn(bool),
     pub debouncer: Debounce,
+    // TODO: I'm just using one signal (the beep of the buzzer on-board) from the OutputExpander
+    // would be better to simplify this code being more specific.
+    output: &'a OutputExpander,
 }
 
 impl<'a> Keyboard<'a> {
-    pub fn new(beep: fn(on: bool), output: &'a OutputExpander, input: &'a InputExpander) -> Self {
+    pub fn new(output: &'a OutputExpander, input: &'a InputExpander) -> Self {
         Self {
             keypad: Keypad::new(output, input),
-            beep,
             debouncer: Debounce::new(),
+            output,
         }
     }
 
     pub fn get_key(&mut self) -> Option<KeyCode> {
         //TODO: put this beep code in a better place and make its timeing non-halting
         let beep = |key| {
-            (self.beep)(true);
+            self.output.BUZZER(true);
             delay_ms(20);
-            (self.beep)(false);
+            self.output.BUZZER(false);
             key
         };
 
