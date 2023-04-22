@@ -71,12 +71,6 @@ pub fn development_entry_point() -> ! {
     // Leds from the frontal panel
     let mut frontal_panel_leds = FrontPanel::new(&output_expander);
 
-    // intensive test of shift_register output ports
-
-    init_shiftout_pins();
-
-    //loop {}
-
     // ////////////////////////////////////////
     // Start comunication infrastructure
     // ////////////////////////////////////////

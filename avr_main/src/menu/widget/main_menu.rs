@@ -120,6 +120,7 @@ impl<'a> MainMenu<'a> {
     pub fn update(&mut self) {
         match self.current_state {
             State::MainMenu => {
+                // Reset frontend leds
                 self.front_panel_leds.LED_MANUAL(false);
                 self.front_panel_leds.LED_EXECUCAO(false);
                 self.front_panel_leds.LED_PROGRAMA(false);
