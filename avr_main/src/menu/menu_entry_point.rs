@@ -35,44 +35,77 @@ fn emit_print_go_signal(transport: &TransportLayer) {
     }
 }
 
+/// On board peripherals:
+///
+///   * Timer interruption (at 1khz)
+///   * Serial port
+///   * Lcd display
+///   * Input & output ports expander
+///   * Front panel
+///   * Keyboard
+///   * Canvas
+struct Peripherals {
+    output_expander: OutputExpander,
+    input_expander: InputExpander,
+}
+
+impl<'a> Peripherals {
+    /// Initialize peripherals
+    ///
+    /// NOTE: Call this function once during the entire lifetime of the program
+    pub fn new() -> Self {
+        ////////////////////////////////
+        // Low Level initialization
+        ////////////////////////////////
+
+        // Initialize timer couting (1khz)
+        init_timer();
+        // Serial port
+        let baud_rate = 9600;
+        serial::init(baud_rate);
+        // Lcd display
+        lcd::lcd_initialize();
+        // Initialize on-board IO Expander
+        Self {
+            output_expander: OutputExpander::new(),
+            input_expander: InputExpander::new(),
+        }
+    }
+
+    fn get_keyboard(&'a self) -> Keyboard<'a> {
+        let keyboard = Keyboard::new(&self.output_expander, &self.input_expander);
+        keyboard
+    }
+
+    fn get_front_panel(&'a self) -> FrontPanel<'a> {
+        // Leds from the frontal panel
+        let front_panel = FrontPanel::new(&self.output_expander);
+        front_panel
+    }
+
+    fn get_canvas(&self) -> Canvas {
+        let canvas = Canvas::new();
+        canvas
+    }
+}
+
 pub fn development_entry_point() -> ! {
     // /////////////////////////////////////////////////////////////////////
     // Initialize system
     // ////////////////////////////////////////////////////////////////////
 
-    // ////////////////////////////////////////////////////
+    // ////////////////////////////////////////
+    // initialize peripherals
+    // ////////////////////////////////////////
     //
-    //   Initialize peripherals:
-    //   * Timer interruption (at 1khz)
-    //   * Serial port
-    //   * Lcd display
-    //   * Input & output ports expander
-    //   * Keyboard
-    //   * Canvas
-    //   * Front panel leds
-    //
-    // TODO: Improve the system enviroment construction
-    // ////////////////////////////////////////////////////
 
-    // Initialize timer couting (1khz)
-    init_timer();
-    // Serial port
-    let baud_rate = 9600;
-    serial::init(baud_rate);
-    // Lcd display
-    lcd::lcd_initialize();
-    // Initialize on-board IO Expander
-    let output_expander = OutputExpander::new();
-    let intput_expander = InputExpander::new();
-    // Keyboard
-    let mut keyboard = Keyboard::new(&output_expander, &intput_expander);
-    // Canvas
-    let mut canvas = Canvas::new();
-    // Leds from the frontal panel
-    let mut frontal_panel_leds = FrontPanel::new(&output_expander);
+    let peripherals = Peripherals::new();
+    let mut front_panel = peripherals.get_front_panel();
+    let mut keyboard = peripherals.get_keyboard();
+    let mut canvas = peripherals.get_canvas();
 
     // ////////////////////////////////////////
-    // Start comunication infrastructure
+    // Initialize cmpp communication infrastructure
     // ////////////////////////////////////////
     //
     let channel = Channel::from_u8(0).unwrap();
@@ -134,7 +167,7 @@ pub fn development_entry_point() -> ! {
         menu_programa,
         &transport,
         &data_storage,
-        &mut frontal_panel_leds,
+        &mut front_panel,
     );
 
     // ///////////////////////////////////////

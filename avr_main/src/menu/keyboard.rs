@@ -96,9 +96,9 @@ impl<'a> Keyboard<'a> {
     pub fn get_key(&mut self) -> Option<KeyCode> {
         //TODO: put this beep code in a better place and make its timeing non-halting
         let beep = |key| {
-            self.output.BUZZER(true);
+            self.output.BUZZER(true).commit();
             delay_ms(20);
-            self.output.BUZZER(false);
+            self.output.BUZZER(false).commit();
             key
         };
 
