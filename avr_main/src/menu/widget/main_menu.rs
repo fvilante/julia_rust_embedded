@@ -88,18 +88,20 @@ impl<'a> MainMenu<'a> {
         match self.current_state {
             State::MainMenu => match key {
                 KeyCode::KEY_MANUAL => {
+                    self.front_panel_leds.LED_MANUAL(true);
                     self.current_state = State::Manual;
                 }
                 KeyCode::KEY_EXECUCAO => {
+                    self.front_panel_leds.LED_EXECUCAO(true);
                     self.current_state = State::Execucao;
                 }
                 KeyCode::KEY_PROGRAMA => {
+                    self.front_panel_leds.LED_PROGRAMA(true);
                     self.current_state = State::Programa;
                 }
                 _ => {}
             },
             State::Manual => {
-                self.front_panel_leds.LED_EXECUCAO(true);
                 self.menu_manual.send_key(key);
             }
             State::Execucao => {
@@ -117,7 +119,11 @@ impl<'a> MainMenu<'a> {
 
     pub fn update(&mut self) {
         match self.current_state {
-            State::MainMenu => {}
+            State::MainMenu => {
+                self.front_panel_leds.LED_MANUAL(false);
+                self.front_panel_leds.LED_EXECUCAO(false);
+                self.front_panel_leds.LED_PROGRAMA(false);
+            }
 
             State::Manual => {
                 if self.menu_manual.current_state == ManualModeState::Resting {
