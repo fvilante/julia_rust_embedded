@@ -36,6 +36,56 @@ fn emit_print_go_signal(transport: &TransportLayer) {
     }
 }
 
+/// High-level cmpp driver  
+///
+/// Represents an entire Cmpp Axis System, including unit of measurement convertion
+struct CmppAxis {
+    mechanical_properties: MechanicalProperties,
+    baudrate: u32,
+    channel: Channel,
+    datalink: Datalink,
+}
+
+impl CmppAxis {
+    pub fn new(
+        baudrate: u32,
+        channel: Channel,
+        timeout_ms: u16,
+        mechanical_properties: MechanicalProperties,
+    ) -> Self {
+        // set callbacks
+        fn now__() -> u16 {
+            timer::now() as u16
+        }
+        fn try_rx() -> Result<Option<u8>, ()> {
+            Ok(serial::try_receive())
+        }
+        fn try_tx(byte: u8) -> Option<()> {
+            serial::try_transmit(byte).ok()
+        }
+        // instantiation
+        let datalink = Datalink {
+            channel,
+            now: now__,
+            timeout_ms,
+            try_rx,
+            try_tx,
+            debug_reception: None,
+        };
+        Self {
+            mechanical_properties,
+            baudrate,
+            channel,
+            datalink,
+        }
+    }
+
+    fn get_transport_layer<'a>(&'a self) -> TransportLayer<'a> {
+        let transport = TransportLayer::new(&self.datalink, self.mechanical_properties);
+        transport
+    }
+}
+
 pub fn development_entry_point() -> ! {
     // /////////////////////////////////////////////////////////////////////
     // Initialize system
@@ -45,8 +95,8 @@ pub fn development_entry_point() -> ! {
     // initialize peripherals
     // ////////////////////////////////////////
     //
-
-    let peripherals = Peripherals::new();
+    let baudrate = 9600; // FIX: 2400 is not working, the problem seems to be in the register's port setup configuration
+    let peripherals = Peripherals::new(baudrate);
     let mut front_panel = peripherals.get_front_panel();
     let mut keyboard = peripherals.get_keyboard();
     let mut canvas = peripherals.get_canvas();
@@ -55,31 +105,8 @@ pub fn development_entry_point() -> ! {
     // Initialize cmpp communication infrastructure
     // ////////////////////////////////////////
     //
-    let channel = Channel::from_u8(0).unwrap();
 
-    fn now__() -> u16 {
-        timer::now() as u16
-    }
-    const TIMEOUT_MS: u16 = 1000; // TODO: Maybe in future be calculated as a function of the connection baud rate
-
-    const BAUD_RATE: u32 = 9600; // FIX: 2400 is not working, the problem seems to be in the register's port setup configuration
-
-    fn try_rx() -> Result<Option<u8>, ()> {
-        Ok(serial::try_receive())
-    }
-
-    fn try_tx(byte: u8) -> Option<()> {
-        serial::try_transmit(byte).ok()
-    }
-
-    let datalink = &Datalink {
-        channel,
-        now: now__,
-        timeout_ms: TIMEOUT_MS,
-        try_rx,
-        try_tx,
-        debug_reception: None,
-    };
+    const TIMEOUT_MS: u16 = 1000; // TODO: Maybe this value in future be calculated as a function of the connection baud rate
 
     let mechanical_properties = MechanicalProperties {
         pulses_per_motor_revolution: 400,
@@ -87,7 +114,9 @@ pub fn development_entry_point() -> ! {
         number_of_tooths_of_motor_pulley: 16,
     };
 
-    let transport = TransportLayer::new(datalink, mechanical_properties);
+    let channel = Channel::from_u8(0).unwrap();
+    let cmpp_axis = CmppAxis::new(baudrate, channel, TIMEOUT_MS, mechanical_properties);
+    let transport = cmpp_axis.get_transport_layer();
 
     // ////////////////////////////////////////
     //  Data Storage

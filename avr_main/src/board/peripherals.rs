@@ -24,7 +24,7 @@ impl<'a> Peripherals {
     /// Initialize peripherals
     ///
     /// NOTE: Call this function once during the entire lifetime of the program
-    pub fn new() -> Self {
+    pub fn new(baud_rate: u32) -> Self {
         ////////////////////////////////
         // Low Level initialization
         ////////////////////////////////
@@ -32,7 +32,6 @@ impl<'a> Peripherals {
         // Initialize timer couting (1khz)
         init_timer();
         // Serial port
-        let baud_rate = 9600;
         serial::init(baud_rate);
         // Lcd display
         lcd::lcd_initialize();
