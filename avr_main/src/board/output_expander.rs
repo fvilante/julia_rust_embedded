@@ -13,6 +13,7 @@ use lib_1::utils::common::{configure_bit, get_bit_at_as_bool};
 
 use super::shiftout::write_shiftout;
 
+// See board schematic. This represents the electrical signals on the board
 pub enum OutputExpanderSignal {
     KBD_SA,            // OUTPUT_BUS0     KBD-SA                   BIT0 - SHIFT-REGISTER 0 BEGIN
     KBD_SB,            // OUTPUT_BUS1     KBD-SB                   BIT1

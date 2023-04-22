@@ -41,7 +41,7 @@ fn serial_in() -> bool {
 }
 
 //
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone, Copy)]
 pub struct ShiftInData {
     pub byte0: u8,
     pub byte1: u8,
