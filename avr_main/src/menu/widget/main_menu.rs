@@ -3,7 +3,9 @@ use lib_1::protocol::transport::transport_layer::TransportLayer;
 
 use crate::{
     board::{keyboard::KeyCode, lcd},
+    enviroment::front_panel::FrontPanel,
     menu::{canvas::Canvas, flash::FlashString, model::DataStorage, point::Point},
+    microcontroler::delay::delay_ms,
 };
 
 use super::{
@@ -34,7 +36,9 @@ pub struct MainMenu<'a> {
     menu_programa: SubmenuProgramaRender<'a>,
     transport: &'a TransportLayer<'a>,
     model: &'a DataStorage,
-    //program_mode: IWidget,
+    //TODO: We're just controling 3 Leds (Execucao, Manual, Programa), better would be to wrap
+    //the type 'FrontPanel' into an abstract class.
+    front_panel_leds: &'a mut FrontPanel<'a>,
 }
 
 impl<'a> MainMenu<'a> {
@@ -44,6 +48,7 @@ impl<'a> MainMenu<'a> {
         menu_programa: SubmenuProgramaRender<'a>,
         transport: &'a TransportLayer<'a>,
         model: &'a DataStorage,
+        front_panel_leds: &'a mut FrontPanel<'a>,
     ) -> Self {
         Self {
             current_state: State::MainMenu,
@@ -52,6 +57,7 @@ impl<'a> MainMenu<'a> {
             menu_programa,
             transport,
             model,
+            front_panel_leds,
         }
     }
 
@@ -81,15 +87,26 @@ impl<'a> MainMenu<'a> {
     pub fn send_key(&mut self, key: KeyCode) {
         match self.current_state {
             State::MainMenu => match key {
-                KeyCode::KEY_MANUAL => self.current_state = State::Manual,
-                KeyCode::KEY_EXECUCAO => self.current_state = State::Execucao,
-                KeyCode::KEY_PROGRAMA => self.current_state = State::Programa,
+                KeyCode::KEY_MANUAL => {
+                    self.front_panel_leds.LED_MANUAL(true);
+                    self.current_state = State::Manual;
+                }
+                KeyCode::KEY_EXECUCAO => {
+                    self.front_panel_leds.LED_EXECUCAO(true);
+                    self.current_state = State::Execucao;
+                }
+                KeyCode::KEY_PROGRAMA => {
+                    self.front_panel_leds.LED_PROGRAMA(true);
+                    self.current_state = State::Programa;
+                }
                 _ => {}
             },
-            State::Manual => self.menu_manual.send_key(key),
+            State::Manual => {
+                self.menu_manual.send_key(key);
+            }
             State::Execucao => {
                 if key == KeyCode::KEY_ESC {
-                    self.current_state = State::MainMenu
+                    self.current_state = State::MainMenu;
                 } else {
                     self.menu_execucao.send_key(key)
                 }
@@ -102,7 +119,13 @@ impl<'a> MainMenu<'a> {
 
     pub fn update(&mut self) {
         match self.current_state {
-            State::MainMenu => {}
+            State::MainMenu => {
+                // Reset frontend leds
+                self.front_panel_leds.LED_MANUAL(false);
+                self.front_panel_leds.LED_EXECUCAO(false);
+                self.front_panel_leds.LED_PROGRAMA(false);
+            }
+
             State::Manual => {
                 if self.menu_manual.current_state == ManualModeState::Resting {
                     self.menu_manual.current_state = ManualModeState::FirstScreen; // reset state

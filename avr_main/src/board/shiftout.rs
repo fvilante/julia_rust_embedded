@@ -9,6 +9,7 @@ const HIGH: bool = true;
 const LOW: bool = false;
 
 // Initialize shift registers
+pub fn init_shiftout_pins() -> () {
     port::B0::set_output();
     port::B2::set_output();
     port::D6::set_output();
@@ -73,10 +74,6 @@ pub struct ShiftOutData {
 
 /// This shifts 8 bits out MSB first, on the rising edge of the clock, clock idles low
 fn shiftout__(data_out: u8) {
-    // This shifts 8 bits out MSB first,
-    // on the rising edge of the clock,
-    // clock idles low
-
     //clear everything out just in case to
     //prepare shift register for bit shifting
     serial_out(LOW);
@@ -103,9 +100,6 @@ fn shiftout__(data_out: u8) {
 }
 
 pub fn write_shiftout(data: ShiftOutData) -> () {
-    //FIX: When possible make this initialization execute once on first execution.
-    init_shiftout_pins();
-
     //enable chips
     srenab_out(LOW);
 

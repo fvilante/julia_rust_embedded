@@ -7,4 +7,3 @@ pub mod menu_item;
 pub mod splash;
 pub mod submenu;
 pub mod widget;
-pub mod widget_tests;

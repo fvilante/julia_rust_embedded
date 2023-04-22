@@ -1,5 +1,6 @@
 // low-level driver for keypad
 
+use arduino_hal::port::mode::Output;
 use avr_progmem::progmem;
 
 use crate::board::lcd;
@@ -165,9 +166,10 @@ impl KeyCode {
 
 //constants
 
+pub struct Keypad<'a> {
     /// NOTE: output is a pointer, because it must be shared with the
     output: &'a OutputExpander,
-    //last_keycode_read: KeyCode,
+    input: &'a InputExpander,
 }
 
 progmem! {
@@ -215,14 +217,12 @@ progmem! {
     ];
 }
 
-impl Keypad {
-    pub fn new() -> Self {
-        let output = OutputExpander::new();
-        let input = InputExpander::new();
+impl<'a> Keypad<'a> {
+    pub fn new(output: &'a OutputExpander, input: &'a InputExpander) -> Self {
         Keypad { output, input }
     }
 
-    fn set_output(&mut self, n: u8, value: bool) -> () {
+    fn set_output(&self, n: u8, value: bool) -> () {
         //ATTENTION: Do call commit() after write.
         match n {
             0 => self.output.KBD_S1(value).commit(),
@@ -237,7 +237,7 @@ impl Keypad {
         };
     }
 
-    fn get_input(&mut self, n: u8) -> bool {
+    fn get_input(&self, n: u8) -> bool {
         //ATTENTION: Do call fetch() before read.
         match n {
             0 => self.input.fetch().KBD_E1(),
@@ -267,20 +267,5 @@ impl Keypad {
             self.set_output(collumn, DEACTIVATE);
         }
         key_code
-    }
-}
-
-pub fn development_entry_point() -> ! {
-    lcd::lcd_initialize();
-    lcd::clear();
-    lcd::print("Pressione qualquer tecla");
-
-    let mut keypad = Keypad::new();
-
-    loop {
-        let keycode = keypad.scan();
-        lcd::set_cursor(0, 1);
-        lcd::print_u8_in_hex(keycode as u8);
-        delay_ms(100);
     }
 }

@@ -1,7 +1,13 @@
 use super::model::DataStorage;
 use super::widget::submenu::render::SubmenuProgramaRender;
+use crate::board::input_expander::InputExpander;
 use crate::board::keyboard::KeyCode;
-use crate::board::lcd;
+use crate::board::output_expander::OutputExpander;
+use crate::board::shiftout::init_shiftout_pins;
+use crate::board::{lcd, shiftin};
+use crate::enviroment::front_panel::FrontPanel;
+use crate::menu::canvas::Canvas;
+use crate::menu::keyboard::Keyboard;
 use crate::menu::point::Point;
 use crate::menu::widget::execucao::MenuExecucao;
 use crate::menu::widget::main_menu::MainMenu;
@@ -9,8 +15,8 @@ use crate::menu::widget::manual_mode::ManualModeMenu;
 use crate::menu::widget::splash::Splash;
 use crate::menu::widget::submenu::spec::{SubmenuProgramaHandle, SubmenuProgramaStorage};
 use crate::menu::widget::widget::Widget;
-use crate::menu::widget::widget_tests::SystemEnviroment;
-use crate::microcontroler::timer::now;
+use crate::microcontroler::delay::delay_ms;
+use crate::microcontroler::timer::{init_timer, now};
 use crate::microcontroler::{serial, timer};
 use lib_1::protocol::datalink::datalink::{DLError, Datalink};
 use lib_1::protocol::transport::channel::Channel;
@@ -30,15 +36,43 @@ fn emit_print_go_signal(transport: &TransportLayer) {
 }
 
 pub fn development_entry_point() -> ! {
-    // ////////////////////////////////////////
-    // Initialize System
-    // ////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
+    // Initialize system
+    // ////////////////////////////////////////////////////////////////////
+
+    // ////////////////////////////////////////////////////
     //
-    let SystemEnviroment {
-        mut canvas,
-        mut keyboard,
-        ..
-    } = SystemEnviroment::new(BAUD_RATE);
+    //   Initialize peripherals:
+    //   * Timer interruption (at 1khz)
+    //   * Serial port
+    //   * Lcd display
+    //   * Input & output ports expander
+    //   * Keyboard
+    //   * Canvas
+    //   * Front panel leds
+    //
+    // TODO: Improve the system enviroment construction
+    // ////////////////////////////////////////////////////
+
+    // Initialize timer couting (1khz)
+    init_timer();
+    // Serial port
+    let baud_rate = 9600;
+    serial::init(baud_rate);
+    // Lcd display
+    lcd::lcd_initialize();
+    // Initialize IO Expander
+    let output_expander = OutputExpander::new();
+    let intput_expander = InputExpander::new();
+    // Keyboard
+    fn beep(on: bool) {
+        OutputExpander::new().BUZZER(on).commit();
+    };
+    let mut keyboard = Keyboard::new(beep, &output_expander, &intput_expander);
+    // Canvas
+    let mut canvas = Canvas::new();
+    // Leds from the frontal panel
+    let mut frontal_panel_leds = FrontPanel::new(&output_expander);
 
     // ////////////////////////////////////////
     // Start comunication infrastructure
@@ -103,6 +137,7 @@ pub fn development_entry_point() -> ! {
         menu_programa,
         &transport,
         &data_storage,
+        &mut frontal_panel_leds,
     );
 
     // ///////////////////////////////////////

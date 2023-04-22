@@ -6,11 +6,11 @@ use crate::{board::output_expander::OutputExpander, microcontroler::delay::delay
 /// These leds and the buzzer is parte of the interface human-machine and has
 /// purpose to inform the user some events, like errors and keypressed.  
 pub struct FrontPanel<'a> {
-    output_expander: &'a mut OutputExpander,
+    output_expander: &'a OutputExpander,
 }
 
 impl<'a> FrontPanel<'a> {
-    pub fn new(output_expander: &'a mut OutputExpander) -> Self {
+    pub fn new(output_expander: &'a OutputExpander) -> Self {
         Self { output_expander }
     }
 
