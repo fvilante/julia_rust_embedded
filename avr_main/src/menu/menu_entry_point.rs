@@ -1,5 +1,6 @@
 use super::model::DataStorage;
 use super::widget::submenu::render::SubmenuProgramaRender;
+use crate::board::input_expander::InputExpander;
 use crate::board::keyboard::KeyCode;
 use crate::board::output_expander::OutputExpander;
 use crate::board::shiftout::init_shiftout_pins;
@@ -42,31 +43,33 @@ pub fn development_entry_point() -> ! {
     // ////////////////////////////////////////////////////
     //
     //   Initialize peripherals:
-    //   * timer interruption (at 1khz)
-    //   * serial port
-    //   * lcd display
-    //   * keyboard
-    //   * general I/O and canvas
-    //   * front panel leds
+    //   * Timer interruption (at 1khz)
+    //   * Serial port
+    //   * Lcd display
+    //   * Input & output ports expander
+    //   * Keyboard
+    //   * Canvas
+    //   * Front panel leds
     //
     // TODO: Improve the system enviroment construction
     // ////////////////////////////////////////////////////
 
-    // initialize timer couting (1khz)
+    // Initialize timer couting (1khz)
     init_timer();
-    // serial port
+    // Serial port
     let baud_rate = 9600;
     serial::init(baud_rate);
-    // lcd display
+    // Lcd display
     lcd::lcd_initialize();
-    // general outputs (PCI Julia on-board low-latency outputs)
+    // Initialize IO Expander
     let output_expander = OutputExpander::new();
-    // keyboard
+    let intput_expander = InputExpander::new();
+    // Keyboard
     fn beep(on: bool) {
         OutputExpander::new().BUZZER(on).commit();
     };
-    let mut keyboard = Keyboard::new(beep, &output_expander);
-    // canvas
+    let mut keyboard = Keyboard::new(beep, &output_expander, &intput_expander);
+    // Canvas
     let mut canvas = Canvas::new();
     // Leds from the frontal panel
     let mut frontal_panel_leds = FrontPanel::new(&output_expander);

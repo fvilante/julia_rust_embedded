@@ -1,3 +1,4 @@
+use crate::board::input_expander::InputExpander;
 use crate::board::keyboard::KeyCode;
 use crate::board::keyboard::Keypad;
 use crate::board::output_expander::OutputExpander;
@@ -9,8 +10,8 @@ type TimePoint = u16;
 const DEBOUNCE_TIME: TimePoint = 250; // miliseconds
 
 pub struct Debounce {
-    pub last_key_time: TimePoint,
-    pub last_key: KeyCode,
+    last_key_time: TimePoint,
+    last_key: KeyCode,
 }
 
 impl Debounce {
@@ -70,7 +71,7 @@ impl Debounce {
     }
 }
 
-/// High level function to control keyboard
+/// High level function to control keyboard key strokes
 pub struct Keyboard<'a> {
     pub keypad: Keypad<'a>,
     pub beep: fn(bool),
@@ -78,9 +79,9 @@ pub struct Keyboard<'a> {
 }
 
 impl<'a> Keyboard<'a> {
-    pub fn new(beep: fn(on: bool), output: &'a OutputExpander) -> Self {
+    pub fn new(beep: fn(on: bool), output: &'a OutputExpander, input: &'a InputExpander) -> Self {
         Self {
-            keypad: Keypad::new(output),
+            keypad: Keypad::new(output, input),
             beep,
             debouncer: Debounce::new(),
         }

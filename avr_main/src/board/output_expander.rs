@@ -3,15 +3,11 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use core::cell::Cell;
-
-use super::shiftout::{init_shiftout_pins, ShiftOutData};
-
-use crate::microcontroler::delay::delay_ms;
-
-use lib_1::utils::common::{configure_bit, get_bit_at_as_bool};
-
 use super::shiftout::write_shiftout;
+use super::shiftout::{init_shiftout_pins, ShiftOutData};
+use crate::microcontroler::delay::delay_ms;
+use core::cell::Cell;
+use lib_1::utils::common::{configure_bit, get_bit_at_as_bool};
 
 // See board schematic. This represents the electrical signals on the board
 pub enum OutputExpanderSignal {
@@ -116,7 +112,7 @@ pub struct OutputExpander {
 }
 
 impl OutputExpander {
-    // call this function before all others
+    /// NOTE: Do call this funcition just once in the entire program lifetime
     pub fn new() -> Self {
         init_shiftout_pins();
         OutputExpander {
@@ -130,7 +126,7 @@ impl OutputExpander {
         }
     }
 
-    // send all signais from the staged_area area to hardware if there is something to send
+    /// send all signais from the staged_area area to hardware if there is something to send
     pub fn commit(&self) -> () {
         // avoid to send data if nothing has changed
         if self.has_changed.get() {

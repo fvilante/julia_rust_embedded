@@ -3,13 +3,10 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use core::cell::Cell;
-
-use lib_1::utils::common::get_bit_at_as_bool;
-
 use super::shiftin::{init_shiftin_pins, readShiftIn, ShiftInData};
-
 use crate::board::lcd::{lcd_initialize, print_u8_in_hex};
+use core::cell::Cell;
+use lib_1::utils::common::get_bit_at_as_bool;
 
 // Represents each of the three CD4021 Integrated Circuit present on the board
 enum ShiftRegister {
@@ -96,6 +93,7 @@ pub struct InputExpander {
 }
 
 impl InputExpander {
+    /// NOTE: Do call this funcition just once in the entire program lifetime
     pub fn new() -> Self {
         init_shiftin_pins();
         Self {
@@ -108,15 +106,15 @@ impl InputExpander {
         }
     }
 
-    // fetch data from the hardware and save it on memory cache
+    /// fetch data from the hardware and save it on memory cache
     pub fn fetch(&self) -> &Self {
         let data_read = readShiftIn();
         self.cache.set(data_read);
         self
     }
 
-    // NOTE: If first run fetch data from hardware else from cache.
-    //       To pull data from hardware use 'fetch' method.
+    /// NOTE: If first run fetch data from hardware else from cache.
+    ///       To pull data from hardware use 'fetch' method.
     fn get_signal__(&self, signal: InputExpanderSignalRequest) -> bool {
         let cache = {
             if self.is_first_run.get() == true {

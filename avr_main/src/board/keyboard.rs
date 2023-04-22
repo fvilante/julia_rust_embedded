@@ -169,7 +169,7 @@ impl KeyCode {
 pub struct Keypad<'a> {
     /// NOTE: output is a pointer, because it must be shared with the
     output: &'a OutputExpander,
-    input: InputExpander,
+    input: &'a InputExpander,
     //last_keycode_read: KeyCode,
 }
 
@@ -219,12 +219,11 @@ progmem! {
 }
 
 impl<'a> Keypad<'a> {
-    pub fn new(output: &'a OutputExpander) -> Self {
-        let input = InputExpander::new();
+    pub fn new(output: &'a OutputExpander, input: &'a InputExpander) -> Self {
         Keypad { output, input }
     }
 
-    fn set_output(&mut self, n: u8, value: bool) -> () {
+    fn set_output(&self, n: u8, value: bool) -> () {
         //ATTENTION: Do call commit() after write.
         match n {
             0 => self.output.KBD_S1(value).commit(),
@@ -239,7 +238,7 @@ impl<'a> Keypad<'a> {
         };
     }
 
-    fn get_input(&mut self, n: u8) -> bool {
+    fn get_input(&self, n: u8) -> bool {
         //ATTENTION: Do call fetch() before read.
         match n {
             0 => self.input.fetch().KBD_E1(),
@@ -254,7 +253,8 @@ impl<'a> Keypad<'a> {
         }
     }
 
-    pub fn scan(&mut self) -> KeyCode {
+    /// Performs a hardware scan of the keypad signals and returns the key stroke
+    pub fn scan(&self) -> KeyCode {
         let mut key_code: KeyCode = KeyCode::NO_KEY;
         for collumn in 0..=7 {
             self.set_output(collumn, ACTIVATED);
