@@ -9,12 +9,12 @@ use crate::menu::widget::manual_mode::ManualModeMenu;
 use crate::menu::widget::splash::Splash;
 use crate::menu::widget::submenu::spec::{MenuProgramaHandle, MenuProgramaStorage};
 use crate::menu::widget::widget::Widget;
-use crate::microcontroler::timer::{now};
+use crate::microcontroler::timer::now;
 use crate::microcontroler::{serial, timer};
-use lib_1::protocol::datalink::datalink::{Datalink};
+use lib_1::protocol::datalink::datalink::Datalink;
 use lib_1::protocol::transport::channel::Channel;
 use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
-use lib_1::protocol::transport::transport_layer::{TransportLayer};
+use lib_1::protocol::transport::transport_layer::TransportLayer;
 
 /// TODO: Implement user interaction with the signal emitted
 fn emit_print_go_signal(transport: &TransportLayer) {
@@ -150,7 +150,7 @@ pub fn development_entry_point() -> ! {
 
         splash_window.update();
         let start_point = Point::new(0, 0);
-        splash_window.draw(&mut canvas, start_point);
+        splash_window.draw(&mut canvas);
         canvas.render();
     }
 

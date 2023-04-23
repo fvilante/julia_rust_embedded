@@ -1,8 +1,7 @@
 // low-level driver for keypad
 
-use avr_progmem::progmem;
 use super::{input_expander::InputExpander, output_expander::OutputExpander};
-
+use avr_progmem::progmem;
 
 const ACTIVATED: bool = false; //low level
 const DEACTIVATE: bool = true; //true level

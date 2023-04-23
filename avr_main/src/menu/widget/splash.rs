@@ -94,12 +94,12 @@ impl<'a> Splash<'a> {
     }
 }
 
-impl Widget for Splash<'_> {
-    fn send_key(&mut self, _key: KeyCode) {
+impl Splash<'_> {
+    pub fn send_key(&mut self, _key: KeyCode) {
         // do nothing
     }
 
-    fn update(&mut self) {
+    pub fn update(&mut self) {
         let has_finished = self.current_state == State::End;
         if !has_finished {
             if now() as u32 > self.next_state_time_point {
@@ -110,7 +110,7 @@ impl Widget for Splash<'_> {
         }
     }
 
-    fn draw(&self, canvas: &mut Canvas, _start_point: Point) {
+    pub fn draw(&self, canvas: &mut Canvas) {
         canvas.clear();
         match self.current_state {
             State::Initial => {}
