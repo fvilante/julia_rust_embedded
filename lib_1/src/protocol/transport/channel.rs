@@ -61,6 +61,12 @@ impl Into<u8> for Channel {
     }
 }
 
+impl Default for Channel {
+    fn default() -> Self {
+        Self { number: 0 }
+    }
+}
+
 ///////////////////////////////////////////////////////////
 
 #[cfg(test)]
