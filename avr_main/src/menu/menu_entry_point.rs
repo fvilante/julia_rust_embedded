@@ -1,5 +1,5 @@
 use super::model::DataStorage;
-use super::widget::submenu::render::SubmenuProgramaRender;
+use super::widget::submenu::render::MenuProgramaRender;
 use crate::board::input_expander::InputExpander;
 use crate::board::keyboard::KeyCode;
 use crate::board::output_expander::OutputExpander;
@@ -14,7 +14,7 @@ use crate::menu::widget::execucao::MenuExecucao;
 use crate::menu::widget::main_menu::MainMenu;
 use crate::menu::widget::manual_mode::ManualModeMenu;
 use crate::menu::widget::splash::Splash;
-use crate::menu::widget::submenu::spec::{SubmenuProgramaHandle, SubmenuProgramaStorage};
+use crate::menu::widget::submenu::spec::{MenuProgramaHandle, MenuProgramaStorage};
 use crate::menu::widget::widget::Widget;
 use crate::microcontroler::delay::delay_ms;
 use crate::microcontroler::timer::{init_timer, now};
@@ -129,11 +129,9 @@ pub fn development_entry_point() -> ! {
     //  Main Menu Mounting
     // ///////////////////////////////////////
     //
-    let submenu_programa_storage: SubmenuProgramaStorage =
-        SubmenuProgramaStorage::new(&data_storage);
-    let submenu_programa_handle = SubmenuProgramaHandle::MenuPrograma;
-    let menu_programa =
-        SubmenuProgramaRender::new(submenu_programa_handle, &submenu_programa_storage);
+    let menu_programa_storage: MenuProgramaStorage = MenuProgramaStorage::new(&data_storage);
+    let menu_programa_handle = MenuProgramaHandle::MenuPrograma;
+    let menu_programa = MenuProgramaRender::new(menu_programa_handle, &menu_programa_storage);
 
     let menu_manual = ManualModeMenu::new(&transport);
     let menu_execucao = MenuExecucao::new(&transport);

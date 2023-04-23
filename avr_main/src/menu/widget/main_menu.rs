@@ -11,7 +11,7 @@ use crate::{
 use super::{
     execucao::MenuExecucao,
     manual_mode::{ManualModeMenu, ManualModeState},
-    submenu::render::SubmenuProgramaRender,
+    submenu::render::MenuProgramaRender,
     widget::Widget,
 };
 
@@ -33,7 +33,7 @@ pub struct MainMenu<'a> {
     current_state: State,
     menu_manual: ManualModeMenu<'a>,
     menu_execucao: MenuExecucao<'a>,
-    menu_programa: SubmenuProgramaRender<'a>,
+    menu_programa: MenuProgramaRender<'a>,
     transport: &'a TransportLayer<'a>,
     model: &'a DataStorage,
     //TODO: We're just controling 3 Leds (Execucao, Manual, Programa), better would be to wrap
@@ -45,7 +45,7 @@ impl<'a> MainMenu<'a> {
     pub fn new(
         menu_manual: ManualModeMenu<'a>,
         menu_execucao: MenuExecucao<'a>,
-        menu_programa: SubmenuProgramaRender<'a>,
+        menu_programa: MenuProgramaRender<'a>,
         transport: &'a TransportLayer<'a>,
         model: &'a DataStorage,
         front_panel_leds: &'a mut FrontPanel<'a>,

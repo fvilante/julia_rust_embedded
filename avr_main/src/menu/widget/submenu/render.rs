@@ -7,7 +7,7 @@ use crate::{
         canvas::Canvas,
         point::Point,
         ratangular_wave::RectangularWave,
-        widget::submenu::spec::{SubmenuProgramaHandle, SubmenuProgramaStorage},
+        widget::submenu::spec::{MenuProgramaHandle, MenuProgramaStorage},
     },
 };
 use heapless::Vec;
@@ -15,16 +15,16 @@ use lib_1::utils::common::usize_to_u8_clamper;
 
 /////////////////////////////////
 
-pub struct SubmenuProgramaRender<'a> {
+pub struct MenuProgramaRender<'a> {
     /// List of all submenu items.
-    menu_storage: &'a SubmenuProgramaStorage<'a>,
-    current_menu: SubmenuProgramaHandle,
+    menu_storage: &'a MenuProgramaStorage<'a>,
+    current_menu: MenuProgramaHandle,
     /// State of widgets which are currently mounted on screen.
     /// TODO: Is not necessary to have two MenuItemWidget states on memory but just one. Introduce some logic when possible
     /// to optimize this.
     mounted: [MenuItemWidget<'a>; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
     /// Stores the path of menu jumps that user perform, so you can go back to previous menu
-    navigation_path: Vec<SubmenuProgramaHandle, 7>,
+    navigation_path: Vec<MenuProgramaHandle, 7>,
     /// Main menu reads this bit, if it is set then it will render the main menu. When menu_menu pass control
     /// do menu_programa it resets this bit, and then menu_program is responsible to set it when it want to give
     /// back control to main_menu.
@@ -34,11 +34,8 @@ pub struct SubmenuProgramaRender<'a> {
     blink: RectangularWave,
 }
 
-impl<'a> SubmenuProgramaRender<'a> {
-    pub fn new(
-        submenu_handle: SubmenuProgramaHandle,
-        menu_storage: &'a SubmenuProgramaStorage,
-    ) -> Self {
+impl<'a> MenuProgramaRender<'a> {
+    pub fn new(submenu_handle: MenuProgramaHandle, menu_storage: &'a MenuProgramaStorage) -> Self {
         const T_ON: u16 = 500;
         const T_OFF: u16 = 500;
         Self {
@@ -128,12 +125,12 @@ impl<'a> SubmenuProgramaRender<'a> {
     }
 
     /// Changes current submenu
-    fn go_to_submenu(&mut self, submenu_handle: SubmenuProgramaHandle) {
+    fn go_to_submenu(&mut self, submenu_handle: MenuProgramaHandle) {
         self.current_menu = submenu_handle;
         self.mount();
     }
 
-    fn go_to_child(&mut self, child: SubmenuProgramaHandle) {
+    fn go_to_child(&mut self, child: MenuProgramaHandle) {
         // do nothing if child is pointing to itself
         if self.current_menu != child {
             // saves parent
@@ -199,7 +196,7 @@ impl<'a> SubmenuProgramaRender<'a> {
     }
 }
 
-impl SubmenuProgramaRender<'_> {
+impl MenuProgramaRender<'_> {
     pub fn clone_from(&mut self, origin: Self) {
         self.menu_storage = origin.menu_storage;
         self.current_menu = origin.current_menu;
@@ -207,7 +204,7 @@ impl SubmenuProgramaRender<'_> {
     }
 }
 
-impl SubmenuProgramaRender<'_> {
+impl MenuProgramaRender<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         if let Some(line_being_edited) = self.get_line_being_edited() {
             // if is editing some line, delegate keys to sub widgets.

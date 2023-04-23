@@ -24,7 +24,7 @@ use super::flash_texts::*;
 ///
 /// TODO: Rename to `MenuStorageIndex`
 #[derive(Copy, Clone, PartialEq)]
-pub enum SubmenuProgramaHandle {
+pub enum MenuProgramaHandle {
     MenuPrograma,
     MenuArquivoDeEixo,
     MenuParametrosDeMovimento,
@@ -66,7 +66,7 @@ impl<T: SubmenuLayout> SubmenuLayout for Register<T> {
 
 /// The storage for all sub menus inside the submenu 'Programa'. If you create a new sub menu you must put it here.
 /// TODO: May change name to `MenuRegister`
-pub struct SubmenuProgramaStorage<'a> {
+pub struct MenuProgramaStorage<'a> {
     model: &'a DataStorage,
 
     pub MenuPrograma: Register<MenuPrograma<'a>>,
@@ -82,7 +82,7 @@ pub struct SubmenuProgramaStorage<'a> {
     pub MenuConfiguracaoDoEixo: Register<MenuConfiguracaoDeEixo<'a>>,
 }
 
-impl<'a> SubmenuProgramaStorage<'a> {
+impl<'a> MenuProgramaStorage<'a> {
     /// Constructs all the menus and initializes its internal state
     pub fn new(model: &'a DataStorage) -> Self {
         Self {
@@ -106,31 +106,29 @@ impl<'a> SubmenuProgramaStorage<'a> {
     /// If index is out of range than returns None
     pub fn get_item(
         &self,
-        submenu_handle: SubmenuProgramaHandle,
+        submenu_handle: MenuProgramaHandle,
         index: usize,
     ) -> Option<MenuItemWidget> {
         match submenu_handle {
-            SubmenuProgramaHandle::MenuPrograma => self.MenuPrograma.get_item(index),
-            SubmenuProgramaHandle::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_item(index),
-            SubmenuProgramaHandle::MenuParametrosDeMovimento => {
+            MenuProgramaHandle::MenuPrograma => self.MenuPrograma.get_item(index),
+            MenuProgramaHandle::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_item(index),
+            MenuProgramaHandle::MenuParametrosDeMovimento => {
                 self.MenuParametrosDeMovimento.get_item(index)
             }
 
-            SubmenuProgramaHandle::MenuParametrosDeImpressao => {
+            MenuProgramaHandle::MenuParametrosDeImpressao => {
                 self.MenuParametrosDeImpressao.get_item(index)
             }
 
-            SubmenuProgramaHandle::MenuParametrosDeCiclo => {
-                self.MenuParametrosDeCiclo.get_item(index)
-            }
-            SubmenuProgramaHandle::MenuConfiguracaoDaImpressora => {
+            MenuProgramaHandle::MenuParametrosDeCiclo => self.MenuParametrosDeCiclo.get_item(index),
+            MenuProgramaHandle::MenuConfiguracaoDaImpressora => {
                 self.MenuConfiguracaoDaImpressora.get_item(index)
             }
 
-            SubmenuProgramaHandle::MenuIntertravamentoParaDoisEixos => {
+            MenuProgramaHandle::MenuIntertravamentoParaDoisEixos => {
                 self.MenuIntertravamentoParaDoisEixos.get_item(index)
             }
-            SubmenuProgramaHandle::MenuConfiguracaoDeEixo => {
+            MenuProgramaHandle::MenuConfiguracaoDeEixo => {
                 self.MenuConfiguracaoDoEixo.get_item(index)
             }
         }
@@ -140,33 +138,31 @@ impl<'a> SubmenuProgramaStorage<'a> {
     /// TODO: Simplify this function implementation reusing self.get_item which has a similar implementation
     pub fn get_navigation_state(
         &self,
-        submenu_handle: SubmenuProgramaHandle,
+        submenu_handle: MenuProgramaHandle,
     ) -> &Cell<NavigationState> {
         match submenu_handle {
-            SubmenuProgramaHandle::MenuPrograma => self.MenuPrograma.get_navigation_state(),
-            SubmenuProgramaHandle::MenuArquivoDeEixo => {
-                self.MenuArquivoDeEixo.get_navigation_state()
-            }
-            SubmenuProgramaHandle::MenuParametrosDeMovimento => {
+            MenuProgramaHandle::MenuPrograma => self.MenuPrograma.get_navigation_state(),
+            MenuProgramaHandle::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_navigation_state(),
+            MenuProgramaHandle::MenuParametrosDeMovimento => {
                 self.MenuParametrosDeMovimento.get_navigation_state()
             }
 
-            SubmenuProgramaHandle::MenuParametrosDeImpressao => {
+            MenuProgramaHandle::MenuParametrosDeImpressao => {
                 self.MenuParametrosDeImpressao.get_navigation_state()
             }
 
-            SubmenuProgramaHandle::MenuParametrosDeCiclo => {
+            MenuProgramaHandle::MenuParametrosDeCiclo => {
                 self.MenuParametrosDeCiclo.get_navigation_state()
             }
-            SubmenuProgramaHandle::MenuConfiguracaoDaImpressora => {
+            MenuProgramaHandle::MenuConfiguracaoDaImpressora => {
                 self.MenuConfiguracaoDaImpressora.get_navigation_state()
             }
 
-            SubmenuProgramaHandle::MenuIntertravamentoParaDoisEixos => {
+            MenuProgramaHandle::MenuIntertravamentoParaDoisEixos => {
                 self.MenuIntertravamentoParaDoisEixos.get_navigation_state()
             }
 
-            SubmenuProgramaHandle::MenuConfiguracaoDeEixo => {
+            MenuProgramaHandle::MenuConfiguracaoDeEixo => {
                 self.MenuConfiguracaoDoEixo.get_navigation_state()
             }
         }
@@ -177,7 +173,7 @@ impl<'a> SubmenuProgramaStorage<'a> {
     /// TODO: This algoritm may be highly optimized, because the length currently is obtained instantiating &
     /// throwing away all the menu items in memory. A better option may be to restructure datastructures
     /// to calculate this size in static time.
-    pub fn len(&self, submenu_handle: SubmenuProgramaHandle) -> usize {
+    pub fn len(&self, submenu_handle: MenuProgramaHandle) -> usize {
         for index in 0..u8::MAX {
             if let None = self.get_item(submenu_handle, index as usize) {
                 return index as usize;
@@ -204,13 +200,13 @@ impl SubmenuLayout for MenuPrograma<'_> {
         match index {
             0 => Some(
                 MenuItemBuilder::from_text(&EDITAR_PROGRAMA_EIXO_X)
-                    .add_conection_to_submenu(SubmenuProgramaHandle::MenuArquivoDeEixo)
+                    .add_conection_to_submenu(MenuProgramaHandle::MenuArquivoDeEixo)
                     .build(),
             ),
 
             1 => Some(
                 MenuItemBuilder::from_text(&CONFIGURACAO_EIXO_X)
-                    .add_conection_to_submenu(SubmenuProgramaHandle::MenuConfiguracaoDeEixo)
+                    .add_conection_to_submenu(MenuProgramaHandle::MenuConfiguracaoDeEixo)
                     .build(),
             ),
 
@@ -238,33 +234,31 @@ impl SubmenuLayout for MenuArquivoDeEixo<'_> {
         match index {
             0 => Some(
                 MenuItemBuilder::from_text(&PARAMETROS_DE_MOVIMENTO)
-                    .add_conection_to_submenu(SubmenuProgramaHandle::MenuParametrosDeMovimento)
+                    .add_conection_to_submenu(MenuProgramaHandle::MenuParametrosDeMovimento)
                     .build(),
             ),
 
             1 => Some(
                 MenuItemBuilder::from_text(&PARAMETROS_DE_IMPRESSAO)
-                    .add_conection_to_submenu(SubmenuProgramaHandle::MenuParametrosDeImpressao)
+                    .add_conection_to_submenu(MenuProgramaHandle::MenuParametrosDeImpressao)
                     .build(),
             ),
 
             2 => Some(
                 MenuItemBuilder::from_text(&CONFIGURACAO_DO_CICLO)
-                    .add_conection_to_submenu(SubmenuProgramaHandle::MenuParametrosDeCiclo)
+                    .add_conection_to_submenu(MenuProgramaHandle::MenuParametrosDeCiclo)
                     .build(),
             ),
 
             3 => Some(
                 MenuItemBuilder::from_text(&CONFIGURACAO_DA_IMPRESSORA)
-                    .add_conection_to_submenu(SubmenuProgramaHandle::MenuConfiguracaoDaImpressora)
+                    .add_conection_to_submenu(MenuProgramaHandle::MenuConfiguracaoDaImpressora)
                     .build(),
             ),
 
             4 => Some(
                 MenuItemBuilder::from_text(&INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO)
-                    .add_conection_to_submenu(
-                        SubmenuProgramaHandle::MenuIntertravamentoParaDoisEixos,
-                    )
+                    .add_conection_to_submenu(MenuProgramaHandle::MenuIntertravamentoParaDoisEixos)
                     .build(),
             ),
 

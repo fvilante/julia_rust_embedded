@@ -8,7 +8,7 @@ use crate::{
     },
 };
 
-use crate::menu::widget::submenu::spec::SubmenuProgramaHandle;
+use crate::menu::widget::submenu::spec::MenuProgramaHandle;
 
 use super::super::{
     field::field::Field,
@@ -21,7 +21,7 @@ use super::super::{
 pub struct MenuItemWidget<'a> {
     point_and_caption: (Point1d, Caption),
     point_and_field: Option<(Point1d, Field<'a>)>,
-    pub child: Option<SubmenuProgramaHandle>,
+    pub child: Option<MenuProgramaHandle>,
     unit_of_measurement: Option<(Point1d, Caption)>,
 }
 
@@ -31,7 +31,7 @@ impl<'a> MenuItemWidget<'a> {
     pub fn new(
         point_and_text: (Point1d, FlashString),
         point_and_field: Option<(Point1d, Field<'a>)>,
-        child: Option<SubmenuProgramaHandle>,
+        child: Option<MenuProgramaHandle>,
         unit_of_measurement: Option<(Point1d, FlashString)>,
     ) -> Self {
         let (point_a, text) = point_and_text;
