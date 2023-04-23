@@ -5,7 +5,6 @@ use crate::{
     board::{keyboard::KeyCode, lcd},
     enviroment::front_panel::FrontPanel,
     menu::{canvas::Canvas, flash::FlashString, model::DataStorage, point::Point},
-    microcontroler::delay::delay_ms,
 };
 
 use super::{

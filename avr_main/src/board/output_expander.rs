@@ -315,7 +315,7 @@ pub fn development_entry_point() -> ! {
     lcd_initialize();
     print("iniciei");
 
-    let mut output = OutputExpander::new();
+    let output = OutputExpander::new();
 
     loop {
         output

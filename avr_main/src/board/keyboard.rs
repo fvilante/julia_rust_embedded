@@ -1,13 +1,8 @@
 // low-level driver for keypad
 
-use arduino_hal::port::mode::Output;
 use avr_progmem::progmem;
-
-use crate::board::lcd;
-
 use super::{input_expander::InputExpander, output_expander::OutputExpander};
 
-use crate::microcontroler::delay::delay_ms;
 
 const ACTIVATED: bool = false; //low level
 const DEACTIVATE: bool = true; //true level

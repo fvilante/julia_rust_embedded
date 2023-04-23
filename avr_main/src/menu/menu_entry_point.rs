@@ -1,14 +1,7 @@
 use super::model::DataStorage;
 use super::widget::submenu::render::MenuProgramaRender;
-use crate::board::input_expander::InputExpander;
 use crate::board::keyboard::KeyCode;
-use crate::board::output_expander::OutputExpander;
 use crate::board::peripherals::Peripherals;
-use crate::board::shiftout::init_shiftout_pins;
-use crate::board::{lcd, shiftin};
-use crate::enviroment::front_panel::FrontPanel;
-use crate::menu::canvas::Canvas;
-use crate::menu::keyboard::Keyboard;
 use crate::menu::point::Point;
 use crate::menu::widget::execucao::MenuExecucao;
 use crate::menu::widget::main_menu::MainMenu;
@@ -16,13 +9,12 @@ use crate::menu::widget::manual_mode::ManualModeMenu;
 use crate::menu::widget::splash::Splash;
 use crate::menu::widget::submenu::spec::{MenuProgramaHandle, MenuProgramaStorage};
 use crate::menu::widget::widget::Widget;
-use crate::microcontroler::delay::delay_ms;
-use crate::microcontroler::timer::{init_timer, now};
+use crate::microcontroler::timer::{now};
 use crate::microcontroler::{serial, timer};
-use lib_1::protocol::datalink::datalink::{DLError, Datalink};
+use lib_1::protocol::datalink::datalink::{Datalink};
 use lib_1::protocol::transport::channel::Channel;
 use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
-use lib_1::protocol::transport::transport_layer::{TLError, TransportLayer};
+use lib_1::protocol::transport::transport_layer::{TransportLayer};
 
 /// TODO: Implement user interaction with the signal emitted
 fn emit_print_go_signal(transport: &TransportLayer) {

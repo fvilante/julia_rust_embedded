@@ -213,7 +213,7 @@ impl InputExpander {
 //
 
 pub fn development_entry_point() -> ! {
-    let mut input = InputExpander::new();
+    let input = InputExpander::new();
 
     // retrieve data from hardware to cache
     input.fetch();
