@@ -119,14 +119,14 @@ pub fn development_entry_point() -> ! {
     let transport = cmpp_axis.get_transport_layer();
 
     // ////////////////////////////////////////
-    //  CPU Data Storage
+    //  CPU data storage
     // ////////////////////////////////////////
     //
     let mut data_storage = DataStorage::new();
     data_storage.load_from_eeprom();
 
     // ///////////////////////////////////////
-    //  Main Menu Mounting
+    //  Main menu mounting
     // ///////////////////////////////////////
     //
     let menu_programa_storage: MenuProgramaStorage = MenuProgramaStorage::new(&data_storage);
@@ -135,6 +135,7 @@ pub fn development_entry_point() -> ! {
 
     let menu_manual = ManualModeMenu::new(&transport);
     let menu_execucao = MenuExecucao::new(&transport);
+
     let mut main_menu = MainMenu::new(
         menu_manual,
         menu_execucao,
@@ -145,7 +146,7 @@ pub fn development_entry_point() -> ! {
     );
 
     // ///////////////////////////////////////
-    //  Show Initial Splash Window
+    //  Show initial splash window
     // ///////////////////////////////////////
     //
     let mut splash_window = Splash::new(&data_storage, &transport);
@@ -162,7 +163,7 @@ pub fn development_entry_point() -> ! {
     }
 
     // /////////////////////////////////////////////////////////////////////
-    //  Main Loop
+    //  Main loop
     // ////////////////////////////////////////////////////////////////////
 
     //
