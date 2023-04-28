@@ -528,7 +528,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
                 MenuItemBuilder::from_text(&LOGICA_DO_SINAL_DE_IMPRESSAO)
                     .add_optional_variable(
                         &self.model.arquivo_de_eixo_x.logica_do_sinal_de_impressao,
-                        Options::ligado_desligado(),
+                        Options::aberto_fechado(),
                         32,
                     )
                     .build(),
@@ -738,7 +738,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                     .add_numerical_variable(
                         &self.model.configuracao_do_eixo_x.deslocamento_giro_do_motor,
                         Some(0..0xFFFF),
-                        30,
+                        33,
                         None,
                     )
                     .build(),
@@ -752,7 +752,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                             .configuracao_do_eixo_x
                             .giro_com_funcao_de_protecao,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -765,7 +765,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                             .configuracao_do_eixo_x
                             .giro_com_funcao_de_correcao,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -775,7 +775,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                     .add_optional_variable(
                         &self.model.configuracao_do_eixo_x.logica_do_start_externo,
                         Options::aberto_fechado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -824,7 +824,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                             .configuracao_do_eixo_x
                             .reducao_da_corrente_em_repouso,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -837,7 +837,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                             .configuracao_do_eixo_x
                             .referencia_pelo_start_externo,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),
@@ -847,7 +847,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                     .add_optional_variable(
                         &self.model.configuracao_do_eixo_x.modo_turbo,
                         Options::ligado_desligado(),
-                        30,
+                        32,
                     )
                     .build(),
             ),

@@ -104,12 +104,16 @@ progmem! {
 
     // OPTIONAL PARAMETER'S TEXT
 
-    pub static progmem string LIGADO = "Ligado";
+    // NOTE: If you want that the length of the options look like the same this behavior is not
+    // implemented by software at moment, so you need to do it manually makeing options text
+    // same size.
+    // TODO: Make behaviour mentioned in the note above automatic instead of manual.
+    pub static progmem string LIGADO =    "Ligado";
     pub static progmem string DESLIGADO = "Deslig";
-    pub static progmem string CONTINUO = "Contin";
+    pub static progmem string CONTINUO =      "Contin";
     pub static progmem string PASSO_A_PASSO = "PasPas";
-    pub static progmem string ABERTO = "Aberto";
-    pub static progmem string FECHADO = "Fechado";
+    pub static progmem string ABERTO =  "Aberto";
+    pub static progmem string FECHADO = "Fechad";
 
 
     //NOTE: it is possible to load any type in progmem not only strings
