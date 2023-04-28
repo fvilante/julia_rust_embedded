@@ -5,6 +5,7 @@ use crate::{
     board::{keyboard::KeyCode, lcd},
     enviroment::front_panel::FrontPanel,
     menu::{canvas::Canvas, flash::FlashString, model::DataStorage, point::Point},
+    microcontroler::delay::delay_ms,
 };
 
 use super::{
@@ -143,7 +144,15 @@ impl<'a> MainMenu<'a> {
                     lcd::clear();
                     lcd::set_cursor(0, 1);
                     lcd::print("Por favor aguarde a carga do programa X");
-                    for _response in self.model.send_all(&self.transport) {}
+                    for response in self.model.send_all(&self.transport) {
+                        if let Err(e) = response {
+                            lcd::clear();
+                            lcd::set_cursor(0, 0);
+                            lcd::print("Erro de comunicacao serial");
+                            delay_ms(4000);
+                            break;
+                        }
+                    }
                     // saves data into the eeprom
                     self.model.save_to_eeprom();
                 } else {

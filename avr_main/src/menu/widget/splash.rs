@@ -2,9 +2,9 @@ use avr_progmem::progmem;
 use lib_1::protocol::transport::transport_layer::TransportLayer;
 
 use crate::{
-    board::keyboard::KeyCode,
+    board::{keyboard::KeyCode, lcd},
     menu::{canvas::Canvas, model::DataStorage, point::Point},
-    microcontroler::timer::now,
+    microcontroler::{delay::delay_ms, timer::now},
     utils::generic_string::GenericString,
 };
 
@@ -123,7 +123,15 @@ impl Splash<'_> {
                     GenericString::from_flash(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X),
                 );
                 // TODO: Move this effect to `update` method when possible
-                for _response in self.model.send_all(&self.transport) {}
+                for response in self.model.send_all(&self.transport) {
+                    if let Err(e) = response {
+                        lcd::clear();
+                        lcd::set_cursor(0, 0);
+                        lcd::print("Erro de comunicacao serial");
+                        delay_ms(4000);
+                        break;
+                    }
+                }
             }
             State::LoadingY => canvas.print_xy(Point::new(0, 0), GenericString::from_flash(&TEXT2)),
             State::End => {
