@@ -1,3 +1,11 @@
+/// Here we specify the concrete menu items and submenus of the application
+///
+/// If you want to add more submenus or menu items consider this commit a
+/// an example: 9959bd686
+///
+/// Note that this is a first implementation of the menu, and there is plenty of room
+/// to improve and to make the operation of add submenus or menuitems a lot more easier.
+/// By for example using macros! etc
 use core::{cell::Cell, u8};
 
 use crate::menu::flash::FlashString;
