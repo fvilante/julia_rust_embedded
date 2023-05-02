@@ -2,19 +2,23 @@ use super::{
     super::menu_item::menu_item::MenuItemWidget, hepers::LcdLine, navigation_state::NavigationState,
 };
 use crate::{
-    board::keyboard::KeyCode,
+    board::{keyboard::KeyCode, lcd},
     menu::{
         canvas::Canvas,
         point::Point,
         ratangular_wave::RectangularWave,
         widget::submenu::spec::{MenuProgramaHandle, MenuProgramaStorage},
     },
+    microcontroler::delay::delay_ms,
 };
 use heapless::Vec;
 use lib_1::utils::common::usize_to_u8_clamper;
 
 /////////////////////////////////
 
+/// Responsible to render the menu on the screen
+///
+/// TODO: Improve error handling
 pub struct MenuProgramaRender<'a> {
     /// List of all submenu items.
     menu_storage: &'a MenuProgramaStorage<'a>,
@@ -38,12 +42,26 @@ impl<'a> MenuProgramaRender<'a> {
     pub fn new(submenu_handle: MenuProgramaHandle, menu_storage: &'a MenuProgramaStorage) -> Self {
         const T_ON: u16 = 500;
         const T_OFF: u16 = 500;
+
+        let Some(menu_storage_item_0) =  menu_storage.get_item(submenu_handle, 0) else {
+            // TODO: Improve error handling
+            lcd::clear();
+            lcd::print("err44");
+            delay_ms(4000);
+            panic!()
+        };
+
+        let Some(menu_storage_item_1) =  menu_storage.get_item(submenu_handle, 1) else {
+            // TODO: Improve error handling
+            lcd::clear();
+            lcd::print("err33");
+            delay_ms(4000);
+            panic!()
+        };
+
         Self {
             menu_storage,
-            mounted: [
-                menu_storage.get_item(submenu_handle, 0).unwrap(),
-                menu_storage.get_item(submenu_handle, 1).unwrap(),
-            ],
+            mounted: [menu_storage_item_0, menu_storage_item_1],
             current_menu: submenu_handle,
             navigation_path: Vec::new(),
             must_return_to_main_menu: false,
@@ -77,15 +95,26 @@ impl<'a> MenuProgramaRender<'a> {
     fn mount(&mut self) {
         for lcd_line in LcdLine::iterator() {
             let index = self.get_navigation_state().get_current_index_for(lcd_line) as usize;
-            let menu_item_widget = self
+            let Some(menu_item_widget) = self
                 .menu_storage
                 .get_item(self.current_menu, index)
-                .unwrap();
+                else {
+                    // TODO: Improve error handling
+                    // Mounting error
+                    lcd::clear();
+                    lcd::print("Err91"); // menu mounting error
+                    delay_ms(4000);
+                    panic!("E2");
+                };
             if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
                 // mount item
                 *elem = menu_item_widget;
             } else {
+                // TODO: Improve error handling
                 // Mounting error
+                lcd::clear();
+                lcd::print("Err92"); // menu mounting error
+                delay_ms(4000);
                 panic!("E2");
             }
         }
