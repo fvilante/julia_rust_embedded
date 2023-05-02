@@ -10,6 +10,28 @@ use lib_1::{
 
 use crate::microcontroler::eeprom::EepromAddress;
 
+///
+
+/// Implamented by some object that can be serialized to be written and read in EEPROM
+///
+/// TODO: Consider to move this type to a better place
+trait EepromStorable {
+    /// Signature is used to inform that the eeprom is correctly initialized.
+    ///
+    /// When microcontroler is flashed first time, the eeprom is erased and is in an invalid state
+    /// we use this signature to inform that the block of eeprom data is initialized
+    const SIGNATURE: u16;
+    /// Given initial address, write data and return next available address and size written in bytes
+    /// TODO: KNOWN-ISSUES: EepromAddress currently only address first 255 bytes of eeprom
+    fn save_into_eeprom(&self, initial_address: EepromAddress) -> (EepromAddress, u8);
+    /// Given an initial address load data from eeprom in itself and return next address available
+    /// and the size of bytes read
+    /// /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom
+    fn load_from_eeprom(&mut self, initial_address: EepromAddress) -> (EepromAddress, u8);
+}
+
+///
+
 pub struct ArquivoDeEixo {
     // PARAMETROS DE MOVIMENTO
     pub posicao_inicial: Cell<u16>,
@@ -49,15 +71,9 @@ pub struct ArquivoDeEixo {
     pub saida_de_start_passo_a_passo: Cell<Cursor>,
 }
 
-impl ArquivoDeEixo {
-    /// Signature is used to inform that the eeprom is correctly initialized.
-    ///
-    /// When microcontroler is flashed first time, the eeprom is erased and is in an invalid state
-    /// we use this signature to inform that the block of eeprom data is initialized
+impl EepromStorable for ArquivoDeEixo {
     const SIGNATURE: u16 = 0xA000;
 
-    /// Given initial address, write data and return next available address and size written in bytes
-    /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom
     fn save_into_eeprom(&self, mut initial_address: EepromAddress) -> (EepromAddress, u8) {
         let next = initial_address
             .write_u16(Self::SIGNATURE)
@@ -251,6 +267,8 @@ impl Default for ArquivoDeEixo {
     }
 }
 
+// ********************************************************
+
 pub struct ConfiguracaoDoEixo {
     pub numero_do_canal: Cell<u16>,
     pub numero_de_pulso_do_giro: Cell<u16>,
@@ -267,11 +285,9 @@ pub struct ConfiguracaoDoEixo {
     pub modo_turbo: Cell<Cursor>,
 }
 
-impl ConfiguracaoDoEixo {
+impl EepromStorable for ConfiguracaoDoEixo {
     const SIGNATURE: u16 = 0xB000;
 
-    /// Given initial address, write data and return next available address and size written in bytes
-    /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom
     fn save_into_eeprom(&self, mut initial_address: EepromAddress) -> (EepromAddress, u8) {
         let next = initial_address
             .write_u16(Self::SIGNATURE)
@@ -293,9 +309,6 @@ impl ConfiguracaoDoEixo {
         (next, size_of_bytes_written)
     }
 
-    /// Given an initial address load data from eeprom in itself and return next address available
-    /// and the size of bytes read
-    /// /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom
     fn load_from_eeprom(&mut self, initial_address: EepromAddress) -> (EepromAddress, u8) {
         let next = initial_address;
         let (signature, next) = next.read_u16();
