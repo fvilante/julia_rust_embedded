@@ -3,7 +3,9 @@ use crate::menu::{
     widget::field::optional::{make_options_buffer_from_array, OptionsBuffer},
 };
 
-use super::flash_texts::{ABERTO, CONTINUO, DESLIGADO, FECHADO, LIGADO, PASSO_A_PASSO};
+use super::flash_texts::{
+    ABERTO, B2400, B9600, CONTINUO, DESLIGADO, FECHADO, LIGADO, PASSO_A_PASSO,
+};
 
 /// A storage for variable Options existent on the menu system
 /// TODO: Eventually move this to a more appropriate place (ie: ".\widget/field/optional.rs")
@@ -23,5 +25,9 @@ impl Options {
 
     pub fn aberto_fechado() -> OptionsBuffer {
         make_options_buffer_from_array([FlashString::new(&ABERTO), FlashString::new(&FECHADO)])
+    }
+
+    pub fn baudrate_2400_9600() -> OptionsBuffer {
+        make_options_buffer_from_array([FlashString::new(&B2400), FlashString::new(&B9600)])
     }
 }

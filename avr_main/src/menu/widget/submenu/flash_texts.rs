@@ -22,8 +22,9 @@ progmem! {
     //pub static progmem string CONFIGURACAO_DO_EQUIPAMENTO =     "Configuracao do equipamento ...";
     //pub static progmem string ROTINAS_DE_TESTES_E_VERIFICACAO = "Rotinas de testes e verificacao ...";
 
-    pub static progmem string EDITAR_PROGRAMA_EIXO_X = "Editar programa eixo X";
-    pub static progmem string CONFIGURACAO_EIXO_X = "Configuracao eixo X";
+    pub static progmem string EDITAR_PROGRAMA_EIXO_X = "Editar programa eixo X...";
+    pub static progmem string CONFIGURACAO_EIXO_X = "Configuracao eixo X...";
+    pub static progmem string CONFIGURACAO_DO_EQUIPAMENTO = "Configuracao do equipamento...";
 
 
     //ARQUIVO DE EIXO
@@ -101,6 +102,11 @@ progmem! {
     pub static progmem string REFERENCIA_PELO_START_EXTERNO = "Referencia pelo start externo";
     pub static progmem string MODO_TURBO_X = "Modo Turbo X";
 
+    // MENU CONFIGURACAO DO EQUIPAMENTO
+
+    pub static progmem string VELOCIDADE_DE_COMUNICACAO = "Velocidade de comunicacao";
+
+
 
     // OPTIONAL PARAMETER'S TEXT
 
@@ -114,6 +120,8 @@ progmem! {
     pub static progmem string PASSO_A_PASSO = "PasPas";
     pub static progmem string ABERTO =  "Aberto";
     pub static progmem string FECHADO = "Fechad";
+    pub static progmem string B2400 = "2400";
+    pub static progmem string B9600 = "9600";
 
 
     //NOTE: it is possible to load any type in progmem not only strings

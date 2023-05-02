@@ -390,11 +390,61 @@ impl Default for ConfiguracaoDoEixo {
 
 ///
 
+pub struct ConfiguracaoDoEquipamento {
+    pub velocidade_de_comunicacao: Cell<Cursor>,
+}
+
+impl Default for ConfiguracaoDoEquipamento {
+    fn default() -> Self {
+        Self {
+            velocidade_de_comunicacao: Cell::new(Cursor::new(0, 2, 1)),
+        }
+    }
+}
+
+impl EepromStorable for ConfiguracaoDoEquipamento {
+    const SIGNATURE: u16 = 0x0C00;
+
+    fn save_into_eeprom(&self, mut initial_address: EepromAddress) -> (EepromAddress, u8) {
+        let next = initial_address
+            .write_u16(Self::SIGNATURE)
+            .write_cursor(self.velocidade_de_comunicacao.get());
+
+        let size_of_bytes_written = next.0 - initial_address.0;
+        (next, size_of_bytes_written)
+    }
+
+    fn load_from_eeprom(&mut self, initial_address: EepromAddress) -> (EepromAddress, u8) {
+        let next = initial_address;
+        let (signature, next) = next.read_u16();
+
+        let signature_is_valid = signature == Self::SIGNATURE;
+
+        if signature_is_valid {
+            let (value, next) = next.read_cursor();
+            self.velocidade_de_comunicacao.set(value);
+
+            //
+            let size_of_bytes_loadded = next.0 - initial_address.0;
+            (next, size_of_bytes_loadded)
+        } else {
+            // EEPROM is not initialized yet
+            // Then initialize it.
+
+            Self::default().save_into_eeprom(initial_address);
+            self.load_from_eeprom(initial_address)
+        }
+    }
+}
+
+///
+
 pub struct DataStorage {
     pub arquivo_de_eixo_x: ArquivoDeEixo,
     //pub arquivo_de_eixo_y: ArquivoDeEixo,
     pub configuracao_do_eixo_x: ConfiguracaoDoEixo,
     //pub configuracao_do_eixo_y: ConfiguracaoDoEixo,
+    pub configuracao_do_equipamento: ConfiguracaoDoEquipamento,
 }
 
 impl DataStorage {
@@ -410,6 +460,7 @@ impl DataStorage {
             //arquivo_de_eixo_y: ArquivoDeEixo::default(),
             configuracao_do_eixo_x: ConfiguracaoDoEixo::default(),
             //configuracao_do_eixo_y: ConfiguracaoDoEixo::default(),
+            configuracao_do_equipamento: ConfiguracaoDoEquipamento::default(),
         }
     }
 
@@ -428,7 +479,8 @@ impl DataStorage {
             .arquivo_de_eixo_x
             .save_into_eeprom(Self::INITIAL_ADDRESS);
 
-        let (_next, _size) = self.configuracao_do_eixo_x.save_into_eeprom(next);
+        let (next, _size) = self.configuracao_do_eixo_x.save_into_eeprom(next);
+        let (_next, _size) = self.configuracao_do_equipamento.save_into_eeprom(next);
     }
 
     /// loads data from EEPROM
@@ -436,7 +488,8 @@ impl DataStorage {
         let (next, _address) = self
             .arquivo_de_eixo_x
             .load_from_eeprom(Self::INITIAL_ADDRESS);
-        let (_next, _size) = self.configuracao_do_eixo_x.load_from_eeprom(next);
+        let (next, _size) = self.configuracao_do_eixo_x.load_from_eeprom(next);
+        let (_next, _size) = self.configuracao_do_equipamento.load_from_eeprom(next);
     }
 }
 
@@ -447,6 +500,7 @@ pub struct CmppData<'a> {
     configuracao_de_eixo: &'a ConfiguracaoDoEixo,
 }
 
+/// Sends all local cmpp parameters to the cmpp board (iterator)
 pub struct SendAllIterator<'a> {
     // counts the current item to sent (starts at index -1 and it pre-increments counter)
     counter: i8,

@@ -33,6 +33,7 @@ pub enum MenuProgramaHandle {
     MenuConfiguracaoDaImpressora,
     MenuIntertravamentoParaDoisEixos,
     MenuConfiguracaoDeEixo,
+    MenuConfiguracaoDoEquipamento,
 }
 
 /// Used to store the navigation state of the submenu alongside the submenu itself
@@ -80,6 +81,7 @@ pub struct MenuProgramaStorage<'a> {
     pub MenuIntertravamentoParaDoisEixos: Register<MenuIntertravamentoParaDoisEixos<'a>>,
     //pub MenuParametrosDeSelecaoDeMensagem: Register<MenuParametrosDeSelecaoDeMensagem>,
     pub MenuConfiguracaoDoEixo: Register<MenuConfiguracaoDeEixo<'a>>,
+    pub MenuConfiguracaoDoEquipamento: Register<MenuConfiguracaoDoEquipamento<'a>>,
 }
 
 impl<'a> MenuProgramaStorage<'a> {
@@ -99,6 +101,9 @@ impl<'a> MenuProgramaStorage<'a> {
                 MenuIntertravamentoParaDoisEixos::new(model),
             ),
             MenuConfiguracaoDoEixo: Register::from_menu(MenuConfiguracaoDeEixo::new(model)),
+            MenuConfiguracaoDoEquipamento: Register::from_menu(MenuConfiguracaoDoEquipamento::new(
+                model,
+            )),
         }
     }
 
@@ -130,6 +135,9 @@ impl<'a> MenuProgramaStorage<'a> {
             }
             MenuProgramaHandle::MenuConfiguracaoDeEixo => {
                 self.MenuConfiguracaoDoEixo.get_item(index)
+            }
+            MenuProgramaHandle::MenuConfiguracaoDoEquipamento => {
+                self.MenuConfiguracaoDoEquipamento.get_item(index)
             }
         }
     }
@@ -164,6 +172,9 @@ impl<'a> MenuProgramaStorage<'a> {
 
             MenuProgramaHandle::MenuConfiguracaoDeEixo => {
                 self.MenuConfiguracaoDoEixo.get_navigation_state()
+            }
+            MenuProgramaHandle::MenuConfiguracaoDoEquipamento => {
+                self.MenuConfiguracaoDoEquipamento.get_navigation_state()
             }
         }
     }
@@ -207,6 +218,12 @@ impl SubmenuLayout for MenuPrograma<'_> {
             1 => Some(
                 MenuItemBuilder::from_text(&CONFIGURACAO_EIXO_X)
                     .add_conection_to_submenu(MenuProgramaHandle::MenuConfiguracaoDeEixo)
+                    .build(),
+            ),
+
+            2 => Some(
+                MenuItemBuilder::from_text(&CONFIGURACAO_DO_EQUIPAMENTO)
+                    .add_conection_to_submenu(MenuProgramaHandle::MenuConfiguracaoDoEquipamento)
                     .build(),
             ),
 
@@ -852,6 +869,53 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                     .build(),
             ),
 
+            _ => None,
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//          MENU CONFIGURACAO DO EQUIPAMENTO
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+pub struct MenuConfiguracaoDoEquipamento<'a> {
+    model: &'a DataStorage,
+}
+
+impl<'a> MenuConfiguracaoDoEquipamento<'a> {
+    pub const fn new(model: &'a DataStorage) -> Self {
+        Self { model }
+    }
+}
+
+impl SubmenuLayout for MenuConfiguracaoDoEquipamento<'_> {
+    fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
+        match index {
+            0 => Some(
+                MenuItemBuilder::from_text(&VELOCIDADE_DE_COMUNICACAO)
+                    .add_optional_variable(
+                        &self
+                            .model
+                            .configuracao_do_equipamento
+                            .velocidade_de_comunicacao,
+                        Options::baudrate_2400_9600(),
+                        32,
+                    )
+                    .build(),
+            ),
+            // TODO: Remove the need of this duplicated parameter when possible
+            1 => Some(
+                MenuItemBuilder::from_text(&VELOCIDADE_DE_COMUNICACAO)
+                    .add_optional_variable(
+                        &self
+                            .model
+                            .configuracao_do_equipamento
+                            .velocidade_de_comunicacao,
+                        Options::baudrate_2400_9600(),
+                        32,
+                    )
+                    .build(),
+            ),
             _ => None,
         }
     }
