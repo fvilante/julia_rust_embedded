@@ -18,6 +18,11 @@ impl Channel {
         }
     }
 
+    /// Creates a cmpp Channel from a 16 bits word
+    pub fn from_u16(number: u16) -> Result<Channel, DLError> {
+        Self::from_u8(number as u8)
+    }
+
     /// This function creates an Channel but do not perform validation on the given number.
     ///
     /// If a number equal or greater then Self::MAX_CHANNELS is given,
