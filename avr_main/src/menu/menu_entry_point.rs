@@ -2,6 +2,7 @@ use super::model::DataStorage;
 use super::widget::submenu::render::MenuProgramaRender;
 use crate::board::keyboard::KeyCode;
 use crate::board::peripherals::Peripherals;
+use crate::cmpp::datalink;
 use crate::menu::point::Point;
 use crate::menu::widget::execucao::MenuExecucao;
 use crate::menu::widget::main_menu::MainMenu;
@@ -28,12 +29,15 @@ fn emit_print_go_signal(transport: &TransportLayer) {
     }
 }
 
+/// TODO: Make this a type
+type Baudrate = u32;
+
 /// High-level cmpp driver  
 ///
 /// Represents an entire Cmpp Axis System, including unit of measurement convertion
 struct CmppAxis {
     mechanical_properties: MechanicalProperties,
-    baudrate: u32,
+    baudrate: Baudrate,
     channel: Channel,
     datalink: Datalink,
 }
@@ -84,11 +88,34 @@ pub fn development_entry_point() -> ! {
     // ////////////////////////////////////////////////////////////////////
 
     // ////////////////////////////////////////
+    //  Start main data storage
+    // ////////////////////////////////////////
+    //
+    let mut data_storage = DataStorage::new();
+    data_storage.load_from_eeprom();
+
+    // ////////////////////////////////////////
     // initialize peripherals
     // ////////////////////////////////////////
     //
-    let baudrate = 2400; // FIX: 2400 is not working, the problem seems to be in the register's port setup configuration
-    let peripherals = Peripherals::new(baudrate);
+
+    // Serial port
+    // TODO: Abstract and Improve readability of this initialization
+    const B2400_CODE: u8 = 0;
+    let baudrate_code = data_storage
+        .configuracao_do_equipamento
+        .velocidade_de_comunicacao
+        .get()
+        .get_current();
+    let baudrate = if baudrate_code == B2400_CODE {
+        2400
+    } else {
+        9600
+    };
+    serial::init(baudrate);
+
+    // other peripherals
+    let peripherals = Peripherals::new();
     let mut front_panel = peripherals.get_front_panel();
     let mut keyboard = peripherals.get_keyboard();
     let mut canvas = peripherals.get_canvas();
@@ -109,13 +136,6 @@ pub fn development_entry_point() -> ! {
     let channel = Channel::from_u8(0).unwrap_or_default();
     let cmpp_axis = CmppAxis::new(baudrate, channel, TIMEOUT_MS, mechanical_properties);
     let transport = cmpp_axis.get_transport_layer();
-
-    // ////////////////////////////////////////
-    //  CPU data storage
-    // ////////////////////////////////////////
-    //
-    let mut data_storage = DataStorage::new();
-    data_storage.load_from_eeprom();
 
     // ///////////////////////////////////////
     //  Main menu mounting

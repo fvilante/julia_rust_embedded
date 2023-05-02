@@ -9,12 +9,13 @@ use super::{input_expander::InputExpander, lcd, output_expander::OutputExpander}
 /// On board peripherals initialization:
 ///
 ///   * Timer interruption (at 1khz)
-///   * Serial port
 ///   * Lcd display
 ///   * Input & output ports expander
 ///   * Front panel
 ///   * Keyboard
 ///   * Canvas
+///
+/// NOTE: We are initializing serial port in other place, not here.
 pub struct Peripherals {
     output_expander: OutputExpander,
     input_expander: InputExpander,
@@ -24,15 +25,14 @@ impl<'a> Peripherals {
     /// Initialize peripherals
     ///
     /// NOTE: Call this function once during the entire lifetime of the program
-    pub fn new(baud_rate: u32) -> Self {
+    pub fn new() -> Self {
         ////////////////////////////////
         // Low Level initialization
         ////////////////////////////////
 
         // Initialize timer couting (1khz)
         init_timer();
-        // Serial port
-        serial::init(baud_rate);
+
         // Lcd display
         lcd::lcd_initialize();
         // Initialize on-board IO Expander

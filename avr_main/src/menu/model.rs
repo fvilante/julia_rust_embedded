@@ -391,13 +391,13 @@ impl Default for ConfiguracaoDoEixo {
 ///
 
 pub struct ConfiguracaoDoEquipamento {
-    pub velocidade_de_comunicacao: Cell<Cursor>,
+    pub velocidade_de_comunicacao: Cell<Cursor>, // 0 => 2400, 1 => 9600
 }
 
 impl Default for ConfiguracaoDoEquipamento {
     fn default() -> Self {
         Self {
-            velocidade_de_comunicacao: Cell::new(Cursor::new(0, 2, 1)),
+            velocidade_de_comunicacao: Cell::new(Cursor::new(0, 2, 0)),
         }
     }
 }
