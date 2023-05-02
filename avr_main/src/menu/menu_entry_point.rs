@@ -133,7 +133,8 @@ pub fn development_entry_point() -> ! {
         number_of_tooths_of_motor_pulley: 16,
     };
 
-    let channel = Channel::from_u8(0).unwrap_or_default();
+    let ch = data_storage.configuracao_do_eixo_x.numero_do_canal.get();
+    let channel = Channel::from_u8(ch as u8).unwrap_or_default();
     let cmpp_axis = CmppAxis::new(baudrate, channel, TIMEOUT_MS, mechanical_properties);
     let transport = cmpp_axis.get_transport_layer();
 
