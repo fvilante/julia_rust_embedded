@@ -285,6 +285,26 @@ pub struct ConfiguracaoDoEixo {
     pub modo_turbo: Cell<Cursor>,
 }
 
+impl Default for ConfiguracaoDoEixo {
+    fn default() -> Self {
+        Self {
+            numero_do_canal: Cell::new(0),
+            numero_de_pulso_do_giro: Cell::new(400),
+            janela_de_protecao_do_giro: Cell::new(50),
+            deslocamento_giro_do_motor: Cell::new(8100),
+            giro_com_funcao_de_protecao: Default::default(),
+            giro_com_funcao_de_correcao: Default::default(),
+            logica_do_start_externo: Default::default(),
+            valor_da_posicao_de_referencia: Cell::new(50),
+            velocidade_para_referencia: Cell::new(500),
+            aceleracao_para_referencia: Cell::new(5000),
+            reducao_da_corrente_em_repouso: Default::default(),
+            referencia_pelo_start_externo: Default::default(),
+            modo_turbo: Default::default(),
+        }
+    }
+}
+
 impl EepromStorable for ConfiguracaoDoEixo {
     const SIGNATURE: u16 = 0xB000;
 
@@ -364,26 +384,6 @@ impl EepromStorable for ConfiguracaoDoEixo {
 
             Self::default().save_into_eeprom(initial_address);
             self.load_from_eeprom(initial_address)
-        }
-    }
-}
-
-impl Default for ConfiguracaoDoEixo {
-    fn default() -> Self {
-        Self {
-            numero_do_canal: Cell::new(0),
-            numero_de_pulso_do_giro: Cell::new(400),
-            janela_de_protecao_do_giro: Cell::new(50),
-            deslocamento_giro_do_motor: Cell::new(8100),
-            giro_com_funcao_de_protecao: Default::default(),
-            giro_com_funcao_de_correcao: Default::default(),
-            logica_do_start_externo: Default::default(),
-            valor_da_posicao_de_referencia: Cell::new(50),
-            velocidade_para_referencia: Cell::new(500),
-            aceleracao_para_referencia: Cell::new(5000),
-            reducao_da_corrente_em_repouso: Default::default(),
-            referencia_pelo_start_externo: Default::default(),
-            modo_turbo: Default::default(),
         }
     }
 }
