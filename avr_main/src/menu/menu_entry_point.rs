@@ -87,7 +87,7 @@ pub fn development_entry_point() -> ! {
     // initialize peripherals
     // ////////////////////////////////////////
     //
-    let baudrate = 9600; // FIX: 2400 is not working, the problem seems to be in the register's port setup configuration
+    let baudrate = 2400; // FIX: 2400 is not working, the problem seems to be in the register's port setup configuration
     let peripherals = Peripherals::new(baudrate);
     let mut front_panel = peripherals.get_front_panel();
     let mut keyboard = peripherals.get_keyboard();
