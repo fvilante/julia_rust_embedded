@@ -22,7 +22,7 @@ use lib_1::utils::cursor::Cursor;
 const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 6;
 
 /// A string buffer with static capacity defined and stack allocated
-pub(super) type StringBuffer = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
+pub type StringBuffer = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
 
 /// Represents a variable length  data, in memory, though a sequence of characters (ie: numbers, texts).
 ///
