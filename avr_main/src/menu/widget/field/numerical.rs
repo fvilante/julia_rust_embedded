@@ -22,28 +22,28 @@ use lib_1::utils::cursor::Cursor;
 const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 6;
 
 /// A string buffer with static capacity defined and stack allocated
-pub type StringBuffer = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
+pub type FieldBuffer = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
 
 /// Represents a variable length  data, in memory, though a sequence of characters (ie: numbers, texts).
 ///
 /// This type is a wrapper over the [`StringBuffer`] type
 pub struct Content {
-    data: StringBuffer,
+    data: FieldBuffer,
 }
 
 impl Content {
-    fn from_raw(data: StringBuffer) -> Self {
+    fn from_raw(data: FieldBuffer) -> Self {
         Self { data }
     }
 
     /// New empty content
     pub fn new() -> Self {
-        Self::from_raw(StringBuffer::new())
+        Self::from_raw(FieldBuffer::new())
     }
 
     /// Constructs from [`&str`] returns None if str is greater than buffer capacity (see: [`MAX_NUMBER_OF_CHARS_IN_BUFFER`])
     pub fn from_str(s: &str) -> Option<Self> {
-        if let Ok(data) = StringBuffer::from_str(s) {
+        if let Ok(data) = FieldBuffer::from_str(s) {
             Some(Self::from_raw(data))
         } else {
             None
