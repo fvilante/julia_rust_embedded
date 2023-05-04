@@ -23,12 +23,9 @@ pub fn make_options_buffer_from_array<const ARRAY_SIZE: usize>(
 ) -> OptionsBuffer {
     let mut options: OptionsBuffer = Vec::new();
     for item in options_list {
-        match options.push(item) {
-            Ok(_) => {}
-            Err(_) => {
-                panic!("E10");
-                // Error: Vector size not enough. Change 'OptionsBuffer' size to a higher value.
-            }
+        if let Err(_) = options.push(item) {
+            // Error: Vector size not enough. Change 'OptionsBuffer' size to a higher value.
+            panic!("E10");
         }
     }
     options
@@ -38,12 +35,12 @@ pub struct OptionEditorWidget<'a> {
     options: OptionsBuffer,
     editing_selection: Cursor,
     blink: RectangularWave,
-    edit_mode: EditMode,
+    is_in_edit_mode_: bool,
     variable: &'a Cell<Cursor>,
 }
 
 impl<'a> OptionEditorWidget<'a> {
-    pub fn new(variable: &'a Cell<Cursor>, options: OptionsBuffer, is_in_edit_mode: bool) -> Self {
+    pub fn new(variable: &'a Cell<Cursor>, options: OptionsBuffer, is_in_edit_mode_: bool) -> Self {
         const T_ON: u16 = 600;
         const T_OFF: u16 = 300;
         let initial_value = variable.get();
@@ -51,7 +48,7 @@ impl<'a> OptionEditorWidget<'a> {
             options: options.clone(),
             editing_selection: initial_value,
             blink: RectangularWave::new(T_ON, T_OFF),
-            edit_mode: EditMode::new(is_in_edit_mode),
+            is_in_edit_mode_,
             variable,
         }
     }
@@ -92,27 +89,13 @@ impl Saveble for OptionEditorWidget<'_> {
 
 impl Editable for OptionEditorWidget<'_> {
     fn set_edit_mode(&mut self, value: bool) {
-        self.edit_mode.set_edit_mode(value)
+        self.is_in_edit_mode_ = value;
     }
 
     fn is_in_edit_mode(&self) -> bool {
-        self.edit_mode.is_in_edit_mode()
+        self.is_in_edit_mode_
     }
 }
-
-/* impl Optional<'_> {
-    pub fn abort_edition(&mut self) {
-        let recupered_info = self.original_cursor.clone();
-        self.editing_cursor = recupered_info.clone(); // resets cursor
-        *self.variable = recupered_info; // saves it
-    }
-
-    pub fn save_edition(&mut self) {
-        let info_to_save = self.editing_cursor.clone();
-        self.original_cursor = info_to_save.clone();
-        *self.variable = info_to_save;
-    }
-} */
 
 impl Widget for OptionEditorWidget<'_> {
     fn send_key(&mut self, key: KeyCode) {

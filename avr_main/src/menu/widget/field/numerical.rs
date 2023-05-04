@@ -1,3 +1,4 @@
+/// This module is made to represent a numerical widget
 use core::cell::Cell;
 use core::ops::Range;
 use core::str::{CharIndices, Chars, FromStr};
@@ -17,17 +18,16 @@ use super::edit_mode::EditMode;
 use lib_1::utils::cursor::Cursor;
 
 /// Sets the max size of the [`Content`] type
-///
 /// NOTE: Do not choose a number less than 5 else you cannot represent u16 data types in its decimal representation (ie: 65535)
 const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 6;
 
 /// A string buffer with static capacity defined and stack allocated
-pub type FieldBuffer = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
+/// NOTE: The `String` type here is not from the standard lib but from a lib named `heapless`.
+type FieldBuffer = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
 
 /// Represents a variable length  data, in memory, though a sequence of characters (ie: numbers, texts).
-///
-/// This type is a wrapper over the [`StringBuffer`] type
-pub struct Content {
+/// This type is a wrapper over the [`FieldBuffer`] type
+struct Content {
     data: FieldBuffer,
 }
 
@@ -37,12 +37,12 @@ impl Content {
     }
 
     /// New empty content
-    pub fn new() -> Self {
+    fn new() -> Self {
         Self::from_raw(FieldBuffer::new())
     }
 
     /// Constructs from [`&str`] returns None if str is greater than buffer capacity (see: [`MAX_NUMBER_OF_CHARS_IN_BUFFER`])
-    pub fn from_str(s: &str) -> Option<Self> {
+    fn from_str(s: &str) -> Option<Self> {
         if let Ok(data) = FieldBuffer::from_str(s) {
             Some(Self::from_raw(data))
         } else {
@@ -51,9 +51,8 @@ impl Content {
     }
 
     /// Converts an [`u16`] to a [`Content`] and format the resulting number to the specified `number_of_digits`
-    ///
     /// TODO: Use `number_of_digits` to represent the max digits you want for your u16 representation
-    /// If the `u16` value is greater than max size that `number_of_digits` can contain, than than
+    /// If the `u16` value is greater than max size that `number_of_digits` can contain, than
     /// the u16 will be clamped silently.
     fn from_u16_formated(data: u16, number_of_digits: u8) -> Content {
         const BLACKET_CHAR: char = '0';
@@ -61,7 +60,7 @@ impl Content {
         let base = Content::from_str(s.as_str()).unwrap();
         let mut temp = Content::new();
         //leading zeros
-        let len = usize_to_u8_clamper(base.len());
+        let len = base.len();
         for _ in len..number_of_digits {
             temp.push(BLACKET_CHAR);
         }
@@ -72,8 +71,7 @@ impl Content {
         temp
     }
 
-    /// Converts a [`Content`] that is supposed to contains an number into an [`u16`] value
-    ///
+    /// Converts a [`Content`] that is supposed to contains an number into an [`u16`] value.
     /// If [`Content`] does not contains a number or if the convertion is not possible returns zero
     fn to_u16(&self) -> u16 {
         self.parse::<u16>().unwrap_or(0)
@@ -81,11 +79,9 @@ impl Content {
 
     // ============== [ wrapping over heapless::String methods ] ================
 
-    /// Returns lenght of Content.
-    ///
-    /// It must be less or equal to [`MAX_NUMBER_OF_CHARS_IN_BUFFER`]
-    pub fn len(&self) -> usize {
-        self.data.len()
+    /// Returns lenght of Content. It must be less or equal to [`MAX_NUMBER_OF_CHARS_IN_BUFFER`]
+    pub fn len(&self) -> u8 {
+        self.data.len() as u8
     }
 
     pub fn char_indices(&self) -> CharIndices {
@@ -110,7 +106,6 @@ impl Content {
 }
 
 /// A constant sized string that represents some data content being edited by a navigating cursor.
-///
 /// This type is agnostic to the type of data being edited, that means you can use this type to edit numbers and even text
 struct InputEditor {
     /// String content being edited.
@@ -122,7 +117,7 @@ struct InputEditor {
 impl InputEditor {
     pub fn new(initial_content: Content, initial_cursor_position: u8) -> Self {
         let start = 0;
-        let end = usize_to_u8_clamper(initial_content.len());
+        let end = initial_content.len();
         Self {
             cursor: Cursor::new(start, end, initial_cursor_position),
             content: initial_content,
@@ -130,7 +125,7 @@ impl InputEditor {
     }
 
     /// Changes the character in place of the current cursor position to given `new_char`
-    pub fn change_cursor_item_to(&mut self, new_char: char) -> &mut Self {
+    pub fn change_cursor_item_to(&mut self, new_char: char) {
         let current_cursor = self.cursor.get_current();
         let mut s = Content::new();
         for (index, current_char) in self.content.char_indices() {
@@ -141,42 +136,36 @@ impl InputEditor {
             }
         }
         self.content = s.clone();
-        self
     }
 
     /// Move cursor to a single character to the right
-    pub fn move_cursor_right(&mut self) -> &mut Self {
+    pub fn move_cursor_right(&mut self) {
         self.cursor.next();
-        self
     }
 
     /// Move cursor to a single character to the left
-    pub fn move_cursor_left(&mut self) -> &mut Self {
+    pub fn move_cursor_left(&mut self) {
         self.cursor.previous();
-        self
     }
 
     /// Move cursor to the most left-sided character of the [`Content`]
-    pub fn move_cursor_begin(&mut self) -> &mut Self {
+    pub fn move_cursor_begin(&mut self) {
         self.cursor.begin();
-        self
     }
 
     /// Move cursor to the most right-sided character of the [`Content`]
-    pub fn move_cursor_end(&mut self) -> &mut Self {
+    pub fn move_cursor_end(&mut self) {
         self.cursor.end();
-        self
     }
 
     /// Adds an given character in place of current cursor position and increment cursor once to the right
-    pub fn addAndMoveRight(&mut self, item: char) -> &mut Self {
-        self.change_cursor_item_to(item).move_cursor_right()
+    pub fn addAndMoveRight(&mut self, item: char) {
+        self.change_cursor_item_to(item);
+        self.move_cursor_right()
     }
 }
 
-/// Format parameters for [`NumberInputEditor`]
-///
-/// Wrapper of the main parameters of the [`NumberInputEditor`]
+/// Formating parameters for [`NumberInputEditor`] type. Wrapper around the main parameters of the [`NumberInputEditor`]
 #[derive(Copy, Clone)]
 pub struct Format {
     /// Initial admissible value (included)
@@ -184,7 +173,6 @@ pub struct Format {
     /// Final admissible value (excluded)
     pub end: u16,
     /// In what digit cursor should start in. (from left to right, starting at 0 and going until Self::get_number_of_digits)
-    ///
     /// The total number of digits is based in the number of digits necessary to represent the `Format::end` value
     pub initial_cursor_position: u8,
 }
@@ -203,14 +191,14 @@ impl Format {
     }
 }
 
-/// Just decorator around [`InputEditor`] for deal with formated numbers
+/// Just a decorator around [`InputEditor`] for deal with formated numbers
 struct NumberInputEditor {
     content_editor: InputEditor,
     format: Format,
 }
 
 impl NumberInputEditor {
-    /// Private constructor. NOTE: Use method `from_u16` instead
+    /// Private constructor. NOTE: Use method [`Self::from_u16`] instead
     fn new(initial_content: Content, format: Format) -> Self {
         Self {
             content_editor: InputEditor::new(initial_content, format.initial_cursor_position),
@@ -252,9 +240,7 @@ impl NumberInputEditor {
         self.content_editor.cursor.get_current()
     }
     /// Reset cursor to its default initial position
-    ///
     /// NOTE: This method is not necessary the same as begin() method
-    ///
     /// TODO: Remove the necessity of this method being avoiding make the Self alive when no edition is hapenning
     /// by the user (for example when the info is just being show in screen without any edition mode)
     pub fn reset_cursor(&mut self, initial_cursor_position: u8) {
@@ -262,7 +248,7 @@ impl NumberInputEditor {
         cursor.set_current(initial_cursor_position);
     }
 
-    /// An iterator over the [char]s of a [`Unsigned16Editor`], and their positions.
+    /// An iterator over the char's of a [`NumberInputEditor`], and their positions.
     pub fn char_indices(&self) -> CharIndices {
         self.content_editor.content.char_indices()
     }
@@ -274,53 +260,55 @@ impl NumberInputEditor {
 
 /// This [`Widget`] manages the edition of an number (unsigned integer) by the user using the keyboard and lcd display
 pub struct NumberInputEditorWidget<'a> {
-    u16_editor: NumberInputEditor,
+    number_editor: NumberInputEditor,
     /// This class is responsible to generate the blinking character effect
     blink: RectangularWave,
-    edit_mode: EditMode,
+    is_in_edit_mode_: bool,
     variable: &'a Cell<u16>,
 }
 
 impl<'a> NumberInputEditorWidget<'a> {
-    pub fn new(variable: &'a Cell<u16>, format: Format, is_in_edit_mode: bool) -> Self {
+    pub fn new(variable: &'a Cell<u16>, format: Format, is_in_edit_mode_: bool) -> Self {
         const T_ON: u16 = 600;
         const T_OFF: u16 = 300;
-        let __initial_value = variable.get();
+        let initial_value = variable.get();
         Self {
-            u16_editor: NumberInputEditor::from_u16(__initial_value, format.clone()),
+            number_editor: NumberInputEditor::from_u16(initial_value, format.clone()),
             blink: RectangularWave::new(T_ON, T_OFF),
-            edit_mode: EditMode::new(is_in_edit_mode),
+            is_in_edit_mode_,
             variable,
         }
     }
 }
 
 impl Saveble for NumberInputEditorWidget<'_> {
+    /// Restore initial value, discard edited value
     fn restore_value(&mut self) {
         let initial_value = self.variable.get();
-        self.u16_editor.set_u16(initial_value, None);
+        self.number_editor.set_u16(initial_value, None);
     }
 
+    /// Save value being edited
     fn save_value(&mut self) {
-        let edited_value = self.u16_editor.as_u16_clamped();
+        let edited_value = self.number_editor.as_u16_clamped();
         self.variable.set(edited_value);
     }
 }
 
 impl Editable for NumberInputEditorWidget<'_> {
     fn set_edit_mode(&mut self, value: bool) {
-        self.edit_mode.set_edit_mode(value)
+        self.is_in_edit_mode_ = value
     }
 
     fn is_in_edit_mode(&self) -> bool {
-        self.edit_mode.is_in_edit_mode()
+        self.is_in_edit_mode_
     }
 }
 
 impl Widget for NumberInputEditorWidget<'_> {
     fn send_key(&mut self, key: KeyCode) {
         if self.is_in_edit_mode() {
-            let content_editor = &mut self.u16_editor.content_editor;
+            let content_editor = &mut self.number_editor.content_editor;
             match key {
                 // navigation_key left and right
                 KeyCode::KEY_SETA_BRANCA_ESQUERDA => {
@@ -380,14 +368,13 @@ impl Widget for NumberInputEditorWidget<'_> {
 
     fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         canvas.set_cursor(start_point);
-        let is_in_edit_mode = self.is_in_edit_mode();
-        for (position, digit) in self.u16_editor.char_indices() {
+        for (position, digit) in self.number_editor.char_indices() {
             const BLINK_CHAR: char = '_';
             let mut current_char = digit;
             let is_current_char_over_cursor =
-                position == self.u16_editor.get_current_cursor_index() as usize;
+                position == self.number_editor.get_current_cursor_index() as usize;
             let is_time_to_blink = !self.blink.read();
-            if is_current_char_over_cursor && is_time_to_blink && is_in_edit_mode {
+            if is_current_char_over_cursor && is_time_to_blink && self.is_in_edit_mode() {
                 current_char = BLINK_CHAR;
             }
             canvas.print_char(current_char);
