@@ -4,7 +4,6 @@ use super::common::{const_clamp, usize_to_u8_clamper};
 
 /// The purpose of a [`Cursor`] is to statefully move a current unsigned integer around a predefined interval of values
 /// normally defined between start (inclusive) and end (exclusive). Through a serie of defined methods.
-///
 #[derive(Copy, Clone)]
 pub struct Cursor {
     /// varies between start (inclusive) and end (exclusive)
@@ -72,15 +71,15 @@ impl Cursor {
     }
 
     pub fn next_wrap_around(&mut self) {
-        let has_finished = self.next();
-        if has_finished {
+        let has_exausted = self.next();
+        if has_exausted {
             self.begin();
         }
     }
 
     pub fn previous_wrap_around(&mut self) {
-        let has_finished = self.previous();
-        if has_finished {
+        let has_exausted = self.previous();
+        if has_exausted {
             self.end();
         }
     }

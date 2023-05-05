@@ -126,6 +126,8 @@ impl FlashString {
     }
 }
 
+// ***********************************************
+
 pub struct FlashStringIterator {
     flash_string: FlashString,
     counter: u8,
