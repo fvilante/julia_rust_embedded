@@ -4,6 +4,7 @@ pub mod field;
 pub mod main_menu;
 pub mod manual_mode;
 pub mod menu_item;
+pub mod rectangle;
 pub mod splash;
 pub mod submenu;
 pub mod widget;
