@@ -96,11 +96,12 @@ dependencies = [
 
 [[package]]
 name = "avr-progmem"
-version = "0.3.1"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d40dd576c3ebfdb9b2b0acd41787d2beb2dd77d1184077a13d8f6c79ab52aacf"
+checksum = "4026b5cfd2368953bed46ffaa1acc7e4ea398bb7a610743d11895a5187498076"
 dependencies = [
  "cfg-if 1.0.0",
+ "derivative",
  "ufmt",
 ]
 
@@ -179,6 +180,17 @@ name = "critical-section"
 version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6548a0ad5d2549e111e1f6a11a6c2e2d00ce6a3dafe22948d67c2b443f775e52"
+
+[[package]]
+name = "derivative"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fcc3dd5e9e9c0b295d6e1e4d811fb6f157d5ffd784b8d202fc62eac8035a770b"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "embedded-hal"
