@@ -3,9 +3,8 @@ use lib_1::protocol::transport::transport_layer::TransportLayer;
 
 use crate::{
     board::{keyboard::KeyCode, lcd},
-    menu::{canvas::Canvas, model::DataStorage, point::Point},
+    menu::{canvas::Canvas, flash::FlashString, model::DataStorage, point::Point},
     microcontroler::{delay::delay_ms, timer::now},
-    utils::generic_string::GenericString,
 };
 
 use super::widget::Widget;
@@ -115,13 +114,12 @@ impl Splash<'_> {
         match self.current_state {
             State::Initial => {}
             State::BrandName => {
-                canvas.print_xy(Point::new(4, 0), GenericString::from_flash(&TEXT0))
+                canvas.set_cursor(Point::new(4, 0));
+                canvas.print_flash_str(FlashString::new(&TEXT0));
             }
             State::LoadingX => {
-                canvas.print_xy(
-                    Point::new(0, 1),
-                    GenericString::from_flash(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X),
-                );
+                canvas.set_cursor(Point::new(0, 1));
+                canvas.print_flash_str(FlashString::new(&&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X));
                 // TODO: Move this effect to `update` method when possible
                 for response in self.model.send_all(&self.transport) {
                     if let Err(e) = response {
@@ -133,7 +131,10 @@ impl Splash<'_> {
                     }
                 }
             }
-            State::LoadingY => canvas.print_xy(Point::new(0, 0), GenericString::from_flash(&TEXT2)),
+            State::LoadingY => {
+                canvas.set_cursor(Point::new(0, 0));
+                canvas.print_flash_str(FlashString::new(&TEXT2));
+            }
             State::End => {
                 // do nothing
             }

@@ -19,7 +19,6 @@ mod enviroment;
 mod menu;
 mod microcontroler;
 mod panic;
-mod utils;
 
 use lib_1;
 

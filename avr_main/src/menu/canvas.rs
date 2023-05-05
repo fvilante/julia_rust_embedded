@@ -2,7 +2,7 @@ use heapless::String;
 use lib_1::utils::common::convert_u16_to_string_decimal;
 
 use super::{flash::FlashString, point::Point};
-use crate::{board::lcd, utils::generic_string::GenericString};
+use crate::board::lcd;
 
 ///TODO: Reimplement it using [`Cursor`]'s type
 struct CursorPosition {
@@ -118,17 +118,6 @@ impl Canvas {
     pub fn print_string<const N: usize>(&mut self, string: String<N>) {
         for char in string.chars() {
             self.print_char(char);
-        }
-    }
-
-    pub fn print_xy(&mut self, point: Point, generic_string: GenericString) {
-        self.set_cursor(point);
-        self.print_generic_string(generic_string)
-    }
-
-    pub fn print_generic_string(&mut self, string: GenericString) {
-        for byte in string.iter() {
-            self.print_char(byte as char)
         }
     }
 
