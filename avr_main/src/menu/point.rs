@@ -1,3 +1,5 @@
+// **********************************
+
 #[derive(Copy, Clone)]
 pub struct Point<T = u8> {
     pub x: T,
@@ -9,6 +11,15 @@ impl<T> Point<T> {
         Self { x, y }
     }
 }
+
+impl<T> From<(T, T)> for Point<T> {
+    fn from(value: (T, T)) -> Self {
+        let (x, y) = value;
+        Self::new(x, y)
+    }
+}
+
+// **********************************
 
 #[derive(Copy, Clone)]
 pub struct Point1d<T = u8> {
