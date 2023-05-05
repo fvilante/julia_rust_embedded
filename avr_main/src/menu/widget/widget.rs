@@ -15,31 +15,6 @@ pub trait Widget {
     fn draw(&self, canvas: &mut Canvas, start_point: Point);
 }
 
-pub type IWidget<'a> = &'a mut dyn Widget;
-
-/// helper to abstracts pointer manipulation
-pub struct WidgetHelper;
-
-impl WidgetHelper {
-    pub fn send_key(self_widget: &mut Option<IWidget>, key: KeyCode) {
-        if let Some(widget) = &mut *self_widget {
-            widget.send_key(key)
-        }
-    }
-
-    pub fn update(self_widget: &mut Option<IWidget>) {
-        if let Some(widget) = &mut *self_widget {
-            widget.update()
-        }
-    }
-
-    pub fn draw(self_widget: &Option<IWidget>, canvas: &mut Canvas, start_point: Point) {
-        if let Some(widget) = &*self_widget {
-            widget.draw(canvas, start_point)
-        }
-    }
-}
-
 /// Represents an editable type (ie: editable Widget)
 pub trait Editable {
     fn set_edit_mode(&mut self, value: bool);
