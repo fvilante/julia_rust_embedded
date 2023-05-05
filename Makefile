@@ -100,3 +100,8 @@ gource:
 # NOT TESTED YET. TODO: TEST IT! CAUTION TO NOT PERMANENT DELETE SOME USEFUL DATA
 clean:
 	rmdir -Force ./target
+
+# Not implemented yet, but something like following should work:
+# avr-objcopy -O ihex input.elf output.hex
+make_hex_file:
+	
