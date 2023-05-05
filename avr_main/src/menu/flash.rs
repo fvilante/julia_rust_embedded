@@ -15,7 +15,7 @@ progmem! {
 #[derive(Copy, Clone)]
 pub struct FlashString {
     /// This pointer MUST NEVER be dereferenced because it represents a pointer to Flash DOMAIN, but rust does not
-    /// understand it natively. Is the metods in this class to work with this pointer instead of using the pointer
+    /// understand it natively. Use the metods in this class to work with this pointer instead of using the pointer
     /// directly (except if you know what are you doing)
     flash_ptr: *const u8,
     /// Number of characters in the flash_ptr. If zero, than the string is considered empty
