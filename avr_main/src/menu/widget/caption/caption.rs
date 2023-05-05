@@ -1,6 +1,6 @@
 use crate::{
     board::keyboard::KeyCode,
-    menu::{canvas::Canvas, flash::FlashString, point::Point},
+    menu::{canvas::Canvas, flash::FlashString, point::Point, widget::widget::Widget},
 };
 
 pub struct Caption {
@@ -17,16 +17,16 @@ impl Caption {
     }
 }
 
-impl Caption {
-    pub fn send_key(&mut self, _key: KeyCode) {
+impl Widget for Caption {
+    fn send_key(&mut self, _key: KeyCode) {
         // ignore key
     }
 
-    pub fn update(&mut self) {
+    fn update(&mut self) {
         // do nothing
     }
 
-    pub fn draw(&self, canvas: &mut Canvas, start_point: Point) {
+    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
         canvas.set_cursor(start_point);
         for (byte, _index) in self.text.chars_indices() {
             canvas.print_char(byte as char);
