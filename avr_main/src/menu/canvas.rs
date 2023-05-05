@@ -114,13 +114,6 @@ impl Canvas {
         }
     }
 
-    // Attention: this function is designed to be used with 'String' from the 'heapless' library
-    pub fn print_string<const N: usize>(&mut self, string: String<N>) {
-        for char in string.chars() {
-            self.print_char(char);
-        }
-    }
-
     pub fn print_u16(&mut self, value: u16) {
         let string = convert_u16_to_string_decimal(value);
         for current_char in string.chars() {
