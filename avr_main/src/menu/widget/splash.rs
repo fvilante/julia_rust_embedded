@@ -119,7 +119,7 @@ impl Splash<'_> {
             }
             State::LoadingX => {
                 canvas.set_cursor(Point::new(0, 1));
-                canvas.print_iterable(FlashString::new(&&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X));
+                canvas.print_iterable(FlashString::new(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X));
                 // TODO: Move this effect to `update` method when possible
                 for response in self.model.send_all(&self.transport) {
                     if let Err(e) = response {
