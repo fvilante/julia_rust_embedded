@@ -126,6 +126,15 @@ impl FlashString {
     }
 }
 
+impl IntoIterator for FlashString {
+    type Item = (Char, CharIndex);
+    type IntoIter = FlashStringIterator;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.chars_indices()
+    }
+}
+
 // ***********************************************
 
 pub struct FlashStringIterator {

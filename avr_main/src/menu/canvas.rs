@@ -87,8 +87,8 @@ impl Canvas {
         }
     }
 
-    pub fn print_flash_str(&mut self, flash_string: FlashString) {
-        for (char, _index) in flash_string.chars_indices() {
+    pub fn print_flash_str<T: IntoIterator<Item = (u8, u8)>>(&mut self, flash_string: T) {
+        for (char, _index) in flash_string.into_iter() {
             self.print_char(char as char);
         }
     }
