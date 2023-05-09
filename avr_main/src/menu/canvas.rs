@@ -81,7 +81,11 @@ impl Canvas {
     }
 
     /// Prints an iterable that can iterate over some type convertible to u8.
-    pub fn print_iterable<T: IntoIterator<Item = B>, B: Into<u8>>(&mut self, iterable: T) {
+    pub fn print_iterable<T, B>(&mut self, iterable: T)
+    where
+        T: IntoIterator<Item = B>,
+        B: Into<u8>,
+    {
         let iterator = iterable.into_iter();
         for each in iterator {
             let ascii_code: u8 = each.into();
