@@ -80,15 +80,11 @@ impl Canvas {
         self.cursor_position.set(Point::new(0, 0));
     }
 
-    /// Prints a `&str`
-    pub fn print(&mut self, str: &str) {
-        for char in str.chars() {
-            self.print_char(char)
-        }
-    }
-
-    pub fn print_flash_str<T: IntoIterator<Item = u8>>(&mut self, flash_string: T) {
-        for ascii_code in flash_string.into_iter() {
+    /// Prints an iterable that can iterate over some type convertible to u8.
+    pub fn print_iterable<T: IntoIterator<Item = B>, B: Into<u8>>(&mut self, iterable: T) {
+        let iterator = iterable.into_iter();
+        for each in iterator {
+            let ascii_code: u8 = each.into();
             self.print_char(ascii_code as char);
         }
     }

@@ -131,7 +131,7 @@ impl Widget for OptionEditorWidget<'_> {
         let current_index = self.editing_selection.get_current();
         self.blinks_char_if_in_editing_mode(canvas, OPEN_BRACKETS, is_in_editing_mode);
         let flash_string = self.options[current_index as usize];
-        canvas.print_flash_str(flash_string);
+        canvas.print_iterable(flash_string);
         self.blinks_char_if_in_editing_mode(canvas, CLOSE_BRACKETS, is_in_editing_mode);
     }
 }

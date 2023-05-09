@@ -47,15 +47,6 @@ impl FlashString {
         }
     }
 
-    /// Returns the chars indices of this [`FlashString`].
-    /// returns (Char, CharIndex)
-    pub fn chars_indices(&self) -> FlashStringIterator {
-        FlashStringIterator {
-            flash_string: self.clone(),
-            counter: 0,
-        }
-    }
-
     /// Returns the length of this [`FlashString`].
     pub fn len(&self) -> u8 {
         self.length
@@ -78,7 +69,7 @@ impl FlashString {
         let mut is_first_run = true;
         let mut index = 0;
         let mut possible_index = 0;
-        for (current_index, byte) in self.chars_indices().enumerate() {
+        for (current_index, byte) in self.into_iter().enumerate() {
             // if one more byte found.
             if byte as char == pattern[index] {
                 // if first run save current index.
@@ -131,7 +122,10 @@ impl IntoIterator for FlashString {
     type IntoIter = FlashStringIterator;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.chars_indices()
+        FlashStringIterator {
+            flash_string: self.clone(),
+            counter: 0,
+        }
     }
 }
 
