@@ -78,7 +78,7 @@ impl FlashString {
         let mut is_first_run = true;
         let mut index = 0;
         let mut possible_index = 0;
-        for (byte, current_index) in self.chars_indices() {
+        for (current_index, byte) in self.chars_indices().enumerate() {
             // if one more byte found.
             if byte as char == pattern[index] {
                 // if first run save current index.
@@ -90,7 +90,7 @@ impl FlashString {
                             // bound check.
                 if index as usize >= pattern.len() {
                     // does match
-                    return Some(possible_index);
+                    return Some(possible_index as u8);
                 }
             } else {
                 // false match, so reset
@@ -127,7 +127,7 @@ impl FlashString {
 }
 
 impl IntoIterator for FlashString {
-    type Item = (Char, CharIndex);
+    type Item = u8;
     type IntoIter = FlashStringIterator;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -142,26 +142,30 @@ pub struct FlashStringIterator {
     counter: u8,
 }
 
-type Char = u8;
-type CharIndex = u8;
-
 impl Iterator for FlashStringIterator {
-    type Item = (Char, CharIndex);
+    /// ASCII code of the char
+    type Item = u8;
 
-    /// returns (Char, CharIndex)
+    /// Returns the ascii code of the char in a u8 format.
+    /// NOTE: Currently we are only supporting `7-bits ASCII char` no UTF-8 support
     fn next(&mut self) -> Option<Self::Item> {
-        let is_running = self.counter < self.flash_string.length;
-        if is_running {
+        let has_iteration_finished = self.counter >= self.flash_string.length;
+        if !has_iteration_finished {
+            // reads next byte from flash
             let byte = unsafe {
-                // reads next byte from flash
-                ProgMem::new(self.flash_string.flash_ptr.add(self.counter as usize)).load()
+                // points to the start of the text in flash
+                let flash_text_ptr = self.flash_string.flash_ptr;
+                // points to the exact char that is being iterated now
+                let extact_char_pointer = flash_text_ptr.add(self.counter as usize);
+                // loads it from flash to sram memory.
+                ProgMem::new(extact_char_pointer).load()
             };
-            let current_index = self.counter;
-            let next_index = self.counter + 1;
-            let response = (byte, current_index);
-            self.counter = next_index; // updates counter index
-            Some(response)
+            // updates iteration index
+            self.counter += 1;
+            // emit response
+            Some(byte)
         } else {
+            // iterator exaushted
             None
         }
     }
