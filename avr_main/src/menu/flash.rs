@@ -161,7 +161,7 @@ impl Iterator for FlashStringIterator {
             // emit response
             Some(byte)
         } else {
-            // iterator exaushted
+            // iterator has being exausted
             None
         }
     }
