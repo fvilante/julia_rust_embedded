@@ -142,7 +142,7 @@ pub fn development_entry_point() -> ! {
     //  Main menu mounting
     // ///////////////////////////////////////
     //
-    let menu_programa_storage: MenuProgramaStorage = MenuProgramaStorage::new(&data_storage);
+    let menu_programa_storage = MenuProgramaStorage::new(&data_storage);
     let menu_programa_handle = MenuProgramaHandle::MenuPrograma;
     let menu_programa = MenuProgramaRender::new(menu_programa_handle, &menu_programa_storage);
 
