@@ -146,6 +146,8 @@ impl Iterator for FlashStringIterator {
         let has_iteration_finished = self.counter >= self.flash_string.length;
         if !has_iteration_finished {
             // reads next byte from flash
+            // SAFETY: Safety is assured because is garanteed that the index responsible to
+            // point to the string char is less then the length of the string.
             let byte = unsafe {
                 // points to the start of the text in flash
                 let flash_text_ptr = self.flash_string.flash_ptr;
