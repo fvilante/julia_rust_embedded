@@ -1,4 +1,4 @@
-use super::model::DataStorage;
+use super::model::DataModel;
 use super::widget::submenu::render::MenuProgramaRender;
 use crate::board::keyboard::KeyCode;
 use crate::board::peripherals::Peripherals;
@@ -8,7 +8,7 @@ use crate::menu::widget::execucao::MenuExecucao;
 use crate::menu::widget::main_menu::MainMenu;
 use crate::menu::widget::manual_mode::ManualModeMenu;
 use crate::menu::widget::splash::Splash;
-use crate::menu::widget::submenu::spec::{MenuProgramaHandle, MenuProgramaStorage};
+use crate::menu::widget::submenu::spec::{MenuProgramaHandle, MenuProgramaView};
 use crate::menu::widget::widget::Widget;
 use crate::microcontroler::timer::now;
 use crate::microcontroler::{serial, timer};
@@ -91,8 +91,8 @@ pub fn development_entry_point() -> ! {
     //  Start main data storage
     // ////////////////////////////////////////
     //
-    let mut data_storage = DataStorage::new();
-    data_storage.load_from_eeprom();
+    let mut data_model = DataModel::new();
+    data_model.load_from_eeprom();
 
     // ////////////////////////////////////////
     // initialize peripherals
@@ -102,7 +102,7 @@ pub fn development_entry_point() -> ! {
     // Serial port
     // TODO: Abstract and Improve readability of this initialization
     const B2400_CODE: u8 = 0;
-    let baudrate_code = data_storage
+    let baudrate_code = data_model
         .configuracao_do_equipamento
         .velocidade_de_comunicacao
         .get()
@@ -133,7 +133,7 @@ pub fn development_entry_point() -> ! {
         number_of_tooths_of_motor_pulley: 16,
     };
 
-    let ch = data_storage.configuracao_do_eixo_x.numero_do_canal.get();
+    let ch = data_model.configuracao_do_eixo_x.numero_do_canal.get();
     let channel = Channel::from_u16(ch).unwrap_or_default();
     let cmpp_axis = CmppAxis::new(baudrate, channel, TIMEOUT_MS, mechanical_properties);
     let transport = cmpp_axis.get_transport_layer();
@@ -142,9 +142,9 @@ pub fn development_entry_point() -> ! {
     //  Main menu mounting
     // ///////////////////////////////////////
     //
-    let menu_programa_storage = MenuProgramaStorage::new(&data_storage);
+    let menu_programa_view = MenuProgramaView::new(&data_model);
     let menu_programa_handle = MenuProgramaHandle::MenuPrograma;
-    let menu_programa = MenuProgramaRender::new(menu_programa_handle, &menu_programa_storage);
+    let menu_programa = MenuProgramaRender::new(menu_programa_handle, &menu_programa_view);
 
     let menu_manual = ManualModeMenu::new(&transport);
     let menu_execucao = MenuExecucao::new(&transport);
@@ -154,7 +154,7 @@ pub fn development_entry_point() -> ! {
         menu_execucao,
         menu_programa,
         &transport,
-        &data_storage,
+        &data_model,
         &mut front_panel,
     );
 
@@ -162,7 +162,7 @@ pub fn development_entry_point() -> ! {
     //  Show initial splash window
     // ///////////////////////////////////////
     //
-    let mut splash_window = Splash::new(&data_storage, &transport);
+    let mut splash_window = Splash::new(&data_model, &transport);
 
     while splash_window.is_running() {
         if let Some(key) = keyboard.get_key() {

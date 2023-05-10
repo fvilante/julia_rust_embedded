@@ -4,7 +4,7 @@ use lib_1::protocol::transport::transport_layer::TransportLayer;
 use crate::{
     board::{keyboard::KeyCode, lcd},
     enviroment::front_panel::FrontPanel,
-    menu::{canvas::Canvas, flash::FlashString, model::DataStorage, point::Point},
+    menu::{canvas::Canvas, flash::FlashString, model::DataModel, point::Point},
     microcontroler::delay::delay_ms,
 };
 
@@ -35,7 +35,7 @@ pub struct MainMenu<'a> {
     menu_execucao: MenuExecucao<'a>,
     menu_programa: MenuProgramaRender<'a>,
     transport: &'a TransportLayer<'a>,
-    model: &'a DataStorage,
+    model: &'a DataModel,
     //TODO: We're just controling 3 Leds (Execucao, Manual, Programa), better would be to wrap
     //the type 'FrontPanel' into an abstract class.
     front_panel_leds: &'a mut FrontPanel<'a>,
@@ -47,7 +47,7 @@ impl<'a> MainMenu<'a> {
         menu_execucao: MenuExecucao<'a>,
         menu_programa: MenuProgramaRender<'a>,
         transport: &'a TransportLayer<'a>,
-        model: &'a DataStorage,
+        model: &'a DataModel,
         front_panel_leds: &'a mut FrontPanel<'a>,
     ) -> Self {
         Self {

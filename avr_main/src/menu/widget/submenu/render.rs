@@ -7,7 +7,7 @@ use crate::{
         canvas::Canvas,
         point::Point,
         ratangular_wave::RectangularWave,
-        widget::submenu::spec::{MenuProgramaHandle, MenuProgramaStorage},
+        widget::submenu::spec::{MenuProgramaHandle, MenuProgramaView},
     },
     microcontroler::delay::delay_ms,
 };
@@ -21,7 +21,7 @@ use lib_1::utils::common::usize_to_u8_clamper;
 /// TODO: Improve error handling
 pub struct MenuProgramaRender<'a> {
     /// List of all submenu items.
-    menu_storage: &'a MenuProgramaStorage<'a>,
+    menu_view: &'a MenuProgramaView<'a>,
     current_menu: MenuProgramaHandle,
     /// State of widgets which are currently mounted on screen.
     /// TODO: Is not necessary to have two MenuItemWidget states on memory but just one. Introduce some logic when possible
@@ -39,11 +39,11 @@ pub struct MenuProgramaRender<'a> {
 }
 
 impl<'a> MenuProgramaRender<'a> {
-    pub fn new(submenu_handle: MenuProgramaHandle, menu_storage: &'a MenuProgramaStorage) -> Self {
+    pub fn new(submenu_handle: MenuProgramaHandle, menu_view: &'a MenuProgramaView) -> Self {
         const T_ON: u16 = 500;
         const T_OFF: u16 = 500;
 
-        let Some(menu_storage_item_0) =  menu_storage.get_item(submenu_handle, 0) else {
+        let Some(menu_storage_item_0) =  menu_view.get_item(submenu_handle, 0) else {
             // TODO: Improve error handling
             lcd::clear();
             lcd::print("err44");
@@ -51,7 +51,7 @@ impl<'a> MenuProgramaRender<'a> {
             panic!()
         };
 
-        let Some(menu_storage_item_1) =  menu_storage.get_item(submenu_handle, 1) else {
+        let Some(menu_storage_item_1) =  menu_view.get_item(submenu_handle, 1) else {
             // TODO: Improve error handling
             lcd::clear();
             lcd::print("err33");
@@ -60,7 +60,7 @@ impl<'a> MenuProgramaRender<'a> {
         };
 
         Self {
-            menu_storage,
+            menu_view,
             mounted: [menu_storage_item_0, menu_storage_item_1],
             current_menu: submenu_handle,
             navigation_path: Vec::new(),
@@ -73,9 +73,7 @@ impl<'a> MenuProgramaRender<'a> {
     /// NOTE: Any modification on the copy will not reflect in the official state.
     /// TODO: Refactor this concept when possible.
     fn get_navigation_state(&self) -> NavigationState {
-        self.menu_storage
-            .get_navigation_state(self.current_menu)
-            .get()
+        self.menu_view.get_navigation_state(self.current_menu).get()
     }
 
     /// Updates the navigation state of current sub_menu by applying update_fn on it
@@ -83,10 +81,10 @@ impl<'a> MenuProgramaRender<'a> {
         &self,
         update_fn: fn(NavigationState, menu_length: u8) -> NavigationState,
     ) {
-        let menu_length = usize_to_u8_clamper(self.menu_storage.len(self.current_menu));
+        let menu_length = usize_to_u8_clamper(self.menu_view.len(self.current_menu));
         let current_nav_state = self.get_navigation_state();
         let updated_nav_state = update_fn(current_nav_state, menu_length);
-        self.menu_storage
+        self.menu_view
             .get_navigation_state(self.current_menu)
             .set(updated_nav_state)
     }
@@ -96,7 +94,7 @@ impl<'a> MenuProgramaRender<'a> {
         for lcd_line in LcdLine::iterator() {
             let index = self.get_navigation_state().get_current_index_for(lcd_line) as usize;
             let Some(menu_item_widget) = self
-                .menu_storage
+                .menu_view
                 .get_item(self.current_menu, index)
                 else {
                     // TODO: Improve error handling
@@ -227,7 +225,7 @@ impl<'a> MenuProgramaRender<'a> {
 
 impl MenuProgramaRender<'_> {
     pub fn clone_from(&mut self, origin: Self) {
-        self.menu_storage = origin.menu_storage;
+        self.menu_view = origin.menu_view;
         self.current_menu = origin.current_menu;
         self.mounted = origin.mounted;
     }

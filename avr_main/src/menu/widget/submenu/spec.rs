@@ -12,7 +12,7 @@ use crate::menu::flash::FlashString;
 
 use super::{
     super::super::{
-        model::DataStorage,
+        model::DataModel,
         widget::{menu_item::builder::MenuItemBuilder, menu_item::menu_item::MenuItemWidget},
     },
     core::SubmenuLayout,
@@ -75,8 +75,8 @@ impl<T: SubmenuLayout> SubmenuLayout for Register<T> {
 
 /// The storage for all sub menus inside the submenu 'Programa'. If you create a new sub menu you must put it here.
 /// TODO: May change name to `MenuRegister`
-pub struct MenuProgramaStorage<'a> {
-    model: &'a DataStorage,
+pub struct MenuProgramaView<'a> {
+    model: &'a DataModel,
 
     pub MenuPrograma: Register<MenuPrograma<'a>>,
 
@@ -92,9 +92,9 @@ pub struct MenuProgramaStorage<'a> {
     pub MenuConfiguracaoDoEquipamento: Register<MenuConfiguracaoDoEquipamento<'a>>,
 }
 
-impl<'a> MenuProgramaStorage<'a> {
+impl<'a> MenuProgramaView<'a> {
     /// Constructs all the menus and initializes its internal state
-    pub fn new(model: &'a DataStorage) -> Self {
+    pub fn new(model: &'a DataModel) -> Self {
         Self {
             model,
             MenuPrograma: Register::from_menu(MenuPrograma::new(model)),
@@ -205,11 +205,11 @@ impl<'a> MenuProgramaStorage<'a> {
 ////////////////////////////////////////////////////
 
 pub struct MenuPrograma<'a> {
-    model: &'a DataStorage,
+    model: &'a DataModel,
 }
 
 impl<'a> MenuPrograma<'a> {
-    pub const fn new(model: &'a DataStorage) -> Self {
+    pub const fn new(model: &'a DataModel) -> Self {
         Self { model }
     }
 }
@@ -245,11 +245,11 @@ impl SubmenuLayout for MenuPrograma<'_> {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 pub struct MenuArquivoDeEixo<'a> {
-    model: &'a DataStorage,
+    model: &'a DataModel,
 }
 
 impl<'a> MenuArquivoDeEixo<'a> {
-    pub const fn new(model: &'a DataStorage) -> Self {
+    pub const fn new(model: &'a DataModel) -> Self {
         Self { model }
     }
 }
@@ -295,11 +295,11 @@ impl SubmenuLayout for MenuArquivoDeEixo<'_> {
 ////////////////////////////////////////////////////
 
 pub struct MenuParametrosDeMovimento<'a> {
-    model: &'a DataStorage,
+    model: &'a DataModel,
 }
 
 impl<'a> MenuParametrosDeMovimento<'a> {
-    pub const fn new(model: &'a DataStorage) -> Self {
+    pub const fn new(model: &'a DataModel) -> Self {
         Self { model }
     }
 }
@@ -379,11 +379,11 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
 ////////////////////////////////////////////////////
 
 pub struct MenuParametrosDeImpressao<'a> {
-    model: &'a DataStorage,
+    model: &'a DataModel,
 }
 
 impl<'a> MenuParametrosDeImpressao<'a> {
-    pub const fn new(model: &'a DataStorage) -> Self {
+    pub const fn new(model: &'a DataModel) -> Self {
         Self { model }
     }
 }
@@ -465,11 +465,11 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
 ////////////////////////////////////////////////////
 
 pub struct MenuParametrosDeCiclo<'a> {
-    model: &'a DataStorage,
+    model: &'a DataModel,
 }
 
 impl<'a> MenuParametrosDeCiclo<'a> {
-    pub const fn new(model: &'a DataStorage) -> Self {
+    pub const fn new(model: &'a DataModel) -> Self {
         Self { model }
     }
 }
@@ -537,11 +537,11 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
 ////////////////////////////////////////////////////
 
 pub struct MenuConfiguracaoDaImpressora<'a> {
-    model: &'a DataStorage,
+    model: &'a DataModel,
 }
 
 impl<'a> MenuConfiguracaoDaImpressora<'a> {
-    pub const fn new(model: &'a DataStorage) -> Self {
+    pub const fn new(model: &'a DataModel) -> Self {
         Self { model }
     }
 }
@@ -598,11 +598,11 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
 ////////////////////////////////////////////////////
 
 pub struct MenuIntertravamentoParaDoisEixos<'a> {
-    model: &'a DataStorage,
+    model: &'a DataModel,
 }
 
 impl<'a> MenuIntertravamentoParaDoisEixos<'a> {
-    pub const fn new(model: &'a DataStorage) -> Self {
+    pub const fn new(model: &'a DataModel) -> Self {
         Self { model }
     }
 }
@@ -713,11 +713,11 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 pub struct MenuConfiguracaoDeEixo<'a> {
-    model: &'a DataStorage,
+    model: &'a DataModel,
 }
 
 impl<'a> MenuConfiguracaoDeEixo<'a> {
-    pub const fn new(model: &'a DataStorage) -> Self {
+    pub const fn new(model: &'a DataModel) -> Self {
         Self { model }
     }
 }
@@ -887,11 +887,11 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 pub struct MenuConfiguracaoDoEquipamento<'a> {
-    model: &'a DataStorage,
+    model: &'a DataModel,
 }
 
 impl<'a> MenuConfiguracaoDoEquipamento<'a> {
-    pub const fn new(model: &'a DataStorage) -> Self {
+    pub const fn new(model: &'a DataModel) -> Self {
         Self { model }
     }
 }

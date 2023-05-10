@@ -439,7 +439,7 @@ impl EepromStorable for ConfiguracaoDoEquipamento {
 
 ///
 
-pub struct DataStorage {
+pub struct DataModel {
     pub arquivo_de_eixo_x: ArquivoDeEixo,
     //pub arquivo_de_eixo_y: ArquivoDeEixo,
     pub configuracao_do_eixo_x: ConfiguracaoDoEixo,
@@ -447,7 +447,7 @@ pub struct DataStorage {
     pub configuracao_do_equipamento: ConfiguracaoDoEquipamento,
 }
 
-impl DataStorage {
+impl DataModel {
     const ADDR_LOW: u8 = 0x00;
     const ADDR_HIGH: u8 = 0x01;
 
