@@ -7,7 +7,6 @@ use crate::protocol::datalink::datalink::{
 
 use self::{
     cmpp_value::{Bit, MechanicalProperties},
-    manipulator::WordSetter,
     memory_map::{BitAddress, BitPosition, BytePosition, WordAddress},
     new_proposal::{
         Acceleration, ActivationState, Adimensional, AxisMode, BinaryManipulator, ByteManipulator,
@@ -148,25 +147,6 @@ pub mod manipulator {
         memory_map::{self, BitAddress, WordAddress},
         TLError, TransportLayer,
     };
-
-    pub struct WordSetter<'a> {
-        pub transport_layer: &'a TransportLayer<'a>,
-        pub memory_map: WordAddress,
-    }
-
-    impl<'a> WordSetter<'a> {
-        pub fn set<T>(&self, value: T) -> Result<Status, TLError>
-        where
-            T: IntoCmppValue<Word16>,
-        {
-            let properties = self.transport_layer.get_mechanical_properties();
-            let cmpp_value = value.to_cmpp_value(properties);
-            let word_address = self.memory_map;
-            self.transport_layer
-                .safe_datalink()
-                .set_word16(cmpp_value, word_address)
-        }
-    }
 
     pub struct BitSetter<'a> {
         transport_layer: &'a TransportLayer<'a>,
