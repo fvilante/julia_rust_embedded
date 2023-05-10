@@ -45,6 +45,8 @@ impl EepromAddress {
     /// TODO: Currently this eeprom driver only address 255 bytes, change it to address the 1KB available
     ///      in the avr328p
     pub fn out_of_range_error() -> ! {
+        //TODO: Currently panic is not showing message in lcd because this is a costly operation in terms of flash consumption
+        //because that it's necessary to elaborate a way to show this error message on lcd display in a cheap way.
         panic!("E81")
     }
 
