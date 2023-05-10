@@ -19,7 +19,7 @@ use lib_1::utils::common::usize_to_u8_clamper;
 /// Responsible to render the menu on the screen
 ///
 /// TODO: Improve error handling
-pub struct MenuProgramaRender<'a> {
+pub struct MenuProgramaControler<'a> {
     /// List of all submenu items.
     menu_view: &'a MenuProgramaView<'a>,
     current_menu: MenuProgramaHandle,
@@ -38,7 +38,7 @@ pub struct MenuProgramaRender<'a> {
     blink: RectangularWave,
 }
 
-impl<'a> MenuProgramaRender<'a> {
+impl<'a> MenuProgramaControler<'a> {
     pub fn new(submenu_handle: MenuProgramaHandle, menu_view: &'a MenuProgramaView) -> Self {
         const T_ON: u16 = 500;
         const T_OFF: u16 = 500;
@@ -223,7 +223,7 @@ impl<'a> MenuProgramaRender<'a> {
     }
 }
 
-impl MenuProgramaRender<'_> {
+impl MenuProgramaControler<'_> {
     pub fn clone_from(&mut self, origin: Self) {
         self.menu_view = origin.menu_view;
         self.current_menu = origin.current_menu;
@@ -231,7 +231,7 @@ impl MenuProgramaRender<'_> {
     }
 }
 
-impl MenuProgramaRender<'_> {
+impl MenuProgramaControler<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         if let Some(line_being_edited) = self.get_line_being_edited() {
             // if is editing some line, delegate keys to sub widgets.

@@ -9,9 +9,9 @@ use crate::{
 };
 
 use super::{
-    execucao::MenuExecucao,
-    manual_mode::{ManualModeMenu, ManualModeState},
-    submenu::render::MenuProgramaRender,
+    execucao::MenuExecucaoControler,
+    manual_mode::{ManualModeMenuControler, ManualModeState},
+    submenu::menu_programa_controler::MenuProgramaControler,
     widget::Widget,
 };
 
@@ -31,9 +31,9 @@ pub enum State {
 
 pub struct MainMenu<'a> {
     current_state: State,
-    menu_manual: ManualModeMenu<'a>,
-    menu_execucao: MenuExecucao<'a>,
-    menu_programa: MenuProgramaRender<'a>,
+    menu_manual_controler: ManualModeMenuControler<'a>,
+    menu_execucao_controler: MenuExecucaoControler<'a>,
+    menu_programa_controler: MenuProgramaControler<'a>,
     transport: &'a TransportLayer<'a>,
     model: &'a DataModel,
     //TODO: We're just controling 3 Leds (Execucao, Manual, Programa), better would be to wrap
@@ -43,18 +43,18 @@ pub struct MainMenu<'a> {
 
 impl<'a> MainMenu<'a> {
     pub fn new(
-        menu_manual: ManualModeMenu<'a>,
-        menu_execucao: MenuExecucao<'a>,
-        menu_programa: MenuProgramaRender<'a>,
+        menu_manual_controler: ManualModeMenuControler<'a>,
+        menu_execucao_controler: MenuExecucaoControler<'a>,
+        menu_programa_controler: MenuProgramaControler<'a>,
         transport: &'a TransportLayer<'a>,
         model: &'a DataModel,
         front_panel_leds: &'a mut FrontPanel<'a>,
     ) -> Self {
         Self {
             current_state: State::MainMenu,
-            menu_manual,
-            menu_execucao,
-            menu_programa,
+            menu_manual_controler,
+            menu_execucao_controler,
+            menu_programa_controler,
             transport,
             model,
             front_panel_leds,
@@ -102,17 +102,17 @@ impl<'a> MainMenu<'a> {
                 _ => {}
             },
             State::Manual => {
-                self.menu_manual.send_key(key);
+                self.menu_manual_controler.send_key(key);
             }
             State::Execucao => {
                 if key == KeyCode::KEY_ESC {
                     self.current_state = State::MainMenu;
                 } else {
-                    self.menu_execucao.send_key(key)
+                    self.menu_execucao_controler.send_key(key)
                 }
             }
             State::Programa => {
-                self.menu_programa.send_key(key) // TODO: How can I do to return from `menu programa`
+                self.menu_programa_controler.send_key(key) // TODO: How can I do to return from `menu programa`
             }
         }
     }
@@ -127,18 +127,18 @@ impl<'a> MainMenu<'a> {
             }
 
             State::Manual => {
-                if self.menu_manual.current_state == ManualModeState::Resting {
-                    self.menu_manual.current_state = ManualModeState::FirstScreen; // reset state
+                if self.menu_manual_controler.current_state == ManualModeState::Resting {
+                    self.menu_manual_controler.current_state = ManualModeState::FirstScreen; // reset state
                     self.current_state = State::MainMenu
                 } else {
-                    self.menu_manual.update()
+                    self.menu_manual_controler.update()
                 }
             }
-            State::Execucao => self.menu_execucao.update(),
+            State::Execucao => self.menu_execucao_controler.update(),
             State::Programa => {
-                if self.menu_programa.must_return_to_main_menu {
+                if self.menu_programa_controler.must_return_to_main_menu {
                     self.current_state = State::MainMenu;
-                    self.menu_programa.must_return_to_main_menu = false;
+                    self.menu_programa_controler.must_return_to_main_menu = false;
                     // send all data to cmpp when transitioning from menu_programa to main_menu
                     // TODO: Place the below text in the Flash
                     lcd::clear();
@@ -156,7 +156,7 @@ impl<'a> MainMenu<'a> {
                     // saves data into the eeprom
                     self.model.save_to_eeprom();
                 } else {
-                    self.menu_programa.update()
+                    self.menu_programa_controler.update()
                 }
             }
         }
@@ -165,9 +165,9 @@ impl<'a> MainMenu<'a> {
     pub fn draw(&mut self, canvas: &mut Canvas, start_point: Point) {
         match self.current_state {
             State::MainMenu => self.draw_main_menu(canvas),
-            State::Manual => self.menu_manual.draw(canvas, start_point),
-            State::Execucao => self.menu_execucao.draw(canvas, start_point),
-            State::Programa => self.menu_programa.draw(canvas),
+            State::Manual => self.menu_manual_controler.draw(canvas, start_point),
+            State::Execucao => self.menu_execucao_controler.draw(canvas, start_point),
+            State::Programa => self.menu_programa_controler.draw(canvas),
         }
     }
 }

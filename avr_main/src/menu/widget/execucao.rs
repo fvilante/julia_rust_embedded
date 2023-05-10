@@ -15,11 +15,11 @@ progmem! {
     static progmem string LINE1 = "X =       mm"; //"${nnnn}    Y=${nnnn}";
 }
 
-pub struct MenuExecucao<'a> {
+pub struct MenuExecucaoControler<'a> {
     transport: &'a TransportLayer<'a>,
 }
 
-impl<'a> MenuExecucao<'a> {
+impl<'a> MenuExecucaoControler<'a> {
     pub fn new(transport: &'a TransportLayer<'a>) -> Self {
         Self { transport }
     }
@@ -37,7 +37,7 @@ impl<'a> MenuExecucao<'a> {
     }
 }
 
-impl<'a> Widget for MenuExecucao<'a> {
+impl<'a> Widget for MenuExecucaoControler<'a> {
     fn send_key(&mut self, key: KeyCode) {
         match key {
             KeyCode::KEY_START => {

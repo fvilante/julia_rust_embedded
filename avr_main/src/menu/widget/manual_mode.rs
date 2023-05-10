@@ -24,12 +24,12 @@ pub enum ManualModeState {
     LastScreen,  // Server is responsible to changes to Resting state
 }
 
-pub struct ManualModeMenu<'a> {
+pub struct ManualModeMenuControler<'a> {
     pub current_state: ManualModeState,
     transport: &'a TransportLayer<'a>,
 }
 
-impl<'a> ManualModeMenu<'a> {
+impl<'a> ManualModeMenuControler<'a> {
     pub fn new(transport: &'a TransportLayer<'a>) -> Self {
         Self {
             current_state: ManualModeState::FirstScreen,
@@ -38,7 +38,7 @@ impl<'a> ManualModeMenu<'a> {
     }
 }
 
-impl Widget for ManualModeMenu<'_> {
+impl Widget for ManualModeMenuControler<'_> {
     fn send_key(&mut self, key: KeyCode) {
         match self.current_state {
             ManualModeState::Resting => {}

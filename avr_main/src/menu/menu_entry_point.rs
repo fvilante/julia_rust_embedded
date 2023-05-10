@@ -1,12 +1,12 @@
 use super::model::DataModel;
-use super::widget::submenu::render::MenuProgramaRender;
+use super::widget::submenu::menu_programa_controler::MenuProgramaControler;
 use crate::board::keyboard::KeyCode;
 use crate::board::peripherals::Peripherals;
 use crate::cmpp::datalink;
 use crate::menu::point::Point;
-use crate::menu::widget::execucao::MenuExecucao;
+use crate::menu::widget::execucao::MenuExecucaoControler;
 use crate::menu::widget::main_menu::MainMenu;
-use crate::menu::widget::manual_mode::ManualModeMenu;
+use crate::menu::widget::manual_mode::ManualModeMenuControler;
 use crate::menu::widget::splash::Splash;
 use crate::menu::widget::submenu::spec::{MenuProgramaHandle, MenuProgramaView};
 use crate::menu::widget::widget::Widget;
@@ -144,15 +144,16 @@ pub fn development_entry_point() -> ! {
     //
     let menu_programa_view = MenuProgramaView::new(&data_model);
     let menu_programa_handle = MenuProgramaHandle::MenuPrograma;
-    let menu_programa = MenuProgramaRender::new(menu_programa_handle, &menu_programa_view);
+    let menu_programa_controler =
+        MenuProgramaControler::new(menu_programa_handle, &menu_programa_view);
 
-    let menu_manual = ManualModeMenu::new(&transport);
-    let menu_execucao = MenuExecucao::new(&transport);
+    let menu_manual_controler = ManualModeMenuControler::new(&transport);
+    let menu_execucao_controler = MenuExecucaoControler::new(&transport);
 
-    let mut main_menu = MainMenu::new(
-        menu_manual,
-        menu_execucao,
-        menu_programa,
+    let mut main_menu_controler = MainMenu::new(
+        menu_manual_controler,
+        menu_execucao_controler,
+        menu_programa_controler,
         &transport,
         &data_model,
         &mut front_panel,
@@ -188,16 +189,16 @@ pub fn development_entry_point() -> ! {
         if let Some(key) = keyboard.get_key() {
             match key {
                 KeyCode::KEY_F2 => emit_print_go_signal(&transport),
-                _ => main_menu.send_key(key),
+                _ => main_menu_controler.send_key(key),
             }
         }
         // Update calculations
-        main_menu.update();
+        main_menu_controler.update();
 
         // Render next frame
         if now() > next_frame {
             next_frame = now() + (1000 / fps);
-            main_menu.draw(&mut canvas, Point::new(0, 0));
+            main_menu_controler.draw(&mut canvas, Point::new(0, 0));
             canvas.render();
         }
     }
