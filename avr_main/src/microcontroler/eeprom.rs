@@ -3,43 +3,55 @@ use ruduino::{cores::current as avr_core, interrupt::without_interrupts, Registe
 
 use avr_core::{EEAR, EECR, EEDR, SPMCSR};
 
-/// This code was originally written by `MalteT` and was grab from github commit below:
+/// Low-level function to write one single byte in local EEPROM
+/// NOTE: This code was originally written by `MalteT` and was grab by fvilante from github commit below:
 /// https://github.com/MalteT/counter-avr/blob/ebb7ca36d7a04b11265cb41024798a38ac31ad05/src/main.rs#L251
+/// TODO: Make address u16 or something that can address 1kb of EEPROM
+fn write_eeprom_raw(address: u8, byte: u8) {
+    without_interrupts(|| {
+        // Do not acces eeprom, if it is written to or the flash is currently programmed!
+        while EECR::is_set(EECR::EEPE) || SPMCSR::is_set(SPMCSR::SPMEN) {}
+        // Write the address
+        EEAR::write(address);
+        // Write the value
+        EEDR::write(byte);
+        // Start writing to the eeprom
+        // XXX: This could be `set` but `set` isn't using volatile_* atm.
+        EECR::write(EECR::EEMPE);
+        // XXX: This could be `set` but `set` isn't using volatile_* atm.
+        EECR::write(EECR::EEPE);
+    })
+}
+
+/// Low-level function that reads one single byte from local EEPROM
+/// NOTE: This code was originally written by `MalteT` and was grab by fvilante from github commit below:
+/// https://github.com/MalteT/counter-avr/blob/ebb7ca36d7a04b11265cb41024798a38ac31ad05/src/main.rs#L251
+/// TODO: Make address u16 or something that can address 1kb of EEPROM
+fn read_eeprom_byte_raw(address: u8) -> u8 {
+    without_interrupts(|| {
+        // Do not acces eeprom, if it is written to or the flash is currently programmed!
+        while EECR::is_set(EECR::EEPE) || SPMCSR::is_set(SPMCSR::SPMEN) {}
+        // Write the address
+        EEAR::write(address);
+        // Start reading from eeprom
+        // XXX: This could be `set` but `set` isn't using volatile_* atm.
+        EECR::write(EECR::EERE);
+        // Return the read value
+        let ret = EEDR::read();
+        ret
+    })
+}
+
 #[derive(Copy, Clone)]
 pub struct EepromAddress(pub u8);
 
 impl EepromAddress {
     pub fn read(&self) -> u8 {
-        without_interrupts(|| {
-            // Do not acces eeprom, if it is written to or the flash is currently programmed!
-            while EECR::is_set(EECR::EEPE) || SPMCSR::is_set(SPMCSR::SPMEN) {}
-            // Write the address
-            EEAR::write(self.0);
-            // Start reading from eeprom
-            // XXX: This could be `set` but `set` isn't using volatile_* atm.
-            EECR::write(EECR::EERE);
-            // Return the read value
-            let ret = EEDR::read();
-            ret
-        })
+        read_eeprom_byte_raw(self.0)
     }
-    pub fn write(&mut self, val: u8) {
-        without_interrupts(|| {
-            // Do not acces eeprom, if it is written to or the flash is currently programmed!
-            while EECR::is_set(EECR::EEPE) || SPMCSR::is_set(SPMCSR::SPMEN) {}
-            // Write the address
-            EEAR::write(self.0);
-            // Write the value
-            EEDR::write(val);
-            // Start writing to the eeprom
-            // XXX: This could be `set` but `set` isn't using volatile_* atm.
-            EECR::write(EECR::EEMPE);
-            // XXX: This could be `set` but `set` isn't using volatile_* atm.
-            EECR::write(EECR::EEPE);
-        })
+    pub fn write(&self, val: u8) {
+        write_eeprom_raw(self.0, val)
     }
-
-    // Flavio's API
 
     /// EEprom address out of 255 range.
     /// TODO: Currently this eeprom driver only address 255 bytes, change it to address the 1KB available
@@ -51,7 +63,7 @@ impl EepromAddress {
     }
 
     /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom, and cannot address the last word address.
-    pub fn write_u8(&mut self, val: u8) -> EepromAddress {
+    pub fn write_u8(&self, val: u8) -> EepromAddress {
         let address = self.0;
         let Some(next_address) = address.checked_add(1) else {
             Self::out_of_range_error()
@@ -62,7 +74,7 @@ impl EepromAddress {
 
     /// Writes u16 into the current address (in `little-endian` format) and returns the address of the next chunk.
     /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom, and cannot address the last word address.
-    pub fn write_u16(&mut self, val: u16) -> EepromAddress {
+    pub fn write_u16(&self, val: u16) -> EepromAddress {
         let (byte_low, byte_high) = Word16::from_u16(val).split_bytes();
         let mut next = self.write_u8(byte_low);
         let next = next.write_u8(byte_high);
@@ -70,7 +82,7 @@ impl EepromAddress {
     }
 
     /// TODO: Cursor is being write in eeprom using 3 bytes, but if Cursor::start is always zero we can use just 2 bytes
-    pub fn write_cursor(&mut self, cursor: Cursor) -> EepromAddress {
+    pub fn write_cursor(&self, cursor: Cursor) -> EepromAddress {
         let byte_0 = cursor.get_current();
         let byte_1 = cursor.get_range().start; // TODO: Check if this byte is always 0, and if it is remove it from eeprom
         let byte_2 = cursor.get_range().end;
@@ -90,6 +102,18 @@ impl EepromAddress {
         (value, EepromAddress(next_address))
     }
 
+    /// Reads one byte from eeprom address and advance address by one. Returns None if error.
+    pub fn read_u8_mut(&mut self) -> Option<u8> {
+        let address = self.0;
+        if let Some(next_address) = address.checked_add(1) {
+            let value = self.read();
+            self.0 = next_address;
+            Some(value)
+        } else {
+            None
+        }
+    }
+
     /// Return the u16 read (in `little-endian` format) and the address pointing to the next chunk
     /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom, and cannot address the last word address.
     pub fn read_u16(&self) -> (u16, Self) {
@@ -107,7 +131,40 @@ impl EepromAddress {
         let cursor = Cursor::new(start, end, initial_value);
         (cursor, next)
     }
+
+    // Reading and writting an iterator abstract for any type T
+
+    fn write_iterable<T: IntoIterator<Item = u8>>(&self, iterable: T) -> EepromAddress {
+        let iterator = iterable.into_iter();
+        let mut next_address = self.clone();
+        for byte in iterator {
+            let next_address = next_address.write_u8(byte);
+        }
+        next_address
+    }
+
+    // None if iterator is exausted before enough data has been iterated to construct type T
+    //fn read_iterable<T: FromIterator>(&self) -> Option<T> {}
 }
+
+/*struct Iter {
+    addr: EepromAddress,
+}
+
+impl Iterator for Iter {
+    type Item = u8;
+
+    /// PANIC: This function may panic if you try to read address above 255. We hope this limitation
+    /// will be removed soon
+    /// TODO: Return Option::None instead of panic!
+    fn next(&mut self) -> Option<Self::Item> {
+        let (byte_read, next_address) = self.addr.read_u8();
+        self.addr = next_address;
+        Some(byte_read)
+    }
+}*/
+
+// *****************
 
 pub struct EepromTestError {
     address: u16,
