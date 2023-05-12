@@ -1,48 +1,115 @@
-// high level abstraction over board ios
-
-#![allow(non_camel_case_types)]
+#![allow(non_camel_case_types)] // TODO: removed this two lines when possible
 #![allow(non_snake_case)]
-
+/// High level abstraction over board low-latency outputs
+///
+/// # Example
+///
+/// ```
+/// pub fn development_entry_point() -> ! {
+///     lcd_initialize();
+///     print("iniciei");
+///
+///     let output = OutputExpander::new();
+///
+///     loop {
+///         output
+///             .BUZZER(true)
+///             .LED_ERRO(true)
+///             .LED_MANUAL(true)
+///             .LED_POS_ALC(true)
+///             .LED_PROGRAMA(true)
+///             .commit();
+///
+///         delay_ms(2000);
+///
+///         output
+///             .BUZZER(false)
+///             .LED_ERRO(false)
+///             .LED_MANUAL(false)
+///             .LED_POS_ALC(false)
+///             .LED_PROGRAMA(false)
+///             .commit();
+///
+///         delay_ms(1000);
+///     }
+/// }
+/// ```
+///
+/// # Electrical Connections
+///
+/// OUTPUT_BUS0     KBD-SA                   BIT0 - SHIFT-REGISTER 0 BEGIN
+/// OUTPUT_BUS1     KBD-SB                   BIT1
+/// OUTPUT_BUS2     KBD-S1                   BIT2
+/// OUTPUT_BUS3     KBD-S2                   BIT3
+/// OUTPUT_BUS4     KBD-S3                   BIT4
+/// OUTPUT_BUS5     KBD-S4                   BIT5
+/// OUTPUT_BUS6     KBD-S5                   BIT6
+/// OUTPUT_BUS7     KBD-S6                   BIT7
+/// OUTPUT_BUS8     KBD-S7                   BIT0 - SHIFT-REGISTER 1 BEGIN
+/// OUTPUT_BUS9     KBD-S8                   BIT1
+/// OUTPUT_BUS10    SAIDA-VAGO1              BIT2
+/// OUTPUT_BUS11    COPIA-SINAL-PTR          BIT3
+/// OUTPUT_BUS12    SAIDA-START-OUTRO        BIT4
+/// OUTPUT_BUS13    INVMEN                   BIT5
+/// OUTPUT_BUS14    P3                       BIT6
+/// OUTPUT_BUS15    P2                       BIT7
+/// OUTPUT_BUS16    P1                       BIT0 - SHIFT-REGISTER 2 BEGIN
+/// OUTPUT_BUS17    P0                       BIT1
+/// OUTPUT_BUS18    DMOTOR-1                 BIT2
+/// OUTPUT_BUS19    DMOTOR-2                 BIT3
+/// OUTPUT_BUS20    EMOTOR-1                 BIT4
+/// OUTPUT_BUS21    EMOTOR-2                 BIT5
+/// OUTPUT_BUS22    NMOTOR-1                 BIT6
+/// OUTPUT_BUS23    NMOTOR-2                 BIT7
+/// OUTPUT_BUS24    H/F-1                    BIT0 - SHIFT-REGISTER 3 BEGIN
+/// OUTPUT_BUS25    H/F-2                    BIT1
+/// OUTPUT_BUS26    BUZZER                   BIT2
+/// OUTPUT_BUS27    LED_POS_ALC              BIT3
+/// OUTPUT_BUS28    LED_PROGRAMA             BIT4
+/// OUTPUT_BUS29    LED_ERRO                 BIT5
+/// OUTPUT_BUS30    LED_EXECUCAO             BIT6
+/// OUTPUT_BUS31    LED_MANUAL               BIT7
 use super::shiftout::write_shiftout;
 use super::shiftout::{init_shiftout_pins, ShiftOutData};
 use crate::microcontroler::delay::delay_ms;
 use core::cell::Cell;
 use lib_1::utils::bit_wise::{configure_bit, get_bit_at_as_bool};
 
-// See board schematic. This represents the electrical signals on the board
+/// Represents the electrical signals on the board
+/// See the board schematic or this file description for more.
 pub enum OutputExpanderSignal {
-    KBD_SA,            // OUTPUT_BUS0     KBD-SA                   BIT0 - SHIFT-REGISTER 0 BEGIN
-    KBD_SB,            // OUTPUT_BUS1     KBD-SB                   BIT1
-    KBD_S1,            // OUTPUT_BUS2     KBD-S1                   BIT2
-    KBD_S2,            // OUTPUT_BUS3     KBD-S2                   BIT3
-    KBD_S3,            // OUTPUT_BUS4     KBD-S3                   BIT4
-    KBD_S4,            // OUTPUT_BUS5     KBD-S4                   BIT5
-    KBD_S5,            // OUTPUT_BUS6     KBD-S5                   BIT6
-    KBD_S6,            // OUTPUT_BUS7     KBD-S6                   BIT7
-    KBD_S7,            // OUTPUT_BUS8     KBD-S7                   BIT0 - SHIFT-REGISTER 1 BEGIN
-    KBD_S8,            // OUTPUT_BUS9     KBD-S8                   BIT1
-    SAIDA_VAGO1,       // OUTPUT_BUS10    SAIDA-VAGO1              BIT2
-    COPIA_SINAL_PTR,   // OUTPUT_BUS11    COPIA-SINAL-PTR          BIT3
-    SAIDA_START_OUTRO, // OUTPUT_BUS12    SAIDA-START-OUTRO        BIT4
-    INVMEN,            // OUTPUT_BUS13    INVMEN                   BIT5
-    P3,                // OUTPUT_BUS14    P3                       BIT6
-    P2,                // OUTPUT_BUS15    P2                       BIT7
-    P1,                // OUTPUT_BUS16    P1                       BIT0 - SHIFT-REGISTER 2 BEGIN
-    P0,                // OUTPUT_BUS17    P0                       BIT1
-    DMOTOR_1,          // OUTPUT_BUS18    DMOTOR-1                 BIT2
-    DMOTOR_2,          // OUTPUT_BUS19    DMOTOR-2                 BIT3
-    EMOTOR_1,          // OUTPUT_BUS20    EMOTOR-1                 BIT4
-    EMOTOR_2,          // OUTPUT_BUS21    EMOTOR-2                 BIT5
-    NMOTOR_1,          // OUTPUT_BUS22    NMOTOR-1                 BIT6
-    NMOTOR_2,          // OUTPUT_BUS23    NMOTOR-2                 BIT7
-    HF_1,              // OUTPUT_BUS24    H/F-1                    BIT0 - SHIFT-REGISTER 3 BEGIN
-    HF_2,              // OUTPUT_BUS25    H/F-2                    BIT1
-    BUZZER,            // OUTPUT_BUS26    BUZZER                   BIT2
-    LED_POS_ALC,       // OUTPUT_BUS27    LED_POS_ALC              BIT3
-    LED_PROGRAMA,      // OUTPUT_BUS28    LED_PROGRAMA             BIT4
-    LED_ERRO,          // OUTPUT_BUS29    LED_ERRO                 BIT5
-    LED_EXECUCAO,      // OUTPUT_BUS30    LED_EXECUCAO             BIT6
-    LED_MANUAL,        // OUTPUT_BUS31    LED_MANUAL               BIT7
+    KBD_SA,
+    KBD_SB,
+    KBD_S1,
+    KBD_S2,
+    KBD_S3,
+    KBD_S4,
+    KBD_S5,
+    KBD_S6,
+    KBD_S7,
+    KBD_S8,
+    SAIDA_VAGO1,
+    COPIA_SINAL_PTR,
+    SAIDA_START_OUTRO,
+    INVMEN,
+    P3,
+    P2,
+    P1,
+    P0,
+    DMOTOR_1,
+    DMOTOR_2,
+    EMOTOR_1,
+    EMOTOR_2,
+    NMOTOR_1,
+    NMOTOR_2,
+    HF_1,
+    HF_2,
+    BUZZER,
+    LED_POS_ALC,
+    LED_PROGRAMA,
+    LED_ERRO,
+    LED_EXECUCAO,
+    LED_MANUAL,
 }
 
 /// Represents each of the four 74HC595N Integrated Circuit present on the Julia board
@@ -54,6 +121,7 @@ enum ShiftRegister {
     IC3, // Board descriptor: U103
 }
 
+/// TODO: Duplicated with input_expander.rs. Please unduplicate it when possible.
 enum Bit {
     D0 = 0, // bit 0 of a byte
     D1 = 1, // bit 1 of a byte
@@ -67,7 +135,7 @@ enum Bit {
 
 struct Address(ShiftRegister, Bit);
 
-// Signals setup
+/// Signals setup
 fn getAddress__(signal: OutputExpanderSignal) -> Address {
     match signal {
         OutputExpanderSignal::KBD_SA => Address(ShiftRegister::IC0, Bit::D0),
@@ -304,38 +372,5 @@ impl OutputExpander {
 
     pub fn LED_MANUAL(&self, data: bool) -> &Self {
         self.stage_signal__(OutputExpanderSignal::LED_MANUAL, data)
-    }
-}
-
-//
-
-use crate::board::lcd::*;
-
-pub fn development_entry_point() -> ! {
-    lcd_initialize();
-    print("iniciei");
-
-    let output = OutputExpander::new();
-
-    loop {
-        output
-            .BUZZER(true)
-            .LED_ERRO(true)
-            .LED_MANUAL(true)
-            .LED_POS_ALC(true)
-            .LED_PROGRAMA(true)
-            .commit();
-
-        delay_ms(2000);
-
-        output
-            .BUZZER(false)
-            .LED_ERRO(false)
-            .LED_MANUAL(false)
-            .LED_POS_ALC(false)
-            .LED_PROGRAMA(false)
-            .commit();
-
-        delay_ms(1000);
     }
 }

@@ -1,5 +1,34 @@
-//driver for on-board 3 shift-register serially connected for expand input of microcontroller
-
+/// Driver for on-board 3 shift-register serially connected for expand input of microcontroller
+///
+/// # Example
+///
+/// ```
+/// pub fn main() -> ! {
+///     lcd::lcd_initialize();
+///
+///     let data: ShiftOutData = ShiftOutData {
+///         byte0: (0x00),
+///         byte1: (0x00),
+///         byte2: (0x00),
+///         byte3: (0x00),
+///     };
+///     write_shiftout(data);
+///
+///     loop {
+///         let current = readShiftIn();
+///         lcd::clear();
+///         lcd::print_u8_in_hex(current.byte0);
+///         lcd::print(";");
+///         lcd::print_u8_in_hex(current.byte1);
+///         lcd::print(";");
+///         lcd::print_u8_in_hex(current.byte2);
+///         lcd::print(";");
+///
+///         delay_ms(1000);
+///     }
+/// }
+/// ```
+///
 use ruduino::cores::atmega328p::port;
 use ruduino::Pin;
 
@@ -90,31 +119,4 @@ pub fn readShiftIn() -> ShiftInData {
 
     //return information
     data
-}
-
-//
-
-pub fn development_entry_point() -> ! {
-    lcd::lcd_initialize();
-
-    let data: ShiftOutData = ShiftOutData {
-        byte0: (0x00),
-        byte1: (0x00),
-        byte2: (0x00),
-        byte3: (0x00),
-    };
-    write_shiftout(data);
-
-    loop {
-        let current = readShiftIn();
-        lcd::clear();
-        lcd::print_u8_in_hex(current.byte0);
-        lcd::print(";");
-        lcd::print_u8_in_hex(current.byte1);
-        lcd::print(";");
-        lcd::print_u8_in_hex(current.byte2);
-        lcd::print(";");
-
-        delay_ms(1000);
-    }
 }

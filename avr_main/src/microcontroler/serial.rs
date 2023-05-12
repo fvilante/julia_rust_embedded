@@ -59,8 +59,6 @@
 ///
 use ruduino::legacy::serial;
 
-use crate::board::lcd;
-
 /// you must call this function before call other serial related functions
 pub fn init(baud_rate: u32) {
     let BAUD: u32 = baud_rate;

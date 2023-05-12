@@ -1,9 +1,36 @@
-// driver for off-board lcd HITACH HD44780 display
-
+/// Driver for off-board lcd HITACH HD44780 display
+///
+/// # Example
+///
+/// ```
+/// pub fn main() -> ! {
+///     lcd_initialize();
+///     // cursor(); // This function is not working properly must be debuged
+///
+///     let icon: char = 'X';
+///
+///     loop {
+///         clear();
+///         set_cursor(10, 0);
+///         print("Julia AVR Rust");
+///         set_cursor(10, 1);
+///         print("@FlavioVilante");
+///         for row in 0..2 {
+///             for col in 0..40 {
+///                 set_cursor(col, row);
+///                 print_char(icon);
+///                 delay_ms(100);
+///                 set_cursor(col, row);
+///                 print_char(' ');
+///             }
+///         }
+///     }
+/// }
+/// ```
 use ruduino::cores::atmega328p::port;
 use ruduino::Pin;
 
-use crate::microcontroler::delay::{delay_ms, delay_us};
+use crate::microcontroler::delay::delay_us;
 
 use lib_1::utils::{
     bit_wise::get_bit_at_as_bool,
@@ -13,7 +40,7 @@ use lib_1::utils::{
 const HIGH: bool = true;
 const LOW: bool = false;
 
-// LCD CONFIGURATION: in this case 40x2
+/// LCD CONFIGURATION: in this case 40x2
 const NUMBER_OF_COLS: u8 = 40;
 pub const NUMBER_OF_LINES: u8 = 2;
 
@@ -78,7 +105,7 @@ fn lcd_db4(value: bool) -> () {
 // ---------------------------------------------------------------------------
 /************ low level data pushing commands **********/
 
-// write low four bits of data in the lcd data output channel
+/// write low four bits of data in the lcd data output channel
 fn write4bits(data: u8) -> () {
     /// Pulses the enable pin
     fn pulse_enable() -> () {
@@ -127,7 +154,7 @@ fn write_u8(value: u8) -> () {
 
 // TODO: Improve these `high level user functions` to be something more generic.
 
-// print just one byte
+/// print just one byte
 pub fn print_bit(bit: bool) -> () {
     if bit == true {
         print_char('1');
@@ -136,7 +163,7 @@ pub fn print_bit(bit: bool) -> () {
     }
 }
 
-// print just one byte
+/// print just one byte
 pub fn print_u8(value: u8) -> () {
     write_u8(value);
 }
@@ -157,19 +184,19 @@ pub fn print_u16_in_hex(value: u16) -> () {
     print_char('h');
 }
 
-// print just one byte
+/// print just one byte
 pub fn print_char(char: char) -> () {
     write_u8(char as u8);
 }
 
-// prints a full string
+/// prints a full string
 pub fn print(text: &str) -> () {
     for char in text.as_bytes() {
         write_u8(*char);
     }
 }
 
-// prints a full string
+/// prints a full string
 pub fn print_u8_array<const N: usize>(text: &[u8; N]) -> () {
     for char in text {
         let char_ = *char; // deref
@@ -179,7 +206,7 @@ pub fn print_u8_array<const N: usize>(text: &[u8; N]) -> () {
     }
 }
 
-// --------------------------------------------------------------------------
+/// --------------------------------------------------------------------------
 /********** high level commands, for the user! */
 pub fn clear() -> () {
     const LCD_CLEARDISPLAY: u8 = 0x01;
@@ -298,31 +325,4 @@ pub fn lcd_initialize() -> () {
 
     // clear it off
     clear();
-}
-
-// ------------------------------------------
-// Examples
-
-pub fn example_01() -> ! {
-    lcd_initialize();
-    // cursor(); // This function is not working properly must be debuged
-
-    let icon: char = 'X';
-
-    loop {
-        clear();
-        set_cursor(10, 0);
-        print("Julia AVR Rust");
-        set_cursor(10, 1);
-        print("@FlavioVilante");
-        for row in 0..2 {
-            for col in 0..40 {
-                set_cursor(col, row);
-                print_char(icon);
-                delay_ms(100);
-                set_cursor(col, row);
-                print_char(' ');
-            }
-        }
-    }
 }
