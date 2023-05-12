@@ -1,4 +1,3 @@
-pub mod debug;
 pub mod front_panel;
 pub mod input_expander;
 pub mod keyboard;
