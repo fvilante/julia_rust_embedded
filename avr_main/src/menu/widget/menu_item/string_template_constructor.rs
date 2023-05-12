@@ -1,6 +1,6 @@
 use crate::menu::flash::FlashString;
 
-use lib_1::utils::common::usize_to_u8_clamper;
+use lib_1::utils::numerical::usize_to_u8_clamper;
 
 /// Creates a parser for a menu_item template string
 ///

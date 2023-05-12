@@ -4,7 +4,7 @@ use core::ops::Range;
 use core::str::{CharIndices, Chars, FromStr};
 
 use heapless::String;
-use lib_1::utils::common::{convert_u16_to_string_decimal, usize_to_u8_clamper};
+use lib_1::utils::numerical::{convert_u16_to_string_decimal, usize_to_u8_clamper};
 
 use crate::{
     board::keyboard::KeyCode,

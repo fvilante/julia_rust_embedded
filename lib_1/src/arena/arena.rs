@@ -5,7 +5,7 @@ use core::{
 };
 use heapless::Vec;
 
-use crate::utils::common::usize_to_u8_clamper;
+use crate::utils::numerical::usize_to_u8_clamper;
 
 // Arena
 //

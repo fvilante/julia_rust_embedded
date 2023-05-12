@@ -1,6 +1,6 @@
 use core::ops::Range;
 
-use super::common::{const_clamp, usize_to_u8_clamper};
+use super::numerical::{const_clamp, usize_to_u8_clamper};
 
 /// The purpose of a [`Cursor`] is to statefully move a current unsigned integer around a predefined interval of values
 /// normally defined between start (inclusive) and end (exclusive). Through a serie of defined methods.
