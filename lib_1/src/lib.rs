@@ -16,8 +16,6 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std as alloc;
 
-pub mod adt;
-pub mod arena;
 pub mod mock;
 pub mod protocol;
 pub mod types;
