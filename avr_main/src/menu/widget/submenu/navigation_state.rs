@@ -3,7 +3,7 @@ use crate::board::lcd;
 use super::hepers::LcdLine;
 
 use lib_1::utils::{
-    common::{configure_bit, get_bit_at, reset_bit_at},
+    bit_wise::{configure_bit, get_bit_at, reset_bit_at},
     cursor::StatelessCursor,
 };
 

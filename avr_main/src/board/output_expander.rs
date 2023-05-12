@@ -7,7 +7,7 @@ use super::shiftout::write_shiftout;
 use super::shiftout::{init_shiftout_pins, ShiftOutData};
 use crate::microcontroler::delay::delay_ms;
 use core::cell::Cell;
-use lib_1::utils::common::{configure_bit, get_bit_at_as_bool};
+use lib_1::utils::bit_wise::{configure_bit, get_bit_at_as_bool};
 
 // See board schematic. This represents the electrical signals on the board
 pub enum OutputExpanderSignal {

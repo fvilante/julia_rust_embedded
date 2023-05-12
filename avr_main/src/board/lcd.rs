@@ -5,7 +5,10 @@ use ruduino::Pin;
 
 use crate::microcontroler::delay::{delay_ms, delay_us};
 
-use lib_1::utils::common::{convert_u16_to_str_hex, convert_u8_to_str_hex, get_bit_at_as_bool};
+use lib_1::utils::{
+    bit_wise::get_bit_at_as_bool,
+    common::{convert_u16_to_str_hex, convert_u8_to_str_hex},
+};
 
 const HIGH: bool = true;
 const LOW: bool = false;

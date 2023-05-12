@@ -6,7 +6,7 @@
 use super::shiftin::{init_shiftin_pins, readShiftIn, ShiftInData};
 use crate::board::lcd::{lcd_initialize, print_u8_in_hex};
 use core::cell::Cell;
-use lib_1::utils::common::get_bit_at_as_bool;
+use lib_1::utils::bit_wise::get_bit_at_as_bool;
 
 // Represents each of the three CD4021 Integrated Circuit present on the board
 enum ShiftRegister {

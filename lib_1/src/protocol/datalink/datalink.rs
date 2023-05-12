@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////
 
-use crate::utils::common::{get_bit_at, get_bit_at_as_bool, reset_bit_at};
+use crate::utils::bit_wise::{get_bit_at, get_bit_at_as_bool, reset_bit_at};
 
 use self::word16::Word16;
 
@@ -197,9 +197,9 @@ impl DirectionAndChannel {
 }
 
 pub mod word16 {
-    use crate::utils::common::get_bit_at_as_bool;
+    use crate::utils::bit_wise::get_bit_at_as_bool;
 
-    use crate::utils::common::set_bit_at;
+    use crate::utils::bit_wise::set_bit_at;
     use crate::utils::common::word_to_byte;
 
     /// Represents a 16 bits word
