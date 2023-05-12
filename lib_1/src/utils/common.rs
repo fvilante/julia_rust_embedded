@@ -1,16 +1,6 @@
 use core::{marker::Destruct, str::FromStr};
 use heapless::String;
 
-/// return (byteLow, byteHigh)
-/// TODO: When possible move this function to a better place
-pub const fn word_to_byte(word: u16) -> (u8, u8) {
-    let low_ = word & 0x00FF;
-    let byte_low = low_ as u8;
-    let high_ = (word >> 8) & 0x00FF;
-    let byte_high = high_ as u8;
-    (byte_low, byte_high)
-}
-
 /// SAFETY: Do not call this function with index outside the 0..15 range! Else this function will panic!
 const fn get_char(index: u8) -> char {
     match index {

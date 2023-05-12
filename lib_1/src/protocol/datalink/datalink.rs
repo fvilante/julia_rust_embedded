@@ -200,7 +200,16 @@ pub mod word16 {
     use crate::utils::bit_wise::get_bit_at_as_bool;
 
     use crate::utils::bit_wise::set_bit_at;
-    use crate::utils::common::word_to_byte;
+
+    /// return (byteLow, byteHigh)
+    /// TODO: Maybe place this function inside Word16 type as a method
+    const fn word_to_byte(word: u16) -> (u8, u8) {
+        let low_ = word & 0x00FF;
+        let byte_low = low_ as u8;
+        let high_ = (word >> 8) & 0x00FF;
+        let byte_high = high_ as u8;
+        (byte_low, byte_high)
+    }
 
     /// Represents a 16 bits word
     #[derive(Copy, Clone)]
