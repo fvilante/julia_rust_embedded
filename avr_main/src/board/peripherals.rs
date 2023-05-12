@@ -1,10 +1,11 @@
 use crate::{
-    enviroment::front_panel::FrontPanel,
     menu::{canvas::Canvas, keyboard::Keyboard},
     microcontroler::timer::init_timer,
 };
 
-use super::{input_expander::InputExpander, lcd, output_expander::OutputExpander};
+use super::{
+    front_panel::FrontPanel, input_expander::InputExpander, lcd, output_expander::OutputExpander,
+};
 
 /// On board peripherals initialization:
 ///

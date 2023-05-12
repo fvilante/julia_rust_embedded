@@ -15,7 +15,6 @@ extern "C" fn eh_personality() {}
 mod board;
 mod cmpp;
 mod custom_alloc;
-mod enviroment;
 mod geometry;
 mod menu;
 mod microcontroler;
