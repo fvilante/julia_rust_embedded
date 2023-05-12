@@ -1,7 +1,5 @@
-use crate::menu::{
-    flash::FlashString,
-    widget::field::optional::{make_options_buffer_from_array, OptionsBuffer},
-};
+use crate::menu::widget::field::optional::{make_options_buffer_from_array, OptionsBuffer};
+use crate::string::flash::FlashString;
 
 use super::flash_texts::{
     ABERTO, B2400, B9600, CONTINUO, DESLIGADO, FECHADO, LIGADO, PASSO_A_PASSO,

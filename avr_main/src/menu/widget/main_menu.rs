@@ -1,19 +1,19 @@
 use avr_progmem::progmem;
 use lib_1::protocol::transport::transport_layer::TransportLayer;
 
-use crate::board::front_panel::FrontPanel;
-use crate::geometry::point::Point;
-use crate::{
-    board::{keyboard::KeyCode, lcd},
-    menu::{canvas::Canvas, flash::FlashString, model::DataModel},
-    microcontroler::delay::delay_ms,
-};
-
 use super::{
     execucao::MenuExecucaoControler,
     manual_mode::{ManualModeMenuControler, ManualModeState},
     submenu::menu_programa_controler::MenuProgramaControler,
     widget::Widget,
+};
+use crate::board::front_panel::FrontPanel;
+use crate::geometry::point::Point;
+use crate::string::flash::FlashString;
+use crate::{
+    board::{keyboard::KeyCode, lcd},
+    menu::{canvas::Canvas, model::DataModel},
+    microcontroler::delay::delay_ms,
 };
 
 progmem! {

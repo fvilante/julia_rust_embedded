@@ -8,7 +8,7 @@
 /// By for example using macros! etc
 use core::{cell::Cell, u8};
 
-use crate::menu::flash::FlashString;
+use crate::string::flash::FlashString;
 
 use super::{
     super::super::{

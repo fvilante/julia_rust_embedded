@@ -1,7 +1,8 @@
 use crate::geometry::point::Point;
+use crate::string::flash::FlashString;
 use crate::{
     board::keyboard::KeyCode,
-    menu::{canvas::Canvas, flash::FlashString, widget::widget::Widget},
+    menu::{canvas::Canvas, widget::widget::Widget},
 };
 pub struct Caption {
     text: FlashString,

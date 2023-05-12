@@ -8,9 +8,9 @@ use crate::board::keyboard::KeyCode;
 
 use crate::geometry::point::Point;
 use crate::menu::canvas::Canvas;
-use crate::menu::flash::FlashString;
 use crate::menu::ratangular_wave::RectangularWave;
 use crate::menu::widget::widget::Editable;
+use crate::string::flash::FlashString;
 use lib_1::utils::cursor::Cursor;
 
 // Variable to place the string representing the Optinal Field Parameter in Menu

@@ -2,9 +2,10 @@ use avr_progmem::progmem;
 use lib_1::protocol::transport::transport_layer::TransportLayer;
 
 use crate::geometry::point::Point;
+use crate::string::flash::FlashString;
 use crate::{
     board::{keyboard::KeyCode, lcd},
-    menu::{canvas::Canvas, flash::FlashString, model::DataModel},
+    menu::{canvas::Canvas, model::DataModel},
     microcontroler::{delay::delay_ms, timer::now},
 };
 

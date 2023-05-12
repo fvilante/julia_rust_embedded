@@ -19,6 +19,7 @@ mod geometry;
 mod menu;
 mod microcontroler;
 mod panic;
+mod string;
 
 // Initialize app
 

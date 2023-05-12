@@ -4,10 +4,11 @@ use crate::{
     board::keyboard::KeyCode,
     menu::{
         canvas::Canvas,
-        flash::FlashString,
         widget::{caption::caption::Caption, submenu::hepers::LcdLine},
     },
 };
+
+use crate::string::flash::FlashString;
 
 use super::super::{
     field::field::Field,

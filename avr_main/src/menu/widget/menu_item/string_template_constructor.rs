@@ -1,4 +1,4 @@
-use crate::menu::flash::FlashString;
+use crate::string::flash::FlashString;
 
 use lib_1::utils::numerical::usize_to_u8_clamper;
 

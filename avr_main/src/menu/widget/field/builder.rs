@@ -2,7 +2,7 @@ use core::{cell::Cell, ops::Range};
 
 use lib_1::utils::cursor::Cursor;
 
-use crate::menu::flash::FlashString;
+use crate::string::flash::FlashString;
 
 use super::{
     field::Field,
