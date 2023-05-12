@@ -13,14 +13,11 @@ extern crate alloc;
 extern "C" fn eh_personality() {}
 
 mod board;
-mod cmpp;
 mod custom_alloc;
 mod geometry;
 mod menu;
 mod microcontroler;
 mod panic;
-
-use lib_1;
 
 #[no_mangle]
 #[arduino_hal::entry]

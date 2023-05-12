@@ -32,10 +32,7 @@
 use ruduino::cores::atmega328p::port;
 use ruduino::Pin;
 
-use crate::board::lcd;
-use crate::microcontroler::delay::{delay_ms, delay_us};
-
-use super::shiftout::{write_shiftout, ShiftOutData};
+use crate::microcontroler::delay::delay_us;
 
 const HIGH: bool = true;
 const LOW: bool = false;
