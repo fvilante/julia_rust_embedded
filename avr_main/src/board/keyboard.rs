@@ -1,4 +1,6 @@
-/// Low-level driver for keypad
+//! Low-level driver for keypad
+//!
+
 use super::{input_expander::InputExpander, output_expander::OutputExpander};
 use avr_progmem::progmem;
 

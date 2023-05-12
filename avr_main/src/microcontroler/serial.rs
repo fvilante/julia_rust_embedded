@@ -1,62 +1,62 @@
-/// Wrapper over third-party hardware microcontroller's serial driver
-///
-/// # Example
-///
-/// Here's an example of use:
-///
-/// ```
-/// pub fn main() -> ! {
-///
-///     lcd::lcd_initialize();
-///     lcd::print("Inicializado serial");
-///
-///     init(9600);
-///
-///     lcd::print("Ok!");
-///     //delay_ms(1500);
-///     lcd::clear();
-///
-///     #[allow(arithmetic_overflow)]
-///     //1B 02 C1 50 61 02 1B 03 87 (valid posijet version1 master-to-slave cmpp frame)
-///     let frame: [u8; 9] = [
-///         0x1B,
-///         0x02,
-///         0xC1 - 0xC1,
-///         0x50 + 1,
-///         0x61,
-///         0x02,
-///         0x1B,
-///         0x03,
-///         0x87 + 0xC1 - 1,
-///     ];
-///
-///     for b in frame {
-///         transmit(b);
-///     }
-///
-///     let mut buf: [u8; 12] = [0; 12];
-///     let mut i = 0;
-///     loop {
-///         if ready_to_receive() {
-///             let b = receive();
-///             buf[i] = b;
-///             i = i + 1;
-///             if i > 8 {
-///                 for byte in buf {
-///                     lcd::print_u8_in_hex(byte);
-///                     lcd::print_char(';');
-///                 }
-///                 break;
-///             }
-///         }
-///     }
-///
-///     lcd::print("#");
-///
-///     loop {}
-/// }
-/// ```
-///
+//! Wrapper over third-party hardware microcontroller's serial driver
+//!
+//! # Example
+//!
+//! Here's an example of use:
+//!
+//! ```
+//! pub fn main() -> ! {
+//!
+//!     lcd::lcd_initialize();
+//!     lcd::print("Inicializado serial");
+//!
+//!     init(9600);
+//!
+//!     lcd::print("Ok!");
+//!     //delay_ms(1500);
+//!     lcd::clear();
+//!
+//!     #[allow(arithmetic_overflow)]
+//!     //1B 02 C1 50 61 02 1B 03 87 (valid posijet version1 master-to-slave cmpp frame)
+//!     let frame: [u8; 9] = [
+//!         0x1B,
+//!         0x02,
+//!         0xC1 - 0xC1,
+//!         0x50 + 1,
+//!         0x61,
+//!         0x02,
+//!         0x1B,
+//!         0x03,
+//!         0x87 + 0xC1 - 1,
+//!     ];
+//!
+//!     for b in frame {
+//!         transmit(b);
+//!     }
+//!
+//!     let mut buf: [u8; 12] = [0; 12];
+//!     let mut i = 0;
+//!     loop {
+//!         if ready_to_receive() {
+//!             let b = receive();
+//!             buf[i] = b;
+//!             i = i + 1;
+//!             if i > 8 {
+//!                 for byte in buf {
+//!                     lcd::print_u8_in_hex(byte);
+//!                     lcd::print_char(';');
+//!                 }
+//!                 break;
+//!             }
+//!         }
+//!     }
+//!
+//!     lcd::print("#");
+//!
+//!     loop {}
+//! }
+//! ```
+//!
 use ruduino::legacy::serial;
 
 /// you must call this function before call other serial related functions

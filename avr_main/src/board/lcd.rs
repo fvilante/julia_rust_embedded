@@ -1,32 +1,32 @@
-/// Driver for off-board lcd HITACH HD44780 display
-///
-/// # Example
-///
-/// ```
-/// pub fn main() -> ! {
-///     lcd_initialize();
-///     // cursor(); // This function is not working properly must be debuged
-///
-///     let icon: char = 'X';
-///
-///     loop {
-///         clear();
-///         set_cursor(10, 0);
-///         print("Julia AVR Rust");
-///         set_cursor(10, 1);
-///         print("@FlavioVilante");
-///         for row in 0..2 {
-///             for col in 0..40 {
-///                 set_cursor(col, row);
-///                 print_char(icon);
-///                 delay_ms(100);
-///                 set_cursor(col, row);
-///                 print_char(' ');
-///             }
-///         }
-///     }
-/// }
-/// ```
+//! Driver for off-board lcd HITACH HD44780 display
+//!
+//! # Example
+//!
+//! ```
+//! pub fn main() -> ! {
+//!     lcd_initialize();
+//!     // cursor(); // This function is not working properly must be debuged
+//!
+//!     let icon: char = 'X';
+//!
+//!     loop {
+//!         clear();
+//!         set_cursor(10, 0);
+//!         print("Julia AVR Rust");
+//!         set_cursor(10, 1);
+//!         print("@FlavioVilante");
+//!         for row in 0..2 {
+//!             for col in 0..40 {
+//!                 set_cursor(col, row);
+//!                 print_char(icon);
+//!                 delay_ms(100);
+//!                 set_cursor(col, row);
+//!                 print_char(' ');
+//!             }
+//!         }
+//!     }
+//! }
+//! ```
 use ruduino::cores::atmega328p::port;
 use ruduino::Pin;
 

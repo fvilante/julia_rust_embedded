@@ -1,3 +1,13 @@
+//! This module is responsible for on-board peripherals initialization:
+//!
+//!   * Timer interruption (at 1khz)
+//!   * Lcd display
+//!   * Input & output ports expander
+//!   * Front panel
+//!   * Keyboard
+//!   * Canvas
+//!
+//! NOTE: We are initializing serial port in other place, not here.
 use crate::{
     menu::{canvas::Canvas, keyboard::Keyboard},
     microcontroler::timer::init_timer,
@@ -7,16 +17,7 @@ use super::{
     front_panel::FrontPanel, input_expander::InputExpander, lcd, output_expander::OutputExpander,
 };
 
-/// On board peripherals initialization:
-///
-///   * Timer interruption (at 1khz)
-///   * Lcd display
-///   * Input & output ports expander
-///   * Front panel
-///   * Keyboard
-///   * Canvas
-///
-/// NOTE: We are initializing serial port in other place, not here.
+/// On board peripherals initialization
 pub struct Peripherals {
     output_expander: OutputExpander,
     input_expander: InputExpander,

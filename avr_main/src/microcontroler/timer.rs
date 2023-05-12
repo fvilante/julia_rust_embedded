@@ -1,6 +1,7 @@
-// Timer 16 bits interrupt setup and handling
-
-// This example was from here: https://github.com/Rahix/avr-hal/blob/main/examples/arduino-uno/src/bin/uno-timer.rs
+//! Timer 16 bits interrupt setup and handling
+//!
+//! Below code has beeing derived from code here:
+//! https://github.com/Rahix/avr-hal/blob/main/examples/arduino-uno/src/bin/uno-timer.rs
 
 /*
  This is derived from Rahix' comment to

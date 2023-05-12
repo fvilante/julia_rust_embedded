@@ -1,44 +1,46 @@
+//! Mid-level abstraction for on-board shift registers input expanders
+//!
+//! # Example
+//!
+//! ```
+//! pub fn development_entry_point() -> ! {
+//!      let input = InputExpander::new();
+//!      
+//!      // retrieve data from hardware to cache
+//!      input.fetch();
+//!      
+//!      // read from cache
+//!      let (d0, d1, d2, d3, d4, d5, d6, d7) = (
+//!          input.KBD_E1(),
+//!          input.KBD_E2(),
+//!          input.KBD_E3(),
+//!          input.KBD_E4(),
+//!          input.KBD_E5(),
+//!          input.KBD_E6(),
+//!          input.KBD_E7(),
+//!          input.KBD_E8(),
+//!      );
+//!      
+//!      let value: u8 = (d0 as u8) * (1 << 0)
+//!          + (d1 as u8) * (1 << 1)
+//!          + (d2 as u8) * (1 << 2)
+//!          + (d3 as u8) * (1 << 3)
+//!          + (d4 as u8) * (1 << 4)
+//!          + (d5 as u8) * (1 << 5)
+//!          + (d6 as u8) * (1 << 6)
+//!          + (d7 as u8) * (1 << 7);
+//!      
+//!      lcd_initialize();
+//!      print_u8_in_hex(value);
+//!      
+//!      loop {}
+//! }
+//! ```
+//!
+
 #![allow(non_camel_case_types)] // TODO: removed this two lines when possible
 #![allow(non_snake_case)]
-/// Mid-level abstraction for on-board shift registers input expanders
-///
-/// # Example
-///
-/// ```
-/// pub fn development_entry_point() -> ! {
-///      let input = InputExpander::new();
-///      
-///      // retrieve data from hardware to cache
-///      input.fetch();
-///      
-///      // read from cache
-///      let (d0, d1, d2, d3, d4, d5, d6, d7) = (
-///          input.KBD_E1(),
-///          input.KBD_E2(),
-///          input.KBD_E3(),
-///          input.KBD_E4(),
-///          input.KBD_E5(),
-///          input.KBD_E6(),
-///          input.KBD_E7(),
-///          input.KBD_E8(),
-///      );
-///      
-///      let value: u8 = (d0 as u8) * (1 << 0)
-///          + (d1 as u8) * (1 << 1)
-///          + (d2 as u8) * (1 << 2)
-///          + (d3 as u8) * (1 << 3)
-///          + (d4 as u8) * (1 << 4)
-///          + (d5 as u8) * (1 << 5)
-///          + (d6 as u8) * (1 << 6)
-///          + (d7 as u8) * (1 << 7);
-///      
-///      lcd_initialize();
-///      print_u8_in_hex(value);
-///      
-///      loop {}
-/// }
-/// ```
-///
+
 use super::shiftin::{init_shiftin_pins, readShiftIn, ShiftInData};
 
 use core::cell::Cell;

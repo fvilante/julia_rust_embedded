@@ -1,8 +1,11 @@
-// the ruduino delay appears to clamp miliseconds values above 1024.
-// here we will allow values greater than that.
+//! Just a wrapper over the ruduino lib
 
 use ruduino::delay::{delay_ms as delay_ms__, delay_us as delay_us__};
 
+/// Blocking delay given miliseconds value
+///
+/// The ruduino delay appears to clamp miliseconds values above 1024.
+/// Here we will allow values greater than that.
 pub fn delay_ms(total_ms: u64) -> () {
     delay_ms__(total_ms);
 

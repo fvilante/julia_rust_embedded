@@ -1,74 +1,76 @@
 #![allow(non_camel_case_types)] // TODO: removed this two lines when possible
 #![allow(non_snake_case)]
-/// High level abstraction over board low-latency outputs
-///
-/// # Example
-///
-/// ```
-/// pub fn development_entry_point() -> ! {
-///     lcd_initialize();
-///     print("iniciei");
-///
-///     let output = OutputExpander::new();
-///
-///     loop {
-///         output
-///             .BUZZER(true)
-///             .LED_ERRO(true)
-///             .LED_MANUAL(true)
-///             .LED_POS_ALC(true)
-///             .LED_PROGRAMA(true)
-///             .commit();
-///
-///         delay_ms(2000);
-///
-///         output
-///             .BUZZER(false)
-///             .LED_ERRO(false)
-///             .LED_MANUAL(false)
-///             .LED_POS_ALC(false)
-///             .LED_PROGRAMA(false)
-///             .commit();
-///
-///         delay_ms(1000);
-///     }
-/// }
-/// ```
-///
-/// # Electrical Connections
-///
-/// OUTPUT_BUS0     KBD-SA                   BIT0 - SHIFT-REGISTER 0 BEGIN
-/// OUTPUT_BUS1     KBD-SB                   BIT1
-/// OUTPUT_BUS2     KBD-S1                   BIT2
-/// OUTPUT_BUS3     KBD-S2                   BIT3
-/// OUTPUT_BUS4     KBD-S3                   BIT4
-/// OUTPUT_BUS5     KBD-S4                   BIT5
-/// OUTPUT_BUS6     KBD-S5                   BIT6
-/// OUTPUT_BUS7     KBD-S6                   BIT7
-/// OUTPUT_BUS8     KBD-S7                   BIT0 - SHIFT-REGISTER 1 BEGIN
-/// OUTPUT_BUS9     KBD-S8                   BIT1
-/// OUTPUT_BUS10    SAIDA-VAGO1              BIT2
-/// OUTPUT_BUS11    COPIA-SINAL-PTR          BIT3
-/// OUTPUT_BUS12    SAIDA-START-OUTRO        BIT4
-/// OUTPUT_BUS13    INVMEN                   BIT5
-/// OUTPUT_BUS14    P3                       BIT6
-/// OUTPUT_BUS15    P2                       BIT7
-/// OUTPUT_BUS16    P1                       BIT0 - SHIFT-REGISTER 2 BEGIN
-/// OUTPUT_BUS17    P0                       BIT1
-/// OUTPUT_BUS18    DMOTOR-1                 BIT2
-/// OUTPUT_BUS19    DMOTOR-2                 BIT3
-/// OUTPUT_BUS20    EMOTOR-1                 BIT4
-/// OUTPUT_BUS21    EMOTOR-2                 BIT5
-/// OUTPUT_BUS22    NMOTOR-1                 BIT6
-/// OUTPUT_BUS23    NMOTOR-2                 BIT7
-/// OUTPUT_BUS24    H/F-1                    BIT0 - SHIFT-REGISTER 3 BEGIN
-/// OUTPUT_BUS25    H/F-2                    BIT1
-/// OUTPUT_BUS26    BUZZER                   BIT2
-/// OUTPUT_BUS27    LED_POS_ALC              BIT3
-/// OUTPUT_BUS28    LED_PROGRAMA             BIT4
-/// OUTPUT_BUS29    LED_ERRO                 BIT5
-/// OUTPUT_BUS30    LED_EXECUCAO             BIT6
-/// OUTPUT_BUS31    LED_MANUAL               BIT7
+//! High level abstraction over board low-latency outputs
+//!
+//! # Example
+//!
+//! ```
+//! pub fn development_entry_point() -> ! {
+//!     lcd_initialize();
+//!     print("iniciei");
+//!
+//!     let output = OutputExpander::new();
+//!
+//!     loop {
+//!         output
+//!             .BUZZER(true)
+//!             .LED_ERRO(true)
+//!             .LED_MANUAL(true)
+//!             .LED_POS_ALC(true)
+//!             .LED_PROGRAMA(true)
+//!             .commit();
+//!
+//!         delay_ms(2000);
+//!
+//!         output
+//!             .BUZZER(false)
+//!             .LED_ERRO(false)
+//!             .LED_MANUAL(false)
+//!             .LED_POS_ALC(false)
+//!             .LED_PROGRAMA(false)
+//!             .commit();
+//!
+//!         delay_ms(1000);
+//!     }
+//! }
+//! ```
+//!
+//! # Electrical Connections
+//!
+//! OUTPUT_BUS0     KBD-SA                   BIT0 - SHIFT-REGISTER 0 BEGIN
+//! OUTPUT_BUS1     KBD-SB                   BIT1
+//! OUTPUT_BUS2     KBD-S1                   BIT2
+//! OUTPUT_BUS3     KBD-S2                   BIT3
+//! OUTPUT_BUS4     KBD-S3                   BIT4
+//! OUTPUT_BUS5     KBD-S4                   BIT5
+//! OUTPUT_BUS6     KBD-S5                   BIT6
+//! OUTPUT_BUS7     KBD-S6                   BIT7
+//! OUTPUT_BUS8     KBD-S7                   BIT0 - SHIFT-REGISTER 1 BEGIN
+//! OUTPUT_BUS9     KBD-S8                   BIT1
+//! OUTPUT_BUS10    SAIDA-VAGO1              BIT2
+//! OUTPUT_BUS11    COPIA-SINAL-PTR          BIT3
+//! OUTPUT_BUS12    SAIDA-START-OUTRO        BIT4
+//! OUTPUT_BUS13    INVMEN                   BIT5
+//! OUTPUT_BUS14    P3                       BIT6
+//! OUTPUT_BUS15    P2                       BIT7
+//! OUTPUT_BUS16    P1                       BIT0 - SHIFT-REGISTER 2 BEGIN
+//! OUTPUT_BUS17    P0                       BIT1
+//! OUTPUT_BUS18    DMOTOR-1                 BIT2
+//! OUTPUT_BUS19    DMOTOR-2                 BIT3
+//! OUTPUT_BUS20    EMOTOR-1                 BIT4
+//! OUTPUT_BUS21    EMOTOR-2                 BIT5
+//! OUTPUT_BUS22    NMOTOR-1                 BIT6
+//! OUTPUT_BUS23    NMOTOR-2                 BIT7
+//! OUTPUT_BUS24    H/F-1                    BIT0 - SHIFT-REGISTER 3 BEGIN
+//! OUTPUT_BUS25    H/F-2                    BIT1
+//! OUTPUT_BUS26    BUZZER                   BIT2
+//! OUTPUT_BUS27    LED_POS_ALC              BIT3
+//! OUTPUT_BUS28    LED_PROGRAMA             BIT4
+//! OUTPUT_BUS29    LED_ERRO                 BIT5
+//! OUTPUT_BUS30    LED_EXECUCAO             BIT6
+//! OUTPUT_BUS31    LED_MANUAL               BIT7
+//!
+
 use super::shiftout::write_shiftout;
 use super::shiftout::{init_shiftout_pins, ShiftOutData};
 use crate::microcontroler::delay::delay_ms;
