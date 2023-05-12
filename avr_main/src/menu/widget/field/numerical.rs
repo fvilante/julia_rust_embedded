@@ -17,33 +17,33 @@ use super::edit_mode::EditMode;
 
 use lib_1::utils::cursor::Cursor;
 
-/// Sets the max size of the [`Content`] type
-/// NOTE: Do not choose a number less than 5 else you cannot represent u16 data types in its decimal representation (ie: 65535)
-const MAX_NUMBER_OF_CHARS_IN_BUFFER: usize = 6;
-
-/// A string buffer with static capacity defined and stack allocated
-/// NOTE: The `String` type here is not from the standard lib but from a lib named `heapless`.
-type FieldBuffer = String<MAX_NUMBER_OF_CHARS_IN_BUFFER>;
-
 /// Represents a variable length  data, in memory, though a sequence of characters (ie: numbers, texts).
 /// This type is a wrapper over the [`FieldBuffer`] type
 struct Content {
-    data: FieldBuffer,
+    /// A string buffer with static capacity defined and stack allocated
+    /// NOTE: The `String` type here is not from the standard lib but from a lib named `heapless`.
+    data: String<{ Self::SIZE }>,
 }
 
 impl Content {
-    fn from_raw(data: FieldBuffer) -> Self {
+    /// Sets the max size of the [`Content`] type
+    /// MAX_NUMBER_OF_CHARS_IN_BUFFER
+    /// NOTE: Do not choose a number less than 5 else you cannot represent u16 data types in
+    /// its decimal representation (ie: 65535)
+    const SIZE: usize = 6;
+
+    fn from_raw(data: String<{ Self::SIZE }>) -> Self {
         Self { data }
     }
 
     /// New empty content
     fn new() -> Self {
-        Self::from_raw(FieldBuffer::new())
+        Self::from_raw(String::new())
     }
 
     /// Constructs from [`&str`] returns None if str is greater than buffer capacity (see: [`MAX_NUMBER_OF_CHARS_IN_BUFFER`])
     fn from_str(s: &str) -> Option<Self> {
-        if let Ok(data) = FieldBuffer::from_str(s) {
+        if let Ok(data) = String::from_str(s) {
             Some(Self::from_raw(data))
         } else {
             None
