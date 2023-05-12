@@ -8,13 +8,11 @@
 //!   * Canvas
 //!
 //! NOTE: We are initializing serial port in other place, not here.
-use crate::{
-    menu::{canvas::Canvas, keyboard::Keyboard},
-    microcontroler::timer::init_timer,
-};
+use crate::{menu::canvas::Canvas, microcontroler::timer::init_timer};
 
 use super::{
-    front_panel::FrontPanel, input_expander::InputExpander, lcd, output_expander::OutputExpander,
+    front_panel::FrontPanel, input_expander::InputExpander, keyboard::Keyboard, lcd,
+    output_expander::OutputExpander,
 };
 
 /// On board peripherals initialization
