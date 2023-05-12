@@ -90,8 +90,8 @@ pub const fn convert_u16_to_str_hex(data: u16) -> (char, char, char, char) {
     (highbyte_high, highbyte_low, lowbyte_high, lowbyte_low)
 }
 
-//NOTE: value above 65535 are clamped
 //TODO: Make this function unfalible
+//TODO: When possible write our own `itoa` because this one uses lot of static sram (about 250)
 pub fn convert_u16_to_string_decimal(value: u16) -> String<5> {
     let mut buffer = itoa::Buffer::new();
     let printed = buffer.format(value as u64);
