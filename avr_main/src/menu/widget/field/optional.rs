@@ -8,8 +8,8 @@ use crate::board::keypad::KeyCode;
 
 use crate::geometry::point::Point;
 use crate::menu::canvas::Canvas;
-use crate::menu::ratangular_wave::RectangularWave;
 use crate::menu::widget::widget::Editable;
+use crate::microcontroler::ratangular_wave::RectangularWave;
 use crate::string::flash::FlashString;
 use lib_1::utils::cursor::Cursor;
 

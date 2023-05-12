@@ -1,3 +1,5 @@
+//! Utility to generates asynchronous assymetric parametrizable retangular wave form
+
 use crate::microcontroler::timer::now;
 
 type TimePoint = u64;

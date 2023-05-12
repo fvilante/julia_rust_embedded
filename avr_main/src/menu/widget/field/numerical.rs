@@ -9,10 +9,8 @@ use lib_1::utils::numerical::{convert_u16_to_string_decimal, usize_to_u8_clamper
 use super::super::widget::Saveble;
 use super::super::{widget::Editable, widget::Widget};
 use crate::geometry::point::Point;
-use crate::{
-    board::keypad::KeyCode,
-    menu::{canvas::Canvas, ratangular_wave::RectangularWave},
-};
+use crate::microcontroler::ratangular_wave::RectangularWave;
+use crate::{board::keypad::KeyCode, menu::canvas::Canvas};
 
 use lib_1::utils::cursor::Cursor;
 
