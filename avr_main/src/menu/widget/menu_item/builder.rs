@@ -1,4 +1,4 @@
-use crate::geometry::point::{Point, Point1d};
+use crate::geometry::point::Point1d;
 use crate::menu::flash::FlashString;
 use crate::menu::widget::submenu::spec::MenuProgramaHandle;
 
