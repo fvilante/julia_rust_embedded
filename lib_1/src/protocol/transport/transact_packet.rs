@@ -23,11 +23,11 @@ pub fn transact_packet(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::mock::serial_connection_mock::MockedSerialConnection;
     use crate::protocol::datalink::frame::{Frame, Payload};
     use crate::protocol::datalink::prelude::StartByte;
     use crate::protocol::datalink::transact::DatalinkResult;
     use crate::protocol::transport::master_packet::CmppMessage;
+    use crate::serial_mock::serial_connection_mock::MockedSerialConnection;
     use crate::types::delay::delay_us;
 
     #[test]

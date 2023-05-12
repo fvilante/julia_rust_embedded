@@ -4,7 +4,7 @@ use crate::{
     board::keyboard::KeyCode,
     menu::{
         canvas::Canvas,
-        widget::{caption::caption::Caption, submenu::hepers::LcdLine},
+        widget::{caption::Caption, submenu::hepers::LcdLine},
     },
 };
 

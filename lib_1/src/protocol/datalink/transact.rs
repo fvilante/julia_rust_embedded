@@ -83,8 +83,8 @@ pub fn transact(
 #[cfg(test)]
 mod tests {
     use crate::{
-        mock::serial_connection_mock::MockedSerialConnection,
-        protocol::datalink::prelude::StartByte, types::delay::delay_us,
+        protocol::datalink::prelude::StartByte,
+        serial_mock::serial_connection_mock::MockedSerialConnection, types::delay::delay_us,
     };
 
     use super::*;

@@ -4,6 +4,7 @@ pub enum RingBufferError {
     BufferEmpty,
 }
 
+/// TODO: Substitute and reuse some already existent data type from [`heapless`] crate
 pub struct RingBuffer<T: Copy, const SIZE: usize> {
     buffer: [T; SIZE],
     write_index: usize,
