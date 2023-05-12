@@ -81,6 +81,7 @@ impl CmppAxis {
     }
 }
 
+/// Entry point of the main application
 pub fn run() -> ! {
     // /////////////////////////////////////////////////////////////////////
     // Initialize system
