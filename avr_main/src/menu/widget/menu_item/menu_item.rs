@@ -1,10 +1,10 @@
 use crate::geometry::point::{Point, Point1d};
-use crate::menu::widget::submenu::spec::MenuProgramaHandle;
+use crate::menu::widget::submenu_programa::spec::MenuProgramaHandle;
 use crate::{
     board::keypad::KeyCode,
     menu::{
         canvas::Canvas,
-        widget::{caption::Caption, submenu::hepers::LcdLine},
+        widget::{caption::Caption, submenu_programa::hepers::LcdLine},
     },
 };
 

@@ -4,7 +4,7 @@ use lib_1::protocol::transport::transport_layer::TransportLayer;
 use super::{
     execucao::MenuExecucaoControler,
     manual_mode::{ManualModeMenuControler, ManualModeState},
-    submenu::menu_programa_controler::MenuProgramaControler,
+    submenu_programa::menu_programa_controler::MenuProgramaControler,
     widget::Widget,
 };
 use crate::board::front_panel::FrontPanel;

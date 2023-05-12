@@ -1,5 +1,5 @@
 use crate::geometry::point::Point1d;
-use crate::menu::widget::submenu::spec::MenuProgramaHandle;
+use crate::menu::widget::submenu_programa::spec::MenuProgramaHandle;
 use crate::string::flash::FlashString;
 
 use super::{

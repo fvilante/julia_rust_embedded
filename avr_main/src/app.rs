@@ -1,14 +1,14 @@
 use crate::board::keypad::KeyCode;
 use crate::board::peripherals::Peripherals;
 use crate::menu::model::DataModel;
-use crate::menu::widget::submenu::menu_programa_controler::MenuProgramaControler;
+use crate::menu::widget::submenu_programa::menu_programa_controler::MenuProgramaControler;
 
 use crate::geometry::point::Point;
 use crate::menu::widget::execucao::MenuExecucaoControler;
 use crate::menu::widget::main_menu::MainMenu;
 use crate::menu::widget::manual_mode::ManualModeMenuControler;
 use crate::menu::widget::splash::Splash;
-use crate::menu::widget::submenu::spec::{MenuProgramaHandle, MenuProgramaView};
+use crate::menu::widget::submenu_programa::spec::{MenuProgramaHandle, MenuProgramaView};
 use crate::microcontroler::timer::now;
 use crate::microcontroler::{serial, timer};
 use lib_1::protocol::datalink::datalink::Datalink;

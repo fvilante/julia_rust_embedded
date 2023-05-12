@@ -7,7 +7,7 @@ use crate::{
     board::{keypad::KeyCode, lcd},
     menu::{
         canvas::Canvas,
-        widget::submenu::spec::{MenuProgramaHandle, MenuProgramaView},
+        widget::submenu_programa::spec::{MenuProgramaHandle, MenuProgramaView},
     },
     microcontroler::delay::delay_ms,
 };
