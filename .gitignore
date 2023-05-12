@@ -1,3 +1,4 @@
+.vscode/
 temp/
 /target/
 **/*.rs.bk
