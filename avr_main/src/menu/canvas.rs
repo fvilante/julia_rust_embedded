@@ -1,7 +1,7 @@
 use lib_1::utils::numerical::convert_u16_to_string_decimal;
 
-use super::point::Point;
 use crate::board::lcd;
+use crate::geometry::point::Point;
 
 ///TODO: Reimplement it using [`Cursor`]'s type
 struct CursorPosition {

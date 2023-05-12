@@ -6,9 +6,9 @@ use super::super::widget::{Saveble, Widget};
 
 use crate::board::keyboard::KeyCode;
 
+use crate::geometry::point::Point;
 use crate::menu::canvas::Canvas;
 use crate::menu::flash::FlashString;
-use crate::menu::point::Point;
 use crate::menu::ratangular_wave::RectangularWave;
 use crate::menu::widget::widget::Editable;
 use lib_1::utils::cursor::Cursor;

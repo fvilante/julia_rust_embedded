@@ -1,7 +1,6 @@
-use crate::{
-    board::keyboard::KeyCode,
-    menu::{canvas::Canvas, point::Point},
-};
+use crate::{board::keyboard::KeyCode, menu::canvas::Canvas};
+
+use crate::geometry::point::Point;
 
 /// A component that can be draw on lcd display, receive key strokes from keyboard and update its own state
 pub trait Widget {

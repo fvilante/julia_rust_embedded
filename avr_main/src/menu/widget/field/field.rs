@@ -1,10 +1,10 @@
 use core::cell::Cell;
 
+use crate::geometry::point::Point;
 use crate::{
     board::keyboard::KeyCode,
     menu::{
         canvas::Canvas,
-        point::Point,
         widget::widget::{Editable, Saveble, Widget},
     },
 };

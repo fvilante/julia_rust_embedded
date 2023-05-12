@@ -1,12 +1,12 @@
 use avr_progmem::progmem;
 use lib_1::protocol::transport::transport_layer::{new_proposal::ActivationState, TransportLayer};
 
+use super::widget::Widget;
+use crate::geometry::point::Point;
 use crate::{
     board::keyboard::KeyCode,
-    menu::{canvas::Canvas, flash::FlashString, point::Point},
+    menu::{canvas::Canvas, flash::FlashString},
 };
-
-use super::widget::Widget;
 
 progmem! {
     //                            1234567890123456789012345678901234567890

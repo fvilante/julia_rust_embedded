@@ -1,6 +1,6 @@
 use core::cell::Cell;
 
-use crate::menu::point::Point;
+use crate::geometry::point::Point;
 
 /// Rectangle internal spec
 /// X increases from left to right, Y increases from up to  bottom.

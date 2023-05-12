@@ -1,14 +1,13 @@
+use crate::geometry::point::{Point, Point1d};
+use crate::menu::widget::submenu::spec::MenuProgramaHandle;
 use crate::{
     board::keyboard::KeyCode,
     menu::{
         canvas::Canvas,
         flash::FlashString,
-        point::{Point, Point1d},
         widget::{caption::caption::Caption, submenu::hepers::LcdLine},
     },
 };
-
-use crate::menu::widget::submenu::spec::MenuProgramaHandle;
 
 use super::super::{
     field::field::Field,

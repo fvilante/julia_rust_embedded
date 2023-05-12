@@ -3,7 +3,7 @@ use super::widget::submenu::menu_programa_controler::MenuProgramaControler;
 use crate::board::keyboard::KeyCode;
 use crate::board::peripherals::Peripherals;
 
-use crate::menu::point::Point;
+use crate::geometry::point::Point;
 use crate::menu::widget::execucao::MenuExecucaoControler;
 use crate::menu::widget::main_menu::MainMenu;
 use crate::menu::widget::manual_mode::ManualModeMenuControler;

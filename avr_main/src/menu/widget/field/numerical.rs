@@ -6,13 +6,13 @@ use core::str::{CharIndices, Chars, FromStr};
 use heapless::String;
 use lib_1::utils::numerical::{convert_u16_to_string_decimal, usize_to_u8_clamper};
 
-use crate::{
-    board::keyboard::KeyCode,
-    menu::{canvas::Canvas, point::Point, ratangular_wave::RectangularWave},
-};
-
 use super::super::widget::Saveble;
 use super::super::{widget::Editable, widget::Widget};
+use crate::geometry::point::Point;
+use crate::{
+    board::keyboard::KeyCode,
+    menu::{canvas::Canvas, ratangular_wave::RectangularWave},
+};
 
 use lib_1::utils::cursor::Cursor;
 

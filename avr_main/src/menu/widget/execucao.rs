@@ -1,8 +1,9 @@
 //menu "execucao"
 
+use crate::geometry::point::Point;
 use crate::{
     board::keyboard::KeyCode,
-    menu::{canvas::Canvas, flash::FlashString, point::Point},
+    menu::{canvas::Canvas, flash::FlashString},
 };
 use avr_progmem::progmem;
 use lib_1::protocol::transport::transport_layer::{new_proposal::Displacement, TransportLayer};

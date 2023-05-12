@@ -1,11 +1,11 @@
 use super::{
     super::menu_item::menu_item::MenuItemWidget, hepers::LcdLine, navigation_state::NavigationState,
 };
+use crate::geometry::point::Point;
 use crate::{
     board::{keyboard::KeyCode, lcd},
     menu::{
         canvas::Canvas,
-        point::Point,
         ratangular_wave::RectangularWave,
         widget::submenu::spec::{MenuProgramaHandle, MenuProgramaView},
     },
