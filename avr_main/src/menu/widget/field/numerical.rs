@@ -10,7 +10,7 @@ use super::super::widget::Saveble;
 use super::super::{widget::Editable, widget::Widget};
 use crate::geometry::point::Point;
 use crate::{
-    board::keyboard::KeyCode,
+    board::keypad::KeyCode,
     menu::{canvas::Canvas, ratangular_wave::RectangularWave},
 };
 

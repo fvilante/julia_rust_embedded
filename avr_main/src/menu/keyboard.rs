@@ -1,6 +1,6 @@
 use crate::board::input_expander::InputExpander;
-use crate::board::keyboard::KeyCode;
-use crate::board::keyboard::Keypad;
+use crate::board::keypad::KeyCode;
+use crate::board::keypad::Keypad;
 use crate::board::output_expander::OutputExpander;
 use crate::microcontroler::delay::delay_ms;
 use crate::microcontroler::timer::now;

@@ -2,7 +2,7 @@ use core::cell::Cell;
 
 use crate::geometry::point::Point;
 use crate::{
-    board::keyboard::KeyCode,
+    board::keypad::KeyCode,
     menu::{
         canvas::Canvas,
         widget::widget::{Editable, Saveble, Widget},

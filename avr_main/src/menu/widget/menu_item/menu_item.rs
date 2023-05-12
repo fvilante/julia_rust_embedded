@@ -1,7 +1,7 @@
 use crate::geometry::point::{Point, Point1d};
 use crate::menu::widget::submenu::spec::MenuProgramaHandle;
 use crate::{
-    board::keyboard::KeyCode,
+    board::keypad::KeyCode,
     menu::{
         canvas::Canvas,
         widget::{caption::Caption, submenu::hepers::LcdLine},

@@ -1,4 +1,4 @@
-use crate::{board::keyboard::KeyCode, menu::canvas::Canvas};
+use crate::{board::keypad::KeyCode, menu::canvas::Canvas};
 
 use crate::geometry::point::Point;
 

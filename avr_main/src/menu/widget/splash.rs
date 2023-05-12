@@ -4,7 +4,7 @@ use lib_1::protocol::transport::transport_layer::TransportLayer;
 use crate::geometry::point::Point;
 use crate::string::flash::FlashString;
 use crate::{
-    board::{keyboard::KeyCode, lcd},
+    board::{keypad::KeyCode, lcd},
     menu::{canvas::Canvas, model::DataModel},
     microcontroler::{delay::delay_ms, timer::now},
 };

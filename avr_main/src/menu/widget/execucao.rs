@@ -2,7 +2,7 @@
 
 use crate::geometry::point::Point;
 use crate::string::flash::FlashString;
-use crate::{board::keyboard::KeyCode, menu::canvas::Canvas};
+use crate::{board::keypad::KeyCode, menu::canvas::Canvas};
 use avr_progmem::progmem;
 use lib_1::protocol::transport::transport_layer::{new_proposal::Displacement, TransportLayer};
 

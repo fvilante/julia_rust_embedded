@@ -4,7 +4,7 @@ use heapless::Vec;
 
 use super::super::widget::{Saveble, Widget};
 
-use crate::board::keyboard::KeyCode;
+use crate::board::keypad::KeyCode;
 
 use crate::geometry::point::Point;
 use crate::menu::canvas::Canvas;

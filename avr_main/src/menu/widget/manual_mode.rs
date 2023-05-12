@@ -4,7 +4,7 @@ use lib_1::protocol::transport::transport_layer::{new_proposal::ActivationState,
 use super::widget::Widget;
 use crate::geometry::point::Point;
 use crate::string::flash::FlashString;
-use crate::{board::keyboard::KeyCode, menu::canvas::Canvas};
+use crate::{board::keypad::KeyCode, menu::canvas::Canvas};
 progmem! {
     //                            1234567890123456789012345678901234567890
     static progmem string LINE0 = "Aperte qualquer tecla para entrar";

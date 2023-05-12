@@ -3,7 +3,7 @@ use super::{
 };
 use crate::geometry::point::Point;
 use crate::{
-    board::{keyboard::KeyCode, lcd},
+    board::{keypad::KeyCode, lcd},
     menu::{
         canvas::Canvas,
         ratangular_wave::RectangularWave,

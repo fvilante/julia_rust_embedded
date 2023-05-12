@@ -1,6 +1,6 @@
 use super::model::DataModel;
 use super::widget::submenu::menu_programa_controler::MenuProgramaControler;
-use crate::board::keyboard::KeyCode;
+use crate::board::keypad::KeyCode;
 use crate::board::peripherals::Peripherals;
 
 use crate::geometry::point::Point;
