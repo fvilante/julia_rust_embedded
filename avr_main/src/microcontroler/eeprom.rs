@@ -76,7 +76,7 @@ impl EepromAddress {
     /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom, and cannot address the last word address.
     pub fn write_u16(&self, val: u16) -> EepromAddress {
         let (byte_low, byte_high) = Word16::from_u16(val).split_bytes();
-        let mut next = self.write_u8(byte_low);
+        let next = self.write_u8(byte_low);
         let next = next.write_u8(byte_high);
         next
     }
@@ -86,8 +86,8 @@ impl EepromAddress {
         let byte_0 = cursor.get_current();
         let byte_1 = cursor.get_range().start; // TODO: Check if this byte is always 0, and if it is remove it from eeprom
         let byte_2 = cursor.get_range().end;
-        let mut next = self.write_u8(byte_0);
-        let mut next = next.write_u8(byte_1);
+        let next = self.write_u8(byte_0);
+        let next = next.write_u8(byte_1);
         let next = next.write_u8(byte_2);
         next
     }
@@ -136,9 +136,9 @@ impl EepromAddress {
 
     fn write_iterable<T: IntoIterator<Item = u8>>(&self, iterable: T) -> EepromAddress {
         let iterator = iterable.into_iter();
-        let mut next_address = self.clone();
+        let next_address = self.clone();
         for byte in iterator {
-            let next_address = next_address.write_u8(byte);
+            let _next_address = next_address.write_u8(byte);
         }
         next_address
     }

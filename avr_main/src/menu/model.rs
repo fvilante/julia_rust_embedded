@@ -74,7 +74,7 @@ pub struct ArquivoDeEixo {
 impl EepromStorable for ArquivoDeEixo {
     const SIGNATURE: u16 = 0xA000;
 
-    fn save_into_eeprom(&self, mut initial_address: EepromAddress) -> (EepromAddress, u8) {
+    fn save_into_eeprom(&self, initial_address: EepromAddress) -> (EepromAddress, u8) {
         let next = initial_address
             .write_u16(Self::SIGNATURE)
             .write_u16(self.posicao_inicial.get())
@@ -308,7 +308,7 @@ impl Default for ConfiguracaoDoEixo {
 impl EepromStorable for ConfiguracaoDoEixo {
     const SIGNATURE: u16 = 0xB000;
 
-    fn save_into_eeprom(&self, mut initial_address: EepromAddress) -> (EepromAddress, u8) {
+    fn save_into_eeprom(&self, initial_address: EepromAddress) -> (EepromAddress, u8) {
         let next = initial_address
             .write_u16(Self::SIGNATURE)
             .write_u16(self.numero_do_canal.get())
@@ -405,7 +405,7 @@ impl Default for ConfiguracaoDoEquipamento {
 impl EepromStorable for ConfiguracaoDoEquipamento {
     const SIGNATURE: u16 = 0x0C00;
 
-    fn save_into_eeprom(&self, mut initial_address: EepromAddress) -> (EepromAddress, u8) {
+    fn save_into_eeprom(&self, initial_address: EepromAddress) -> (EepromAddress, u8) {
         let next = initial_address
             .write_u16(Self::SIGNATURE)
             .write_cursor(self.velocidade_de_comunicacao.get());

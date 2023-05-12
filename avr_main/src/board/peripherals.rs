@@ -1,7 +1,7 @@
 use crate::{
     enviroment::front_panel::FrontPanel,
     menu::{canvas::Canvas, keyboard::Keyboard},
-    microcontroler::{serial, timer::init_timer},
+    microcontroler::timer::init_timer,
 };
 
 use super::{input_expander::InputExpander, lcd, output_expander::OutputExpander};

@@ -2,14 +2,13 @@ use super::model::DataModel;
 use super::widget::submenu::menu_programa_controler::MenuProgramaControler;
 use crate::board::keyboard::KeyCode;
 use crate::board::peripherals::Peripherals;
-use crate::cmpp::datalink;
+
 use crate::menu::point::Point;
 use crate::menu::widget::execucao::MenuExecucaoControler;
 use crate::menu::widget::main_menu::MainMenu;
 use crate::menu::widget::manual_mode::ManualModeMenuControler;
 use crate::menu::widget::splash::Splash;
 use crate::menu::widget::submenu::spec::{MenuProgramaHandle, MenuProgramaView};
-use crate::menu::widget::widget::Widget;
 use crate::microcontroler::timer::now;
 use crate::microcontroler::{serial, timer};
 use lib_1::protocol::datalink::datalink::Datalink;
@@ -171,7 +170,7 @@ pub fn development_entry_point() -> ! {
         }
 
         splash_window.update();
-        let start_point = Point::new(0, 0);
+        let _start_point = Point::new(0, 0);
         splash_window.draw(&mut canvas);
         canvas.render();
     }

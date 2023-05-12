@@ -3,7 +3,7 @@ use core::cell::Cell;
 use heapless::Vec;
 
 use super::super::widget::{Saveble, Widget};
-use super::edit_mode::EditMode;
+
 use crate::board::keyboard::KeyCode;
 
 use crate::menu::canvas::Canvas;

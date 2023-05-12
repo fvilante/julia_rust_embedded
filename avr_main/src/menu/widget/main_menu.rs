@@ -145,7 +145,7 @@ impl<'a> MainMenu<'a> {
                     lcd::set_cursor(0, 1);
                     lcd::print("Por favor aguarde a carga do programa X");
                     for response in self.model.send_all(&self.transport) {
-                        if let Err(e) = response {
+                        if let Err(_e) = response {
                             lcd::clear();
                             lcd::set_cursor(0, 0);
                             lcd::print("Erro de comunicacao serial");

@@ -1,7 +1,6 @@
-use heapless::String;
 use lib_1::utils::numerical::convert_u16_to_string_decimal;
 
-use super::{flash::FlashString, point::Point};
+use super::point::Point;
 use crate::board::lcd;
 
 ///TODO: Reimplement it using [`Cursor`]'s type
