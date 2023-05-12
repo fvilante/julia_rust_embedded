@@ -1,14 +1,81 @@
-// Driver for output expander made of 4 serially connected shift registers
-
+/// Driver for output expander made of 4 serially connected shift registers
+///
+/// # Characteristics
+///
+/// 32bits I/O Expander (using 4 output shift-registers in the board) has max output frequency about => 5kHz
+/// perid = 200usec / f = 5khz
+/// high pulse width = 4usec
+/// note: the focus was just to take a first measurement, no conclusions have beeing derived from that.
+///
+/// # Example
+///
+/// ```
+/// // Speed Test Measurement Results:
+/// pub fn example_1() -> ! {
+///     loop {
+///         let mut data: ShiftOutData = ShiftOutData {
+///             byte0: (0x00),
+///             byte1: (0x00),
+///             byte2: (0x00),
+///             byte3: (0x00),
+///         };
+///         write_shiftout(data);
+///         //delay_ms(100);
+///         data = ShiftOutData {
+///             byte0: (0x00),
+///             byte1: (0x00),
+///             byte2: (0x00),
+///             byte3: (1 << 6), // this pulse has 230 usec of period and
+///         };
+///         write_shiftout(data);
+///         //delay_ms(100);
+///     }
+/// }
+/// ```
+///
+/// # Electrical connections on the board
+///
+/// OUTPUT_BUS0     KBD-SA                   BIT0 - SHIFT-REGISTER 1 BEGIN
+/// OUTPUT_BUS1     KBD-SB                   BIT1
+/// OUTPUT_BUS2     KBD-S1                   BIT2
+/// OUTPUT_BUS3     KBD-S2                   BIT3
+/// OUTPUT_BUS4     KBD-S3                   BIT4
+/// OUTPUT_BUS5     KBD-S4                   BIT5
+/// OUTPUT_BUS6     KBD-S5                   BIT6
+/// OUTPUT_BUS7     KBD-S6                   BIT7
+/// OUTPUT_BUS8     KBD-S7                   BIT0 - SHIFT-REGISTER 2 BEGIN
+/// OUTPUT_BUS9     KBD-S8                   BIT1
+/// OUTPUT_BUS10    SAIDA-VAGO1              BIT2
+/// OUTPUT_BUS11    COPIA-SINAL-PTR          BIT3
+/// OUTPUT_BUS12    SAIDA-START-OUTRO        BIT4
+/// OUTPUT_BUS13    INVMEN                   BIT5
+/// OUTPUT_BUS14    P3                       BIT6
+/// OUTPUT_BUS15    P2                       BIT7
+/// OUTPUT_BUS16    P1                       BIT0 - SHIFT-REGISTER 3 BEGIN
+/// OUTPUT_BUS17    P0                       BIT1
+/// OUTPUT_BUS18    DMOTOR-1                 BIT2
+/// OUTPUT_BUS19    DMOTOR-2                 BIT3
+/// OUTPUT_BUS20    EMOTOR-1                 BIT4
+/// OUTPUT_BUS21    EMOTOR-2                 BIT5
+/// OUTPUT_BUS22    NMOTOR-1                 BIT6
+/// OUTPUT_BUS23    NMOTOR-2                 BIT7
+/// OUTPUT_BUS24    H/F-1                    BIT0 - SHIFT-REGISTER 4 BEGIN
+/// OUTPUT_BUS25    H/F-2                    BIT1
+/// OUTPUT_BUS26    BUZZER                   BIT2
+/// OUTPUT_BUS27    LED_POS_ALC              BIT3
+/// OUTPUT_BUS28    LED_PROGRAMA             BIT4
+/// OUTPUT_BUS29    LED_ERRO                 BIT5
+/// OUTPUT_BUS30    LED_EXECUCAO             BIT6
+/// OUTPUT_BUS31    LED_MANUAL               BIT7
+///
+///
 use ruduino::cores::atmega328p::port;
 use ruduino::Pin;
-
-use super::debug::set_led3;
 
 const HIGH: bool = true;
 const LOW: bool = false;
 
-// Initialize shift registers
+/// Initialize shift registers
 pub fn init_shiftout_pins() -> () {
     port::B0::set_output();
     port::B2::set_output();
@@ -118,83 +185,4 @@ pub fn write_shiftout(data: ShiftOutData) -> () {
 
     //latch
     rclk_out(HIGH);
-}
-
-// eletrical test result:
-// serial_out => ok (checar com pulso assimetrico)
-// srclk_out => ok
-// srclr_out => ok
-// rclk_out => ok
-pub fn test_signal() -> ! {
-    loop {
-        serial_out(HIGH);
-        srenab_out(HIGH);
-        rclk_out(HIGH);
-        set_led3(HIGH);
-        //delay_ms(300);
-        serial_out(LOW);
-        srenab_out(LOW);
-        rclk_out(LOW);
-        set_led3(LOW);
-        //delay_ms(100);
-    }
-}
-
-// OUTPUT_BUS0     KBD-SA                   BIT0 - SHIFT-REGISTER 1 BEGIN
-// OUTPUT_BUS1     KBD-SB                   BIT1
-// OUTPUT_BUS2     KBD-S1                   BIT2
-// OUTPUT_BUS3     KBD-S2                   BIT3
-// OUTPUT_BUS4     KBD-S3                   BIT4
-// OUTPUT_BUS5     KBD-S4                   BIT5
-// OUTPUT_BUS6     KBD-S5                   BIT6
-// OUTPUT_BUS7     KBD-S6                   BIT7
-// OUTPUT_BUS8     KBD-S7                   BIT0 - SHIFT-REGISTER 2 BEGIN
-// OUTPUT_BUS9     KBD-S8                   BIT1
-// OUTPUT_BUS10    SAIDA-VAGO1              BIT2
-// OUTPUT_BUS11    COPIA-SINAL-PTR          BIT3
-// OUTPUT_BUS12    SAIDA-START-OUTRO        BIT4
-// OUTPUT_BUS13    INVMEN                   BIT5
-// OUTPUT_BUS14    P3                       BIT6
-// OUTPUT_BUS15    P2                       BIT7
-// OUTPUT_BUS16    P1                       BIT0 - SHIFT-REGISTER 3 BEGIN
-// OUTPUT_BUS17    P0                       BIT1
-// OUTPUT_BUS18    DMOTOR-1                 BIT2
-// OUTPUT_BUS19    DMOTOR-2                 BIT3
-// OUTPUT_BUS20    EMOTOR-1                 BIT4
-// OUTPUT_BUS21    EMOTOR-2                 BIT5
-// OUTPUT_BUS22    NMOTOR-1                 BIT6
-// OUTPUT_BUS23    NMOTOR-2                 BIT7
-// OUTPUT_BUS24    H/F-1                    BIT0 - SHIFT-REGISTER 4 BEGIN
-// OUTPUT_BUS25    H/F-2                    BIT1
-// OUTPUT_BUS26    BUZZER                   BIT2
-// OUTPUT_BUS27    LED_POS_ALC              BIT3
-// OUTPUT_BUS28    LED_PROGRAMA             BIT4
-// OUTPUT_BUS29    LED_ERRO                 BIT5
-// OUTPUT_BUS30    LED_EXECUCAO             BIT6
-// OUTPUT_BUS31    LED_MANUAL               BIT7
-
-// Speed Test Measurement Results:
-// 32bits I/O Expander (using 4 output shift-registers in the board) has max output frequency about => 5kHz
-// perid = 200usec / f = 5khz
-// high pulse width = 4usec
-// note: the focus was just to take a first measurement, no conclusions have beeing derived from that.
-pub fn example_1() -> ! {
-    loop {
-        let mut data: ShiftOutData = ShiftOutData {
-            byte0: (0x00),
-            byte1: (0x00),
-            byte2: (0x00),
-            byte3: (0x00),
-        };
-        write_shiftout(data);
-        //delay_ms(100);
-        data = ShiftOutData {
-            byte0: (0x00),
-            byte1: (0x00),
-            byte2: (0x00),
-            byte3: (1 << 6), // this pulse has 230 usec of period and
-        };
-        write_shiftout(data);
-        //delay_ms(100);
-    }
 }
