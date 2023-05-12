@@ -1,7 +1,7 @@
-use super::model::DataModel;
-use super::widget::submenu::menu_programa_controler::MenuProgramaControler;
 use crate::board::keypad::KeyCode;
 use crate::board::peripherals::Peripherals;
+use crate::menu::model::DataModel;
+use crate::menu::widget::submenu::menu_programa_controler::MenuProgramaControler;
 
 use crate::geometry::point::Point;
 use crate::menu::widget::execucao::MenuExecucaoControler;
@@ -81,7 +81,7 @@ impl CmppAxis {
     }
 }
 
-pub fn development_entry_point() -> ! {
+pub fn run() -> ! {
     // /////////////////////////////////////////////////////////////////////
     // Initialize system
     // ////////////////////////////////////////////////////////////////////

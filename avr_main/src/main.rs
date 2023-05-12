@@ -12,8 +12,9 @@ extern crate alloc;
 extern "C" fn eh_personality() {}
 mod custom_alloc;
 
-// Load modules
+// Load main modules
 
+mod app;
 mod board;
 mod geometry;
 mod menu;
@@ -26,6 +27,6 @@ mod string;
 #[no_mangle]
 #[arduino_hal::entry]
 fn main() -> ! {
-    // Entry point
-    menu::menu_entry_point::development_entry_point()
+    // Application entry point
+    app::run()
 }
