@@ -1,4 +1,3 @@
-pub mod accessor;
 pub mod canvas;
 pub mod flash;
 pub mod keyboard;
