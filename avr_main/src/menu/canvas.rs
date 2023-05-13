@@ -4,6 +4,7 @@ use crate::board::lcd;
 use crate::geometry::point::Point;
 
 ///TODO: Reimplement it using [`Cursor`]'s type
+///TODO: Test this type because maybe something in it is not working
 struct CursorPosition {
     point: Point,
 }
