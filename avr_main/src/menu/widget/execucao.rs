@@ -23,7 +23,7 @@ impl<'a> MenuExecucaoControler<'a> {
         Self { transport }
     }
 
-    fn get_line_helper(line_number: u8) -> (Point, FlashString) {
+    fn get_line_helper(line_number: u8) -> (Point, impl IntoIterator<Item = u8>) {
         let line0 = FlashString::new(&LINE0);
         let line1 = FlashString::new(&LINE1);
         let col0 = ((40 - line0.len()) / 2).try_into().unwrap_or(0);
@@ -55,9 +55,9 @@ impl<'a> Widget for MenuExecucaoControler<'a> {
         canvas.clear();
         // draw screen frame
         for line_number in 0..2 {
-            let (point, flash_string) = Self::get_line_helper(line_number);
+            let (point, text) = Self::get_line_helper(line_number);
             canvas.set_cursor(point);
-            canvas.print_iterable(flash_string);
+            canvas.print_iterable(text);
         }
         // draw current position
         let posicao_atual = self.transport.posicao_atual();
