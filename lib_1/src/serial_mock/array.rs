@@ -11,7 +11,7 @@ impl<T: Copy, const SIZE: usize> Array<T, SIZE> {
         self.array[index]
     }
 
-    pub unsafe fn put_to_index(&mut self, index: usize, value: T) -> () {
+    pub unsafe fn put_to_index(&mut self, index: usize, value: T) {
         self.array[index] = value;
     }
 }

@@ -5,7 +5,7 @@ use super::{
 };
 use crate::types::serial_connection::SerialConnection;
 
-pub type DelayFn = fn(u64) -> ();
+pub type DelayFn = fn(u64);
 
 #[derive(Debug)]
 pub enum DatalinkError {

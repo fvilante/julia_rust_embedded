@@ -38,7 +38,7 @@ const HIGH: bool = true;
 const LOW: bool = false;
 
 // Initialize shift registers
-pub fn init_shiftin_pins() -> () {
+pub fn init_shiftin_pins() {
     port::D2::set_output(); // clk_in       -> PD2
     port::D3::set_output(); // latch_in     -> PD3
     port::D7::set_input(); // serial_in    -> PD7
@@ -47,7 +47,7 @@ pub fn init_shiftin_pins() -> () {
     latch_in(HIGH);
 }
 
-fn clk_in(value: bool) -> () {
+fn clk_in(value: bool) {
     if value == HIGH {
         port::D2::set_high();
     } else {
@@ -55,7 +55,7 @@ fn clk_in(value: bool) -> () {
     };
 }
 
-fn latch_in(value: bool) -> () {
+fn latch_in(value: bool) {
     if value == HIGH {
         port::D3::set_high();
     } else {

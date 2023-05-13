@@ -60,8 +60,8 @@ fn rig_timer(tmr1: &TC1) {
     tmr1.timsk1.write(|w| w.ocie1a().set_bit()); //enable this specific interrupt
 }
 
-pub fn init_timer() -> () {
-    fn set_initial_state(initial_state: InterruptState) -> () {
+pub fn init_timer() {
+    fn set_initial_state(initial_state: InterruptState) {
         unsafe {
             // SAFETY: Interrupts are not enabled at this point so we can safely write the global
             // variable here.  A memory barrier afterwards ensures the compiler won't reorder this
@@ -71,13 +71,13 @@ pub fn init_timer() -> () {
         }
     }
 
-    fn configure_timer() -> () {
+    fn configure_timer() {
         let dp = arduino_hal::Peripherals::take().unwrap();
         let tmr1: TC1 = dp.TC1;
         rig_timer(&tmr1);
     }
 
-    fn enable_interrupts_globally() -> () {
+    fn enable_interrupts_globally() {
         // Enable interrupts globally, not a replacement for the specific interrupt enable
         unsafe {
             // SAFETY: Not inside a critical section and any non-atomic operations have been completed

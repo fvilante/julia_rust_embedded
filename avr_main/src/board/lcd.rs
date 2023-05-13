@@ -44,7 +44,7 @@ const LOW: bool = false;
 const NUMBER_OF_COLS: u8 = 40;
 pub const NUMBER_OF_LINES: u8 = 2;
 
-fn init_lcd_pins() -> () {
+fn init_lcd_pins() {
     port::B4::set_output(); // lcd_rs = PB4
     port::B5::set_output(); // lcd_enable = PB5
                             //
@@ -54,7 +54,7 @@ fn init_lcd_pins() -> () {
     port::C3::set_output(); // lcd_db4 = PC3
 }
 
-fn lcd_rs(value: bool) -> () {
+fn lcd_rs(value: bool) {
     if value == HIGH {
         port::B4::set_high();
     } else {
@@ -62,7 +62,7 @@ fn lcd_rs(value: bool) -> () {
     };
 }
 
-fn lcd_enable(value: bool) -> () {
+fn lcd_enable(value: bool) {
     if value == HIGH {
         port::B5::set_high();
     } else {
@@ -70,7 +70,7 @@ fn lcd_enable(value: bool) -> () {
     };
 }
 
-fn lcd_db7(value: bool) -> () {
+fn lcd_db7(value: bool) {
     if value == HIGH {
         port::C0::set_high();
     } else {
@@ -78,7 +78,7 @@ fn lcd_db7(value: bool) -> () {
     };
 }
 
-fn lcd_db6(value: bool) -> () {
+fn lcd_db6(value: bool) {
     if value == HIGH {
         port::C1::set_high();
     } else {
@@ -86,7 +86,7 @@ fn lcd_db6(value: bool) -> () {
     };
 }
 
-fn lcd_db5(value: bool) -> () {
+fn lcd_db5(value: bool) {
     if value == HIGH {
         port::C2::set_high();
     } else {
@@ -94,7 +94,7 @@ fn lcd_db5(value: bool) -> () {
     };
 }
 
-fn lcd_db4(value: bool) -> () {
+fn lcd_db4(value: bool) {
     if value == HIGH {
         port::C3::set_high();
     } else {
@@ -106,9 +106,9 @@ fn lcd_db4(value: bool) -> () {
 /************ low level data pushing commands **********/
 
 /// write low four bits of data in the lcd data output channel
-fn write4bits(data: u8) -> () {
+fn write4bits(data: u8) {
     /// Pulses the enable pin
-    fn pulse_enable() -> () {
+    fn pulse_enable() {
         lcd_enable(LOW);
         delay_us(1);
         lcd_enable(HIGH);
@@ -129,7 +129,7 @@ fn write4bits(data: u8) -> () {
 /// Writes either command or data, base in the value of parameter `rs_mode`.
 ///
 /// If `rs_mode` is false then writes a command, otherwise data
-fn send(value: u8, rs_mode: bool) -> () {
+fn send(value: u8, rs_mode: bool) {
     lcd_rs(rs_mode);
     write4bits(value >> 4); // most significant bits
     write4bits(value); // least significant bits
@@ -139,13 +139,13 @@ fn send(value: u8, rs_mode: bool) -> () {
 /*********** mid level commands, for sending data/cmds */
 
 /// Sends commands
-fn command(value: u8) -> () {
+fn command(value: u8) {
     send(value, LOW);
 }
 
 /// Sends data
 /// prints just one byte
-fn write_u8(value: u8) -> () {
+fn write_u8(value: u8) {
     send(value, HIGH);
 }
 
@@ -155,7 +155,7 @@ fn write_u8(value: u8) -> () {
 // TODO: Improve these `high level user functions` to be something more generic.
 
 /// print just one byte
-pub fn print_bit(bit: bool) -> () {
+pub fn print_bit(bit: bool) {
     if bit == true {
         print_char('1');
     } else {
@@ -164,18 +164,18 @@ pub fn print_bit(bit: bool) -> () {
 }
 
 /// print just one byte
-pub fn print_u8(value: u8) -> () {
+pub fn print_u8(value: u8) {
     write_u8(value);
 }
 
-pub fn print_u8_in_hex(value: u8) -> () {
+pub fn print_u8_in_hex(value: u8) {
     let (high, low) = convert_u8_to_str_hex(value);
     print_char(high);
     print_char(low);
     print_char('h');
 }
 
-pub fn print_u16_in_hex(value: u16) -> () {
+pub fn print_u16_in_hex(value: u16) {
     let (Q3, Q2, Q1, Q0) = convert_u16_to_str_hex(value);
     print_char(Q3);
     print_char(Q2);
@@ -185,19 +185,19 @@ pub fn print_u16_in_hex(value: u16) -> () {
 }
 
 /// print just one byte
-pub fn print_char(char: char) -> () {
+pub fn print_char(char: char) {
     write_u8(char as u8);
 }
 
 /// prints a full string
-pub fn print(text: &str) -> () {
+pub fn print(text: &str) {
     for char in text.as_bytes() {
         write_u8(*char);
     }
 }
 
 /// prints a full string
-pub fn print_u8_array<const N: usize>(text: &[u8; N]) -> () {
+pub fn print_u8_array<const N: usize>(text: &[u8; N]) {
     for char in text {
         let char_ = *char; // deref
         if char_ > 0 {
@@ -208,7 +208,7 @@ pub fn print_u8_array<const N: usize>(text: &[u8; N]) -> () {
 
 /// --------------------------------------------------------------------------
 /********** high level commands, for the user! */
-pub fn clear() -> () {
+pub fn clear() {
     const LCD_CLEARDISPLAY: u8 = 0x01;
     command(LCD_CLEARDISPLAY); // clear display, set cursor position to zero
     delay_us(2000); // this command takes a long time!
@@ -293,7 +293,7 @@ fn initialization_protocol() {
 /// NOTE: I made this function still more specialized in LCD 40x2 display, to try to
 /// save some bytes of memory state. But the more generic function can be acessed
 /// in the repository. See commit: 1cf9c0efe402afa2cfe61b67e3fff476cf1b9f01
-pub fn lcd_initialize() -> () {
+pub fn lcd_initialize() {
     const LCD_ENTRYMODESET: u8 = 0x04;
     const LCD_DISPLAYCONTROL: u8 = 0x08;
     const LCD_FUNCTIONSET: u8 = 0x20;

@@ -197,7 +197,7 @@ impl OutputExpander {
     }
 
     /// send all signais from the staged_area area to hardware if there is something to send
-    pub fn commit(&self) -> () {
+    pub fn commit(&self) {
         // avoid to send data if nothing has changed
         if self.has_changed.get() {
             write_shiftout(self.stage_area.get());
@@ -222,7 +222,7 @@ impl OutputExpander {
         bit
     }
 
-    fn set_bit_in_stage_area__(&self, address: Address, data_bit: bool) -> () {
+    fn set_bit_in_stage_area__(&self, address: Address, data_bit: bool) {
         let Address(register, position) = address;
         let current_byte = self.get_byte_from_stage_area__(register);
         let new_byte = configure_bit(current_byte, position as u8, data_bit);

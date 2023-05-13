@@ -6,7 +6,7 @@ use ruduino::delay::{delay_ms as delay_ms__, delay_us as delay_us__};
 ///
 /// The ruduino delay appears to clamp miliseconds values above 1024.
 /// Here we will allow values greater than that.
-pub fn delay_ms(total_ms: u64) -> () {
+pub fn delay_ms(total_ms: u64) {
     delay_ms__(total_ms);
 
     // below code not working correctly, fix when possible
@@ -26,6 +26,6 @@ pub fn delay_ms(total_ms: u64) -> () {
     */
 }
 
-pub fn delay_us(total_us: u64) -> () {
+pub fn delay_us(total_us: u64) {
     delay_us__(total_us)
 }

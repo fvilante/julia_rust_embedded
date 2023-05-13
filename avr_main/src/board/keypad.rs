@@ -217,7 +217,7 @@ impl<'a> Keypad<'a> {
         Keypad { output, input }
     }
 
-    fn set_output(&self, n: u8, value: bool) -> () {
+    fn set_output(&self, n: u8, value: bool) {
         //ATTENTION: Do call commit() after write.
         match n {
             0 => self.output.KBD_S1(value).commit(),

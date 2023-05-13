@@ -76,7 +76,7 @@ const HIGH: bool = true;
 const LOW: bool = false;
 
 /// Initialize shift registers
-pub fn init_shiftout_pins() -> () {
+pub fn init_shiftout_pins() {
     port::B0::set_output();
     port::B2::set_output();
     port::D6::set_output();
@@ -89,7 +89,7 @@ pub fn init_shiftout_pins() -> () {
     serial_out(LOW);
 }
 
-fn serial_out(value: bool) -> () {
+fn serial_out(value: bool) {
     if value == HIGH {
         port::B0::set_high();
     } else {
@@ -97,7 +97,7 @@ fn serial_out(value: bool) -> () {
     };
 }
 
-fn srclk_out(value: bool) -> () {
+fn srclk_out(value: bool) {
     if value == HIGH {
         port::B2::set_high();
     } else {
@@ -105,7 +105,7 @@ fn srclk_out(value: bool) -> () {
     };
 }
 
-fn srclr_out(value: bool) -> () {
+fn srclr_out(value: bool) {
     if value == HIGH {
         port::D6::set_high();
     } else {
@@ -113,7 +113,7 @@ fn srclr_out(value: bool) -> () {
     };
 }
 
-fn rclk_out(value: bool) -> () {
+fn rclk_out(value: bool) {
     if value == HIGH {
         port::C5::set_high();
     } else {
@@ -121,7 +121,7 @@ fn rclk_out(value: bool) -> () {
     };
 }
 
-fn srenab_out(value: bool) -> () {
+fn srenab_out(value: bool) {
     if value == HIGH {
         port::C4::set_high();
     } else {
@@ -166,7 +166,7 @@ fn shiftout__(data_out: u8) {
     }
 }
 
-pub fn write_shiftout(data: ShiftOutData) -> () {
+pub fn write_shiftout(data: ShiftOutData) {
     //enable chips
     srenab_out(LOW);
 
