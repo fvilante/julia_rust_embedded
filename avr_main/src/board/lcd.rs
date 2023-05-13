@@ -114,7 +114,7 @@ fn write4bits(data: u8) {
         lcd_enable(HIGH);
         delay_us(1); // enable pulse must be >450ns
         lcd_enable(LOW);
-        delay_us(100); // commands need > 37us to settle
+        delay_us(30); // commands need > 37us to settle // NOTE: I'm trying a small number let's see if it works for a long time
     }
 
     // push data
