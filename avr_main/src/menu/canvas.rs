@@ -85,11 +85,8 @@ impl Canvas {
         self.cursor_position.set(Point::new(0, 0));
     }
 
-    /// Generic function to print any type that implements [`Printable`] trait.
-    /// NOTE: Any type that implements [`IntoIterator<Item = u8>`] is considered automatically printable.
-    pub fn print<T: Printable>(&mut self, data_to_print: T) {
-        let iterator = data_to_print.into_iter();
-        for byte in iterator {
+    pub fn print(&mut self, data_to_print: impl Printable) {
+        for byte in data_to_print.into_iter() {
             self.print_u8(byte);
         }
     }

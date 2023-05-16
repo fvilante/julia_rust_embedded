@@ -1,7 +1,8 @@
-//! Anything that implements [`IntoIterator<Item = u8>`] is considered printable for this system that
-//! targets anything compatible with the conventional Hitachi LCD displays.
-//!
+//! Anything that can be condiered printable for this system.
 
 pub trait Printable: IntoIterator<Item = u8> {}
 
+/// Any type that implements [`IntoIterator<Item = u8>`] is considered automatically [`Printable`].
 impl<T: IntoIterator<Item = u8>> Printable for T {}
+
+struct Printer {}
