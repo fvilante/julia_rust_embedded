@@ -1,4 +1,7 @@
+mod adapter;
 mod driver;
+mod interface;
+//
 
-/// TODO: Remove (or reduce) the exposition of this low-level driver when possible
+/// TODO: Remove the exposition of the driver, use the adapter instead
 pub use driver::*;
