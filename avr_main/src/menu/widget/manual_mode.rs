@@ -60,15 +60,15 @@ impl Widget for ManualModeMenuControler<'_> {
         if self.current_state == ManualModeState::FirstScreen {
             canvas.clear();
             canvas.set_cursor(Point::new(0, 0));
-            canvas.print_iterable(FlashString::new(&LINE0));
+            canvas.print(FlashString::new(&LINE0));
             canvas.set_cursor(Point::new(0, 1));
-            canvas.print_iterable(FlashString::new(&LINE1));
+            canvas.print(FlashString::new(&LINE1));
         } else if self.current_state == ManualModeState::LastScreen {
             canvas.clear();
             canvas.set_cursor(Point::new(0, 0));
-            canvas.print_iterable(FlashString::new(&LINE2));
+            canvas.print(FlashString::new(&LINE2));
             canvas.set_cursor(Point::new(0, 1));
-            canvas.print_iterable(FlashString::new(&LINE3));
+            canvas.print(FlashString::new(&LINE3));
             //TODO: below effect should be in `update` and not in `draw` method
             //TODO: The use of `.unwrap` method is provoking flash size explosion, check why
             let _unwrap = self.transport.stop_serial().set(ActivationState::Activated);

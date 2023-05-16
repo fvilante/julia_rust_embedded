@@ -115,11 +115,11 @@ impl Splash<'_> {
             State::Initial => {}
             State::BrandName => {
                 canvas.set_cursor(Point::new(4, 0));
-                canvas.print_iterable(FlashString::new(&TEXT0));
+                canvas.print(FlashString::new(&TEXT0));
             }
             State::LoadingX => {
                 canvas.set_cursor(Point::new(0, 1));
-                canvas.print_iterable(FlashString::new(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X));
+                canvas.print(FlashString::new(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X));
                 // TODO: Move this effect to `update` method when possible
                 for response in self.model.send_all(&self.transport) {
                     if let Err(_e) = response {
@@ -133,7 +133,7 @@ impl Splash<'_> {
             }
             State::LoadingY => {
                 canvas.set_cursor(Point::new(0, 0));
-                canvas.print_iterable(FlashString::new(&TEXT2));
+                canvas.print(FlashString::new(&TEXT2));
             }
             State::End => {
                 // do nothing

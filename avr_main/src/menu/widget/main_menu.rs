@@ -79,7 +79,7 @@ impl<'a> MainMenu<'a> {
         for line_number in 0..2 {
             let (point, flash_string) = get_line_helper(line_number);
             canvas.set_cursor(point);
-            canvas.print_iterable(flash_string);
+            canvas.print(flash_string);
         }
     }
 }

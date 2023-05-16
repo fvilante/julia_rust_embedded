@@ -57,7 +57,7 @@ impl<'a> Widget for MenuExecucaoControler<'a> {
         for line_number in 0..2 {
             let (point, text) = Self::get_line_helper(line_number);
             canvas.set_cursor(point);
-            canvas.print_iterable(text);
+            canvas.print(text);
         }
         // draw current position
         let posicao_atual = self.transport.posicao_atual();

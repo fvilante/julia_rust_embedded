@@ -2,6 +2,7 @@ use lib_1::utils::numerical::convert_u16_to_string_decimal;
 
 use crate::board::lcd;
 use crate::geometry::point::Point;
+use crate::printable::Printable;
 
 ///TODO: Reimplement it using [`Cursor`]'s type
 ///TODO: Test this type because maybe something in it is not working
@@ -68,6 +69,10 @@ impl Canvas {
         self.cursor_position.increment();
     }
 
+    pub fn print_u8(&mut self, data: u8) {
+        self.print_char(data as char)
+    }
+
     /// Places cursor at the given position
     pub fn set_cursor(&mut self, point: Point) {
         self.cursor_position.set(point);
@@ -80,16 +85,12 @@ impl Canvas {
         self.cursor_position.set(Point::new(0, 0));
     }
 
-    /// Prints an iterable that can iterate over some type convertible to u8.
-    pub fn print_iterable<T, B>(&mut self, iterable: T)
-    where
-        T: IntoIterator<Item = B>,
-        B: Into<u8>,
-    {
-        let iterator = iterable.into_iter();
-        for each in iterator {
-            let ascii_code: u8 = each.into();
-            self.print_char(ascii_code as char);
+    /// Generic function to print any type that implements [`Printable`] trait.
+    /// NOTE: Any type that implements [`IntoIterator<Item = u8>`] is considered automatically printable.
+    pub fn print<T: Printable>(&mut self, data_to_print: T) {
+        let iterator = data_to_print.into_iter();
+        for byte in iterator {
+            self.print_u8(byte);
         }
     }
 
