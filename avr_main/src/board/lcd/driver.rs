@@ -1,5 +1,8 @@
 //! Driver for off-board lcd HITACH HD44780 display
 //!
+//! > *IMPORTANT*: You need to call the function [`lcd_initialize`] at least once in your program,
+//! > and before call any other function of this library.
+//!
 //! # Example
 //!
 //! ```
