@@ -1,4 +1,4 @@
-use crate::geometry::{point::Point, rectangle::Rectangle};
+use crate::geometry::point::Point;
 
 /// NOTE: It is assumed that any given [`Lcd`] instance is already correctly initialized.
 pub trait Lcd {

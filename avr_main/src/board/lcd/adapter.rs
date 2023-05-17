@@ -18,7 +18,7 @@ impl LcdHardware40x2 {
 impl Lcd for LcdHardware40x2 {
     const MAX_COLS: u8 = 40;
     const MAX_ROWS: u8 = 2;
-    fn print_u8(&self, byte: u8) {
+    fn print_u8(&self, _byte: u8) {
         todo!()
     }
 
