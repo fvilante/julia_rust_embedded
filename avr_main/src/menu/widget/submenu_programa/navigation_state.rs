@@ -60,7 +60,7 @@ impl From<CompressedNumbers> for DecompressedNumbers {
 /// Controls the state of the navigation on sub menu, which is what is the selected line in the list of items.
 ///
 /// TODO: The memory footprint size this struct may be optimized going from 2 bytes to 1 bytes if you join
-/// the two states. Because `lcd_line_cursor` needs just in bit, while `first_line_to_render` may exists with just 7 bits.
+/// the two states. Because `lcd_line_cursor` needs just one bit, while `first_line_to_render` may exists with just 7 bits.
 #[derive(Clone, Copy)]
 pub struct NavigationState {
     /// Tracks the item on the LCD that is currently selected.
