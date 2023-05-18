@@ -5,7 +5,7 @@
 
 This source code is used to control the Circuit Board `Julia PCI`(version 1.10).
 
-But the code is design with the concept of multi-platform in mind, and it is can run in Windows or in another microcontrolers manufactors or another AVR familly chip.
+Part of the code is multiplatform agnostic and part is plataform specific (AVR microcontroler).
 
 ## Prerequisites
 
@@ -22,8 +22,20 @@ But the code is design with the concept of multi-platform in mind, and it is can
 Before start building, enter terminal go to the directory project and type: 
 
 ```
-> rustup install nightly-2022-12-04
+> rustup toolchain install nightly-2022-12-04
 ```
+
+then type:
+
+```
+> rustup default nightly-2022-12-04
+> rustup override set nightly-2022-12-04
+> rustup override nightly-2022-12-04
+> rustup component add rust-src --toolchain nightly-2022-12-04-x86_64-pc-windows-msvc
+```
+
+> Note: Some of upabove commands may be unnecessary, check and update this doc when possible.
+
 
 This will install the specified version of the rust toolchain.
 
