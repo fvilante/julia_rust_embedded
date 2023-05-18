@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "avr_main",
+    "bare_metal",
     "lib_1",
 ]
 

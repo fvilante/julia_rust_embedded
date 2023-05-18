@@ -5,7 +5,7 @@
 AVR_SIZE=C:\avr\avr8-gnu-toolchain-win32_x86/bin/avr-size
 MCU=atmega328p
 BUILD_DIR=target/avr-atmega328p/release
-BASE=-Z build-std=core,alloc --target .\avr_main\avr-specs\avr-atmega328p.json --release
+BASE=-Z build-std=core,alloc --target .\bare_metal\avr-specs\avr-atmega328p.json --release
 
 all: fast
 
@@ -48,20 +48,20 @@ fast: build upload_fast size
 full: check test build upload_fast size
 
 clippy:
-	cargo clippy --package avr_main $(BASE)  
+	cargo clippy --package bare_metal $(BASE)  
 
 check:
-	cargo check --package avr_main $(BASE) 
+	cargo check --package bare_metal $(BASE) 
 
 # Try to automatically correct as many warnings as possible. Note: Assure to have `warning` enabled in your main module. Disabled warnings are not fixed.
 # NOTE: you can also use `--allow-dirty --allow-staged` parameters if you want to overwrite fixed files even if they are uncommited in the repository.
 fix:
-	cargo fix --package avr_main $(BASE) --bins 
+	cargo fix --package bare_metal $(BASE) --bins 
 
 # Same as `fix` rule but do not print fix log messages
 # IMPORTANT: if you have uncommited changes this rule may overwrite your files unadivertedly
 fix_silently:
-	cargo fix --package avr_main $(BASE) --bins --quiet --allow-dirty --allow-staged
+	cargo fix --package bare_metal $(BASE) --bins --quiet --allow-dirty --allow-staged
 
 
 # tests in the platform agnostic lib are performed in x86 host
@@ -69,28 +69,28 @@ test:
 	cargo test --package lib_1 --release
 
 build:
-	cargo build --package avr_main $(BASE) 
+	cargo build --package bare_metal $(BASE) 
 
 doc:
-	cargo doc --package avr_main $(BASE) --open
+	cargo doc --package bare_metal $(BASE) --open
 
 # slow because it verifies after write proccess
 upload_slow:
-	#avrdude -v -F -c usbasp -p m328p -Uflash:w:target/avr-atmega328p/release/avr_main:e
-	avrdude  -v -F -c usbasp -p m328p -Uflash:w:target/avr-atmega328p/release/avr_main.elf -U lfuse:w:0xFF:m -U hfuse:w:0xDE:m -U efuse:w:0xFD:m  
+	#avrdude -v -F -c usbasp -p m328p -Uflash:w:target/avr-atmega328p/release/bare_metal:e
+	avrdude  -v -F -c usbasp -p m328p -Uflash:w:target/avr-atmega328p/release/bare_metal.elf -U lfuse:w:0xFF:m -U hfuse:w:0xDE:m -U efuse:w:0xFD:m  
 
 # do not verify after write
 upload_fast:
-	avrdude  -V -v -F -c usbasp -p m328p -Uflash:w:target/avr-atmega328p/release/avr_main.elf -U lfuse:w:0xFF:m -U hfuse:w:0xDE:m -U efuse:w:0xFD:m  
+	avrdude  -V -v -F -c usbasp -p m328p -Uflash:w:target/avr-atmega328p/release/bare_metal.elf -U lfuse:w:0xFF:m -U hfuse:w:0xDE:m -U efuse:w:0xFD:m  
 
 # produces assembly from .elf file
 assembly_code:
-	avr-objdump -S ./target/avr-atmega328p/release/avr_main.elf > ./target/avr-atmega328p/release/avr_main.asm
+	avr-objdump -S ./target/avr-atmega328p/release/bare_metal.elf > ./target/avr-atmega328p/release/bare_metal.asm
 
 size:
-	@$(AVR_SIZE) --format=sysv $(BUILD_DIR)/avr_main.elf
-	@$(AVR_SIZE) --mcu=$(MCU) $(BUILD_DIR)/avr_main.elf
-	@$(AVR_SIZE) -C --mcu=$(MCU) $(BUILD_DIR)/avr_main.elf
+	@$(AVR_SIZE) --format=sysv $(BUILD_DIR)/bare_metal.elf
+	@$(AVR_SIZE) --mcu=$(MCU) $(BUILD_DIR)/bare_metal.elf
+	@$(AVR_SIZE) -C --mcu=$(MCU) $(BUILD_DIR)/bare_metal.elf
 	
 
 # See in google: "Gource" it is a tool to graphically visualize a repository
