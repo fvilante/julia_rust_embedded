@@ -75,7 +75,7 @@ impl CmppAxis {
         }
     }
 
-    fn get_transport_layer<'a>(&'a self) -> TransportLayer<'a> {
+    fn get_transport_layer(&self) -> TransportLayer {
         let transport = TransportLayer::new(&self.datalink, self.mechanical_properties);
         transport
     }
