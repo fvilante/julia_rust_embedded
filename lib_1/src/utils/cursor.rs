@@ -21,7 +21,7 @@ impl Cursor {
     /// -   `start` (included),
     /// -   `end` (excluded),
     /// -   `initial_value` (included).
-    pub fn new(start: u8, end: u8, initial_value: u8) -> Self {
+    pub const fn new(start: u8, end: u8, initial_value: u8) -> Self {
         Self {
             current: Self::normalize_current(initial_value, start, end),
             start,
@@ -30,11 +30,11 @@ impl Cursor {
     }
 
     // Ensures current is inside start (inclusive) and end (exclusive) range
-    fn normalize_current(current: u8, start: u8, end: u8) -> u8 {
-        u8::clamp(current, start, end - 1)
+    const fn normalize_current(current: u8, start: u8, end: u8) -> u8 {
+        const_clamp(current, start, end - 1)
     }
 
-    pub fn from_range(range: Range<usize>, current: u8) -> Self {
+    pub const fn from_range(range: Range<usize>, current: u8) -> Self {
         let start = usize_to_u8_clamper(range.start);
         let end = usize_to_u8_clamper(range.end);
         Self::new(start, end, current)
