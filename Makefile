@@ -66,7 +66,7 @@ fix_silently:
 
 # tests in the platform agnostic lib are performed in x86 host
 test: 
-	cargo test --package lib_1 --release
+	cargo test --package cross_platform --release
 
 build:
 	cargo build --package bare_metal $(BASE) 

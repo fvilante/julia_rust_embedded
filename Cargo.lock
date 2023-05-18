@@ -129,10 +129,10 @@ dependencies = [
  "arduino-hal",
  "avr-device",
  "avr-progmem",
+ "cross_platform",
  "embedded-hal",
  "enum_dispatch",
  "heapless",
- "lib_1",
  "paste",
  "ruduino",
 ]
@@ -180,6 +180,15 @@ name = "critical-section"
 version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6548a0ad5d2549e111e1f6a11a6c2e2d00ce6a3dafe22948d67c2b443f775e52"
+
+[[package]]
+name = "cross_platform"
+version = "0.1.0"
+dependencies = [
+ "enum_dispatch",
+ "heapless",
+ "itoa",
+]
 
 [[package]]
 name = "derivative"
@@ -252,15 +261,6 @@ name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
-
-[[package]]
-name = "lib_1"
-version = "0.1.0"
-dependencies = [
- "enum_dispatch",
- "heapless",
- "itoa",
-]
 
 [[package]]
 name = "lock_api"
