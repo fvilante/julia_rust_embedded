@@ -25,7 +25,7 @@ div: format
 
 # watch platform-dependent (avr-side) and platform-independent (x86-side)
 watch_all:
-	cargo watch -c --why -s "make div x86_test check"
+	cargo watch -c --why -s "make div test check"
 
 format:
 	cargo fmt
@@ -33,7 +33,7 @@ format:
 # watch executes the tests if any file on the project change (note: ignore files in target and .git folder)
 # if you do not have cargo-watch instaled type "cargo install cargo-watch" to install from source.
 watch_x86_test: 
-	cargo watch -c --why -s "make div x86_test"
+	cargo watch -c --why -s "make div test"
 
 watch_avr: 
 	cargo watch -c --why -s "make div check"
@@ -65,7 +65,7 @@ fix_silently:
 
 
 # tests in the platform agnostic lib are performed in x86 host
-x86_test: 
+test: 
 	cargo test --package lib_1 --release
 
 build:
