@@ -104,4 +104,8 @@ clean:
 # Not implemented yet, but something like following should work:
 # avr-objcopy -O ihex input.elf output.hex
 make_hex_file:
+
+# To install tokei type: `cargo install --git https://github.com/XAMPPRocky/tokei.git tokei`
+statistics:
+	tokei --exclude "assets/"
 	
