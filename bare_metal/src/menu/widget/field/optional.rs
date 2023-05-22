@@ -11,7 +11,7 @@ use crate::menu::canvas::Canvas;
 use crate::menu::widget::widget::Editable;
 use crate::microcontroler::ratangular_wave::RectangularWave;
 use crate::string::flash::FlashString;
-use lib_1::utils::cursor::Cursor;
+use cross_platform::utils::cursor::Cursor;
 
 // Variable to place the string representing the Optinal Field Parameter in Menu
 pub type OptionsBuffer = Vec<FlashString, 3>;

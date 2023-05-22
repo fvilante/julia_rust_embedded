@@ -9,7 +9,7 @@ use super::{
 use avr_progmem::string::PmString;
 use core::{cell::Cell, ops::Range};
 use heapless::Vec;
-use lib_1::utils::cursor::Cursor;
+use cross_platform::utils::cursor::Cursor;
 
 /// Base struct for menu_item builder. Contains usual building options (ie: `Title`, `Child`, etc)
 struct Base {

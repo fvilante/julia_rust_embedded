@@ -11,10 +11,10 @@ use crate::menu::widget::splash::Splash;
 use crate::menu::widget::submenu_programa::spec::{MenuProgramaHandle, MenuProgramaView};
 use crate::microcontroler::timer::now;
 use crate::microcontroler::{serial, timer};
-use lib_1::protocol::datalink::datalink::Datalink;
-use lib_1::protocol::transport::channel::Channel;
-use lib_1::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
-use lib_1::protocol::transport::transport_layer::TransportLayer;
+use cross_platform::protocol::datalink::datalink::Datalink;
+use cross_platform::protocol::transport::channel::Channel;
+use cross_platform::protocol::transport::transport_layer::cmpp_value::MechanicalProperties;
+use cross_platform::protocol::transport::transport_layer::TransportLayer;
 
 /// TODO: Implement user interaction with the signal emitted
 fn emit_print_go_signal(transport: &TransportLayer) {

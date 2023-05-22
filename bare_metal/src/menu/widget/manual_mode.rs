@@ -1,5 +1,5 @@
 use avr_progmem::progmem;
-use lib_1::protocol::transport::transport_layer::{new_proposal::ActivationState, TransportLayer};
+use cross_platform::protocol::transport::transport_layer::{new_proposal::ActivationState, TransportLayer};
 
 use super::widget::Widget;
 use crate::geometry::point::Point;

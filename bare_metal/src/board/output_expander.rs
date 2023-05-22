@@ -75,7 +75,7 @@ use super::shiftout::write_shiftout;
 use super::shiftout::{init_shiftout_pins, ShiftOutData};
 
 use core::cell::Cell;
-use lib_1::utils::bit_wise::{configure_bit, get_bit_at_as_bool};
+use cross_platform::utils::bit_wise::{configure_bit, get_bit_at_as_bool};
 
 /// Represents the electrical signals on the board
 /// See the board schematic or this file description for more.

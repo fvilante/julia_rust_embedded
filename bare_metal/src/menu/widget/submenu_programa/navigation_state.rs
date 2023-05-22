@@ -2,7 +2,7 @@ use crate::board::lcd;
 
 use super::hepers::LcdLine;
 
-use lib_1::utils::{
+use cross_platform::utils::{
     bit_wise::{configure_bit, get_bit_at, reset_bit_at},
     cursor::StatelessCursor,
 };

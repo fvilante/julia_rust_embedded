@@ -12,7 +12,7 @@ use crate::{
     microcontroler::delay::delay_ms,
 };
 use heapless::Vec;
-use lib_1::utils::numerical::usize_to_u8_clamper;
+use cross_platform::utils::numerical::usize_to_u8_clamper;
 
 /////////////////////////////////
 

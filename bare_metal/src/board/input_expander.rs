@@ -44,7 +44,7 @@
 use super::shiftin::{init_shiftin_pins, readShiftIn, ShiftInData};
 
 use core::cell::Cell;
-use lib_1::utils::bit_wise::get_bit_at_as_bool;
+use cross_platform::utils::bit_wise::get_bit_at_as_bool;
 
 /// Represents each of the three CD4021 Integrated Circuit present on the board
 enum ShiftRegister {

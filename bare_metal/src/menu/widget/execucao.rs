@@ -4,7 +4,7 @@ use crate::geometry::point::Point;
 use crate::string::flash::FlashString;
 use crate::{board::keypad::KeyCode, menu::canvas::Canvas};
 use avr_progmem::progmem;
-use lib_1::protocol::transport::transport_layer::{new_proposal::Displacement, TransportLayer};
+use cross_platform::protocol::transport::transport_layer::{new_proposal::Displacement, TransportLayer};
 
 use super::widget::Widget;
 

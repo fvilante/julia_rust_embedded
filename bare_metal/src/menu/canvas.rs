@@ -1,4 +1,4 @@
-use lib_1::utils::numerical::convert_u16_to_string_decimal;
+use cross_platform::utils::numerical::convert_u16_to_string_decimal;
 
 use crate::board::lcd;
 use crate::geometry::point::Point;

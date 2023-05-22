@@ -1,6 +1,6 @@
 use core::{cell::Cell, ops::Range};
 
-use lib_1::utils::cursor::Cursor;
+use cross_platform::utils::cursor::Cursor;
 
 use crate::string::flash::FlashString;
 

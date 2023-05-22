@@ -1,5 +1,5 @@
 use avr_progmem::progmem;
-use lib_1::protocol::transport::transport_layer::TransportLayer;
+use cross_platform::protocol::transport::transport_layer::TransportLayer;
 
 use super::{
     execucao::MenuExecucaoControler,

@@ -1,4 +1,4 @@
-use lib_1::{protocol::datalink::datalink::word16::Word16, utils::cursor::Cursor};
+use cross_platform::{protocol::datalink::datalink::word16::Word16, utils::cursor::Cursor};
 use ruduino::{cores::current as avr_core, interrupt::without_interrupts, Register};
 
 use avr_core::{EEAR, EECR, EEDR, SPMCSR};

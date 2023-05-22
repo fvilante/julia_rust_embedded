@@ -9,7 +9,7 @@ use crate::{
     },
 };
 
-use lib_1::utils::cursor::Cursor;
+use cross_platform::utils::cursor::Cursor;
 
 use super::{
     numerical::{Format, NumberInputEditorWidget},

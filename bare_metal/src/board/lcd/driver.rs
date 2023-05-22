@@ -35,7 +35,7 @@ use ruduino::Pin;
 
 use crate::microcontroler::delay::delay_us;
 
-use lib_1::utils::{
+use cross_platform::utils::{
     bit_wise::get_bit_at_as_bool,
     numerical::{convert_u16_to_str_hex, convert_u8_to_str_hex},
 };

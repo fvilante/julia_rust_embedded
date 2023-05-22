@@ -4,7 +4,7 @@ use core::ops::Range;
 use core::str::{CharIndices, Chars, FromStr};
 
 use heapless::String;
-use lib_1::utils::numerical::{convert_u16_to_string_decimal, usize_to_u8_clamper};
+use cross_platform::utils::numerical::{convert_u16_to_string_decimal, usize_to_u8_clamper};
 
 use super::super::widget::Saveble;
 use super::super::{widget::Editable, widget::Widget};
@@ -12,7 +12,7 @@ use crate::geometry::point::Point;
 use crate::microcontroler::ratangular_wave::RectangularWave;
 use crate::{board::keypad::KeyCode, menu::canvas::Canvas};
 
-use lib_1::utils::cursor::Cursor;
+use cross_platform::utils::cursor::Cursor;
 
 /// Represents a variable length  data, in memory, though a sequence of characters (ie: numbers, texts).
 /// This type is a wrapper over the [`FieldBuffer`] type

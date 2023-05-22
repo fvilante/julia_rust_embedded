@@ -1,6 +1,6 @@
 use core::cell::Cell;
 
-use lib_1::{
+use cross_platform::{
     protocol::{
         datalink::datalink::Status,
         transport::transport_layer::{TLError, TransportLayer},
