@@ -62,7 +62,7 @@ impl From<CompressedNumbers> for DecompressedNumbers {
 /// TODO: The memory footprint size this struct may be optimized going from 2 bytes to 1 bytes if you join
 /// the two states. Because `lcd_line_cursor` needs just one bit, while `first_line_to_render` may exists with just 7 bits.
 #[derive(Clone, Copy)]
-pub struct NavigationState {
+pub struct NavigationStateModel {
     /// Tracks the item on the LCD that is currently selected.
     lcd_line_cursor: u8,
     /// Tracks the first line of menu to be rendered in the lcd screen. Note that the index is represented in relation to the list of menu items
@@ -70,7 +70,7 @@ pub struct NavigationState {
     first_line_to_render: u8,
 }
 
-impl NavigationState {
+impl NavigationStateModel {
     const TOTAL_NUMBER_OF_LINES_IN_LCD: u8 = lcd::NUMBER_OF_LINES;
     const DEFAULT_INITIAL_LINE_SELECTED: u8 = 0;
     const DEFAULT_INITIAL_MENU_ITEM: u8 = 0;

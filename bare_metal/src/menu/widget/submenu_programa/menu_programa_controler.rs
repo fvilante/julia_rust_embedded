@@ -1,5 +1,6 @@
 use super::{
-    super::menu_item::menu_item::MenuItemWidget, hepers::LcdLine, navigation_state::NavigationState,
+    super::menu_item::menu_item::MenuItemWidget, hepers::LcdLine,
+    navigation_state::NavigationStateModel,
 };
 use crate::geometry::point::Point;
 use crate::microcontroler::ratangular_wave::RectangularWave;
@@ -72,14 +73,14 @@ impl<'a> MenuProgramaControler<'a> {
     /// Gets a copy of the Navigation State.
     /// NOTE: Any modification on the copy will not reflect in the official state.
     /// TODO: Refactor this concept when possible.
-    fn get_navigation_state(&self) -> NavigationState {
+    fn get_navigation_state(&self) -> NavigationStateModel {
         self.menu_view.get_navigation_state(self.current_menu).get()
     }
 
     /// Updates the navigation state of current sub_menu by applying update_fn on it
     fn update_navigation_state(
         &self,
-        update_fn: fn(NavigationState, menu_length: u8) -> NavigationState,
+        update_fn: fn(NavigationStateModel, menu_length: u8) -> NavigationStateModel,
     ) {
         let menu_length = usize_to_u8_clamper(self.menu_view.len(self.current_menu));
         let current_nav_state = self.get_navigation_state();

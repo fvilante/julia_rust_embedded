@@ -16,7 +16,7 @@ use super::{
         widget::{menu_item::builder::MenuItemBuilder, menu_item::menu_item::MenuItemWidget},
     },
     core::SubmenuLayout,
-    navigation_state::NavigationState,
+    navigation_state::NavigationStateModel,
     spec_options::Options,
 };
 
@@ -47,14 +47,14 @@ pub enum MenuProgramaHandle {
 /// Used to store the navigation state of the submenu alongside the submenu itself
 pub struct Register<T: SubmenuLayout> {
     pub menu: T,
-    pub navigation_state: Cell<NavigationState>,
+    pub navigation_state: Cell<NavigationStateModel>,
 }
 
 impl<T: SubmenuLayout> Register<T> {
     fn from_menu(menu: T) -> Self {
         Self {
             menu,
-            navigation_state: Cell::new(NavigationState::new()),
+            navigation_state: Cell::new(NavigationStateModel::new()),
         }
     }
 
@@ -62,7 +62,7 @@ impl<T: SubmenuLayout> Register<T> {
         &self.menu
     }
 
-    fn get_navigation_state(&self) -> &Cell<NavigationState> {
+    fn get_navigation_state(&self) -> &Cell<NavigationStateModel> {
         &&self.navigation_state
     }
 }
@@ -155,7 +155,7 @@ impl<'a> MenuProgramaView<'a> {
     pub fn get_navigation_state(
         &self,
         submenu_handle: MenuProgramaHandle,
-    ) -> &Cell<NavigationState> {
+    ) -> &Cell<NavigationStateModel> {
         match submenu_handle {
             MenuProgramaHandle::MenuPrograma => self.MenuPrograma.get_navigation_state(),
             MenuProgramaHandle::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_navigation_state(),
