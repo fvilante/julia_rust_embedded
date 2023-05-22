@@ -34,6 +34,12 @@ then type:
 > rustup component add rust-src --toolchain nightly-2022-12-04-x86_64-pc-windows-msvc
 ```
 
+If you want to install `cargo-watch` utility type this:
+
+```
+> cargo install cargo-watch
+```
+
 > Note: Some of upabove commands may be unnecessary, check and update this doc when possible.
 
 

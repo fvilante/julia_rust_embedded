@@ -3,8 +3,8 @@ use core::cell::Cell;
 use core::ops::Range;
 use core::str::{CharIndices, Chars, FromStr};
 
-use heapless::String;
 use cross_platform::utils::numerical::{convert_u16_to_string_decimal, usize_to_u8_clamper};
+use heapless::String;
 
 use super::super::widget::Saveble;
 use super::super::{widget::Editable, widget::Widget};
