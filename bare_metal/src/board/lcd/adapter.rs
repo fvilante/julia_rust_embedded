@@ -16,14 +16,17 @@ impl LcdHardware40x2 {
 }
 
 impl Lcd for LcdHardware40x2 {
-    const MAX_COLS: u8 = 40;
-    const MAX_ROWS: u8 = 2;
-    fn print_u8(&self, _byte: u8) {
-        todo!()
+    //const MAX_COLS: u8 = 40;
+    //const MAX_ROWS: u8 = 2;
+    fn clear(&self) {
+        driver::clear();
+    }
+    fn print_u8(&self, byte: u8) {
+        driver::print_u8(byte);
     }
 
     fn set_cursor(&self, point: Point) {
         let Point { x: col, y: row } = point;
-        driver::set_cursor(col, row)
+        driver::set_cursor(col, row);
     }
 }

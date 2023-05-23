@@ -11,7 +11,10 @@
 use crate::{menu::canvas::Canvas, microcontroler::timer::init_timer};
 
 use super::{
-    front_panel::FrontPanel, input_expander::InputExpander, keyboard::Keyboard, lcd,
+    front_panel::FrontPanel,
+    input_expander::InputExpander,
+    keyboard::Keyboard,
+    lcd::{self, adapter::LcdHardware40x2, interface::Lcd},
     output_expander::OutputExpander,
 };
 
@@ -19,6 +22,7 @@ use super::{
 pub struct Peripherals {
     output_expander: OutputExpander,
     input_expander: InputExpander,
+    hardware_lcd: LcdHardware40x2,
 }
 
 impl<'a> Peripherals {
@@ -39,6 +43,7 @@ impl<'a> Peripherals {
         Self {
             output_expander: OutputExpander::new(),
             input_expander: InputExpander::new(),
+            hardware_lcd: LcdHardware40x2::new(),
         }
     }
 
@@ -54,7 +59,8 @@ impl<'a> Peripherals {
     }
 
     pub fn get_canvas(&self) -> Canvas {
-        let canvas = Canvas::new();
+        let lcd = &self.hardware_lcd;
+        let canvas = Canvas::new(lcd);
         canvas
     }
 }

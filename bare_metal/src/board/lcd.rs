@@ -1,4 +1,4 @@
-mod adapter;
+pub mod adapter;
 mod driver;
 pub mod interface;
 //

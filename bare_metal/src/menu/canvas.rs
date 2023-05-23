@@ -1,6 +1,7 @@
 use cross_platform::utils::numerical::convert_u16_to_string_decimal;
 
 use crate::board::lcd;
+use crate::board::lcd::interface::Lcd;
 use crate::geometry::point::Point;
 use crate::printable::Printable;
 
@@ -48,17 +49,18 @@ impl CursorPosition {
 /// Its function is to make possible do cache displayed information reducing
 /// screen flackering. You decide how many frames per second you want to send this to screen through the method [`render`]
 /// TODO: Rename to ScreenBuffer
-pub struct Canvas {
+pub struct Canvas<'a> {
     cursor_position: CursorPosition, // for screen_buffer_input
     screen_buffer_input: [u8; 80],
+    lcd: &'a dyn Lcd,
 }
 
-impl Canvas {
-    pub fn new() -> Self {
-        lcd::lcd_initialize();
+impl<'a> Canvas<'a> {
+    pub fn new(lcd: &'a dyn Lcd) -> Self {
         Self {
             cursor_position: CursorPosition::new(Point::new(0, 0)),
             screen_buffer_input: [' ' as u8; 80],
+            lcd,
         }
     }
 
@@ -105,9 +107,10 @@ impl Canvas {
     /// input_buffer represent the desired state of lcd
     pub fn render(&mut self) {
         // The current implementation of this function is very! very! simplified, it may be improved later
-        lcd::set_cursor(0, 0);
+        let lcd_driver = self.lcd;
+        lcd_driver.set_cursor(Point::new(0, 0));
         for byte in self.screen_buffer_input {
-            lcd::print_u8(byte);
+            lcd_driver.print_u8(byte);
         }
     }
 }
