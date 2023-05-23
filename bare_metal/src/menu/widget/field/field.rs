@@ -4,7 +4,7 @@ use crate::geometry::point::Point;
 use crate::{
     board::keypad::KeyCode,
     menu::{
-        canvas::Canvas,
+        screen_buffer::ScreenBuffer,
         widget::widget::{Editable, Saveble, Widget},
     },
 };
@@ -71,10 +71,10 @@ impl Widget for Field<'_> {
         }
     }
 
-    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
+    fn draw(&self, screen_buffer: &mut ScreenBuffer, start_point: Point) {
         match self {
-            Self::Numerical(x) => x.draw(canvas, start_point),
-            Self::Optional(x) => x.draw(canvas, start_point),
+            Self::Numerical(x) => x.draw(screen_buffer, start_point),
+            Self::Optional(x) => x.draw(screen_buffer, start_point),
         }
     }
 }

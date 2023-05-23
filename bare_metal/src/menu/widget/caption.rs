@@ -2,7 +2,7 @@ use crate::geometry::point::Point;
 use crate::string::flash::FlashString;
 use crate::{
     board::keypad::KeyCode,
-    menu::{canvas::Canvas, widget::widget::Widget},
+    menu::{screen_buffer::ScreenBuffer, widget::widget::Widget},
 };
 pub struct Caption {
     text: FlashString,
@@ -27,10 +27,10 @@ impl Widget for Caption {
         // do nothing
     }
 
-    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
-        canvas.set_cursor(start_point);
+    fn draw(&self, screen_buffer: &mut ScreenBuffer, start_point: Point) {
+        screen_buffer.set_cursor(start_point);
         for byte in self.text.into_iter() {
-            canvas.print_char(byte as char);
+            screen_buffer.print_char(byte as char);
         }
     }
 }

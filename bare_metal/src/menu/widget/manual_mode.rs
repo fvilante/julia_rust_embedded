@@ -6,7 +6,7 @@ use cross_platform::protocol::transport::transport_layer::{
 use super::widget::Widget;
 use crate::geometry::point::Point;
 use crate::string::flash::FlashString;
-use crate::{board::keypad::KeyCode, menu::canvas::Canvas};
+use crate::{board::keypad::KeyCode, menu::screen_buffer::ScreenBuffer};
 progmem! {
     //                            1234567890123456789012345678901234567890
     static progmem string LINE0 = "Aperte qualquer tecla para entrar";
@@ -58,19 +58,19 @@ impl Widget for ManualModeMenuControler<'_> {
 
     fn update(&mut self) {}
 
-    fn draw(&self, canvas: &mut Canvas, _start_point: Point) {
+    fn draw(&self, screen_buffer: &mut ScreenBuffer, _start_point: Point) {
         if self.current_state == ManualModeState::FirstScreen {
-            canvas.clear();
-            canvas.set_cursor(Point::new(0, 0));
-            canvas.print(FlashString::new(&LINE0));
-            canvas.set_cursor(Point::new(0, 1));
-            canvas.print(FlashString::new(&LINE1));
+            screen_buffer.clear();
+            screen_buffer.set_cursor(Point::new(0, 0));
+            screen_buffer.print(FlashString::new(&LINE0));
+            screen_buffer.set_cursor(Point::new(0, 1));
+            screen_buffer.print(FlashString::new(&LINE1));
         } else if self.current_state == ManualModeState::LastScreen {
-            canvas.clear();
-            canvas.set_cursor(Point::new(0, 0));
-            canvas.print(FlashString::new(&LINE2));
-            canvas.set_cursor(Point::new(0, 1));
-            canvas.print(FlashString::new(&LINE3));
+            screen_buffer.clear();
+            screen_buffer.set_cursor(Point::new(0, 0));
+            screen_buffer.print(FlashString::new(&LINE2));
+            screen_buffer.set_cursor(Point::new(0, 1));
+            screen_buffer.print(FlashString::new(&LINE3));
             //TODO: below effect should be in `update` and not in `draw` method
             //TODO: The use of `.unwrap` method is provoking flash size explosion, check why
             let _unwrap = self.transport.stop_serial().set(ActivationState::Activated);

@@ -2,7 +2,7 @@
 
 use crate::geometry::point::Point;
 use crate::string::flash::FlashString;
-use crate::{board::keypad::KeyCode, menu::canvas::Canvas};
+use crate::{board::keypad::KeyCode, menu::screen_buffer::ScreenBuffer};
 use avr_progmem::progmem;
 use cross_platform::protocol::transport::transport_layer::{
     new_proposal::Displacement, TransportLayer,
@@ -53,19 +53,19 @@ impl<'a> Widget for MenuExecucaoControler<'a> {
 
     fn update(&mut self) {}
 
-    fn draw(&self, canvas: &mut Canvas, _start_point: Point) {
-        canvas.clear();
+    fn draw(&self, screen_buffer: &mut ScreenBuffer, _start_point: Point) {
+        screen_buffer.clear();
         // draw screen frame
         for line_number in 0..2 {
             let (point, text) = Self::get_line_helper(line_number);
-            canvas.set_cursor(point);
-            canvas.print(text);
+            screen_buffer.set_cursor(point);
+            screen_buffer.print(text);
         }
         // draw current position
         let posicao_atual = self.transport.posicao_atual();
         if let Ok(Displacement(posicao_atual)) = posicao_atual {
-            canvas.set_cursor(Point::new(18, 1));
-            canvas.print_u16(posicao_atual);
+            screen_buffer.set_cursor(Point::new(18, 1));
+            screen_buffer.print_u16(posicao_atual);
         }
     }
 }

@@ -7,7 +7,7 @@ use super::super::widget::{Saveble, Widget};
 use crate::board::keypad::KeyCode;
 
 use crate::geometry::point::Point;
-use crate::menu::canvas::Canvas;
+use crate::menu::screen_buffer::ScreenBuffer;
 use crate::menu::widget::widget::Editable;
 use crate::microcontroler::ratangular_wave::RectangularWave;
 use crate::string::flash::FlashString;
@@ -56,7 +56,7 @@ impl<'a> OptionEditorWidget<'a> {
     /// helper function
     fn blinks_char_if_in_editing_mode(
         &self,
-        canvas: &mut Canvas,
+        screen_buffer: &mut ScreenBuffer,
         char: char,
         is_in_editing_mode: bool,
     ) {
@@ -64,13 +64,13 @@ impl<'a> OptionEditorWidget<'a> {
         if is_in_editing_mode {
             //blinks
             if self.blink.read() {
-                canvas.print_char(char);
+                screen_buffer.print_char(char);
             } else {
-                canvas.print_char(EMPTY_CHAR);
+                screen_buffer.print_char(EMPTY_CHAR);
             }
         } else {
             //do not blink
-            canvas.print_char(char);
+            screen_buffer.print_char(char);
         }
     }
 }
@@ -123,15 +123,15 @@ impl Widget for OptionEditorWidget<'_> {
         self.blink.update();
     }
 
-    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
-        canvas.set_cursor(start_point);
+    fn draw(&self, screen_buffer: &mut ScreenBuffer, start_point: Point) {
+        screen_buffer.set_cursor(start_point);
         const OPEN_BRACKETS: char = '[';
         const CLOSE_BRACKETS: char = ']';
         let is_in_editing_mode = self.is_in_edit_mode();
         let current_index = self.editing_selection.get_current();
-        self.blinks_char_if_in_editing_mode(canvas, OPEN_BRACKETS, is_in_editing_mode);
+        self.blinks_char_if_in_editing_mode(screen_buffer, OPEN_BRACKETS, is_in_editing_mode);
         let flash_string = self.options[current_index as usize];
-        canvas.print(flash_string);
-        self.blinks_char_if_in_editing_mode(canvas, CLOSE_BRACKETS, is_in_editing_mode);
+        screen_buffer.print(flash_string);
+        self.blinks_char_if_in_editing_mode(screen_buffer, CLOSE_BRACKETS, is_in_editing_mode);
     }
 }

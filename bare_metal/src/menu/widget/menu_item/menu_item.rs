@@ -3,7 +3,7 @@ use crate::menu::widget::submenu_programa::spec::MenuProgramaHandle;
 use crate::{
     board::keypad::KeyCode,
     menu::{
-        canvas::Canvas,
+        screen_buffer::ScreenBuffer,
         widget::{caption::Caption, submenu_programa::hepers::LcdLine},
     },
 };
@@ -95,18 +95,18 @@ impl MenuItemWidget<'_> {
         };
     }
 
-    pub fn draw(&self, canvas: &mut Canvas, lcd_line: LcdLine) {
+    pub fn draw(&self, screen_buffer: &mut ScreenBuffer, lcd_line: LcdLine) {
         let line = lcd_line as u8;
         let (point1, caption) = &self.point_and_caption;
         let point1: Point<u8> = Point::new(point1.pos, line);
-        caption.draw(canvas, point1);
+        caption.draw(screen_buffer, point1);
         if let Some((point2, field)) = &self.point_and_field {
             let point2: Point<u8> = Point::new(point2.pos, line);
-            field.draw(canvas, point2);
+            field.draw(screen_buffer, point2);
         };
         if let Some((point3, uom)) = &self.unit_of_measurement {
             let point3: Point<u8> = Point::new(point3.pos, line);
-            uom.draw(canvas, point3);
+            uom.draw(screen_buffer, point3);
         };
     }
 }

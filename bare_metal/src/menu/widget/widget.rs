@@ -1,4 +1,4 @@
-use crate::{board::keypad::KeyCode, menu::canvas::Canvas};
+use crate::{board::keypad::KeyCode, menu::screen_buffer::ScreenBuffer};
 
 use crate::geometry::point::Point;
 
@@ -11,7 +11,7 @@ pub trait Widget {
     /// TODO: Instead of `start_point` i should give a rectangle where the widget is responsible to draw it self
     /// while the client is responsible to define where this rectangle is placed in the screen. This kind of implementation
     /// make draw() method more generic
-    fn draw(&self, canvas: &mut Canvas, start_point: Point);
+    fn draw(&self, screen_buffer: &mut ScreenBuffer, start_point: Point);
 }
 
 /// Represents an editable type (ie: editable Widget)

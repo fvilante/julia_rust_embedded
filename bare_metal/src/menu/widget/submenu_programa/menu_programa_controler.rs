@@ -7,7 +7,7 @@ use crate::microcontroler::ratangular_wave::RectangularWave;
 use crate::{
     board::{keypad::KeyCode, lcd},
     menu::{
-        canvas::Canvas,
+        screen_buffer::ScreenBuffer,
         widget::submenu_programa::spec::{MenuProgramaHandle, MenuProgramaView},
     },
     microcontroler::delay::delay_ms,
@@ -201,23 +201,23 @@ impl<'a> MenuProgramaControler<'a> {
     /// helper function to draw submenu cursor on screen
     ///
     /// TODO: remove mutability on self when possible
-    fn draw_menu_item_selector(&mut self, line: LcdLine, canvas: &mut Canvas) {
+    fn draw_menu_item_selector(&mut self, line: LcdLine, screen_buffer: &mut ScreenBuffer) {
         const EDITING_CURSOR: char = '*';
         const NAVIGATING_CURSOR: char = '>';
         const EMPTY_CURSOR: char = ' ';
         // position cursor
-        canvas.set_cursor(Point::new(0, line as u8));
+        screen_buffer.set_cursor(Point::new(0, line as u8));
         // draw selector char
         match self.get_line_being_edited() {
             Some(_line) => {
-                canvas.print_char(EDITING_CURSOR);
+                screen_buffer.print_char(EDITING_CURSOR);
             }
             None => {
                 let is_time_to_blink = self.blink.read();
                 if is_time_to_blink {
-                    canvas.print_char(NAVIGATING_CURSOR);
+                    screen_buffer.print_char(NAVIGATING_CURSOR);
                 } else {
-                    canvas.print_char(EMPTY_CURSOR)
+                    screen_buffer.print_char(EMPTY_CURSOR)
                 }
             }
         }
@@ -280,16 +280,17 @@ impl MenuProgramaControler<'_> {
         }
     }
 
-    /// TODO: Remove motability of self when possible.
-    pub fn draw(&mut self, canvas: &mut Canvas) {
+    /// TODO: Remove mutability of self when possible.
+    pub fn draw(&mut self, screen_buffer: &mut ScreenBuffer) {
         // clear screen
-        canvas.clear();
+        screen_buffer.clear();
         // draw menu item selector
         let line = self.get_navigation_state().get_current_lcd_line();
-        self.draw_menu_item_selector(line, canvas);
+        self.draw_menu_item_selector(line, screen_buffer);
         // draw menu items
         for line in LcdLine::iterator() {
-            self.get_mounted_item_for_line(line).draw(canvas, line);
+            self.get_mounted_item_for_line(line)
+                .draw(screen_buffer, line);
         }
     }
 }

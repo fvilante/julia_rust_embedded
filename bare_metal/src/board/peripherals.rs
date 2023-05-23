@@ -8,7 +8,7 @@
 //!   * Canvas
 //!
 //! NOTE: We are initializing serial port in other place, not here.
-use crate::{menu::canvas::Canvas, microcontroler::timer::init_timer};
+use crate::{menu::screen_buffer::ScreenBuffer, microcontroler::timer::init_timer};
 
 use super::{
     front_panel::FrontPanel,
@@ -58,9 +58,8 @@ impl<'a> Peripherals {
         front_panel
     }
 
-    pub fn get_canvas(&self) -> Canvas {
+    pub fn get_screen_buffer(&self) -> ScreenBuffer {
         let lcd = &self.hardware_lcd;
-        let canvas = Canvas::new(lcd);
-        canvas
+        ScreenBuffer::new(lcd)
     }
 }

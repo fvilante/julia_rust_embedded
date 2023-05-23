@@ -12,7 +12,7 @@ use crate::geometry::point::Point;
 use crate::string::flash::FlashString;
 use crate::{
     board::{keypad::KeyCode, lcd},
-    menu::{canvas::Canvas, model::DataModel},
+    menu::{model::DataModel, screen_buffer::ScreenBuffer},
     microcontroler::delay::delay_ms,
 };
 
@@ -62,7 +62,7 @@ impl<'a> MainMenu<'a> {
         }
     }
 
-    fn draw_main_menu(&self, canvas: &mut Canvas) {
+    fn draw_main_menu(&self, screen_buffer: &mut ScreenBuffer) {
         fn get_line_helper(line_number: u8) -> (Point, FlashString) {
             let line0 = FlashString::new(&LINE0);
             let line1 = FlashString::new(&LINE1);
@@ -75,11 +75,11 @@ impl<'a> MainMenu<'a> {
             }
         }
 
-        canvas.clear();
+        screen_buffer.clear();
         for line_number in 0..2 {
             let (point, flash_string) = get_line_helper(line_number);
-            canvas.set_cursor(point);
-            canvas.print(flash_string);
+            screen_buffer.set_cursor(point);
+            screen_buffer.print(flash_string);
         }
     }
 }
@@ -163,12 +163,14 @@ impl<'a> MainMenu<'a> {
         }
     }
 
-    pub fn draw(&mut self, canvas: &mut Canvas, start_point: Point) {
+    pub fn draw(&mut self, screen_buffer: &mut ScreenBuffer, start_point: Point) {
         match self.current_state {
-            State::MainMenu => self.draw_main_menu(canvas),
-            State::Manual => self.menu_manual_controler.draw(canvas, start_point),
-            State::Execucao => self.menu_execucao_controler.draw(canvas, start_point),
-            State::Programa => self.menu_programa_controler.draw(canvas),
+            State::MainMenu => self.draw_main_menu(screen_buffer),
+            State::Manual => self.menu_manual_controler.draw(screen_buffer, start_point),
+            State::Execucao => self
+                .menu_execucao_controler
+                .draw(screen_buffer, start_point),
+            State::Programa => self.menu_programa_controler.draw(screen_buffer),
         }
     }
 }

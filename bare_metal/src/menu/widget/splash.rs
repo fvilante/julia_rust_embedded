@@ -5,7 +5,7 @@ use crate::geometry::point::Point;
 use crate::string::flash::FlashString;
 use crate::{
     board::{keypad::KeyCode, lcd},
-    menu::{canvas::Canvas, model::DataModel},
+    menu::{model::DataModel, screen_buffer::ScreenBuffer},
     microcontroler::{delay::delay_ms, timer::now},
 };
 
@@ -109,17 +109,17 @@ impl Splash<'_> {
         }
     }
 
-    pub fn draw(&self, canvas: &mut Canvas) {
-        canvas.clear();
+    pub fn draw(&self, screen_buffer: &mut ScreenBuffer) {
+        screen_buffer.clear();
         match self.current_state {
             State::Initial => {}
             State::BrandName => {
-                canvas.set_cursor(Point::new(4, 0));
-                canvas.print(FlashString::new(&TEXT0));
+                screen_buffer.set_cursor(Point::new(4, 0));
+                screen_buffer.print(FlashString::new(&TEXT0));
             }
             State::LoadingX => {
-                canvas.set_cursor(Point::new(0, 1));
-                canvas.print(FlashString::new(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X));
+                screen_buffer.set_cursor(Point::new(0, 1));
+                screen_buffer.print(FlashString::new(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X));
                 // TODO: Move this effect to `update` method when possible
                 for response in self.model.send_all(&self.transport) {
                     if let Err(_e) = response {
@@ -132,8 +132,8 @@ impl Splash<'_> {
                 }
             }
             State::LoadingY => {
-                canvas.set_cursor(Point::new(0, 0));
-                canvas.print(FlashString::new(&TEXT2));
+                screen_buffer.set_cursor(Point::new(0, 0));
+                screen_buffer.print(FlashString::new(&TEXT2));
             }
             State::End => {
                 // do nothing

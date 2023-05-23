@@ -10,7 +10,7 @@ use super::super::widget::Saveble;
 use super::super::{widget::Editable, widget::Widget};
 use crate::geometry::point::Point;
 use crate::microcontroler::ratangular_wave::RectangularWave;
-use crate::{board::keypad::KeyCode, menu::canvas::Canvas};
+use crate::{board::keypad::KeyCode, menu::screen_buffer::ScreenBuffer};
 
 use cross_platform::utils::cursor::Cursor;
 
@@ -363,8 +363,8 @@ impl Widget for NumberInputEditorWidget<'_> {
         self.blink.update(); // blinks cursor
     }
 
-    fn draw(&self, canvas: &mut Canvas, start_point: Point) {
-        canvas.set_cursor(start_point);
+    fn draw(&self, screen_buffer: &mut ScreenBuffer, start_point: Point) {
+        screen_buffer.set_cursor(start_point);
         for (position, digit) in self.number_editor.char_indices() {
             const BLINK_CHAR: char = '_';
             let mut current_char = digit;
@@ -374,7 +374,7 @@ impl Widget for NumberInputEditorWidget<'_> {
             if is_current_char_over_cursor && is_time_to_blink && self.is_in_edit_mode() {
                 current_char = BLINK_CHAR;
             }
-            canvas.print_char(current_char);
+            screen_buffer.print_char(current_char);
         }
     }
 }

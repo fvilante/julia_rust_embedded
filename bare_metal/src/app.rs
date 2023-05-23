@@ -118,7 +118,7 @@ pub fn run() -> ! {
     let peripherals = Peripherals::new();
     let mut front_panel = peripherals.get_front_panel();
     let mut keyboard = peripherals.get_keyboard();
-    let mut canvas = peripherals.get_canvas();
+    let mut screnn_buffer = peripherals.get_screen_buffer();
 
     // ////////////////////////////////////////
     // Initialize cmpp communication infrastructure
@@ -172,8 +172,8 @@ pub fn run() -> ! {
 
         splash_window.update();
         let _start_point = Point::new(0, 0);
-        splash_window.draw(&mut canvas);
-        canvas.render();
+        splash_window.draw(&mut screnn_buffer);
+        screnn_buffer.render();
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -198,8 +198,8 @@ pub fn run() -> ! {
         // Render next frame
         if now() > next_frame {
             next_frame = now() + (1000 / fps);
-            main_menu_controler.draw(&mut canvas, Point::new(0, 0));
-            canvas.render();
+            main_menu_controler.draw(&mut screnn_buffer, Point::new(0, 0));
+            screnn_buffer.render();
         }
     }
 }

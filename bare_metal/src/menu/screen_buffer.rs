@@ -47,15 +47,14 @@ impl CursorPosition {
 /// A memory representation of the LCD display.
 ///
 /// Its function is to make possible do cache displayed information reducing
-/// screen flackering. You decide how many frames per second you want to send this to screen through the method [`render`]
-/// TODO: Rename to ScreenBuffer
-pub struct Canvas<'a> {
+/// screen flickering. You decide how many frames per second you want to send this to screen through the method [`Self::render`]
+pub struct ScreenBuffer<'a> {
     cursor_position: CursorPosition, // for screen_buffer_input
     screen_buffer_input: [u8; 80],
     lcd: &'a dyn Lcd,
 }
 
-impl<'a> Canvas<'a> {
+impl<'a> ScreenBuffer<'a> {
     pub fn new(lcd: &'a dyn Lcd) -> Self {
         Self {
             cursor_position: CursorPosition::new(Point::new(0, 0)),
@@ -80,7 +79,7 @@ impl<'a> Canvas<'a> {
         self.cursor_position.set(point);
     }
 
-    /// Clear all canvas
+    /// Clear screen buffer completelly
     pub fn clear(&mut self) {
         const CLEARING_CHAR: u8 = ' ' as u8;
         self.screen_buffer_input.fill(CLEARING_CHAR);
