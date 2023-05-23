@@ -1,6 +1,6 @@
 mod adapter;
 mod driver;
-mod interface;
+pub mod interface;
 //
 
 /// TODO: Remove the exposition of the driver, use the adapter instead.
