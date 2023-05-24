@@ -162,7 +162,7 @@ impl InputEditor {
     }
 }
 
-/// Formating parameters for [`NumberInputEditor`] type. Wrapper around the main parameters of the [`NumberInputEditor`]
+/// Format parameters for the [`NumberInputEditor`] type. Wrapper around the main parameters of the [`NumberInputEditor`]
 #[derive(Copy, Clone)]
 pub struct Format {
     /// Initial admissible value (included)

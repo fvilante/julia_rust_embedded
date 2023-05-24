@@ -11,36 +11,33 @@ use core::{cell::Cell, ops::Range};
 use cross_platform::utils::cursor::Cursor;
 use heapless::Vec;
 
-/// Base struct for menu_item builder. Contains usual building options (ie: `Title`, `Child`, etc)
+/// Base struct, contains common building options (ie: `text of parameter's name`, `child sub menu`, etc)
 struct Base {
+    /// X-Position of the text of parameter's name.
     point1: u8,
-    point2: Option<u8>, // only used if has numerical or optional field
+    /// X-Position for the [`Field`] if some exists.
+    point2: Option<u8>,
+    /// Text of parameter's name.
     text: FlashString,
+    /// Pointer to the child sub_submenu if some exists.
     child: Option<MenuProgramaHandle>,
 }
 
-impl Default for Base {
-    fn default() -> Self {
-        Self {
-            point1: Default::default(),
-            point2: None,
-            text: Default::default(),
-            child: None,
-        }
-    }
-}
-
-/// only numerical
+/// `Numerical` specialization for the base struct. It is used to construct the [`Numerical`] [`Field`] [`Widget`]
 struct Numerical<'a> {
+    /// Number format (ie: min and max acceptable values, etc)
     format: Format,
+    /// Reference to the value to store the final result of the edition (ie: the model)
     variable_u16: &'a Cell<u16>,
     /// define the position and text for display unit of measurement on screen
     unit_of_measurement: Option<(u8, FlashString)>,
 }
 
-/// only optional
+/// `Numerical` specialization for the base struct. It is used to construct the [`OptionEditorWidget`] [`Field`] [`Widget`]
 struct Optional<'a> {
+    /// Reference to the value to store the final result of the edition (ie: the model)
     variable_option: &'a Cell<Cursor>,
+    /// List of strings with the texts to show to user
     options_list: OptionsBuffer,
 }
 
@@ -53,8 +50,7 @@ pub struct MenuItemBuilder<'a> {
 }
 
 impl<'a> MenuItemBuilder<'a> {
-    //
-
+    /// Constructs and sets the text of the parameter
     pub fn from_text<const N: usize>(val: &PmString<N>) -> Self {
         Self {
             base: Base {
@@ -68,11 +64,13 @@ impl<'a> MenuItemBuilder<'a> {
         }
     }
 
+    /// Sets the submenu child
     pub fn add_conection_to_submenu(&mut self, handle: MenuProgramaHandle) -> &mut Self {
         self.base.child = Some(handle);
         self
     }
 
+    /// Configures the numerical field
     pub fn add_numerical_variable(
         &mut self,
         variable: &'a Cell<u16>,
@@ -99,6 +97,7 @@ impl<'a> MenuItemBuilder<'a> {
         self
     }
 
+    /// Configures the optional field
     pub fn add_optional_variable(
         &mut self,
         variable: &'a Cell<Cursor>,
@@ -113,12 +112,15 @@ impl<'a> MenuItemBuilder<'a> {
         self
     }
 
+    /// Builds the menu item widget
     pub fn build(&mut self) -> MenuItemWidget<'a> {
         const DEFAULT_POSITION_FOR_POINT_2: u8 = 30; // TODO: this value should be improved, to be more reasoned and less arbitrary, or eventually a panic with proper error message should be preferable
 
         // FIX: If client construct numerical and optional at same time the numerical will be taken and the
         // optional will be ignored. It's safe, but it's better to refactor the code so client cannot
         // compile this ambiguity.
+
+        // If must build a numerical menu item parameter
         if let Some(numerical) = &mut self.numerical {
             let point1 = Point1d::new(self.base.point1);
             let point2 = Point1d::new(self.base.point2.unwrap_or(DEFAULT_POSITION_FOR_POINT_2));
@@ -131,6 +133,7 @@ impl<'a> MenuItemBuilder<'a> {
                 Some((Point1d::new(point3), unit_of_measurement)),
             );
             menu_item
+        // Else if must build an optional menu item parameter
         } else if let Some(optional) = &mut self.optional {
             let mut options_list_cloned = Vec::new();
             options_list_cloned.clone_from(&optional.options_list);
@@ -146,6 +149,7 @@ impl<'a> MenuItemBuilder<'a> {
                 None,
             );
             menu_item
+        // Else if must build a text-only submenu parameter
         } else {
             // it is submenu caller
             let point1 = Point1d::new(self.base.point1);
