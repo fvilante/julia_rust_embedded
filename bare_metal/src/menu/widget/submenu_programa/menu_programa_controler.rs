@@ -221,14 +221,6 @@ impl<'a> MenuProgramaControler<'a> {
 }
 
 impl MenuProgramaControler<'_> {
-    pub fn clone_from(&mut self, origin: Self) {
-        self.menu_arena = origin.menu_arena;
-        self.current_menu_handle = origin.current_menu_handle;
-        self.mounted = origin.mounted;
-    }
-}
-
-impl MenuProgramaControler<'_> {
     pub fn send_key(&mut self, key: KeyCode) {
         if let Some(line_being_edited) = self.get_line_being_edited() {
             // if is editing some line, delegate keys to sub widgets.
