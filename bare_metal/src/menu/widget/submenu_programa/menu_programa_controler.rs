@@ -3,6 +3,7 @@ use super::{
     navigation_state::NavigationStateModel,
 };
 use crate::geometry::point::Point;
+use crate::menu::widget::widget::Widget;
 use crate::microcontroler::ratangular_wave::RectangularWave;
 use crate::{
     board::{keypad::KeyCode, lcd},
@@ -117,7 +118,7 @@ impl<'a> MenuProgramaControler<'a> {
     }
 
     /// Get mounted item for a particular line (mutable reference)
-    fn get_mounted_item_for_line(&mut self, lcd_line: LcdLine) -> &mut MenuItemWidget<'a> {
+    fn get_mounted_item_for_lcd_line_mut(&mut self, lcd_line: LcdLine) -> &mut MenuItemWidget<'a> {
         if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
             return elem;
         } else {
@@ -126,10 +127,19 @@ impl<'a> MenuProgramaControler<'a> {
         }
     }
 
-    /// Get mounted item in the current line which is selected by user
-    fn get_current_selected_mounted_item(&mut self) -> &mut MenuItemWidget<'a> {
+    fn get_mounted_item_for_lcd_line(&self, lcd_line: LcdLine) -> &MenuItemWidget<'a> {
+        if let Some(elem) = self.mounted.get(lcd_line as u8 as usize) {
+            return elem;
+        } else {
+            // Mounting error
+            panic!("E1");
+        }
+    }
+
+    /// Get mounted item for the lcd line selected by the user
+    fn get_monted_item_for_current_lcd_line(&mut self) -> &mut MenuItemWidget<'a> {
         let line = self.get_navigation_state().get_current_lcd_line();
-        let current_menu_item = self.get_mounted_item_for_line(line);
+        let current_menu_item = self.get_mounted_item_for_lcd_line_mut(line);
         current_menu_item
     }
 
@@ -185,9 +195,9 @@ impl<'a> MenuProgramaControler<'a> {
 
     /// If is in edit mode for some line returns Some(LcdLine) else None.
     /// TODO: Remove mutability of self when possible
-    fn get_line_being_edited(&mut self) -> Option<LcdLine> {
+    fn get_line_being_edited(&self) -> Option<LcdLine> {
         for line in LcdLine::iterator() {
-            let is_editing_some_line = self.get_mounted_item_for_line(line).is_in_edit_mode();
+            let is_editing_some_line = self.get_mounted_item_for_lcd_line(line).is_in_edit_mode();
             if is_editing_some_line {
                 return Some(line);
             }
@@ -198,34 +208,34 @@ impl<'a> MenuProgramaControler<'a> {
     /// helper function to draw submenu cursor on screen
     ///
     /// TODO: remove mutability on self when possible
-    fn draw_menu_item_selector(&mut self, line: LcdLine, screen_buffer: &mut ScreenBuffer) {
-        const EDITING_CURSOR: char = '*';
-        const NAVIGATING_CURSOR: char = '>';
-        const EMPTY_CURSOR: char = ' ';
+    fn draw_menu_item_selector(&self, line: LcdLine, screen_buffer: &mut ScreenBuffer) {
+        const EDITING_CURSOR: u8 = b'*';
+        const NAVIGATING_CURSOR: u8 = b'>';
+        const EMPTY_CURSOR: u8 = b' ';
         // position cursor
         screen_buffer.set_cursor(Point::new(0, line as u8));
         // draw selector char
         match self.get_line_being_edited() {
             Some(_line) => {
-                screen_buffer.print_char(EDITING_CURSOR);
+                screen_buffer.print_u8(EDITING_CURSOR);
             }
             None => {
                 let is_time_to_blink = self.blink.read();
                 if is_time_to_blink {
-                    screen_buffer.print_char(NAVIGATING_CURSOR);
+                    screen_buffer.print_u8(NAVIGATING_CURSOR);
                 } else {
-                    screen_buffer.print_char(EMPTY_CURSOR)
+                    screen_buffer.print_u8(EMPTY_CURSOR)
                 }
             }
         }
     }
 }
 
-impl MenuProgramaControler<'_> {
-    pub fn send_key(&mut self, key: KeyCode) {
+impl Widget for MenuProgramaControler<'_> {
+    fn send_key(&mut self, key: KeyCode) {
         if let Some(line_being_edited) = self.get_line_being_edited() {
             // if is editing some line, delegate keys to sub widgets.
-            self.get_mounted_item_for_line(line_being_edited)
+            self.get_mounted_item_for_lcd_line_mut(line_being_edited)
                 .send_key(key);
         } else {
             // if not editing any line we are responsible to show up/down menu navigation.
@@ -239,7 +249,7 @@ impl MenuProgramaControler<'_> {
                 }
 
                 KeyCode::KEY_ENTER => {
-                    let current_menu_item = self.get_current_selected_mounted_item();
+                    let current_menu_item = self.get_monted_item_for_current_lcd_line();
                     if let Some(child_handle) = current_menu_item.child {
                         // TEMP CODE: if current mitem has a child submenu, opens it.
                         self.go_to_child(child_handle);
@@ -260,17 +270,17 @@ impl MenuProgramaControler<'_> {
         }
     }
 
-    pub fn update(&mut self) {
+    fn update(&mut self) {
         // updates the blinker
         self.blink.update();
         // updates each line
         for line in LcdLine::iterator() {
-            self.get_mounted_item_for_line(line).update();
+            self.get_mounted_item_for_lcd_line_mut(line).update();
         }
     }
 
-    /// TODO: Remove mutability of self when possible.
-    pub fn draw(&mut self, screen_buffer: &mut ScreenBuffer) {
+    /// TODO: Check if it is possible to remove the unused `_start_point` argument.
+    fn draw(&self, screen_buffer: &mut ScreenBuffer, _start_point: Point) {
         // clear screen
         screen_buffer.clear();
         // draw menu item selector
@@ -278,7 +288,7 @@ impl MenuProgramaControler<'_> {
         self.draw_menu_item_selector(line, screen_buffer);
         // draw menu items
         for line in LcdLine::iterator() {
-            self.get_mounted_item_for_line(line)
+            self.get_mounted_item_for_lcd_line(line)
                 .draw(screen_buffer, line);
         }
     }

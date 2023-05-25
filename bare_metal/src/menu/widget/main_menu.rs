@@ -170,7 +170,9 @@ impl<'a> MainMenu<'a> {
             State::Execucao => self
                 .menu_execucao_controler
                 .draw(screen_buffer, start_point),
-            State::Programa => self.menu_programa_controler.draw(screen_buffer),
+            State::Programa => self
+                .menu_programa_controler
+                .draw(screen_buffer, start_point),
         }
     }
 }
