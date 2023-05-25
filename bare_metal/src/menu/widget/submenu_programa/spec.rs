@@ -30,7 +30,7 @@ use super::flash_texts::*;
 /// Indexes the sub menus in the menu storage, it works like a reference pointer to the concrete menu.
 /// If you create a new sub menu you must put it here.
 ///
-/// TODO: Rename to `MenuStorageIndex`
+/// TODO: Consider rename to `MenuStorageIndex`
 #[derive(Copy, Clone, PartialEq)]
 pub enum MenuProgramaHandle {
     MenuPrograma,
@@ -78,8 +78,6 @@ impl<T: SubmenuLayout> SubmenuLayout for Register<T, NavigationStateModel> {
 type RegisterSubMenu<T> = Register<T, NavigationStateModel>;
 
 /// The storage for all sub menus inside the submenu 'Programa'. If you create a new sub menu you must put it here.
-/// TODO: May change name to `MenuRegister`
-/// TODO: May change name to `MenuArena`
 pub struct MenuProgramaArena<'a> {
     model: &'a DataModel,
 
@@ -171,22 +169,18 @@ impl<'a> MenuProgramaArena<'a> {
             MenuProgramaHandle::MenuParametrosDeMovimento => {
                 self.MenuParametrosDeMovimento.get_navigation_state()
             }
-
             MenuProgramaHandle::MenuParametrosDeImpressao => {
                 self.MenuParametrosDeImpressao.get_navigation_state()
             }
-
             MenuProgramaHandle::MenuParametrosDeCiclo => {
                 self.MenuParametrosDeCiclo.get_navigation_state()
             }
             MenuProgramaHandle::MenuConfiguracaoDaImpressora => {
                 self.MenuConfiguracaoDaImpressora.get_navigation_state()
             }
-
             MenuProgramaHandle::MenuIntertravamentoParaDoisEixos => {
                 self.MenuIntertravamentoParaDoisEixos.get_navigation_state()
             }
-
             MenuProgramaHandle::MenuConfiguracaoDeEixo => {
                 self.MenuConfiguracaoDoEixo.get_navigation_state()
             }
