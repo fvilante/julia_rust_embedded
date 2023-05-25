@@ -27,7 +27,7 @@ pub struct Point1d<T = u8> {
 }
 
 impl<T> Point1d<T> {
-    pub fn new(pos: T) -> Self {
+    pub const fn new(pos: T) -> Self {
         Self { pos }
     }
 }

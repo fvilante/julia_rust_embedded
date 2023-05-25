@@ -11,156 +11,93 @@ use core::{cell::Cell, ops::Range};
 use cross_platform::utils::cursor::Cursor;
 use heapless::Vec;
 
-/// Base struct, contains common building options (ie: `text of parameter's name`, `child sub menu`, etc)
-struct Base {
-    /// X-Position of the text of parameter's name.
-    point1: u8,
-    /// X-Position for the [`Field`] if some exists.
-    point2: Option<u8>,
-    /// Text of parameter's name.
-    text: FlashString,
-    /// Pointer to the child sub_submenu if some exists.
-    child: Option<MenuProgramaHandle>,
+pub struct SimpleMenu<'a, const N: usize> {
+    pub parent_name: &'a PmString<N>,
+    pub child_menu: MenuProgramaHandle,
 }
 
-/// `Numerical` specialization for the base struct. It is used to construct the [`Numerical`] [`Field`] [`Widget`]
-struct Numerical<'a> {
-    /// Number format (ie: min and max acceptable values, etc)
-    format: Format,
-    /// Reference to the value to store the final result of the edition (ie: the model)
-    variable_u16: &'a Cell<u16>,
-    /// define the position and text for display unit of measurement on screen
-    unit_of_measurement: Option<(u8, FlashString)>,
+/// TODO: Improve this construction (ie: why (col, text) instead of an iterator of Captions and/or Fields ?)
+/// TODO: Abstract string, use IntoIterator<Item = u8>.
+/// TODO: Verify if is there there a way to avoid the Option<T> in the `unit_of_measurement` field
+pub struct NumericalParameter<'a, const N: usize> {
+    pub parameter_name: &'a PmString<N>,
+    pub variable: (u8, &'a Cell<u16>), // (collunm_position, text)
+    pub valid_range: Range<u16>,
+    pub unit_of_measurement_text: Option<(u8, FlashString)>, // (collunm_position, text)
 }
 
-/// `Numerical` specialization for the base struct. It is used to construct the [`OptionEditorWidget`] [`Field`] [`Widget`]
-struct Optional<'a> {
-    /// Reference to the value to store the final result of the edition (ie: the model)
-    variable_option: &'a Cell<Cursor>,
-    /// List of strings with the texts to show to user
-    options_list: OptionsBuffer,
+pub struct OptionalParameter<'a, const N: usize> {
+    pub parameter_name: &'a PmString<N>,
+    pub variable: (u8, &'a Cell<Cursor>), // (collunm_position, text)
+    pub options_list: OptionsBuffer,
 }
 
-/// TODO: This entire construction of the menusystem would be refactored when possible
-/// This is a [builder pattern](https://doc.rust-lang.org/1.0.0/style/ownership/builders.html) to construct MenuItems.
-pub struct MenuItemBuilder<'a> {
-    base: Base,
-    numerical: Option<Numerical<'a>>,
-    optional: Option<Optional<'a>>,
-}
+/// TODO: Make construction methods `const fn`
+pub struct MenuBuilder2;
 
-impl<'a> MenuItemBuilder<'a> {
-    /// Constructs and sets the text of the parameter
-    pub fn from_text<const N: usize>(val: &PmString<N>) -> Self {
-        Self {
-            base: Base {
-                point1: 1,
-                point2: None,
-                text: FlashString::new(val),
-                child: None,
-            },
-            numerical: None,
-            optional: None,
-        }
+impl MenuBuilder2 {
+    /// collum to start to print menu_item text in the lcd
+    const POINT1: Point1d = Point1d::new(1);
+
+    /// Wraps the menu into an Some value for convenience, because it will be used as the return
+    /// of a next method of an Iterator
+    fn wrap_value_for_convenience(menu_item: MenuItemWidget) -> Option<MenuItemWidget> {
+        Some(menu_item)
     }
 
-    /// Sets the submenu child
-    pub fn add_conection_to_submenu(&mut self, handle: MenuProgramaHandle) -> &mut Self {
-        self.base.child = Some(handle);
-        self
+    pub fn make_simple_menu<const N: usize>(ctor: SimpleMenu<N>) -> Option<MenuItemWidget> {
+        // prepare
+        let point1 = Self::POINT1;
+        let text = FlashString::new(ctor.parent_name);
+        let child = Some(ctor.child_menu);
+        // build
+        let menu_item = MenuItemWidget::new((point1, text), None, child, None);
+        Self::wrap_value_for_convenience(menu_item)
     }
 
-    /// Configures the numerical field
-    pub fn add_numerical_variable(
-        &mut self,
-        variable: &'a Cell<u16>,
-        valid_range: Option<Range<u16>>,
-        point2: u8,
-        unit_of_measurement: Option<(u8, FlashString)>,
-    ) -> &mut Self {
-        let valid_range = if let Some(valid_range) = valid_range {
-            valid_range
-        } else {
-            let full_range = 0..0xFFFF;
-            full_range
+    pub fn make_numerical_parameter<const N: usize>(
+        ctor: NumericalParameter<N>,
+    ) -> Option<MenuItemWidget> {
+        // prepare
+        let point1 = Self::POINT1;
+        let text = FlashString::new(ctor.parameter_name);
+        let point2 = ctor.variable.0.into();
+        let format = Format {
+            start: ctor.valid_range.start,
+            end: ctor.valid_range.end,
+            initial_cursor_position: 0,
         };
-        self.base.point2 = Some(point2);
-        self.numerical = Some(Numerical {
-            format: Format {
-                start: valid_range.start,
-                end: valid_range.end,
-                initial_cursor_position: 0,
-            },
-            variable_u16: variable,
-            unit_of_measurement,
-        });
-        self
-    }
-
-    /// Configures the optional field
-    pub fn add_optional_variable(
-        &mut self,
-        variable: &'a Cell<Cursor>,
-        options_list: OptionsBuffer,
-        point2: u8,
-    ) -> &mut Self {
-        self.base.point2 = Some(point2);
-        self.optional = Some(Optional {
-            variable_option: variable,
-            options_list,
-        });
-        self
-    }
-
-    /// Builds the menu item widget
-    pub fn build(&mut self) -> MenuItemWidget<'a> {
-        const DEFAULT_POSITION_FOR_POINT_2: u8 = 30; // TODO: this value should be improved, to be more reasoned and less arbitrary, or eventually a panic with proper error message should be preferable
-
-        // FIX: If client construct numerical and optional at same time the numerical will be taken and the
-        // optional will be ignored. It's safe, but it's better to refactor the code so client cannot
-        // compile this ambiguity.
-
-        let Base {
-            point1,
-            point2,
+        let field = Field::from_numerical(ctor.variable.1, format);
+        let unit_of_measurement_label = ctor
+            .unit_of_measurement_text
+            .map(|x| (Point1d::new(x.0), x.1));
+        let child = None.into();
+        // build
+        let menu_item = MenuItemWidget::new(
+            (point1, text),
+            Some((point2, field)),
             child,
-            text,
-        } = self.base;
+            unit_of_measurement_label,
+        );
+        Self::wrap_value_for_convenience(menu_item)
+    }
 
-        // If must build a numerical menu item parameter
-        if let Some(Numerical {
-            format,
-            variable_u16,
-            unit_of_measurement,
-        }) = self.numerical
-        {
-            let point1 = point1.into();
-            let point2 = point2.unwrap_or(DEFAULT_POSITION_FOR_POINT_2).into();
-            let field = Field::from_numerical(variable_u16, format);
-            let (point3, unit_of_measurement) = unit_of_measurement.unwrap_or_default();
-            MenuItemWidget::new(
-                (point1, text),
-                Some((point2, field)),
-                child,
-                Some((point3.into(), unit_of_measurement)),
-            )
-        // Else if must build an optional menu item parameter
-        } else if let Some(Optional {
-            variable_option,
-            options_list,
-        }) = &self.optional
-        {
+    pub fn make_optional_parameter<const N: usize>(
+        ctor: OptionalParameter<N>,
+    ) -> Option<MenuItemWidget> {
+        // prepare
+        let point1 = Self::POINT1;
+        let text = FlashString::new(ctor.parameter_name);
+        let options_list__ = {
             let mut options_list_cloned = Vec::new();
-            options_list_cloned.clone_from(options_list);
-            let point1 = point1.into();
-            let point2 = point2.unwrap_or(DEFAULT_POSITION_FOR_POINT_2).into();
-            let field = Field::from_optional(variable_option, options_list_cloned);
-            MenuItemWidget::new((point1, text), Some((point2, field)), child, None)
-        // Else if must build a text-only submenu parameter
-        } else {
-            // it is submenu caller
-            let point1 = point1.into();
-            MenuItemWidget::new((point1, text), None, child, None)
-        }
+            options_list_cloned.clone_from(&ctor.options_list);
+            options_list_cloned
+        };
+        let field = Field::from_optional(ctor.variable.1, options_list__);
+        let point2 = ctor.variable.0.into();
+        let child = None;
+        // build
+        let menu_item = MenuItemWidget::new((point1, text), Some((point2, field)), child, None);
+        Self::wrap_value_for_convenience(menu_item)
     }
 }
