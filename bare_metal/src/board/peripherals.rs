@@ -13,7 +13,7 @@ use crate::{menu::screen_buffer::ScreenBuffer, microcontroler::timer::init_timer
 use super::{
     front_panel::FrontPanel,
     input_expander::InputExpander,
-    keyboard::KeyboardAvrDriver,
+    keyboard::{Keyboard, KeyboardAvrDriver},
     lcd::{self, adapter::LcdHardware40x2, interface::Lcd},
     output_expander::OutputExpander,
 };
@@ -47,7 +47,7 @@ impl Peripherals {
         }
     }
 
-    pub fn get_keyboard(&self) -> KeyboardAvrDriver {
+    pub fn get_keyboard(&self) -> impl Keyboard + '_ {
         let keyboard = KeyboardAvrDriver::new(&self.output_expander, &self.input_expander);
         keyboard
     }

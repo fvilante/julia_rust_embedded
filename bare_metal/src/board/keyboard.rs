@@ -5,6 +5,13 @@ use crate::board::output_expander::OutputExpander;
 use crate::microcontroler::delay::delay_ms;
 use crate::microcontroler::timer::now;
 
+/// Keyboard abstraction
+/// TODO: Move to a better place
+pub trait Keyboard {
+    fn get_key(&mut self) -> Option<KeyCode>;
+}
+//
+
 type TimePoint = u16;
 
 const DEBOUNCE_TIME: TimePoint = 250; // miliseconds
@@ -76,7 +83,7 @@ impl Debounce {
 }
 
 /// High level function to control keyboard key strokes
-pub struct Keyboard<'a> {
+pub struct KeyboardAvrDriver<'a> {
     pub keypad: Keypad<'a>,
     pub debouncer: Debounce,
     // TODO: I'm just using one signal (the beep of the buzzer on-board) from the OutputExpander
@@ -84,7 +91,7 @@ pub struct Keyboard<'a> {
     output: &'a OutputExpander,
 }
 
-impl<'a> Keyboard<'a> {
+impl<'a> KeyboardAvrDriver<'a> {
     pub fn new(output: &'a OutputExpander, input: &'a InputExpander) -> Self {
         Self {
             keypad: Keypad::new(output, input),
@@ -92,8 +99,10 @@ impl<'a> Keyboard<'a> {
             output,
         }
     }
+}
 
-    pub fn get_key(&mut self) -> Option<KeyCode> {
+impl<'a> Keyboard for KeyboardAvrDriver<'a> {
+    fn get_key(&mut self) -> Option<KeyCode> {
         //TODO: put this beep code in a better place and make its timeing non-halting
         let beep = |key| {
             self.output.BUZZER(true).commit();

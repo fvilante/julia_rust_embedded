@@ -1,5 +1,5 @@
 use crate::board::front_panel::FrontPanel;
-use crate::board::keyboard::Keyboard;
+use crate::board::keyboard::{Keyboard, KeyboardAvrDriver};
 use crate::board::keypad::KeyCode;
 use crate::board::peripherals::Peripherals;
 use crate::menu::model::DataModel;
@@ -200,10 +200,10 @@ pub fn run() -> ! {
     //  Main loop
     // ////////////////////////////////////////////////////////////////////
 
-    fn start_main_loop<T: Widget>(
+    fn start_main_loop(
         mut screen_buffer: ScreenBuffer,
-        mut keyboard: Keyboard,
-        mut menu: T,
+        mut keyboard: impl Keyboard,
+        mut menu: impl Widget,
         transport: &TransportLayer,
     ) -> ! {
         let fps = 30; // frames_per_second for lcd display redraw -> 30_fps = 200_milisecs
