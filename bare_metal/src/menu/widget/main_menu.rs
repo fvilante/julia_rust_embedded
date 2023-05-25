@@ -5,7 +5,7 @@ use super::{
     widget::Widget,
 };
 use crate::board::front_panel::FrontPanel;
-use crate::board::front_panel::FrontPanelAvrHardware;
+
 use crate::geometry::point::Point;
 use crate::string::flash::FlashString;
 use crate::{

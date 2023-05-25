@@ -1,5 +1,5 @@
-use crate::board::front_panel::{FrontPanel, FrontPanelAvrHardware};
-use crate::board::keyboard::{Keyboard, KeyboardAvrDriver};
+use crate::board::front_panel::FrontPanel;
+use crate::board::keyboard::Keyboard;
 use crate::board::keypad::KeyCode;
 use crate::board::peripherals::Peripherals;
 use crate::board::peripherals::PeripheralsAvrHardware;

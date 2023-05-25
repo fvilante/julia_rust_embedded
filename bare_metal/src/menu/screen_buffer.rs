@@ -1,6 +1,5 @@
 use cross_platform::utils::numerical::convert_u16_to_string_decimal;
 
-use crate::board::lcd;
 use crate::board::lcd::interface::Lcd;
 use crate::geometry::point::Point;
 use crate::printable::Printable;

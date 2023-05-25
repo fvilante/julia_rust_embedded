@@ -14,7 +14,7 @@ use super::{
     front_panel::{FrontPanel, FrontPanelAvrHardware},
     input_expander::InputExpander,
     keyboard::{Keyboard, KeyboardAvrDriver},
-    lcd::{self, adapter::LcdHardware40x2, interface::Lcd},
+    lcd::adapter::LcdHardware40x2,
     output_expander::OutputExpander,
 };
 
