@@ -1,3 +1,4 @@
+use crate::board::front_panel::FrontPanel;
 use crate::board::keyboard::Keyboard;
 use crate::board::keypad::KeyCode;
 use crate::board::peripherals::Peripherals;
@@ -145,19 +146,36 @@ pub fn run() -> ! {
     //  Main menu mounting
     // ///////////////////////////////////////
     //
+
+    fn make_menu<'a>(
+        menu_programa_arena: &'a MenuProgramaArena,
+        data_model: &'a DataModel,
+        transport: &'a TransportLayer,
+        front_panel: &'a mut FrontPanel<'a>,
+    ) -> impl Widget + 'a {
+        // menu root
+        let initial_menu_handle = MenuProgramaHandle::MenuPrograma;
+        // child menus
+        let menu_programa_controler =
+            MenuProgramaControler::new(initial_menu_handle, &menu_programa_arena);
+        let menu_manual_controler = ManualModeMenuControler::new(&transport);
+        let menu_execucao_controler = MenuExecucaoControler::new(&transport);
+        // parent menu
+        MainMenu::new(
+            menu_manual_controler,
+            menu_execucao_controler,
+            menu_programa_controler,
+            &transport,
+            &data_model,
+            front_panel,
+        )
+    }
+
     let menu_programa_arena = MenuProgramaArena::new(&data_model);
-    let initial_menu = MenuProgramaHandle::MenuPrograma;
-    let menu_programa_controler = MenuProgramaControler::new(initial_menu, &menu_programa_arena);
-
-    let menu_manual_controler = ManualModeMenuControler::new(&transport);
-    let menu_execucao_controler = MenuExecucaoControler::new(&transport);
-
-    let mut main_menu_controler = MainMenu::new(
-        menu_manual_controler,
-        menu_execucao_controler,
-        menu_programa_controler,
-        &transport,
+    let menu = make_menu(
+        &menu_programa_arena,
         &data_model,
+        &transport,
         &mut front_panel,
     );
 
@@ -210,5 +228,5 @@ pub fn run() -> ! {
         }
     }
 
-    start_main_loop(screen_buffer, keyboard, main_menu_controler, &transport)
+    start_main_loop(screen_buffer, keyboard, menu, &transport)
 }
