@@ -80,7 +80,7 @@ type RegisterSubMenu<T> = Register<T, NavigationStateModel>;
 /// The storage for all sub menus inside the submenu 'Programa'. If you create a new sub menu you must put it here.
 /// TODO: May change name to `MenuRegister`
 /// TODO: May change name to `MenuArena`
-pub struct MenuProgramaView<'a> {
+pub struct MenuProgramaArena<'a> {
     model: &'a DataModel,
 
     pub MenuPrograma: RegisterSubMenu<MenuPrograma<'a>>,
@@ -97,7 +97,7 @@ pub struct MenuProgramaView<'a> {
     pub MenuConfiguracaoDoEquipamento: RegisterSubMenu<MenuConfiguracaoDoEquipamento<'a>>,
 }
 
-impl<'a> MenuProgramaView<'a> {
+impl<'a> MenuProgramaArena<'a> {
     /// Constructs all the menus and initializes its internal state
     pub fn new(model: &'a DataModel) -> Self {
         Self {

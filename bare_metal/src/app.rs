@@ -8,7 +8,7 @@ use crate::menu::widget::execucao::MenuExecucaoControler;
 use crate::menu::widget::main_menu::MainMenu;
 use crate::menu::widget::manual_mode::ManualModeMenuControler;
 use crate::menu::widget::splash::Splash;
-use crate::menu::widget::submenu_programa::spec::{MenuProgramaHandle, MenuProgramaView};
+use crate::menu::widget::submenu_programa::spec::{MenuProgramaArena, MenuProgramaHandle};
 use crate::microcontroler::timer::now;
 use crate::microcontroler::{serial, timer};
 use cross_platform::protocol::datalink::datalink::Datalink;
@@ -142,10 +142,9 @@ pub fn run() -> ! {
     //  Main menu mounting
     // ///////////////////////////////////////
     //
-    let menu_programa_view = MenuProgramaView::new(&data_model);
-    let menu_programa_handle = MenuProgramaHandle::MenuPrograma;
-    let menu_programa_controler =
-        MenuProgramaControler::new(menu_programa_handle, &menu_programa_view);
+    let menu_programa_arena = MenuProgramaArena::new(&data_model);
+    let initial_menu = MenuProgramaHandle::MenuPrograma;
+    let menu_programa_controler = MenuProgramaControler::new(initial_menu, &menu_programa_arena);
 
     let menu_manual_controler = ManualModeMenuControler::new(&transport);
     let menu_execucao_controler = MenuExecucaoControler::new(&transport);
