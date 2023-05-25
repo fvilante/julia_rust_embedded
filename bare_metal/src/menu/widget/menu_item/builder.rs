@@ -32,10 +32,10 @@ pub struct OptionalParameter<'a> {
     pub options_list: OptionsBuffer,
 }
 
-/// TODO: Make construction methods `const fn`
-pub struct MenuBuilder2;
+/// TODO: Make construction methods `const fn` this may improve flash code's size
+pub struct MenuBuilder;
 
-impl MenuBuilder2 {
+impl MenuBuilder {
     /// collum to start to print menu_item text in the lcd
     const POINT1: Point1d = Point1d::new(1);
 
