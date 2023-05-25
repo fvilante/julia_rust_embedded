@@ -13,7 +13,7 @@ use crate::{menu::screen_buffer::ScreenBuffer, microcontroler::timer::init_timer
 use super::{
     front_panel::FrontPanel,
     input_expander::InputExpander,
-    keyboard::Keyboard,
+    keyboard::KeyboardAvrDriver,
     lcd::{self, adapter::LcdHardware40x2, interface::Lcd},
     output_expander::OutputExpander,
 };
@@ -25,7 +25,7 @@ pub struct Peripherals {
     hardware_lcd: LcdHardware40x2,
 }
 
-impl<'a> Peripherals {
+impl Peripherals {
     /// Initialize peripherals
     ///
     /// NOTE: Call this function once during the entire lifetime of the program
@@ -47,12 +47,12 @@ impl<'a> Peripherals {
         }
     }
 
-    pub fn get_keyboard(&'a self) -> Keyboard<'a> {
-        let keyboard = Keyboard::new(&self.output_expander, &self.input_expander);
+    pub fn get_keyboard(&self) -> KeyboardAvrDriver {
+        let keyboard = KeyboardAvrDriver::new(&self.output_expander, &self.input_expander);
         keyboard
     }
 
-    pub fn get_front_panel(&'a self) -> FrontPanel<'a> {
+    pub fn get_front_panel(&self) -> FrontPanel {
         // Leds from the frontal panel
         let front_panel = FrontPanel::new(&self.output_expander);
         front_panel
