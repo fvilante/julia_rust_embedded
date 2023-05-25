@@ -44,34 +44,38 @@ pub enum MenuProgramaHandle {
     MenuConfiguracaoDoEquipamento,
 }
 
-/// Used to store the navigation state of the submenu alongside the submenu itself
-pub struct Register<T: SubmenuLayout> {
+/// Used to store the menu itself alongside its navigation state
+pub struct Register<T, S> {
     pub menu: T,
-    pub navigation_state: Cell<NavigationStateModel>,
+    pub navigation_state: Cell<S>,
 }
 
-impl<T: SubmenuLayout> Register<T> {
-    fn from_menu(menu: T) -> Self {
+impl<T, S> Register<T, S> {
+    fn get_menu(&self) -> &T {
+        &self.menu
+    }
+
+    fn get_navigation_state(&self) -> &Cell<S> {
+        &self.navigation_state
+    }
+}
+
+impl<T> Register<T, NavigationStateModel> {
+    fn from_submenu(menu: T) -> Self {
         Self {
             menu,
             navigation_state: Cell::new(NavigationStateModel::new()),
         }
     }
-
-    fn get_menu(&self) -> &T {
-        &self.menu
-    }
-
-    fn get_navigation_state(&self) -> &Cell<NavigationStateModel> {
-        &self.navigation_state
-    }
 }
 
-impl<T: SubmenuLayout> SubmenuLayout for Register<T> {
+impl<T: SubmenuLayout> SubmenuLayout for Register<T, NavigationStateModel> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         self.menu.get_item(index)
     }
 }
+
+type RegisterSubMenu<T> = Register<T, NavigationStateModel>;
 
 /// The storage for all sub menus inside the submenu 'Programa'. If you create a new sub menu you must put it here.
 /// TODO: May change name to `MenuRegister`
@@ -79,18 +83,18 @@ impl<T: SubmenuLayout> SubmenuLayout for Register<T> {
 pub struct MenuProgramaView<'a> {
     model: &'a DataModel,
 
-    pub MenuPrograma: Register<MenuPrograma<'a>>,
+    pub MenuPrograma: RegisterSubMenu<MenuPrograma<'a>>,
 
     // ARQUIVO DE EIXO
-    pub MenuArquivoDeEixo: Register<MenuArquivoDeEixo<'a>>,
-    pub MenuParametrosDeMovimento: Register<MenuParametrosDeMovimento<'a>>,
-    pub MenuParametrosDeImpressao: Register<MenuParametrosDeImpressao<'a>>,
-    pub MenuParametrosDeCiclo: Register<MenuParametrosDeCiclo<'a>>,
-    pub MenuConfiguracaoDaImpressora: Register<MenuConfiguracaoDaImpressora<'a>>,
-    pub MenuIntertravamentoParaDoisEixos: Register<MenuIntertravamentoParaDoisEixos<'a>>,
-    //pub MenuParametrosDeSelecaoDeMensagem: Register<MenuParametrosDeSelecaoDeMensagem>,
-    pub MenuConfiguracaoDoEixo: Register<MenuConfiguracaoDeEixo<'a>>,
-    pub MenuConfiguracaoDoEquipamento: Register<MenuConfiguracaoDoEquipamento<'a>>,
+    pub MenuArquivoDeEixo: RegisterSubMenu<MenuArquivoDeEixo<'a>>,
+    pub MenuParametrosDeMovimento: RegisterSubMenu<MenuParametrosDeMovimento<'a>>,
+    pub MenuParametrosDeImpressao: RegisterSubMenu<MenuParametrosDeImpressao<'a>>,
+    pub MenuParametrosDeCiclo: RegisterSubMenu<MenuParametrosDeCiclo<'a>>,
+    pub MenuConfiguracaoDaImpressora: RegisterSubMenu<MenuConfiguracaoDaImpressora<'a>>,
+    pub MenuIntertravamentoParaDoisEixos: RegisterSubMenu<MenuIntertravamentoParaDoisEixos<'a>>,
+    //pub MenuParametrosDeSelecaoDeMensagem: RegisterSubMenu<MenuParametrosDeSelecaoDeMensagem>,
+    pub MenuConfiguracaoDoEixo: RegisterSubMenu<MenuConfiguracaoDeEixo<'a>>,
+    pub MenuConfiguracaoDoEquipamento: RegisterSubMenu<MenuConfiguracaoDoEquipamento<'a>>,
 }
 
 impl<'a> MenuProgramaView<'a> {
@@ -98,21 +102,25 @@ impl<'a> MenuProgramaView<'a> {
     pub fn new(model: &'a DataModel) -> Self {
         Self {
             model,
-            MenuPrograma: Register::from_menu(MenuPrograma::new(model)),
-            MenuArquivoDeEixo: Register::from_menu(MenuArquivoDeEixo::new(model)),
-            MenuParametrosDeMovimento: Register::from_menu(MenuParametrosDeMovimento::new(model)),
-            MenuParametrosDeImpressao: Register::from_menu(MenuParametrosDeImpressao::new(model)),
-            MenuParametrosDeCiclo: Register::from_menu(MenuParametrosDeCiclo::new(model)),
-            MenuConfiguracaoDaImpressora: Register::from_menu(MenuConfiguracaoDaImpressora::new(
+            MenuPrograma: Register::from_submenu(MenuPrograma::new(model)),
+            MenuArquivoDeEixo: Register::from_submenu(MenuArquivoDeEixo::new(model)),
+            MenuParametrosDeMovimento: Register::from_submenu(MenuParametrosDeMovimento::new(
                 model,
             )),
-            MenuIntertravamentoParaDoisEixos: Register::from_menu(
+            MenuParametrosDeImpressao: Register::from_submenu(MenuParametrosDeImpressao::new(
+                model,
+            )),
+            MenuParametrosDeCiclo: Register::from_submenu(MenuParametrosDeCiclo::new(model)),
+            MenuConfiguracaoDaImpressora: Register::from_submenu(
+                MenuConfiguracaoDaImpressora::new(model),
+            ),
+            MenuIntertravamentoParaDoisEixos: Register::from_submenu(
                 MenuIntertravamentoParaDoisEixos::new(model),
             ),
-            MenuConfiguracaoDoEixo: Register::from_menu(MenuConfiguracaoDeEixo::new(model)),
-            MenuConfiguracaoDoEquipamento: Register::from_menu(MenuConfiguracaoDoEquipamento::new(
-                model,
-            )),
+            MenuConfiguracaoDoEixo: Register::from_submenu(MenuConfiguracaoDeEixo::new(model)),
+            MenuConfiguracaoDoEquipamento: Register::from_submenu(
+                MenuConfiguracaoDoEquipamento::new(model),
+            ),
         }
     }
 
