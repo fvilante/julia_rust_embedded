@@ -120,43 +120,47 @@ impl<'a> MenuItemBuilder<'a> {
         // optional will be ignored. It's safe, but it's better to refactor the code so client cannot
         // compile this ambiguity.
 
+        let Base {
+            point1,
+            point2,
+            child,
+            text,
+        } = self.base;
+
         // If must build a numerical menu item parameter
-        if let Some(numerical) = &mut self.numerical {
-            let point1 = Point1d::new(self.base.point1);
-            let point2 = Point1d::new(self.base.point2.unwrap_or(DEFAULT_POSITION_FOR_POINT_2));
-            let field = Field::from_numerical(numerical.variable_u16, (numerical.format).clone());
-            let (point3, unit_of_measurement) = numerical.unit_of_measurement.unwrap_or_default();
-            let menu_item = MenuItemWidget::new(
-                (point1, self.base.text),
+        if let Some(Numerical {
+            format,
+            variable_u16,
+            unit_of_measurement,
+        }) = self.numerical
+        {
+            let point1 = point1.into();
+            let point2 = point2.unwrap_or(DEFAULT_POSITION_FOR_POINT_2).into();
+            let field = Field::from_numerical(variable_u16, format);
+            let (point3, unit_of_measurement) = unit_of_measurement.unwrap_or_default();
+            MenuItemWidget::new(
+                (point1, text),
                 Some((point2, field)),
-                self.base.child,
-                Some((Point1d::new(point3), unit_of_measurement)),
-            );
-            menu_item
+                child,
+                Some((point3.into(), unit_of_measurement)),
+            )
         // Else if must build an optional menu item parameter
-        } else if let Some(optional) = &mut self.optional {
+        } else if let Some(Optional {
+            variable_option,
+            options_list,
+        }) = &self.optional
+        {
             let mut options_list_cloned = Vec::new();
-            options_list_cloned.clone_from(&optional.options_list);
-            let point1 = Point1d::new(self.base.point1);
-            let point2 = Point1d::new(self.base.point2.unwrap_or(DEFAULT_POSITION_FOR_POINT_2));
-            const NUMBER_OF_OPTIONS_AVAILABLE: u8 = 2; // TODO: This is a simplification and not will be always the case in future. Make this avaliation more dynamic and automatic
-            let _initial_selection = Cursor::new(0, NUMBER_OF_OPTIONS_AVAILABLE, 0); //(*args.variable).clone();
-            let field = Field::from_optional(optional.variable_option, options_list_cloned);
-            let menu_item = MenuItemWidget::new(
-                (point1, self.base.text),
-                Some((point2, field)),
-                self.base.child,
-                None,
-            );
-            menu_item
+            options_list_cloned.clone_from(options_list);
+            let point1 = point1.into();
+            let point2 = point2.unwrap_or(DEFAULT_POSITION_FOR_POINT_2).into();
+            let field = Field::from_optional(variable_option, options_list_cloned);
+            MenuItemWidget::new((point1, text), Some((point2, field)), child, None)
         // Else if must build a text-only submenu parameter
         } else {
             // it is submenu caller
-            let point1 = Point1d::new(self.base.point1);
-            let text = self.base.text;
-            let child = self.base.child;
-            let menu_item = MenuItemWidget::new((point1, text), None, child, None);
-            menu_item
+            let point1 = point1.into();
+            MenuItemWidget::new((point1, text), None, child, None)
         }
     }
 }
