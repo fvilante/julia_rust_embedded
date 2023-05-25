@@ -2,15 +2,15 @@ use crate::board::front_panel::{FrontPanel, FrontPanelAvrHardware};
 use crate::board::keyboard::{Keyboard, KeyboardAvrDriver};
 use crate::board::keypad::KeyCode;
 use crate::board::peripherals::Peripherals;
+use crate::board::peripherals::PeripheralsAvrHardware;
+use crate::geometry::point::Point;
 use crate::menu::model::DataModel;
 use crate::menu::screen_buffer::ScreenBuffer;
-use crate::menu::widget::submenu_programa::menu_programa_controler::MenuProgramaControler;
-
-use crate::geometry::point::Point;
 use crate::menu::widget::execucao::MenuExecucaoControler;
 use crate::menu::widget::main_menu::MainMenu;
 use crate::menu::widget::manual_mode::ManualModeMenuControler;
 use crate::menu::widget::splash::Splash;
+use crate::menu::widget::submenu_programa::menu_programa_controler::MenuProgramaControler;
 use crate::menu::widget::submenu_programa::spec::{MenuProgramaArena, MenuProgramaHandle};
 use crate::menu::widget::widget::Widget;
 use crate::microcontroler::timer::now;
@@ -119,7 +119,7 @@ pub fn run() -> ! {
     serial::init(baudrate);
 
     // other peripherals
-    let peripherals = Peripherals::new();
+    let peripherals = PeripheralsAvrHardware::new();
     let mut front_panel = peripherals.get_front_panel();
     let mut keyboard = peripherals.get_keyboard();
     let mut screen_buffer = peripherals.get_screen_buffer();

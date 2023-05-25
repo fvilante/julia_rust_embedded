@@ -18,18 +18,26 @@ use super::{
     output_expander::OutputExpander,
 };
 
+/// Abstraction over the platform specific hardware instantiation
+/// TODO: Move to a better place
+pub trait Peripherals {
+    fn get_keyboard(&self) -> impl Keyboard + '_;
+    fn get_front_panel(&self) -> impl FrontPanel + '_;
+    fn get_screen_buffer(&self) -> ScreenBuffer;
+}
+
 /// On board peripherals initialization
-pub struct Peripherals {
+pub struct PeripheralsAvrHardware {
     output_expander: OutputExpander,
     input_expander: InputExpander,
     hardware_lcd: LcdHardware40x2,
 }
 
-impl Peripherals {
+impl PeripheralsAvrHardware {
     /// Initialize peripherals
     ///
     /// NOTE: Call this function once during the entire lifetime of the program
-    pub fn new() -> Self {
+    pub fn new() -> impl Peripherals {
         ////////////////////////////////
         // Low Level initialization
         ////////////////////////////////
@@ -44,19 +52,21 @@ impl Peripherals {
             hardware_lcd: LcdHardware40x2::new(),
         }
     }
+}
 
-    pub fn get_keyboard(&self) -> impl Keyboard + '_ {
+impl Peripherals for PeripheralsAvrHardware {
+    fn get_keyboard(&self) -> impl Keyboard + '_ {
         let keyboard = KeyboardAvrDriver::new(&self.output_expander, &self.input_expander);
         keyboard
     }
 
-    pub fn get_front_panel(&self) -> impl FrontPanel + '_ {
+    fn get_front_panel(&self) -> impl FrontPanel + '_ {
         // Leds from the frontal panel
         let front_panel = FrontPanelAvrHardware::new(&self.output_expander);
         front_panel
     }
 
-    pub fn get_screen_buffer(&self) -> ScreenBuffer {
+    fn get_screen_buffer(&self) -> ScreenBuffer {
         let lcd = &self.hardware_lcd;
         ScreenBuffer::new(lcd)
     }
