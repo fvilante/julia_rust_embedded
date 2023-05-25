@@ -37,8 +37,6 @@ impl Peripherals {
         // Initialize timer couting (1khz)
         init_timer();
 
-        // Lcd display
-        lcd::lcd_initialize();
         // Initialize on-board IO Expander
         Self {
             output_expander: OutputExpander::new(),
