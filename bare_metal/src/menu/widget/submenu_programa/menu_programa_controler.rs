@@ -36,6 +36,7 @@ pub struct MenuProgramaControler<'a> {
     /// TODO: Improve this communication methodology
     pub must_return_to_main_menu: bool,
     /// Blinks navigation cursor the select each item of the menu
+    /// TODO: Move the blink code to the Caption widget
     blink: RectangularWave,
 }
 
