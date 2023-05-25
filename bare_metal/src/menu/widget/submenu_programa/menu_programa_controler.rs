@@ -44,18 +44,11 @@ impl<'a> MenuProgramaControler<'a> {
         const T_ON: u16 = 500;
         const T_OFF: u16 = 500;
 
-        let Some(menu_storage_item_0) =  menu_view.get_item(submenu_handle, 0) else {
+        let (Some(menu_storage_item_0), Some(menu_storage_item_1)) =  (menu_arena.get_item(submenu_handle, 0), menu_arena.get_item(submenu_handle, 2)) else {
             // TODO: Improve error handling
+            // currently we do not accept submenus with just one parameter
             lcd::clear();
             lcd::print("err44");
-            delay_ms(4000);
-            panic!()
-        };
-
-        let Some(menu_storage_item_1) =  menu_view.get_item(submenu_handle, 1) else {
-            // TODO: Improve error handling
-            lcd::clear();
-            lcd::print("err33");
             delay_ms(4000);
             panic!()
         };
