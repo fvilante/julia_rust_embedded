@@ -1,6 +1,8 @@
+use crate::board::keyboard::Keyboard;
 use crate::board::keypad::KeyCode;
 use crate::board::peripherals::Peripherals;
 use crate::menu::model::DataModel;
+use crate::menu::screen_buffer::ScreenBuffer;
 use crate::menu::widget::submenu_programa::menu_programa_controler::MenuProgramaControler;
 
 use crate::geometry::point::Point;
@@ -9,6 +11,7 @@ use crate::menu::widget::main_menu::MainMenu;
 use crate::menu::widget::manual_mode::ManualModeMenuControler;
 use crate::menu::widget::splash::Splash;
 use crate::menu::widget::submenu_programa::spec::{MenuProgramaArena, MenuProgramaHandle};
+use crate::menu::widget::widget::Widget;
 use crate::microcontroler::timer::now;
 use crate::microcontroler::{serial, timer};
 use cross_platform::protocol::datalink::datalink::Datalink;
@@ -118,7 +121,7 @@ pub fn run() -> ! {
     let peripherals = Peripherals::new();
     let mut front_panel = peripherals.get_front_panel();
     let mut keyboard = peripherals.get_keyboard();
-    let mut screnn_buffer = peripherals.get_screen_buffer();
+    let mut screen_buffer = peripherals.get_screen_buffer();
 
     // ////////////////////////////////////////
     // Initialize cmpp communication infrastructure
@@ -171,34 +174,41 @@ pub fn run() -> ! {
 
         splash_window.update();
         let _start_point = Point::new(0, 0);
-        splash_window.draw(&mut screnn_buffer);
-        screnn_buffer.render();
+        splash_window.draw(&mut screen_buffer);
+        screen_buffer.render();
     }
 
     // /////////////////////////////////////////////////////////////////////
     //  Main loop
     // ////////////////////////////////////////////////////////////////////
 
-    //
-    let fps = 30; // 200 milisecs
-    let mut next_frame = now() + (1000 / fps);
+    fn start_main_loop<T: Widget>(
+        mut screen_buffer: ScreenBuffer,
+        mut keyboard: Keyboard,
+        mut menu: T,
+        transport: &TransportLayer,
+    ) -> ! {
+        let fps = 30; // frames_per_second for lcd display redraw -> 30_fps = 200_milisecs
+        let mut next_frame = now() + (1000 / fps);
+        loop {
+            // Proccess keystrokes
+            if let Some(key) = keyboard.get_key() {
+                match key {
+                    KeyCode::KEY_F2 => emit_print_go_signal(&transport),
+                    _ => menu.send_key(key),
+                }
+            }
+            // Update calculations
+            menu.update();
 
-    loop {
-        // Proccess keystrokes
-        if let Some(key) = keyboard.get_key() {
-            match key {
-                KeyCode::KEY_F2 => emit_print_go_signal(&transport),
-                _ => main_menu_controler.send_key(key),
+            // Render next frame
+            if now() > next_frame {
+                next_frame = now() + (1000 / fps);
+                menu.draw(&mut screen_buffer, Point::new(0, 0));
+                screen_buffer.render();
             }
         }
-        // Update calculations
-        main_menu_controler.update();
-
-        // Render next frame
-        if now() > next_frame {
-            next_frame = now() + (1000 / fps);
-            main_menu_controler.draw(&mut screnn_buffer, Point::new(0, 0));
-            screnn_buffer.render();
-        }
     }
+
+    start_main_loop(screen_buffer, keyboard, main_menu_controler, &transport)
 }
