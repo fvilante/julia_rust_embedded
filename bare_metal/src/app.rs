@@ -1,4 +1,4 @@
-use crate::board::front_panel::FrontPanel;
+use crate::board::front_panel::{FrontPanel, FrontPanelAvrHardware};
 use crate::board::keyboard::{Keyboard, KeyboardAvrDriver};
 use crate::board::keypad::KeyCode;
 use crate::board::peripherals::Peripherals;
@@ -151,7 +151,7 @@ pub fn run() -> ! {
         menu_programa_arena: &'a MenuProgramaArena,
         data_model: &'a DataModel,
         transport: &'a TransportLayer,
-        front_panel: &'a mut FrontPanel<'a>,
+        front_panel: &'a mut impl FrontPanel,
     ) -> impl Widget + 'a {
         // menu root
         let initial_menu_handle = MenuProgramaHandle::MenuPrograma;

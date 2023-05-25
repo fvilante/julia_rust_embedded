@@ -1,6 +1,3 @@
-use avr_progmem::progmem;
-use cross_platform::protocol::transport::transport_layer::TransportLayer;
-
 use super::{
     execucao::MenuExecucaoControler,
     manual_mode::{ManualModeMenuControler, ManualModeState},
@@ -8,6 +5,7 @@ use super::{
     widget::Widget,
 };
 use crate::board::front_panel::FrontPanel;
+use crate::board::front_panel::FrontPanelAvrHardware;
 use crate::geometry::point::Point;
 use crate::string::flash::FlashString;
 use crate::{
@@ -15,6 +13,8 @@ use crate::{
     menu::{model::DataModel, screen_buffer::ScreenBuffer},
     microcontroler::delay::delay_ms,
 };
+use avr_progmem::progmem;
+use cross_platform::protocol::transport::transport_layer::TransportLayer;
 
 progmem! {
     //                             1234567890123456789012345678901234567890
@@ -30,7 +30,7 @@ pub enum State {
     Programa,
 }
 
-pub struct MainMenu<'a> {
+pub struct MainMenu<'a, F: FrontPanel> {
     current_state: State,
     menu_manual_controler: ManualModeMenuControler<'a>,
     menu_execucao_controler: MenuExecucaoControler<'a>,
@@ -39,17 +39,17 @@ pub struct MainMenu<'a> {
     model: &'a DataModel,
     //TODO: We're just controling 3 Leds (Execucao, Manual, Programa), better would be to wrap
     //the type 'FrontPanel' into an abstract class.
-    front_panel_leds: &'a mut FrontPanel<'a>,
+    front_panel_leds: &'a mut F,
 }
 
-impl<'a> MainMenu<'a> {
+impl<'a, F: FrontPanel> MainMenu<'a, F> {
     pub fn new(
         menu_manual_controler: ManualModeMenuControler<'a>,
         menu_execucao_controler: MenuExecucaoControler<'a>,
         menu_programa_controler: MenuProgramaControler<'a>,
         transport: &'a TransportLayer<'a>,
         model: &'a DataModel,
-        front_panel_leds: &'a mut FrontPanel<'a>,
+        front_panel_leds: &'a mut F,
     ) -> Self {
         Self {
             current_state: State::MainMenu,
@@ -84,7 +84,7 @@ impl<'a> MainMenu<'a> {
     }
 }
 
-impl<'a> Widget for MainMenu<'a> {
+impl<'a, F: FrontPanel> Widget for MainMenu<'a, F> {
     fn send_key(&mut self, key: KeyCode) {
         match self.current_state {
             State::MainMenu => match key {

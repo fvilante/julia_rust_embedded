@@ -11,7 +11,7 @@
 use crate::{menu::screen_buffer::ScreenBuffer, microcontroler::timer::init_timer};
 
 use super::{
-    front_panel::FrontPanel,
+    front_panel::{FrontPanel, FrontPanelAvrHardware},
     input_expander::InputExpander,
     keyboard::{Keyboard, KeyboardAvrDriver},
     lcd::{self, adapter::LcdHardware40x2, interface::Lcd},
@@ -52,9 +52,9 @@ impl Peripherals {
         keyboard
     }
 
-    pub fn get_front_panel(&self) -> FrontPanel {
+    pub fn get_front_panel(&self) -> impl FrontPanel + '_ {
         // Leds from the frontal panel
-        let front_panel = FrontPanel::new(&self.output_expander);
+        let front_panel = FrontPanelAvrHardware::new(&self.output_expander);
         front_panel
     }
 
