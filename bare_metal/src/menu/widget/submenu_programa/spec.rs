@@ -63,7 +63,7 @@ impl<T: SubmenuLayout> Register<T> {
     }
 
     fn get_navigation_state(&self) -> &Cell<NavigationStateModel> {
-        &&self.navigation_state
+        &self.navigation_state
     }
 }
 
@@ -75,6 +75,7 @@ impl<T: SubmenuLayout> SubmenuLayout for Register<T> {
 
 /// The storage for all sub menus inside the submenu 'Programa'. If you create a new sub menu you must put it here.
 /// TODO: May change name to `MenuRegister`
+/// TODO: May change name to `MenuArena`
 pub struct MenuProgramaView<'a> {
     model: &'a DataModel,
 
