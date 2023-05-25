@@ -11,23 +11,23 @@ use core::{cell::Cell, ops::Range};
 use cross_platform::utils::cursor::Cursor;
 use heapless::Vec;
 
-pub struct SimpleMenu<'a, const N: usize> {
-    pub parent_name: &'a PmString<N>,
+pub struct SimpleMenu {
+    pub parent_name: FlashString,
     pub child_menu: MenuProgramaHandle,
 }
 
 /// TODO: Improve this construction (ie: why (col, text) instead of an iterator of Captions and/or Fields ?)
 /// TODO: Abstract string, use IntoIterator<Item = u8>.
 /// TODO: Verify if is there there a way to avoid the Option<T> in the `unit_of_measurement` field
-pub struct NumericalParameter<'a, const N: usize> {
-    pub parameter_name: &'a PmString<N>,
+pub struct NumericalParameter<'a> {
+    pub parameter_name: FlashString,
     pub variable: (u8, &'a Cell<u16>), // (collunm_position, text)
     pub valid_range: Range<u16>,
     pub unit_of_measurement_text: Option<(u8, FlashString)>, // (collunm_position, text)
 }
 
-pub struct OptionalParameter<'a, const N: usize> {
-    pub parameter_name: &'a PmString<N>,
+pub struct OptionalParameter<'a> {
+    pub parameter_name: FlashString,
     pub variable: (u8, &'a Cell<Cursor>), // (collunm_position, text)
     pub options_list: OptionsBuffer,
 }
@@ -45,22 +45,20 @@ impl MenuBuilder2 {
         Some(menu_item)
     }
 
-    pub fn make_simple_menu<const N: usize>(ctor: SimpleMenu<N>) -> Option<MenuItemWidget> {
+    pub fn make_simple_menu<'a>(ctor: SimpleMenu) -> Option<MenuItemWidget<'a>> {
         // prepare
         let point1 = Self::POINT1;
-        let text = FlashString::new(ctor.parent_name);
+        let text = ctor.parent_name;
         let child = Some(ctor.child_menu);
         // build
         let menu_item = MenuItemWidget::new((point1, text), None, child, None);
         Self::wrap_value_for_convenience(menu_item)
     }
 
-    pub fn make_numerical_parameter<const N: usize>(
-        ctor: NumericalParameter<N>,
-    ) -> Option<MenuItemWidget> {
+    pub fn make_numerical_parameter(ctor: NumericalParameter) -> Option<MenuItemWidget> {
         // prepare
         let point1 = Self::POINT1;
-        let text = FlashString::new(ctor.parameter_name);
+        let text = ctor.parameter_name;
         let point2 = ctor.variable.0.into();
         let format = Format {
             start: ctor.valid_range.start,
@@ -82,12 +80,10 @@ impl MenuBuilder2 {
         Self::wrap_value_for_convenience(menu_item)
     }
 
-    pub fn make_optional_parameter<const N: usize>(
-        ctor: OptionalParameter<N>,
-    ) -> Option<MenuItemWidget> {
+    pub fn make_optional_parameter(ctor: OptionalParameter) -> Option<MenuItemWidget> {
         // prepare
         let point1 = Self::POINT1;
-        let text = FlashString::new(ctor.parameter_name);
+        let text = ctor.parameter_name;
         let options_list__ = {
             let mut options_list_cloned = Vec::new();
             options_list_cloned.clone_from(&ctor.options_list);

@@ -224,17 +224,17 @@ impl SubmenuLayout for MenuPrograma<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => MenuBuilder2::make_simple_menu(SimpleMenu {
-                parent_name: &EDITAR_PROGRAMA_EIXO_X,
+                parent_name: FlashString::new(&EDITAR_PROGRAMA_EIXO_X),
                 child_menu: MenuProgramaHandle::MenuArquivoDeEixo,
             }),
 
             1 => MenuBuilder2::make_simple_menu(SimpleMenu {
-                parent_name: &CONFIGURACAO_EIXO_X,
+                parent_name: FlashString::new(&CONFIGURACAO_EIXO_X),
                 child_menu: MenuProgramaHandle::MenuConfiguracaoDeEixo,
             }),
 
             2 => MenuBuilder2::make_simple_menu(SimpleMenu {
-                parent_name: &CONFIGURACAO_DO_EQUIPAMENTO,
+                parent_name: FlashString::new(&CONFIGURACAO_DO_EQUIPAMENTO),
                 child_menu: MenuProgramaHandle::MenuConfiguracaoDoEquipamento,
             }),
 
@@ -261,27 +261,27 @@ impl SubmenuLayout for MenuArquivoDeEixo<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => MenuBuilder2::make_simple_menu(SimpleMenu {
-                parent_name: &PARAMETROS_DE_MOVIMENTO,
+                parent_name: FlashString::new(&PARAMETROS_DE_MOVIMENTO),
                 child_menu: MenuProgramaHandle::MenuParametrosDeMovimento,
             }),
 
             1 => MenuBuilder2::make_simple_menu(SimpleMenu {
-                parent_name: &PARAMETROS_DE_IMPRESSAO,
+                parent_name: FlashString::new(&PARAMETROS_DE_IMPRESSAO),
                 child_menu: MenuProgramaHandle::MenuParametrosDeImpressao,
             }),
 
             2 => MenuBuilder2::make_simple_menu(SimpleMenu {
-                parent_name: &CONFIGURACAO_DO_CICLO,
+                parent_name: FlashString::new(&CONFIGURACAO_DO_CICLO),
                 child_menu: MenuProgramaHandle::MenuParametrosDeCiclo,
             }),
 
             3 => MenuBuilder2::make_simple_menu(SimpleMenu {
-                parent_name: &CONFIGURACAO_DA_IMPRESSORA,
+                parent_name: FlashString::new(&CONFIGURACAO_DA_IMPRESSORA),
                 child_menu: MenuProgramaHandle::MenuConfiguracaoDaImpressora,
             }),
 
             4 => MenuBuilder2::make_simple_menu(SimpleMenu {
-                parent_name: &INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO,
+                parent_name: FlashString::new(&INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO),
                 child_menu: MenuProgramaHandle::MenuIntertravamentoParaDoisEixos,
             }),
 
@@ -306,21 +306,21 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &POSICAO_INICIAL,
+                parameter_name: FlashString::new(&POSICAO_INICIAL),
                 variable: (30, &self.model.arquivo_de_eixo_x.posicao_inicial),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((35, FlashString::new(&MILIMETROS))),
             }),
 
             1 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &POSICAO_FINAL,
+                parameter_name: FlashString::new(&POSICAO_FINAL),
                 variable: (30, &self.model.arquivo_de_eixo_x.posicao_final),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((35, FlashString::new(&MILIMETROS))),
             }),
 
             2 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &ACELERACAO_DE_AVANCO,
+                parameter_name: FlashString::new(&ACELERACAO_DE_AVANCO),
                 variable: (30, &self.model.arquivo_de_eixo_x.aceleracao_de_avanco),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((
@@ -330,7 +330,7 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
             }),
 
             3 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &ACELERACAO_DE_RETORNO,
+                parameter_name: FlashString::new(&ACELERACAO_DE_RETORNO),
                 variable: (30, &self.model.arquivo_de_eixo_x.aceleracao_de_retorno),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((
@@ -340,14 +340,14 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
             }),
 
             4 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &VELOCIDADE_DE_AVANCO,
+                parameter_name: FlashString::new(&VELOCIDADE_DE_AVANCO),
                 variable: (30, &self.model.arquivo_de_eixo_x.velocidade_de_avanco),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((35, FlashString::new(&MILIMETROS_POR_SEGUNDO))),
             }),
 
             5 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &VELOCIDADE_DE_RETORNO,
+                parameter_name: FlashString::new(&VELOCIDADE_DE_RETORNO),
                 variable: (30, &self.model.arquivo_de_eixo_x.velocidade_de_retorno),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((35, FlashString::new(&MILIMETROS_POR_SEGUNDO))),
@@ -374,7 +374,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &NUMERO_DE_MENSAGEM_NO_AVANCO,
+                parameter_name: FlashString::new(&NUMERO_DE_MENSAGEM_NO_AVANCO),
                 variable: (
                     35,
                     &self.model.arquivo_de_eixo_x.numero_de_mensagem_no_avanco,
@@ -384,14 +384,14 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
             }),
 
             1 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &NUMERO_DE_MENSAGEM_NO_AVANCO,
+                parameter_name: FlashString::new(&NUMERO_DE_MENSAGEM_NO_AVANCO),
                 variable: (35, &self.model.arquivo_de_eixo_x.velocidade_de_retorno),
                 valid_range: 0..99,
                 unit_of_measurement_text: None,
             }),
 
             2 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &PRIMEIRA_MENSAGEM_NO_AVANCO,
+                parameter_name: FlashString::new(&PRIMEIRA_MENSAGEM_NO_AVANCO),
                 variable: (
                     33,
                     &self.model.arquivo_de_eixo_x.primeira_mensagem_no_avanco,
@@ -401,7 +401,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
             }),
 
             3 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &PRIMEIRA_MENSAGEM_NO_RETORNO,
+                parameter_name: FlashString::new(&PRIMEIRA_MENSAGEM_NO_RETORNO),
                 variable: (
                     33,
                     &self.model.arquivo_de_eixo_x.primeira_mensagem_no_avanco,
@@ -411,14 +411,14 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
             }),
 
             4 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &ULTIMA_MENSAGEM_NO_AVANCO,
+                parameter_name: FlashString::new(&ULTIMA_MENSAGEM_NO_AVANCO),
                 variable: (33, &self.model.arquivo_de_eixo_x.ultima_mensagem_no_avanco),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((38, FlashString::new(&MILIMETROS))),
             }),
 
             5 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &ULTIMA_MENSAGEM_NO_RETORNO,
+                parameter_name: FlashString::new(&ULTIMA_MENSAGEM_NO_RETORNO),
                 variable: (33, &self.model.arquivo_de_eixo_x.ultima_mensagem_no_retorno),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((38, FlashString::new(&MILIMETROS))),
@@ -445,7 +445,7 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &RETARDO_NO_START_AUTOMATICO,
+                parameter_name: FlashString::new(&RETARDO_NO_START_AUTOMATICO),
                 variable: (
                     33,
                     &self.model.arquivo_de_eixo_x.retardo_no_start_automatico,
@@ -455,20 +455,20 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
             }),
 
             1 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &RETARDO_NO_START_EXTERNO,
+                parameter_name: FlashString::new(&RETARDO_NO_START_EXTERNO),
                 variable: (33, &self.model.arquivo_de_eixo_x.retardo_no_start_externo),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((38, FlashString::new(&MILI_SEGUNDOS))),
             }),
 
             2 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &START_AUTOMATICO_NO_AVANCO,
+                parameter_name: FlashString::new(&START_AUTOMATICO_NO_AVANCO),
                 variable: (32, &self.model.arquivo_de_eixo_x.start_automatico_no_avanco),
                 options_list: Options::ligado_desligado(),
             }),
 
             3 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &START_AUTOMATICO_NO_RETORNO,
+                parameter_name: FlashString::new(&START_AUTOMATICO_NO_RETORNO),
                 variable: (
                     32,
                     &self.model.arquivo_de_eixo_x.start_automatico_no_retorno,
@@ -477,7 +477,7 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
             }),
 
             4 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &MODO_DE_TRABALHO_DO_EIXO,
+                parameter_name: FlashString::new(&MODO_DE_TRABALHO_DO_EIXO),
                 variable: (32, &self.model.arquivo_de_eixo_x.modo_de_trabalho_do_eixo),
                 options_list: Options::continuo_passo_a_passo(),
             }),
@@ -503,7 +503,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &LOGICA_DO_SINAL_DE_IMPRESSAO,
+                parameter_name: FlashString::new(&LOGICA_DO_SINAL_DE_IMPRESSAO),
                 variable: (
                     32,
                     &self.model.arquivo_de_eixo_x.logica_do_sinal_de_impressao,
@@ -512,7 +512,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
             }),
 
             1 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &LARGURA_DO_SINAL_DE_IMPRESSAO,
+                parameter_name: FlashString::new(&LARGURA_DO_SINAL_DE_IMPRESSAO),
                 variable: (
                     33,
                     &self.model.arquivo_de_eixo_x.largura_do_sinal_de_impressao,
@@ -522,7 +522,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
             }),
 
             2 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &REVERSAO_DE_MENSAGEM_VIA_SERIAL,
+                parameter_name: FlashString::new(&REVERSAO_DE_MENSAGEM_VIA_SERIAL),
                 variable: (
                     32,
                     &self.model.arquivo_de_eixo_x.reversao_de_mensagem_via_serial,
@@ -531,7 +531,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
             }),
 
             3 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &SELECAO_DE_MENSAGEM_VIA_SERIAL,
+                parameter_name: FlashString::new(&SELECAO_DE_MENSAGEM_VIA_SERIAL),
                 variable: (
                     32,
                     &self.model.arquivo_de_eixo_x.selecao_de_mensagem_via_serial,
@@ -560,7 +560,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &ANTECIPACAO_DA_SAIDA_DE_START,
+                parameter_name: FlashString::new(&ANTECIPACAO_DA_SAIDA_DE_START),
                 variable: (
                     33,
                     &self.model.arquivo_de_eixo_x.antecipacao_da_saida_de_start,
@@ -570,19 +570,19 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
             }),
 
             1 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &SAIDA_DE_START_NO_AVANCO,
+                parameter_name: FlashString::new(&SAIDA_DE_START_NO_AVANCO),
                 variable: (32, &self.model.arquivo_de_eixo_x.saida_de_start_no_avaco),
                 options_list: Options::ligado_desligado(),
             }),
 
             2 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &SAIDA_DE_START_NO_RETORNO,
+                parameter_name: FlashString::new(&SAIDA_DE_START_NO_RETORNO),
                 variable: (32, &self.model.arquivo_de_eixo_x.saida_de_start_no_retorno),
                 options_list: Options::ligado_desligado(),
             }),
 
             3 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &ENTRADA_DE_START_ENTRE_EIXOS,
+                parameter_name: FlashString::new(&ENTRADA_DE_START_ENTRE_EIXOS),
                 variable: (
                     32,
                     &self.model.arquivo_de_eixo_x.entrada_de_start_entre_eixos,
@@ -591,7 +591,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
             }),
 
             4 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &RETARDO_DO_START_ENTRE_EIXOS,
+                parameter_name: FlashString::new(&RETARDO_DO_START_ENTRE_EIXOS),
                 variable: (
                     33,
                     &self.model.arquivo_de_eixo_x.retardo_do_start_entre_eixos,
@@ -601,7 +601,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
             }),
 
             5 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &START_PELO_TECLADO_E_EXTERNO,
+                parameter_name: FlashString::new(&START_PELO_TECLADO_E_EXTERNO),
                 variable: (
                     32,
                     &self.model.arquivo_de_eixo_x.start_pelo_teclado_e_externo,
@@ -610,7 +610,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
             }),
 
             6 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &RETARDO_NO_START_PASSO_A_PASSO,
+                parameter_name: FlashString::new(&RETARDO_NO_START_PASSO_A_PASSO),
                 variable: (
                     33,
                     &self.model.arquivo_de_eixo_x.retardo_no_start_passo_a_passo,
@@ -620,7 +620,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
             }),
 
             7 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &START_AUTOMATICO_PASSO_A_PASSO,
+                parameter_name: FlashString::new(&START_AUTOMATICO_PASSO_A_PASSO),
                 variable: (
                     32,
                     &self.model.arquivo_de_eixo_x.start_automatico_passo_a_passo,
@@ -629,7 +629,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
             }),
 
             8 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &SAIDA_START_PASSO_A_PASSO,
+                parameter_name: FlashString::new(&SAIDA_START_PASSO_A_PASSO),
                 variable: (
                     32,
                     &self.model.arquivo_de_eixo_x.saida_de_start_passo_a_passo,
@@ -660,14 +660,14 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &NUMERO_DO_CANAL_X,
+                parameter_name: FlashString::new(&NUMERO_DO_CANAL_X),
                 variable: (33, &self.model.configuracao_do_eixo_x.numero_do_canal),
                 valid_range: 0..99, // TODO: test define range as `0..64`
                 unit_of_measurement_text: None,
             }),
 
             1 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &NUMERO_DE_PULSO_DO_GIRO_X,
+                parameter_name: FlashString::new(&NUMERO_DE_PULSO_DO_GIRO_X),
                 variable: (
                     33,
                     &self.model.configuracao_do_eixo_x.numero_de_pulso_do_giro,
@@ -677,7 +677,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
             }),
 
             2 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &JANELA_DE_PROTECAO_DO_GITO_X,
+                parameter_name: FlashString::new(&JANELA_DE_PROTECAO_DO_GITO_X),
                 variable: (
                     33,
                     &self.model.configuracao_do_eixo_x.janela_de_protecao_do_giro,
@@ -687,7 +687,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
             }),
 
             3 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &DESLOCAMENTO_GIRO_DO_MOTOR_X,
+                parameter_name: FlashString::new(&DESLOCAMENTO_GIRO_DO_MOTOR_X),
                 variable: (
                     33,
                     &self.model.configuracao_do_eixo_x.deslocamento_giro_do_motor,
@@ -697,7 +697,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
             }),
 
             4 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &GIRO_COM_FUNCAO_DE_PROTECAO,
+                parameter_name: FlashString::new(&GIRO_COM_FUNCAO_DE_PROTECAO),
                 variable: (
                     32,
                     &self
@@ -709,7 +709,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
             }),
 
             5 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &GIRO_COM_FUNCAO_DE_CORRECAO,
+                parameter_name: FlashString::new(&GIRO_COM_FUNCAO_DE_CORRECAO),
                 variable: (
                     32,
                     &self
@@ -721,7 +721,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
             }),
 
             6 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &LOGICA_DO_START_EXTERNO,
+                parameter_name: FlashString::new(&LOGICA_DO_START_EXTERNO),
                 variable: (
                     32,
                     &self.model.configuracao_do_eixo_x.logica_do_start_externo,
@@ -730,7 +730,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
             }),
 
             7 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &VALOR_DA_POSICAO_DA_REFERENCIA,
+                parameter_name: FlashString::new(&VALOR_DA_POSICAO_DA_REFERENCIA),
                 variable: (
                     33,
                     &self
@@ -743,7 +743,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
             }),
 
             8 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &VELOCIDADE_PARA_REFERENCIA_X,
+                parameter_name: FlashString::new(&VELOCIDADE_PARA_REFERENCIA_X),
                 variable: (
                     33,
                     &self.model.configuracao_do_eixo_x.velocidade_para_referencia,
@@ -753,7 +753,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
             }),
 
             9 => MenuBuilder2::make_numerical_parameter(NumericalParameter {
-                parameter_name: &ACELERACAO_PARA_REFERENCIA_X,
+                parameter_name: FlashString::new(&ACELERACAO_PARA_REFERENCIA_X),
                 variable: (
                     33,
                     &self.model.configuracao_do_eixo_x.aceleracao_para_referencia,
@@ -763,7 +763,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
             }),
 
             10 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &REDUCAO_DA_CORRENTE_EM_REPOUSO,
+                parameter_name: FlashString::new(&REDUCAO_DA_CORRENTE_EM_REPOUSO),
                 variable: (
                     32,
                     &self
@@ -775,7 +775,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
             }),
 
             11 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &REFERENCIA_PELO_START_EXTERNO,
+                parameter_name: FlashString::new(&REFERENCIA_PELO_START_EXTERNO),
                 variable: (
                     32,
                     &self
@@ -787,7 +787,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
             }),
 
             12 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &MODO_TURBO_X,
+                parameter_name: FlashString::new(&MODO_TURBO_X),
                 variable: (32, &self.model.configuracao_do_eixo_x.modo_turbo),
                 options_list: Options::ligado_desligado(),
             }),
@@ -815,7 +815,7 @@ impl SubmenuLayout for MenuConfiguracaoDoEquipamento<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
             0 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &VELOCIDADE_DE_COMUNICACAO,
+                parameter_name: FlashString::new(&VELOCIDADE_DE_COMUNICACAO),
                 variable: (
                     32,
                     &self
@@ -828,7 +828,7 @@ impl SubmenuLayout for MenuConfiguracaoDoEquipamento<'_> {
 
             // TODO: Remove the need of this duplicated parameter when possible
             1 => MenuBuilder2::make_optional_parameter(OptionalParameter {
-                parameter_name: &VELOCIDADE_DE_COMUNICACAO,
+                parameter_name: FlashString::new(&VELOCIDADE_DE_COMUNICACAO),
                 variable: (
                     32,
                     &self
