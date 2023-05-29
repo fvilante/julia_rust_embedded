@@ -57,6 +57,11 @@ You can also type `make build upload size`, or if you prefer type only parts of 
 
 To see all rules available see the `Makefile` in the project's main directory.
 
+# Configuring IDE
+
+You may use Visual Studio Code as your IDE do program this project.
+
+> TIP: This [video](www.youtube.com/watch?v=BU1LYFkpJuk) shows one good way to config it.
 
 # Building manually (details)
 
