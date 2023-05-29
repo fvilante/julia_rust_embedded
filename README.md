@@ -9,25 +9,25 @@ Part of the code is multiplatform agnostic and part is plataform specific (AVR m
 
 ## Prerequisites
 
-  * A recent version of the nightly Rust compiler. Anything including or
+* A recent version of the nightly Rust compiler. Anything including or
     greater than `rustc 1.63.0-nightly (fee3a459d 2022-06-05)` can be used.
     > for example this version is known to work: `rustc 1.67.0-nightly (53e4b9dd7 2022-12-04)`
-  * The rust-src rustup component - `$ rustup component add rust-src`
-  * AVR-GCC on the system for linking
-  * AVR-Libc on the system for support libraries
-  * gnu-make
+* The rust-src rustup component - `$ rustup component add rust-src`
+* AVR-GCC on the system for linking
+* AVR-Libc on the system for support libraries
+* gnu-make
 
 ## Usage
 
-Before start building, enter terminal go to the directory project and type: 
+Before start building, enter terminal go to the directory project and type:
 
-```
+```powershell
 > rustup toolchain install nightly-2022-12-04
 ```
 
 then type:
 
-```
+```powershell
 > rustup default nightly-2022-12-04
 > rustup override set nightly-2022-12-04
 > rustup override nightly-2022-12-04
@@ -36,23 +36,22 @@ then type:
 
 If you want to install `cargo-watch` utility type this:
 
-```
+```powershell
 > cargo install cargo-watch
 ```
 
 > Note: Some of upabove commands may be unnecessary, check and update this doc when possible.
 
-
 This will install the specified version of the rust toolchain.
 
 Finally tpe:
 
-```
+```powershell
 > make
-``` 
+```
 
 The `make` command will run the Makefile rules that compile, upload code to the board and show the total size of your compiled program.
- 
+
 You can also type `make build upload size`, or if you prefer type only parts of this rules, exemple: `make upload` to just upload without compiling code, or `make build` to just compile code without upload it, etc.
 
 To see all rules available see the `Makefile` in the project's main directory.
@@ -80,7 +79,7 @@ cargo build -Z build-std=core --target avr-atmega328p.json --release
 #       peeking in .cargo/config.tom  will show that
 #            cargo build --release
 #       is the short version
-```
+```powershell
 There should now be an ELF file at `target/avr-atmega328p/release/blink.elf`. It
 can be flashed directly to an AVR microcontroller or ran inside a simulator.
 
@@ -88,4 +87,3 @@ can be flashed directly to an AVR microcontroller or ran inside a simulator.
 ## Resources
 
   * The [AVR-Rust book](https://book.avr-rust.com)
-
