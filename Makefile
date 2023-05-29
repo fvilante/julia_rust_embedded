@@ -36,7 +36,7 @@ watch_x86_test:
 	cargo watch -c --why -s "make div test"
 
 watch_avr: 
-	cargo watch -c --why -s "make div check"
+	cargo watch -c --why -s "make div check size"
 
 watch_avr_upload:
 	cargo watch -c --why -s "make div fast"
