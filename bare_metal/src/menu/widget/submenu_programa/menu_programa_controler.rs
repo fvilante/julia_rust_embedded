@@ -27,7 +27,7 @@ pub struct MenuProgramaControler<'a> {
     menu_arena: &'a MenuProgramaArena<'a>,
     /// Points to the current menu being displayed on screen
     current_menu: MenuProgramaAreanaSelector,
-    /// State of widgets which are currently mounted on screen.
+    /// State of widgets which are currently mounted and therefore visible on screen.
     /// TODO: Is not necessary to have two MenuItemWidget states on memory but just one. Introduce some logic when possible
     /// to optimize this.
     mounted: [MenuItemWidget<'a>; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
