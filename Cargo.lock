@@ -7,9 +7,23 @@ name = "arduino-hal"
 version = "0.1.0"
 source = "git+https://github.com/rahix/avr-hal?rev=1aacefb335517f85d0de858231e11055d9768cdf#1aacefb335517f85d0de858231e11055d9768cdf"
 dependencies = [
- "atmega-hal",
+ "atmega-hal 0.1.0 (git+https://github.com/rahix/avr-hal?rev=1aacefb335517f85d0de858231e11055d9768cdf)",
  "avr-device",
- "avr-hal-generic",
+ "avr-hal-generic 0.1.0 (git+https://github.com/rahix/avr-hal?rev=1aacefb335517f85d0de858231e11055d9768cdf)",
+ "cfg-if 1.0.0",
+ "embedded-hal",
+ "ufmt",
+ "void",
+]
+
+[[package]]
+name = "arduino-hal"
+version = "0.1.0"
+source = "git+https://github.com/Rahix/avr-hal.git?rev=81edfcd908be8d3b2cd763cf2dc76aedbb22286b#81edfcd908be8d3b2cd763cf2dc76aedbb22286b"
+dependencies = [
+ "atmega-hal 0.1.0 (git+https://github.com/Rahix/avr-hal.git?rev=81edfcd908be8d3b2cd763cf2dc76aedbb22286b)",
+ "avr-device",
+ "avr-hal-generic 0.1.0 (git+https://github.com/Rahix/avr-hal.git?rev=81edfcd908be8d3b2cd763cf2dc76aedbb22286b)",
  "cfg-if 1.0.0",
  "embedded-hal",
  "ufmt",
@@ -22,7 +36,16 @@ version = "0.1.0"
 source = "git+https://github.com/rahix/avr-hal?rev=1aacefb335517f85d0de858231e11055d9768cdf#1aacefb335517f85d0de858231e11055d9768cdf"
 dependencies = [
  "avr-device",
- "avr-hal-generic",
+ "avr-hal-generic 0.1.0 (git+https://github.com/rahix/avr-hal?rev=1aacefb335517f85d0de858231e11055d9768cdf)",
+]
+
+[[package]]
+name = "atmega-hal"
+version = "0.1.0"
+source = "git+https://github.com/Rahix/avr-hal.git?rev=81edfcd908be8d3b2cd763cf2dc76aedbb22286b#81edfcd908be8d3b2cd763cf2dc76aedbb22286b"
+dependencies = [
+ "avr-device",
+ "avr-hal-generic 0.1.0 (git+https://github.com/Rahix/avr-hal.git?rev=81edfcd908be8d3b2cd763cf2dc76aedbb22286b)",
 ]
 
 [[package]]
@@ -83,6 +106,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "avr-hal-generic"
+version = "0.1.0"
+source = "git+https://github.com/Rahix/avr-hal.git?rev=81edfcd908be8d3b2cd763cf2dc76aedbb22286b#81edfcd908be8d3b2cd763cf2dc76aedbb22286b"
+dependencies = [
+ "avr-device",
+ "cfg-if 0.1.10",
+ "embedded-hal",
+ "nb 0.1.3",
+ "paste",
+ "rustversion",
+ "ufmt",
+ "void",
+]
+
+[[package]]
 name = "avr-mcu"
 version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -97,12 +135,16 @@ dependencies = [
 [[package]]
 name = "avr-progmem"
 version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4026b5cfd2368953bed46ffaa1acc7e4ea398bb7a610743d11895a5187498076"
 dependencies = [
+ "arduino-hal 0.1.0 (git+https://github.com/Rahix/avr-hal.git?rev=81edfcd908be8d3b2cd763cf2dc76aedbb22286b)",
+ "atmega-hal 0.1.0 (git+https://github.com/Rahix/avr-hal.git?rev=81edfcd908be8d3b2cd763cf2dc76aedbb22286b)",
+ "avr-device",
  "cfg-if 1.0.0",
  "derivative",
+ "embedded-hal",
+ "panic-halt",
  "ufmt",
+ "void",
 ]
 
 [[package]]
@@ -126,7 +168,7 @@ dependencies = [
 name = "bare_metal"
 version = "0.1.0"
 dependencies = [
- "arduino-hal",
+ "arduino-hal 0.1.0 (git+https://github.com/rahix/avr-hal?rev=1aacefb335517f85d0de858231e11055d9768cdf)",
  "avr-device",
  "avr-progmem",
  "cross_platform",
@@ -291,6 +333,12 @@ name = "once_cell"
 version = "1.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b7e5500299e16ebb147ae15a00a942af264cf3688f47923b8fc2cd5858f23ad3"
+
+[[package]]
+name = "panic-halt"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "de96540e0ebde571dc55c73d60ef407c653844e6f9a1e2fdbd40c07b9252d812"
 
 [[package]]
 name = "paste"

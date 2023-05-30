@@ -17,6 +17,6 @@ avr-device = { version = "0.3.4", features = ["atmega328p"]}
 # Currently the 'Timer" interruption is using arduino-hal crate
 arduino-hal = { git = "https://github.com/rahix/avr-hal", rev = "1aacefb335517f85d0de858231e11055d9768cdf", features = ["arduino-uno"] }
 heapless = { git = "https://github.com/japaric/heapless", rev = "5229dea4e77ef68f034262dc7f6baf02be61b6ab"}
-avr-progmem = "0.3.3"
+avr-progmem = { path = "../avr-progmem-rs" }
 paste = "1.0"
 enum_dispatch = "0.3.11"
