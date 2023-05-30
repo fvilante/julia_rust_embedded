@@ -114,8 +114,10 @@ mod tests {
         ring.read().unwrap();
         ring.write(0x02).unwrap();
         ring.write(0x03).unwrap();
-        let actual = ring.write(0x04).unwrap();
-        assert_eq!((), actual)
+        let res = ring.write(0x04);
+        let actual = res.is_ok();
+        res.unwrap();
+        assert_eq!(true, actual)
     }
 
     #[test]
@@ -126,9 +128,11 @@ mod tests {
         ring.write(0x03).unwrap();
         let is_full = ring.write(0x04).unwrap_err();
         ring.read().unwrap();
-        let is_not_full = ring.write(0x05).unwrap();
+        let res = ring.write(0x05);
+        let is_not_full = res.is_ok();
+        res.unwrap();
         assert_eq!(RingBufferError::BufferFull, is_full);
-        assert_eq!((), is_not_full);
+        assert_eq!(true, is_not_full);
     }
 
     #[test]
