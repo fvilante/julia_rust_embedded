@@ -2,6 +2,7 @@ use super::{
     super::menu_item::menu_item::MenuItemWidget, hepers::LcdLine,
     navigation_state::NavigationStateModel,
 };
+use crate::fatal_error;
 use crate::geometry::point::Point;
 use crate::menu::widget::widget::Widget;
 use crate::microcontroler::ratangular_wave::RectangularWave;
@@ -24,7 +25,8 @@ use heapless::Vec;
 pub struct MenuProgramaControler<'a> {
     /// Storage for of all submenus.
     menu_arena: &'a MenuProgramaArena<'a>,
-    current_menu_selector: MenuProgramaAreanaSelector,
+    /// Points to the current menu being displayed on screen
+    current_menu: MenuProgramaAreanaSelector,
     /// State of widgets which are currently mounted on screen.
     /// TODO: Is not necessary to have two MenuItemWidget states on memory but just one. Introduce some logic when possible
     /// to optimize this.
@@ -46,23 +48,24 @@ impl<'a> MenuProgramaControler<'a> {
         current_menu_selector: MenuProgramaAreanaSelector,
         menu_arena: &'a MenuProgramaArena,
     ) -> Self {
+        // Configuring character blinking
         const T_ON: u16 = 500;
         const T_OFF: u16 = 500;
         let blink = RectangularWave::new(T_ON, T_OFF);
 
-        let (Some(menu_storage_item_0), Some(menu_storage_item_1)) =  (menu_arena.get_item(current_menu_selector, 0), menu_arena.get_item(current_menu_selector, 2)) else {
-            // TODO: Improve error handling
-            // currently we do not accept submenus with just one parameter
-            lcd::clear();
-            lcd::print("err44");
-            delay_ms(4000);
-            panic!()
+        // Mount menu itens that will be visible on the screen
+        let (Some(fist_menu_item), Some(second_menu_item)) = (
+            menu_arena.get_item(current_menu_selector, 0), 
+            menu_arena.get_item(current_menu_selector, 2),
+        ) else {
+            // currently we do not accept submenus with less then 2 menu_items.
+            fatal_error!(44);
         };
 
         Self {
             menu_arena,
-            mounted: [menu_storage_item_0, menu_storage_item_1],
-            current_menu_selector,
+            mounted: [fist_menu_item, second_menu_item],
+            current_menu: current_menu_selector,
             navigation_path: Vec::new(),
             must_return_to_main_menu: false,
             blink,
@@ -74,7 +77,7 @@ impl<'a> MenuProgramaControler<'a> {
     /// TODO: Refactor this concept when possible.
     fn get_navigation_state(&self) -> NavigationStateModel {
         self.menu_arena
-            .get_navigation_state(self.current_menu_selector)
+            .get_navigation_state(self.current_menu)
             .get()
     }
 
@@ -83,11 +86,11 @@ impl<'a> MenuProgramaControler<'a> {
         &self,
         update_fn: fn(NavigationStateModel, menu_length: u8) -> NavigationStateModel,
     ) {
-        let menu_length = usize_to_u8_clamper(self.menu_arena.len(self.current_menu_selector));
+        let menu_length = usize_to_u8_clamper(self.menu_arena.len(self.current_menu));
         let current_nav_state = self.get_navigation_state();
         let updated_nav_state = update_fn(current_nav_state, menu_length);
         self.menu_arena
-            .get_navigation_state(self.current_menu_selector)
+            .get_navigation_state(self.current_menu)
             .set(updated_nav_state)
     }
 
@@ -97,7 +100,7 @@ impl<'a> MenuProgramaControler<'a> {
             let index = self.get_navigation_state().get_current_index_for(lcd_line) as usize;
             let Some(menu_item_widget) = self
                 .menu_arena
-                .get_item(self.current_menu_selector, index)
+                .get_item(self.current_menu, index)
                 else {
                     // TODO: Improve error handling
                     // Mounting error
@@ -164,15 +167,15 @@ impl<'a> MenuProgramaControler<'a> {
 
     /// Changes current submenu
     fn go_to_menu(&mut self, menu_selector: MenuProgramaAreanaSelector) {
-        self.current_menu_selector = menu_selector;
+        self.current_menu = menu_selector;
         self.mount();
     }
 
     fn go_to_child(&mut self, child: MenuProgramaAreanaSelector) {
         // do nothing if child is pointing to itself
-        if self.current_menu_selector != child {
+        if self.current_menu != child {
             // saves parent
-            let parent = self.current_menu_selector;
+            let parent = self.current_menu;
             match self.navigation_path.push(parent) {
                 Ok(_) => (),
                 // ERROR DESCRIPTION: `navigation_path` must be redimensioned to higher capacity.
@@ -189,7 +192,7 @@ impl<'a> MenuProgramaControler<'a> {
             Some(parent) => parent,
             None => {
                 self.must_return_to_main_menu = true;
-                self.current_menu_selector
+                self.current_menu
             }
         };
         // go to parent
