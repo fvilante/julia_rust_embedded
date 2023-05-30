@@ -233,7 +233,7 @@ impl Widget for MenuProgramaControler<'_> {
     fn send_key(&mut self, key: KeyCode) {
         if let Some(line_being_edited) = self.get_line_being_edited() {
             // if is editing some line, delegate keys to sub widgets.
-            let current_menu_item = self.get_mounted_item_for_lcd_line_mut(LcdLine::Line0);
+            let current_menu_item = self.get_mounted_item_for_lcd_line_mut(line_being_edited);
             current_menu_item.send_key(key);
             // if Enter key on a submenu with parameter, after editing the
             // parameter, we need to change to the submenu accordingly.
