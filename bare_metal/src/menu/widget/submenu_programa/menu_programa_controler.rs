@@ -117,7 +117,7 @@ impl<'a> MenuProgramaControler<'a> {
         }
     }
 
-    /// Get mounted item for a particular line (mutable reference)
+    /// Get mounted item for a particular lcd line (mutable reference)
     fn get_mounted_item_for_lcd_line_mut(&mut self, lcd_line: LcdLine) -> &mut MenuItemWidget<'a> {
         if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
             return elem;
@@ -232,11 +232,22 @@ impl<'a> MenuProgramaControler<'a> {
 }
 
 impl Widget for MenuProgramaControler<'_> {
+    /// TODO: Improve this code when possible
     fn send_key(&mut self, key: KeyCode) {
         if let Some(line_being_edited) = self.get_line_being_edited() {
             // if is editing some line, delegate keys to sub widgets.
-            self.get_mounted_item_for_lcd_line_mut(line_being_edited)
-                .send_key(key);
+            let current_menu_item = self.get_mounted_item_for_lcd_line_mut(line_being_edited);
+            current_menu_item.send_key(key);
+            // if Enter key on a submenu with parameter, after editing the
+            // parameter, we need to change to the submenu accordingly.
+            if key == KeyCode::KEY_ENTER {
+                // we assume here that the field has already had its content saved
+
+                if let Some(child_handle) = current_menu_item.child {
+                    current_menu_item.set_edit_mode(false);
+                    self.go_to_child(child_handle)
+                }
+            }
         } else {
             // if not editing any line we are responsible to show up/down menu navigation.
             match key {
@@ -250,9 +261,18 @@ impl Widget for MenuProgramaControler<'_> {
 
                 KeyCode::KEY_ENTER => {
                     let current_menu_item = self.get_monted_item_for_current_lcd_line();
+
+                    let has_field = current_menu_item.point_and_field.is_some();
+
                     if let Some(child_handle) = current_menu_item.child {
                         // TEMP CODE: if current mitem has a child submenu, opens it.
-                        self.go_to_child(child_handle);
+                        if !has_field {
+                            // if it is a pure simple submenu (without parameter) jump straight to the submenu on enter
+                            self.go_to_child(child_handle)
+                        } else {
+                            // if sub menu has field (is not simple submenu) then process it first
+                            current_menu_item.set_edit_mode(true);
+                        };
                     } else {
                         // Enters edit mode on sub-widgets.
                         current_menu_item.set_edit_mode(true);
