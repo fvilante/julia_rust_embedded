@@ -11,6 +11,7 @@ use core::{cell::Cell, u8};
 use crate::{
     menu::widget::menu_item::builder::{
         MenuItemBuilder, NumericalParameter, OptionalParameter, SimpleMenu,
+        SimpleMenuWithNumericalParameter,
     },
     string::flash::FlashString,
 };
@@ -223,10 +224,15 @@ impl<'a> MenuPrograma<'a> {
 impl SubmenuLayout for MenuPrograma<'_> {
     fn get_item(&self, index: usize) -> Option<MenuItemWidget> {
         match index {
-            0 => MenuItemBuilder::make_simple_menu(SimpleMenu {
-                parent_name: FlashString::new(&EDITAR_PROGRAMA_EIXO_X),
-                child_menu: MenuProgramaHandle::MenuArquivoDeEixo,
-            }),
+            0 => {
+                MenuItemBuilder::make_simple_menu_with_parameter(SimpleMenuWithNumericalParameter {
+                    parameter_name: FlashString::new(&EDITAR_PROGRAMA_EIXO_X),
+                    child_menu: MenuProgramaHandle::MenuArquivoDeEixo,
+                    unit_of_measurement_text: None,
+                    valid_range: 0..99,
+                    variable: (30, &self.model.gui_state.numero_do_programa_para_edicao_x),
+                })
+            }
 
             1 => MenuItemBuilder::make_simple_menu(SimpleMenu {
                 parent_name: FlashString::new(&CONFIGURACAO_EIXO_X),
