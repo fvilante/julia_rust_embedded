@@ -32,9 +32,6 @@ use super::flash_texts::*;
 
 /// Indexes the sub menus in the menu arena, it works like a reference pointer to the concrete menu.
 /// If you create a new sub menu you must registry it here.
-///
-/// TODO: When possible generalize the [`MenuProgramaAreana`] to include all menus used in the app
-/// (ie: splash, main_menu, menu_execucao and menu_manual, etc)
 #[derive(Copy, Clone, PartialEq)]
 pub enum MenuProgramaAreanaSelector {
     MenuPrograma,
@@ -82,6 +79,9 @@ impl<T: SubmenuLayout> SubmenuLayout for Register<T, NavigationStateModel> {
 type RegisterSubMenu<T> = Register<T, NavigationStateModel>;
 
 /// The storage for all sub menus inside the submenu 'Programa'. If you create a new sub menu you must put it here.
+///
+/// TODO: When possible generalize the [`MenuProgramaAreana`] to include all menus used in the app
+/// (ie: splash, main_menu, menu_execucao and menu_manual, etc)
 pub struct MenuProgramaArena<'a> {
     model: &'a DataModel,
 
