@@ -2,8 +2,8 @@ use crate::menu::widget::menu_item::menu_item::MenuItemWidget;
 
 /// Trait implemented by all sub menus
 ///
-/// It make possible to given a sub menu to retrieve its menu items already in the Widget format.
-/// Note that the Widget contains its view state, and it is brand new widget. It's your responsability
+/// It make possible that given a sub menu you can retrieve its interior items (already in the Widget format).
+/// Note that the Widget contains its internal state and it's your responsability
 /// to own this object and control its natural lifetime.
 pub trait SubmenuLayout {
     /// Gets the size of menu items inside the submenu
