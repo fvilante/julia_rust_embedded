@@ -18,6 +18,7 @@ mod custom_alloc;
 
 mod app;
 mod board;
+mod fatal_error;
 mod geometry;
 mod menu;
 mod microcontroler;

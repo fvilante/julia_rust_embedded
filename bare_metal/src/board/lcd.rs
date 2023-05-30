@@ -1,5 +1,6 @@
 pub mod adapter;
-mod driver;
+// TODO: Check in future if is possible to make the driver private
+pub mod driver;
 pub mod interface;
 //
 

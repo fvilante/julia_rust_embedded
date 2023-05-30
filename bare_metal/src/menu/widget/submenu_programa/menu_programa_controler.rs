@@ -58,7 +58,8 @@ impl<'a> MenuProgramaControler<'a> {
             menu_arena.get_item(current_menu_selector, 0), 
             menu_arena.get_item(current_menu_selector, 2),
         ) else {
-            // currently we do not accept submenus with less then 2 menu_items.
+            // NOTE: currently we do not accept submenus with less then 2 menu_items.
+            // TODO: Accept submenus with less then 2 menu_items.
             fatal_error!(44);
         };
 
