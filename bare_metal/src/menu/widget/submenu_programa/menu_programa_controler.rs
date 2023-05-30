@@ -45,7 +45,7 @@ pub struct MenuProgramaControler<'a> {
 
 impl<'a> MenuProgramaControler<'a> {
     pub fn new(
-        current_menu_selector: MenuProgramaAreanaSelector,
+        current_menu: MenuProgramaAreanaSelector,
         menu_arena: &'a MenuProgramaArena,
     ) -> Self {
         // Configuring character blinking
@@ -55,8 +55,8 @@ impl<'a> MenuProgramaControler<'a> {
 
         // Mount menu itens that will be visible on the screen
         let (Some(fist_menu_item), Some(second_menu_item)) = (
-            menu_arena.get_item(current_menu_selector, 0), 
-            menu_arena.get_item(current_menu_selector, 2),
+            menu_arena.get_item(current_menu, 0), 
+            menu_arena.get_item(current_menu, 2),
         ) else {
             // NOTE: currently we do not accept submenus with less then 2 menu_items.
             // TODO: Accept submenus with less then 2 menu_items.
@@ -66,7 +66,7 @@ impl<'a> MenuProgramaControler<'a> {
         Self {
             menu_arena,
             mounted: [fist_menu_item, second_menu_item],
-            current_menu: current_menu_selector,
+            current_menu,
             navigation_path: Vec::new(),
             must_return_to_main_menu: false,
             blink,
