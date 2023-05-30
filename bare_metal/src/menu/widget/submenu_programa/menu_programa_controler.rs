@@ -60,7 +60,7 @@ impl<'a> MenuProgramaControler<'a> {
         ) else {
             // NOTE: currently we do not accept submenus with less then 2 menu_items.
             // TODO: Accept submenus with less then 2 menu_items.
-            fatal_error!(44);
+            fatal_error!(100);
         };
 
         Self {
@@ -108,7 +108,7 @@ impl<'a> MenuProgramaControler<'a> {
                     lcd::clear();
                     lcd::print("Err91"); // menu mounting error
                     delay_ms(4000);
-                    panic!("E2");
+                    fatal_error!(103);
                 };
             if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
                 // mount item
@@ -119,7 +119,7 @@ impl<'a> MenuProgramaControler<'a> {
                 lcd::clear();
                 lcd::print("Err92"); // menu mounting error
                 delay_ms(4000);
-                panic!("E2");
+                fatal_error!(104);;
             }
         }
     }
@@ -130,7 +130,7 @@ impl<'a> MenuProgramaControler<'a> {
             return elem;
         } else {
             // Mounting error
-            panic!("E1");
+            fatal_error!(105);
         }
     }
 
@@ -139,7 +139,7 @@ impl<'a> MenuProgramaControler<'a> {
             return elem;
         } else {
             // Mounting error
-            panic!("E1");
+            fatal_error!(106);
         }
     }
 
@@ -180,7 +180,7 @@ impl<'a> MenuProgramaControler<'a> {
             match self.navigation_path.push(parent) {
                 Ok(_) => (),
                 // ERROR DESCRIPTION: `navigation_path` must be redimensioned to higher capacity.
-                Err(_) => panic!("E14"),
+                Err(_) => fatal_error!(107),
             }
             // go to child
             self.go_to_menu(child)

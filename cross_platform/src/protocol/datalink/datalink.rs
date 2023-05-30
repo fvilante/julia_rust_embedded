@@ -1,5 +1,3 @@
-///////////////////////////////////////////////////////////
-
 use crate::utils::bit_wise::{get_bit_at, get_bit_at_as_bool, reset_bit_at};
 
 use self::word16::Word16;
@@ -155,7 +153,9 @@ impl Direction {
         let direction_number = (bit_7 << 7) + (bit_6 << 6);
         Direction::from_u8(direction_number).unwrap_or_else(|_| {
             // Should never happen
-            panic!("E448")
+            // TODO: Instead of panic call "fatal_error!(109)". To acomplish that is necessary to make
+            // macro fatal_error! platform independent.
+            panic!("109")
         })
     }
 }

@@ -3,6 +3,8 @@ use ruduino::{cores::current as avr_core, interrupt::without_interrupts, Registe
 
 use avr_core::{EEAR, EECR, EEDR, SPMCSR};
 
+use crate::fatal_error;
+
 /// Low-level function to write one single byte in local EEPROM
 /// NOTE: This code was originally written by `MalteT` and was grab by fvilante from github commit below:
 /// https://github.com/MalteT/counter-avr/blob/ebb7ca36d7a04b11265cb41024798a38ac31ad05/src/main.rs#L251
@@ -59,7 +61,7 @@ impl EepromAddress {
     pub fn out_of_range_error() -> ! {
         //TODO: Currently panic is not showing message in lcd because this is a costly operation in terms of flash consumption
         //because that it's necessary to elaborate a way to show this error message on lcd display in a cheap way.
-        panic!("E81")
+        fatal_error!(108)
     }
 
     /// TODO: KNOWN-ISSUES: only address first 255 bytes of eeprom, and cannot address the last word address.

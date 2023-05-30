@@ -211,7 +211,8 @@ mod tests {
                 return Ok(frame);
             }
         }
-        panic!("Input is fully proccessed but no frame result was generated")
+        //Error: "Input is fully proccessed but no frame result was generated"
+        fatal_error!()
     }
 
     #[test]

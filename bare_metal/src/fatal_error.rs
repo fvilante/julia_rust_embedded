@@ -16,7 +16,9 @@ macro_rules! fatal_error {
     ($error_code: literal) => {
         // TODO: Improve error handling when possible
 
-        use crate::fatal_error::print_error_code_and_panics;
-        print_error_code_and_panics($error_code);
+        {
+            use crate::fatal_error::print_error_code_and_panics;
+            print_error_code_and_panics($error_code)
+        }
     };
 }

@@ -6,6 +6,7 @@ use super::super::widget::{Saveble, Widget};
 
 use crate::board::keypad::KeyCode;
 
+use crate::fatal_error;
 use crate::geometry::point::Point;
 use crate::menu::screen_buffer::ScreenBuffer;
 use crate::menu::widget::widget::Editable;
@@ -25,7 +26,7 @@ pub fn make_options_buffer_from_array<const ARRAY_SIZE: usize>(
     for item in options_list {
         if let Err(_) = options.push(item) {
             // Error: Vector size not enough. Change 'OptionsBuffer' size to a higher value.
-            panic!("E10");
+            fatal_error!(101);
         }
     }
     options
