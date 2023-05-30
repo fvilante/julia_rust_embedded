@@ -437,6 +437,19 @@ impl EepromStorable for ConfiguracaoDoEquipamento {
     }
 }
 
+pub struct GuiState {
+    /// TODO: Should use u8 instead of u16 here.
+    pub numero_do_programa_para_edicao_x: Cell<u16>,
+}
+
+impl Default for GuiState {
+    fn default() -> Self {
+        Self {
+            numero_do_programa_para_edicao_x: Cell::new(0),
+        }
+    }
+}
+
 ///
 
 pub struct DataModel {
@@ -445,6 +458,8 @@ pub struct DataModel {
     pub configuracao_do_eixo_x: ConfiguracaoDoEixo,
     //pub configuracao_do_eixo_y: ConfiguracaoDoEixo,
     pub configuracao_do_equipamento: ConfiguracaoDoEquipamento,
+    // parametros the GUI (graphical user interface)
+    pub gui_state: GuiState,
 }
 
 impl DataModel {
@@ -461,6 +476,7 @@ impl DataModel {
             configuracao_do_eixo_x: ConfiguracaoDoEixo::default(),
             //configuracao_do_eixo_y: ConfiguracaoDoEixo::default(),
             configuracao_do_equipamento: ConfiguracaoDoEquipamento::default(),
+            gui_state: GuiState::default(),
         }
     }
 
