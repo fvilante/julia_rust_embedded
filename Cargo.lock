@@ -174,7 +174,7 @@ dependencies = [
  "cross_platform",
  "embedded-hal",
  "enum_dispatch",
- "heapless",
+ "heapless 0.8.0 (git+https://github.com/japaric/heapless?rev=644653bf3b831c6bb4963be2de24804acf5e5001)",
  "paste",
  "ruduino",
 ]
@@ -228,7 +228,7 @@ name = "cross_platform"
 version = "0.1.0"
 dependencies = [
  "enum_dispatch",
- "heapless",
+ "heapless 0.8.0 (git+https://github.com/japaric/heapless?rev=5229dea4e77ef68f034262dc7f6baf02be61b6ab)",
  "itoa",
 ]
 
@@ -278,6 +278,18 @@ dependencies = [
 name = "heapless"
 version = "0.8.0"
 source = "git+https://github.com/japaric/heapless?rev=5229dea4e77ef68f034262dc7f6baf02be61b6ab#5229dea4e77ef68f034262dc7f6baf02be61b6ab"
+dependencies = [
+ "atomic-polyfill",
+ "hash32",
+ "rustc_version 0.4.0",
+ "spin",
+ "stable_deref_trait",
+]
+
+[[package]]
+name = "heapless"
+version = "0.8.0"
+source = "git+https://github.com/japaric/heapless?rev=644653bf3b831c6bb4963be2de24804acf5e5001#644653bf3b831c6bb4963be2de24804acf5e5001"
 dependencies = [
  "atomic-polyfill",
  "hash32",
