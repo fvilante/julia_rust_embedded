@@ -20,7 +20,8 @@ use super::super::{
 
 pub struct MenuItemWidget<'a> {
     point_and_caption: (Point1d, Caption),
-    point_and_field: Option<(Point1d, Field<'a>)>,
+    //TODO: Check if is it possible to remove 'pub' visibility in below line
+    pub point_and_field: Option<(Point1d, Field<'a>)>,
     pub child: Option<MenuProgramaHandle>,
     unit_of_measurement: Option<(Point1d, Caption)>,
 }
@@ -77,7 +78,7 @@ impl MenuItemWidget<'_> {
                     self.save_value();
                 }
 
-                //delegate everything else
+                //delegate everything else to the field
                 _ => {
                     if let Some((_, field)) = &mut self.point_and_field {
                         field.send_key(key);
