@@ -1,5 +1,5 @@
 use crate::geometry::point::{Point, Point1d};
-use crate::menu::widget::submenu_programa::spec::MenuProgramaHandle;
+use crate::menu::widget::submenu_programa::spec::MenuProgramaAreanaSelector;
 use crate::{
     board::keypad::KeyCode,
     menu::{
@@ -22,7 +22,7 @@ pub struct MenuItemWidget<'a> {
     point_and_caption: (Point1d, Caption),
     //TODO: Check if is it possible to remove 'pub' visibility in below line
     pub point_and_field: Option<(Point1d, Field<'a>)>,
-    pub child: Option<MenuProgramaHandle>,
+    pub child: Option<MenuProgramaAreanaSelector>,
     unit_of_measurement: Option<(Point1d, Caption)>,
 }
 
@@ -32,7 +32,7 @@ impl<'a> MenuItemWidget<'a> {
     pub fn new(
         point_and_text: (Point1d, FlashString),
         point_and_field: Option<(Point1d, Field<'a>)>,
-        child: Option<MenuProgramaHandle>,
+        child: Option<MenuProgramaAreanaSelector>,
         unit_of_measurement: Option<(Point1d, FlashString)>,
     ) -> Self {
         let (point_a, text) = point_and_text;

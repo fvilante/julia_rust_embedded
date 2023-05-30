@@ -9,7 +9,7 @@ use crate::{
     board::{keypad::KeyCode, lcd},
     menu::{
         screen_buffer::ScreenBuffer,
-        widget::submenu_programa::spec::{MenuProgramaArena, MenuProgramaHandle},
+        widget::submenu_programa::spec::{MenuProgramaAreanaSelector, MenuProgramaArena},
     },
     microcontroler::delay::delay_ms,
 };
@@ -24,13 +24,13 @@ use heapless::Vec;
 pub struct MenuProgramaControler<'a> {
     /// Storage for of all submenus.
     menu_arena: &'a MenuProgramaArena<'a>,
-    current_menu_handle: MenuProgramaHandle,
+    current_menu_selector: MenuProgramaAreanaSelector,
     /// State of widgets which are currently mounted on screen.
     /// TODO: Is not necessary to have two MenuItemWidget states on memory but just one. Introduce some logic when possible
     /// to optimize this.
     mounted: [MenuItemWidget<'a>; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
     /// Stores the path of menu jumps that user perform, so you can go back to previous menu
-    navigation_path: Vec<MenuProgramaHandle, 7>,
+    navigation_path: Vec<MenuProgramaAreanaSelector, 7>,
     /// Main menu reads this bit, if it is set then it will render the main menu. When menu_menu pass control
     /// do menu_programa it resets this bit, and then menu_program is responsible to set it when it want to give
     /// back control to main_menu.
@@ -42,12 +42,15 @@ pub struct MenuProgramaControler<'a> {
 }
 
 impl<'a> MenuProgramaControler<'a> {
-    pub fn new(current_menu_handle: MenuProgramaHandle, menu_arena: &'a MenuProgramaArena) -> Self {
+    pub fn new(
+        current_menu_selector: MenuProgramaAreanaSelector,
+        menu_arena: &'a MenuProgramaArena,
+    ) -> Self {
         const T_ON: u16 = 500;
         const T_OFF: u16 = 500;
         let blink = RectangularWave::new(T_ON, T_OFF);
 
-        let (Some(menu_storage_item_0), Some(menu_storage_item_1)) =  (menu_arena.get_item(current_menu_handle, 0), menu_arena.get_item(current_menu_handle, 2)) else {
+        let (Some(menu_storage_item_0), Some(menu_storage_item_1)) =  (menu_arena.get_item(current_menu_selector, 0), menu_arena.get_item(current_menu_selector, 2)) else {
             // TODO: Improve error handling
             // currently we do not accept submenus with just one parameter
             lcd::clear();
@@ -59,7 +62,7 @@ impl<'a> MenuProgramaControler<'a> {
         Self {
             menu_arena,
             mounted: [menu_storage_item_0, menu_storage_item_1],
-            current_menu_handle,
+            current_menu_selector,
             navigation_path: Vec::new(),
             must_return_to_main_menu: false,
             blink,
@@ -71,7 +74,7 @@ impl<'a> MenuProgramaControler<'a> {
     /// TODO: Refactor this concept when possible.
     fn get_navigation_state(&self) -> NavigationStateModel {
         self.menu_arena
-            .get_navigation_state(self.current_menu_handle)
+            .get_navigation_state(self.current_menu_selector)
             .get()
     }
 
@@ -80,11 +83,11 @@ impl<'a> MenuProgramaControler<'a> {
         &self,
         update_fn: fn(NavigationStateModel, menu_length: u8) -> NavigationStateModel,
     ) {
-        let menu_length = usize_to_u8_clamper(self.menu_arena.len(self.current_menu_handle));
+        let menu_length = usize_to_u8_clamper(self.menu_arena.len(self.current_menu_selector));
         let current_nav_state = self.get_navigation_state();
         let updated_nav_state = update_fn(current_nav_state, menu_length);
         self.menu_arena
-            .get_navigation_state(self.current_menu_handle)
+            .get_navigation_state(self.current_menu_selector)
             .set(updated_nav_state)
     }
 
@@ -94,7 +97,7 @@ impl<'a> MenuProgramaControler<'a> {
             let index = self.get_navigation_state().get_current_index_for(lcd_line) as usize;
             let Some(menu_item_widget) = self
                 .menu_arena
-                .get_item(self.current_menu_handle, index)
+                .get_item(self.current_menu_selector, index)
                 else {
                     // TODO: Improve error handling
                     // Mounting error
@@ -160,23 +163,23 @@ impl<'a> MenuProgramaControler<'a> {
     }
 
     /// Changes current submenu
-    fn go_to_submenu(&mut self, submenu_handle: MenuProgramaHandle) {
-        self.current_menu_handle = submenu_handle;
+    fn go_to_menu(&mut self, menu_selector: MenuProgramaAreanaSelector) {
+        self.current_menu_selector = menu_selector;
         self.mount();
     }
 
-    fn go_to_child(&mut self, child: MenuProgramaHandle) {
+    fn go_to_child(&mut self, child: MenuProgramaAreanaSelector) {
         // do nothing if child is pointing to itself
-        if self.current_menu_handle != child {
+        if self.current_menu_selector != child {
             // saves parent
-            let parent = self.current_menu_handle;
+            let parent = self.current_menu_selector;
             match self.navigation_path.push(parent) {
                 Ok(_) => (),
                 // ERROR DESCRIPTION: `navigation_path` must be redimensioned to higher capacity.
                 Err(_) => panic!("E14"),
             }
             // go to child
-            self.go_to_submenu(child)
+            self.go_to_menu(child)
         }
     }
 
@@ -186,11 +189,11 @@ impl<'a> MenuProgramaControler<'a> {
             Some(parent) => parent,
             None => {
                 self.must_return_to_main_menu = true;
-                self.current_menu_handle
+                self.current_menu_selector
             }
         };
         // go to parent
-        self.go_to_submenu(parent)
+        self.go_to_menu(parent)
     }
 
     /// If is in edit mode for some line returns Some(LcdLine) else None.

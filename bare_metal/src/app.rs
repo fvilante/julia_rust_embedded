@@ -11,7 +11,7 @@ use crate::menu::widget::main_menu::MainMenu;
 use crate::menu::widget::manual_mode::ManualModeMenuControler;
 use crate::menu::widget::splash::Splash;
 use crate::menu::widget::submenu_programa::menu_programa_controler::MenuProgramaControler;
-use crate::menu::widget::submenu_programa::spec::{MenuProgramaArena, MenuProgramaHandle};
+use crate::menu::widget::submenu_programa::spec::{MenuProgramaAreanaSelector, MenuProgramaArena};
 use crate::menu::widget::widget::Widget;
 use crate::microcontroler::timer::now;
 use crate::microcontroler::{serial, timer};
@@ -154,10 +154,10 @@ pub fn run() -> ! {
         front_panel: &'a mut impl FrontPanel,
     ) -> impl Widget + 'a {
         // menu root
-        let initial_menu_handle = MenuProgramaHandle::MenuPrograma;
+        let initial_menu_selector = MenuProgramaAreanaSelector::MenuPrograma;
         // child menus
         let menu_programa_controler =
-            MenuProgramaControler::new(initial_menu_handle, &menu_programa_arena);
+            MenuProgramaControler::new(initial_menu_selector, &menu_programa_arena);
         let menu_manual_controler = ManualModeMenuControler::new(&transport);
         let menu_execucao_controler = MenuExecucaoControler::new(&transport);
         // parent menu

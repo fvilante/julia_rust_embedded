@@ -1,5 +1,5 @@
 use crate::geometry::point::Point1d;
-use crate::menu::widget::submenu_programa::spec::MenuProgramaHandle;
+use crate::menu::widget::submenu_programa::spec::MenuProgramaAreanaSelector;
 use crate::string::flash::FlashString;
 
 use super::{
@@ -13,7 +13,7 @@ use heapless::Vec;
 
 pub struct SimpleMenu {
     pub parent_name: FlashString,
-    pub child_menu: MenuProgramaHandle,
+    pub child_menu: MenuProgramaAreanaSelector,
 }
 
 /// TODO: Improve this construction (ie: why (col, text) instead of an iterator of Captions and/or Fields ?)
@@ -40,7 +40,7 @@ pub struct SimpleMenuWithNumericalParameter<'a> {
     pub variable: (u8, &'a Cell<u16>), // (collunm_position, text)
     pub valid_range: Range<u16>,
     pub unit_of_measurement_text: Option<(u8, FlashString)>, // (collunm_position, text)
-    pub child_menu: MenuProgramaHandle,
+    pub child_menu: MenuProgramaAreanaSelector,
 }
 
 impl MenuItemBuilder {

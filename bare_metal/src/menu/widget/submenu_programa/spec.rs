@@ -30,13 +30,13 @@ use super::flash_texts::*;
 
 ////////////////////////////////////////////////////
 
-/// Indexes the sub menus in the menu storage, it works like a reference pointer to the concrete menu.
-/// If you create a new sub menu you must put it here.
+/// Indexes the sub menus in the menu arena, it works like a reference pointer to the concrete menu.
+/// If you create a new sub menu you must registry it here.
 ///
-/// TODO: Consider rename to `MenuStorageIndex`
-/// TODO: Generalize to include splash, main_menu, menu_execucao and menu_manual
+/// TODO: When possible generalize the [`MenuProgramaAreana`] to include all menus used in the app
+/// (ie: splash, main_menu, menu_execucao and menu_manual, etc)
 #[derive(Copy, Clone, PartialEq)]
-pub enum MenuProgramaHandle {
+pub enum MenuProgramaAreanaSelector {
     MenuPrograma,
     MenuArquivoDeEixo,
     MenuParametrosDeMovimento,
@@ -130,32 +130,34 @@ impl<'a> MenuProgramaArena<'a> {
     /// If index is out of range than returns None
     pub fn get_item(
         &self,
-        submenu_handle: MenuProgramaHandle,
+        menu_selector: MenuProgramaAreanaSelector,
         index: usize,
     ) -> Option<MenuItemWidget> {
-        match submenu_handle {
-            MenuProgramaHandle::MenuPrograma => self.MenuPrograma.get_item(index),
-            MenuProgramaHandle::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_item(index),
-            MenuProgramaHandle::MenuParametrosDeMovimento => {
+        match menu_selector {
+            MenuProgramaAreanaSelector::MenuPrograma => self.MenuPrograma.get_item(index),
+            MenuProgramaAreanaSelector::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_item(index),
+            MenuProgramaAreanaSelector::MenuParametrosDeMovimento => {
                 self.MenuParametrosDeMovimento.get_item(index)
             }
 
-            MenuProgramaHandle::MenuParametrosDeImpressao => {
+            MenuProgramaAreanaSelector::MenuParametrosDeImpressao => {
                 self.MenuParametrosDeImpressao.get_item(index)
             }
 
-            MenuProgramaHandle::MenuParametrosDeCiclo => self.MenuParametrosDeCiclo.get_item(index),
-            MenuProgramaHandle::MenuConfiguracaoDaImpressora => {
+            MenuProgramaAreanaSelector::MenuParametrosDeCiclo => {
+                self.MenuParametrosDeCiclo.get_item(index)
+            }
+            MenuProgramaAreanaSelector::MenuConfiguracaoDaImpressora => {
                 self.MenuConfiguracaoDaImpressora.get_item(index)
             }
 
-            MenuProgramaHandle::MenuIntertravamentoParaDoisEixos => {
+            MenuProgramaAreanaSelector::MenuIntertravamentoParaDoisEixos => {
                 self.MenuIntertravamentoParaDoisEixos.get_item(index)
             }
-            MenuProgramaHandle::MenuConfiguracaoDeEixo => {
+            MenuProgramaAreanaSelector::MenuConfiguracaoDeEixo => {
                 self.MenuConfiguracaoDoEixo.get_item(index)
             }
-            MenuProgramaHandle::MenuConfiguracaoDoEquipamento => {
+            MenuProgramaAreanaSelector::MenuConfiguracaoDoEquipamento => {
                 self.MenuConfiguracaoDoEquipamento.get_item(index)
             }
         }
@@ -165,30 +167,32 @@ impl<'a> MenuProgramaArena<'a> {
     /// TODO: Simplify this function implementation reusing self.get_item which has a similar implementation
     pub fn get_navigation_state(
         &self,
-        submenu_handle: MenuProgramaHandle,
+        menu_selector: MenuProgramaAreanaSelector,
     ) -> &Cell<NavigationStateModel> {
-        match submenu_handle {
-            MenuProgramaHandle::MenuPrograma => self.MenuPrograma.get_navigation_state(),
-            MenuProgramaHandle::MenuArquivoDeEixo => self.MenuArquivoDeEixo.get_navigation_state(),
-            MenuProgramaHandle::MenuParametrosDeMovimento => {
+        match menu_selector {
+            MenuProgramaAreanaSelector::MenuPrograma => self.MenuPrograma.get_navigation_state(),
+            MenuProgramaAreanaSelector::MenuArquivoDeEixo => {
+                self.MenuArquivoDeEixo.get_navigation_state()
+            }
+            MenuProgramaAreanaSelector::MenuParametrosDeMovimento => {
                 self.MenuParametrosDeMovimento.get_navigation_state()
             }
-            MenuProgramaHandle::MenuParametrosDeImpressao => {
+            MenuProgramaAreanaSelector::MenuParametrosDeImpressao => {
                 self.MenuParametrosDeImpressao.get_navigation_state()
             }
-            MenuProgramaHandle::MenuParametrosDeCiclo => {
+            MenuProgramaAreanaSelector::MenuParametrosDeCiclo => {
                 self.MenuParametrosDeCiclo.get_navigation_state()
             }
-            MenuProgramaHandle::MenuConfiguracaoDaImpressora => {
+            MenuProgramaAreanaSelector::MenuConfiguracaoDaImpressora => {
                 self.MenuConfiguracaoDaImpressora.get_navigation_state()
             }
-            MenuProgramaHandle::MenuIntertravamentoParaDoisEixos => {
+            MenuProgramaAreanaSelector::MenuIntertravamentoParaDoisEixos => {
                 self.MenuIntertravamentoParaDoisEixos.get_navigation_state()
             }
-            MenuProgramaHandle::MenuConfiguracaoDeEixo => {
+            MenuProgramaAreanaSelector::MenuConfiguracaoDeEixo => {
                 self.MenuConfiguracaoDoEixo.get_navigation_state()
             }
-            MenuProgramaHandle::MenuConfiguracaoDoEquipamento => {
+            MenuProgramaAreanaSelector::MenuConfiguracaoDoEquipamento => {
                 self.MenuConfiguracaoDoEquipamento.get_navigation_state()
             }
         }
@@ -199,9 +203,9 @@ impl<'a> MenuProgramaArena<'a> {
     /// TODO: This algoritm may be highly optimized, because the length currently is obtained instantiating &
     /// throwing away all the menu items in memory. A better option may be to restructure datastructures
     /// to calculate this size in static time.
-    pub fn len(&self, submenu_handle: MenuProgramaHandle) -> usize {
+    pub fn len(&self, menu_selector: MenuProgramaAreanaSelector) -> usize {
         for index in 0..u8::MAX {
-            if let None = self.get_item(submenu_handle, index as usize) {
+            if let None = self.get_item(menu_selector, index as usize) {
                 return index as usize;
             }
         }
@@ -227,7 +231,7 @@ impl SubmenuLayout for MenuPrograma<'_> {
             0 => {
                 MenuItemBuilder::make_simple_menu_with_parameter(SimpleMenuWithNumericalParameter {
                     parameter_name: FlashString::new(&EDITAR_PROGRAMA_EIXO_X),
-                    child_menu: MenuProgramaHandle::MenuArquivoDeEixo,
+                    child_menu: MenuProgramaAreanaSelector::MenuArquivoDeEixo,
                     unit_of_measurement_text: None,
                     valid_range: 0..99,
                     variable: (30, &self.model.gui_state.numero_do_programa_para_edicao_x),
@@ -236,12 +240,12 @@ impl SubmenuLayout for MenuPrograma<'_> {
 
             1 => MenuItemBuilder::make_simple_menu(SimpleMenu {
                 parent_name: FlashString::new(&CONFIGURACAO_EIXO_X),
-                child_menu: MenuProgramaHandle::MenuConfiguracaoDeEixo,
+                child_menu: MenuProgramaAreanaSelector::MenuConfiguracaoDeEixo,
             }),
 
             2 => MenuItemBuilder::make_simple_menu(SimpleMenu {
                 parent_name: FlashString::new(&CONFIGURACAO_DO_EQUIPAMENTO),
-                child_menu: MenuProgramaHandle::MenuConfiguracaoDoEquipamento,
+                child_menu: MenuProgramaAreanaSelector::MenuConfiguracaoDoEquipamento,
             }),
 
             _ => None,
@@ -268,27 +272,27 @@ impl SubmenuLayout for MenuArquivoDeEixo<'_> {
         match index {
             0 => MenuItemBuilder::make_simple_menu(SimpleMenu {
                 parent_name: FlashString::new(&PARAMETROS_DE_MOVIMENTO),
-                child_menu: MenuProgramaHandle::MenuParametrosDeMovimento,
+                child_menu: MenuProgramaAreanaSelector::MenuParametrosDeMovimento,
             }),
 
             1 => MenuItemBuilder::make_simple_menu(SimpleMenu {
                 parent_name: FlashString::new(&PARAMETROS_DE_IMPRESSAO),
-                child_menu: MenuProgramaHandle::MenuParametrosDeImpressao,
+                child_menu: MenuProgramaAreanaSelector::MenuParametrosDeImpressao,
             }),
 
             2 => MenuItemBuilder::make_simple_menu(SimpleMenu {
                 parent_name: FlashString::new(&CONFIGURACAO_DO_CICLO),
-                child_menu: MenuProgramaHandle::MenuParametrosDeCiclo,
+                child_menu: MenuProgramaAreanaSelector::MenuParametrosDeCiclo,
             }),
 
             3 => MenuItemBuilder::make_simple_menu(SimpleMenu {
                 parent_name: FlashString::new(&CONFIGURACAO_DA_IMPRESSORA),
-                child_menu: MenuProgramaHandle::MenuConfiguracaoDaImpressora,
+                child_menu: MenuProgramaAreanaSelector::MenuConfiguracaoDaImpressora,
             }),
 
             4 => MenuItemBuilder::make_simple_menu(SimpleMenu {
                 parent_name: FlashString::new(&INTERTRAVAMENTO_DOIS_EIXOS_PASSO_A_PASSO),
-                child_menu: MenuProgramaHandle::MenuIntertravamentoParaDoisEixos,
+                child_menu: MenuProgramaAreanaSelector::MenuIntertravamentoParaDoisEixos,
             }),
 
             _ => None,
