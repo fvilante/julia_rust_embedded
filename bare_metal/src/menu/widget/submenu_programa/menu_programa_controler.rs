@@ -194,7 +194,6 @@ impl<'a> MenuProgramaControler<'a> {
     }
 
     /// If is in edit mode for some line returns Some(LcdLine) else None.
-    /// TODO: Remove mutability of self when possible
     fn get_line_being_edited(&self) -> Option<LcdLine> {
         for line in LcdLine::iterator() {
             let is_editing_some_line = self.get_mounted_item_for_lcd_line(line).is_in_edit_mode();
@@ -206,8 +205,6 @@ impl<'a> MenuProgramaControler<'a> {
     }
 
     /// helper function to draw submenu cursor on screen
-    ///
-    /// TODO: remove mutability on self when possible
     fn draw_menu_item_selector(&self, line: LcdLine, screen_buffer: &mut ScreenBuffer) {
         const EDITING_CURSOR: u8 = b'*';
         const NAVIGATING_CURSOR: u8 = b'>';
