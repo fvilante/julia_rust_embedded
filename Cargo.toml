@@ -4,6 +4,7 @@ members = [
     "bare_metal",
     "cross_platform",
     "avr-progmem-rs",
+    "heapless",
 ]
 
 # Note(fv): Below lines seems to be unecessary. Check if it is possible to remove it in future
