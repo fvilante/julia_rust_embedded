@@ -75,6 +75,10 @@ impl<'a> MenuProgramaControler<'a> {
         }
     }
 
+    // -----------------------------------------------------------
+    //           GENERAL FUNCTIONS
+    // -----------------------------------------------------------
+
     fn retrieve_current_menu_navigation_state(&self) -> &Cell<NavigationStateModel> {
         self.menu_arena.get_navigation_state(self.current_menu)
     }
@@ -87,12 +91,12 @@ impl<'a> MenuProgramaControler<'a> {
         // current navigation state and overwrite old widgets.
         for lcd_line in LcdLine::iterator() {
             // creates an brand new menu_item widget from the current navigation state
-            let index = self
-                .retrieve_current_menu_navigation_state()
-                .get()
-                .get_current_index_for(lcd_line) as usize;
-            let current_menu_item = self.menu_arena.get_item(self.current_menu, index);
-            // get access to the mounting place
+            let current_menu_item = self.menu_arena.get_item(
+                self.current_menu,
+                self.retrieve_current_menu_navigation_state()
+                    .get()
+                    .get_current_index_for(lcd_line) as usize,
+            );
             let mounted = self.mounted.get_mut(lcd_line as u8 as usize);
             // safe reads both values
             if let (Some(menu_item_widget), Some(mounting_place)) = (current_menu_item, mounted) {
@@ -125,29 +129,29 @@ impl<'a> MenuProgramaControler<'a> {
     }
 
     /// Get mounted item for the lcd line selected by the user
-    fn get_monted_item_for_current_lcd_line(&mut self) -> &mut MenuItemWidget<'a> {
-        let line = self
+    fn get_selected_menu_item(&mut self) -> &mut MenuItemWidget<'a> {
+        let selected_line = self
             .retrieve_current_menu_navigation_state()
             .get()
             .get_current_lcd_line();
-        let current_menu_item = self.get_mounted_item_for_lcd_line_mut(line);
-        current_menu_item
+        self.get_mounted_item_for_lcd_line_mut(selected_line)
     }
 
+    // -----------------------------------------------------------
+    //           MENUS (INTERNAL) NAVIGATION
+    // -----------------------------------------------------------
+
     fn key_down(&mut self) {
-        // get current menu number of items
-        let number_of_menu_items = usize_to_u8_clamper(self.menu_arena.len(self.current_menu));
-        // update current menu navigation state
+        let size_of_menu = self.menu_arena.len(self.current_menu) as u8;
         self.retrieve_current_menu_navigation_state()
             .update(|mut nav| {
-                nav.key_down(number_of_menu_items);
+                nav.key_down(size_of_menu);
                 nav
             });
         self.mount();
     }
 
     fn key_up(&mut self) {
-        // update current menu navigation state
         self.retrieve_current_menu_navigation_state()
             .update(|mut nav| {
                 nav.key_up();
@@ -155,6 +159,10 @@ impl<'a> MenuProgramaControler<'a> {
             });
         self.mount();
     }
+
+    // -----------------------------------------------------------
+    //           MENUS (EXTERNAL) NAVIGATION
+    // -----------------------------------------------------------
 
     /// Changes current submenu
     fn go_to_menu(&mut self, menu_selector: MenuProgramaAreanaSelector) {
@@ -190,6 +198,10 @@ impl<'a> MenuProgramaControler<'a> {
         self.go_to_menu(parent)
     }
 
+    // -----------------------------------------------------------
+    //            LINE BEING EDITED
+    // -----------------------------------------------------------
+
     /// If is in edit mode for some line returns Some(LcdLine) else None.
     fn get_line_being_edited(&self) -> Option<LcdLine> {
         for line in LcdLine::iterator() {
@@ -200,6 +212,10 @@ impl<'a> MenuProgramaControler<'a> {
         }
         None
     }
+
+    // -----------------------------------------------------------
+    //            DRAWING HELPER
+    // -----------------------------------------------------------
 
     /// helper function to draw submenu cursor on screen
     fn draw_menu_item_selector(&self, line: LcdLine, screen_buffer: &mut ScreenBuffer) {
@@ -224,6 +240,10 @@ impl<'a> MenuProgramaControler<'a> {
         }
     }
 }
+
+// -----------------------------------------------------------
+//            WIDGET IMPLEMENTATION
+// -----------------------------------------------------------
 
 impl Widget for MenuProgramaControler<'_> {
     /// TODO: Improve this code when possible
@@ -254,7 +274,7 @@ impl Widget for MenuProgramaControler<'_> {
                 }
 
                 KeyCode::KEY_ENTER => {
-                    let current_menu_item = self.get_monted_item_for_current_lcd_line();
+                    let current_menu_item = self.get_selected_menu_item();
 
                     let has_field = current_menu_item.point_and_field.is_some();
 
