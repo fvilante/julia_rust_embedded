@@ -27,6 +27,15 @@ dependencies = [
 
 [[package]]
 name = "atomic-polyfill"
+version = "0.1.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e3ff7eb3f316534d83a8a2c3d1674ace8a5a71198eba31e2e2b597833f699b28"
+dependencies = [
+ "critical-section",
+]
+
+[[package]]
+name = "atomic-polyfill"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d299f547288d6db8d5c3a2916f7b2f66134b15b8c1ac1c4357dd3b8752af7bb2"
@@ -132,7 +141,7 @@ dependencies = [
  "cross_platform",
  "embedded-hal",
  "enum_dispatch",
- "heapless",
+ "heapless 0.7.16",
  "paste",
  "ruduino",
 ]
@@ -186,7 +195,7 @@ name = "cross_platform"
 version = "0.1.0"
 dependencies = [
  "enum_dispatch",
- "heapless",
+ "heapless 0.8.0",
  "itoa",
 ]
 
@@ -225,6 +234,15 @@ dependencies = [
 
 [[package]]
 name = "hash32"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0c35f58762feb77d74ebe43bdbc3210f09be9fe6742234d573bacc26ed92b67"
+dependencies = [
+ "byteorder",
+]
+
+[[package]]
+name = "hash32"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "47d60b12902ba28e2730cd37e95b8c9223af2808df9e902d4df49588d1470606"
@@ -234,11 +252,24 @@ dependencies = [
 
 [[package]]
 name = "heapless"
+version = "0.7.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db04bc24a18b9ea980628ecf00e6c0264f3c1426dac36c00cb49b6fbad8b0743"
+dependencies = [
+ "atomic-polyfill 0.1.11",
+ "hash32 0.2.1",
+ "rustc_version 0.4.0",
+ "spin",
+ "stable_deref_trait",
+]
+
+[[package]]
+name = "heapless"
 version = "0.8.0"
 source = "git+https://github.com/japaric/heapless?rev=5229dea4e77ef68f034262dc7f6baf02be61b6ab#5229dea4e77ef68f034262dc7f6baf02be61b6ab"
 dependencies = [
- "atomic-polyfill",
- "hash32",
+ "atomic-polyfill 1.0.1",
+ "hash32 0.3.1",
  "rustc_version 0.4.0",
  "spin",
  "stable_deref_trait",
