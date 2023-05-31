@@ -60,8 +60,7 @@ impl<'a> MenuProgramaControler<'a> {
             menu_arena.get_item(current_menu, 0),
             menu_arena.get_item(current_menu, 1),
         ) else {
-            // NOTE: currently we do not accept submenus with less then 2 menu_items.
-            // TODO: Accept submenus with less then 2 menu_items.
+            // TODO: currently we do not accept submenus with less then 2 menu_items, accept it when possible
             fatal_error!(100);
         };
 
@@ -86,11 +85,12 @@ impl<'a> MenuProgramaControler<'a> {
     /// Mount widgets that are being renderized
     /// TODO: Consider rename to `redraw`. (Hum! Maybe no because I'm saving the Widgets but not
     /// running the .draw method of it. It represents just some internal `model` change)
+    /// TODO: Check if this functoin can be reused in the constructor (Self::new). Because it seems that
+    /// the code is duplicated.
     fn mount(&mut self) {
         // Algorithm: For each line of the Lcd recriates the menu_item Widgets based in the
         // current navigation state and overwrite old widgets.
         for lcd_line in LcdLine::iterator() {
-            // creates an brand new menu_item widget from the current navigation state
             let current_menu_item = self.menu_arena.get_item(
                 self.current_menu,
                 self.retrieve_current_menu_navigation_state()
@@ -98,13 +98,10 @@ impl<'a> MenuProgramaControler<'a> {
                     .get_current_index_for(lcd_line) as usize,
             );
             let mounted = self.mounted.get_mut(lcd_line as u8 as usize);
-            // safe reads both values
             if let (Some(menu_item_widget), Some(mounting_place)) = (current_menu_item, mounted) {
-                // overwrite
                 *mounting_place = menu_item_widget;
             } else {
-                // Menu mounting error
-                fatal_error!(103);
+                fatal_error!(103); // Menu mounting error
             };
         }
     }
@@ -203,14 +200,14 @@ impl<'a> MenuProgramaControler<'a> {
     // -----------------------------------------------------------
 
     /// If is in edit mode for some line returns Some(LcdLine) else None.
+    /// TODO: Why not return Option<&mut MenuItemWidget> instead ?
     fn get_line_being_edited(&self) -> Option<LcdLine> {
-        for line in LcdLine::iterator() {
-            let is_editing_some_line = self.get_mounted_item_for_lcd_line(line).is_in_edit_mode();
-            if is_editing_some_line {
-                return Some(line);
-            }
-        }
-        None
+        self.mounted
+            .iter()
+            .filter(|item| item.is_in_edit_mode())
+            .enumerate()
+            .next()
+            .map(|x| (x.0 as u8).into())
     }
 
     // -----------------------------------------------------------
