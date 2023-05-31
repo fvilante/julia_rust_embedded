@@ -27,8 +27,7 @@ mod printable;
 mod string;
 
 // Initialize app
-
-#[no_mangle]
+#[no_mangle] // TODO: it seems this line is not necessary remove it if possible.
 #[arduino_hal::entry]
 fn main() -> ! {
     // Application entry point
