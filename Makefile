@@ -38,8 +38,8 @@ watch_x86_test:
 watch_avr: 
 	cargo watch -c --why -s "make div check size"
 
-watch_avr_upload:
-	cargo watch -c --why -s "make div fast"
+watch_avr_upload: 
+	cargo watch -c --why -s "make div format fast"
 
 watch_avr_upload_fix: fix_silently watch_avr_upload
 
