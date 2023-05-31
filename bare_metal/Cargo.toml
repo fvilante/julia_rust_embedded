@@ -10,6 +10,7 @@ edition = "2021"
 cross_platform = { path = "../cross_platform" }
 # ruduino "default-features = false" meaning => to disable the dependency of avr-std-stub inside ruduino which implements a default panic_handler. 
 #We want to abort the use of this handler, because we want our own panic_handler.
+# TODO: When possible remove ruduino dependency (use avr-hal instead). Following drivers may be using ruduino at moment: lcd, shift-registers, eeprom 
 ruduino = {  git = "https://github.com/avr-rust/ruduino", rev = "c057499", default-features = false }
 #panic-halt = "0.2.0"
 embedded-hal = "0.2.3"
