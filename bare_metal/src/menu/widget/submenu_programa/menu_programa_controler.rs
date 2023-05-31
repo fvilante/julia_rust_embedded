@@ -242,7 +242,7 @@ impl<'a> MenuProgramaControler<'a> {
 //            WIDGET IMPLEMENTATION
 // -----------------------------------------------------------
 
-impl Widget for MenuProgramaControler<'_> {
+impl<'a> Widget for MenuProgramaControler<'a> {
     /// TODO: Improve this code when possible
     fn send_key(&mut self, key: KeyCode) {
         if let Some(line_being_edited) = self.get_line_being_edited() {
