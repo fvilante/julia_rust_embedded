@@ -1,3 +1,5 @@
+use core::cell::Cell;
+
 use super::{
     super::menu_item::menu_item::MenuItemWidget, hepers::LcdLine,
     navigation_state::NavigationStateModel,
@@ -55,7 +57,7 @@ impl<'a> MenuProgramaControler<'a> {
 
         // Mount menu itens that will be visible on the screen
         let (Some(fist_menu_item), Some(second_menu_item)) = (
-            menu_arena.get_item(current_menu, 0), 
+            menu_arena.get_item(current_menu, 0),
             menu_arena.get_item(current_menu, 2),
         ) else {
             // NOTE: currently we do not accept submenus with less then 2 menu_items.
@@ -73,54 +75,33 @@ impl<'a> MenuProgramaControler<'a> {
         }
     }
 
-    /// Gets a copy of the Navigation State.
-    /// NOTE: Any modification on the copy will not reflect in the official state.
-    /// TODO: Refactor this concept when possible.
-    fn get_navigation_state(&self) -> NavigationStateModel {
-        self.menu_arena
-            .get_navigation_state(self.current_menu)
-            .get()
-    }
-
-    /// Updates the navigation state of current sub_menu by applying update_fn on it
-    fn update_navigation_state(
-        &self,
-        update_fn: fn(NavigationStateModel, menu_length: u8) -> NavigationStateModel,
-    ) {
-        let menu_length = usize_to_u8_clamper(self.menu_arena.len(self.current_menu));
-        let current_nav_state = self.get_navigation_state();
-        let updated_nav_state = update_fn(current_nav_state, menu_length);
-        self.menu_arena
-            .get_navigation_state(self.current_menu)
-            .set(updated_nav_state)
+    fn retrieve_current_menu_navigation_state(&self) -> &Cell<NavigationStateModel> {
+        self.menu_arena.get_navigation_state(self.current_menu)
     }
 
     /// Mount widgets that are being renderized
+    /// TODO: Consider rename to `redraw`. (Hum! Maybe no because I'm saving the Widgets but not
+    /// running the .draw method of it. It represents just some internal `model` change)
     fn mount(&mut self) {
+        // Algorithm: For each line of the Lcd recriates the menu_item Widgets based in the
+        // current navigation state and overwrite old widgets.
         for lcd_line in LcdLine::iterator() {
-            let index = self.get_navigation_state().get_current_index_for(lcd_line) as usize;
-            let Some(menu_item_widget) = self
-                .menu_arena
-                .get_item(self.current_menu, index)
-                else {
-                    // TODO: Improve error handling
-                    // Mounting error
-                    lcd::clear();
-                    lcd::print("Err91"); // menu mounting error
-                    delay_ms(4000);
-                    fatal_error!(103);
-                };
-            if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
-                // mount item
-                *elem = menu_item_widget;
+            // creates an brand new menu_item widget from the current navigation state
+            let index = self
+                .retrieve_current_menu_navigation_state()
+                .get()
+                .get_current_index_for(lcd_line) as usize;
+            let current_menu_item = self.menu_arena.get_item(self.current_menu, index);
+            // get access to the mounting place
+            let mounted = self.mounted.get_mut(lcd_line as u8 as usize);
+            // safe reads both values
+            if let (Some(menu_item_widget), Some(mounting_place)) = (current_menu_item, mounted) {
+                // overwrite
+                *mounting_place = menu_item_widget;
             } else {
-                // TODO: Improve error handling
-                // Mounting error
-                lcd::clear();
-                lcd::print("Err92"); // menu mounting error
-                delay_ms(4000);
-                fatal_error!(104);;
-            }
+                // Menu mounting error
+                fatal_error!(103);
+            };
         }
     }
 
@@ -145,24 +126,33 @@ impl<'a> MenuProgramaControler<'a> {
 
     /// Get mounted item for the lcd line selected by the user
     fn get_monted_item_for_current_lcd_line(&mut self) -> &mut MenuItemWidget<'a> {
-        let line = self.get_navigation_state().get_current_lcd_line();
+        let line = self
+            .retrieve_current_menu_navigation_state()
+            .get()
+            .get_current_lcd_line();
         let current_menu_item = self.get_mounted_item_for_lcd_line_mut(line);
         current_menu_item
     }
 
     fn key_down(&mut self) {
-        self.update_navigation_state(|mut nav_state, menu_length| {
-            nav_state.key_down(menu_length);
-            nav_state
-        });
+        // get current menu number of items
+        let number_of_menu_items = usize_to_u8_clamper(self.menu_arena.len(self.current_menu));
+        // update current menu navigation state
+        self.retrieve_current_menu_navigation_state()
+            .update(|mut nav| {
+                nav.key_down(number_of_menu_items);
+                nav
+            });
         self.mount();
     }
 
     fn key_up(&mut self) {
-        self.update_navigation_state(|mut nav_state, _menu_length| {
-            nav_state.key_up();
-            nav_state
-        });
+        // update current menu navigation state
+        self.retrieve_current_menu_navigation_state()
+            .update(|mut nav| {
+                nav.key_up();
+                nav
+            });
         self.mount();
     }
 
@@ -308,7 +298,10 @@ impl Widget for MenuProgramaControler<'_> {
         // clear screen
         screen_buffer.clear();
         // draw menu item selector
-        let line = self.get_navigation_state().get_current_lcd_line();
+        let line = self
+            .retrieve_current_menu_navigation_state()
+            .get()
+            .get_current_lcd_line();
         self.draw_menu_item_selector(line, screen_buffer);
         // draw menu items
         for line in LcdLine::iterator() {

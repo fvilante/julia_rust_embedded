@@ -11,6 +11,7 @@ pub fn print_error_code_and_panics(error_code: u8) -> ! {
 }
 
 /// TODO: Place this module inside the [`panic.rs`] module
+/// TODO: When possible subs `error_code` argument to a enumeration that can be mapped to an u8.
 #[macro_export]
 macro_rules! fatal_error {
     ($error_code: literal) => {
