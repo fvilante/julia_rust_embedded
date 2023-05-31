@@ -1,6 +1,0 @@
-[submodule "avr-progmem-rs"]
-	path = avr-progmem-rs
-	url = https://github.com/fvilante/avr-progmem-rs.git
-[submodule "heapless"]
-	path = heapless
-	url = https://github.com/fvilante/heapless
