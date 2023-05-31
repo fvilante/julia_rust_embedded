@@ -58,7 +58,7 @@ impl<'a> MenuProgramaControler<'a> {
         // Mount menu itens that will be visible on the screen
         let (Some(fist_menu_item), Some(second_menu_item)) = (
             menu_arena.get_item(current_menu, 0),
-            menu_arena.get_item(current_menu, 2),
+            menu_arena.get_item(current_menu, 1),
         ) else {
             // NOTE: currently we do not accept submenus with less then 2 menu_items.
             // TODO: Accept submenus with less then 2 menu_items.
