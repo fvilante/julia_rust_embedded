@@ -35,6 +35,9 @@ format:
 watch_x86_test: 
 	cargo watch -c --why -s "make div test"
 
+watch_avr_build:
+	cargo watch -c --why -s "make div build size"
+
 watch_avr: 
 	cargo watch -c --why -s "make div check size"
 
