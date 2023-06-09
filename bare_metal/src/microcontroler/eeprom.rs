@@ -9,6 +9,7 @@ use crate::fatal_error;
 /// NOTE: This code was originally written by `MalteT` and was grab by fvilante from github commit below:
 /// https://github.com/MalteT/counter-avr/blob/ebb7ca36d7a04b11265cb41024798a38ac31ad05/src/main.rs#L251
 /// TODO: Make address u16 or something that can address 1kb of EEPROM
+/// TODO: Use crate avr-device when possible to make register manipulation instead of ruduino
 fn write_eeprom_raw(address: u8, byte: u8) {
     without_interrupts(|| {
         // Do not acces eeprom, if it is written to or the flash is currently programmed!
@@ -29,6 +30,7 @@ fn write_eeprom_raw(address: u8, byte: u8) {
 /// NOTE: This code was originally written by `MalteT` and was grab by fvilante from github commit below:
 /// https://github.com/MalteT/counter-avr/blob/ebb7ca36d7a04b11265cb41024798a38ac31ad05/src/main.rs#L251
 /// TODO: Make address u16 or something that can address 1kb of EEPROM
+/// TODO: Use crate avr-device when possible to make register manipulation instead of ruduino
 fn read_eeprom_byte_raw(address: u8) -> u8 {
     without_interrupts(|| {
         // Do not acces eeprom, if it is written to or the flash is currently programmed!
@@ -148,25 +150,6 @@ impl EepromAddress {
     // None if iterator is exausted before enough data has been iterated to construct type T
     //fn read_iterable<T: FromIterator>(&self) -> Option<T> {}
 }
-
-/*struct Iter {
-    addr: EepromAddress,
-}
-
-impl Iterator for Iter {
-    type Item = u8;
-
-    /// PANIC: This function may panic if you try to read address above 255. We hope this limitation
-    /// will be removed soon
-    /// TODO: Return Option::None instead of panic!
-    fn next(&mut self) -> Option<Self::Item> {
-        let (byte_read, next_address) = self.addr.read_u8();
-        self.addr = next_address;
-        Some(byte_read)
-    }
-}*/
-
-// *****************
 
 pub struct EepromTestError {
     address: u16,
