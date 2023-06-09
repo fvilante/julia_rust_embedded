@@ -425,8 +425,8 @@ impl EepromStorable for ConfiguracaoDoEquipamento {
             self.velocidade_de_comunicacao.set(value);
 
             //
-            let size_of_bytes_loadded = next.0 - initial_address.0;
-            (next, size_of_bytes_loadded)
+            let size_of_bytes_loaded = next.0 - initial_address.0;
+            (next, size_of_bytes_loaded)
         } else {
             // EEPROM is not initialized yet
             // Then initialize it.

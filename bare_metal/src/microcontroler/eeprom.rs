@@ -46,6 +46,7 @@ fn read_eeprom_byte_raw(address: u8) -> u8 {
     })
 }
 
+/// mid-level eeprom type
 #[derive(Copy, Clone)]
 pub struct EepromAddress(pub u8);
 
