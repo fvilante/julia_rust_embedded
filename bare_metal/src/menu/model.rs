@@ -8,7 +8,7 @@ use cross_platform::{
     utils::cursor::Cursor,
 };
 
-use crate::microcontroler::eeprom::EepromAddress;
+use crate::{fatal_error, microcontroler::eeprom::EepromAddress};
 
 ///
 
@@ -454,6 +454,7 @@ impl Default for GuiState {
 
 pub struct DataModel {
     pub arquivo_de_eixo_00: ArquivoDeEixo,
+    pub arquivo_de_eixo_01: ArquivoDeEixo,
     //pub arquivo_de_eixo_y: ArquivoDeEixo,
     pub configuracao_do_eixo_x: ConfiguracaoDoEixo,
     //pub configuracao_do_eixo_y: ConfiguracaoDoEixo,
@@ -466,12 +467,10 @@ impl DataModel {
     const ADDR_LOW: u8 = 0x00;
     const ADDR_HIGH: u8 = 0x01;
 
-    /// Start address to store data in eeprom
-    const INITIAL_ADDRESS: EepromAddress = EepromAddress(0x00);
-
     pub fn new() -> Self {
         Self {
             arquivo_de_eixo_00: ArquivoDeEixo::default(),
+            arquivo_de_eixo_01: ArquivoDeEixo::default(),
             //arquivo_de_eixo_y: ArquivoDeEixo::default(),
             configuracao_do_eixo_x: ConfiguracaoDoEixo::default(),
             //configuracao_do_eixo_y: ConfiguracaoDoEixo::default(),
@@ -480,9 +479,44 @@ impl DataModel {
         }
     }
 
+    /// Start address to store `Arquivo de Eixo` data in eeprom
+    fn get_initial_eeprom_address(&self) -> EepromAddress {
+        match self.numero_do_programa_atual() {
+            // TODO: Currently addresses is arbitrarily defined, change this for a more
+            // formal and efficient approuch;
+            0 => EepromAddress(0x00),
+            1 => EepromAddress(100),
+            // TODO: Make this error not being a Fatal Error but a recoverable error
+            _ => fatal_error!(0x7F), // Invalid number of arquivo_de_eixo
+        }
+    }
+
+    fn numero_do_programa_atual(&self) -> u16 {
+        self.gui_state.numero_do_programa_do_eixo_x.get()
+    }
+
+    pub fn get_arquivo_de_eixo_by_ref(&self) -> &ArquivoDeEixo {
+        match self.numero_do_programa_atual() {
+            0 => &self.arquivo_de_eixo_00,
+            1 => &self.arquivo_de_eixo_01,
+            // TODO: Make this error not being a Fatal Error but a recoverable error
+            _ => fatal_error!(0x7F), // Invalid number of arquivo_de_eixo
+        }
+    }
+
+    pub fn get_arquivo_de_eixo_by_ref_mut(&mut self) -> &mut ArquivoDeEixo {
+        let numero_do_programa = self.gui_state.numero_do_programa_do_eixo_x.get();
+        match numero_do_programa {
+            0 => &mut self.arquivo_de_eixo_00,
+            1 => &mut self.arquivo_de_eixo_01,
+            // TODO: Make this error not being a Fatal Error but a recoverable error
+            _ => fatal_error!(0x7F), // Invalid number of arquivo_de_eixo
+        }
+    }
+
     pub fn send_all<'a>(&'a self, transport: &'a TransportLayer) -> SendAllIterator<'a> {
         let cmpp_data = CmppData {
-            arquivo_de_eixo: &self.arquivo_de_eixo_00,
+            arquivo_de_eixo: &self.get_arquivo_de_eixo_by_ref(),
             configuracao_de_eixo: &self.configuracao_do_eixo_x,
         };
 
@@ -491,9 +525,10 @@ impl DataModel {
 
     /// Saves data to EEPROM
     pub fn save_to_eeprom(&self) {
+        let initial_address = self.get_initial_eeprom_address();
         let (next, _size) = self
-            .arquivo_de_eixo_00
-            .save_into_eeprom(Self::INITIAL_ADDRESS);
+            .get_arquivo_de_eixo_by_ref()
+            .save_into_eeprom(initial_address);
 
         let (next, _size) = self.configuracao_do_eixo_x.save_into_eeprom(next);
         let (_next, _size) = self.configuracao_do_equipamento.save_into_eeprom(next);
@@ -501,9 +536,10 @@ impl DataModel {
 
     /// loads data from EEPROM
     pub fn load_from_eeprom(&mut self) {
+        let initial_address = self.get_initial_eeprom_address();
         let (next, _address) = self
-            .arquivo_de_eixo_00
-            .load_from_eeprom(Self::INITIAL_ADDRESS);
+            .get_arquivo_de_eixo_by_ref_mut()
+            .load_from_eeprom(initial_address);
         let (next, _size) = self.configuracao_do_eixo_x.load_from_eeprom(next);
         let (_next, _size) = self.configuracao_do_equipamento.load_from_eeprom(next);
     }
