@@ -439,13 +439,13 @@ impl EepromStorable for ConfiguracaoDoEquipamento {
 
 pub struct GuiState {
     /// TODO: Should use u8 instead of u16 here.
-    pub numero_do_programa_para_edicao_x: Cell<u16>,
+    pub numero_do_programa_do_eixo_x: Cell<u16>,
 }
 
 impl Default for GuiState {
     fn default() -> Self {
         Self {
-            numero_do_programa_para_edicao_x: Cell::new(0),
+            numero_do_programa_do_eixo_x: Cell::new(0),
         }
     }
 }

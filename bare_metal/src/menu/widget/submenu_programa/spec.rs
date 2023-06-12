@@ -234,7 +234,7 @@ impl SubmenuLayout for MenuPrograma<'_> {
                     child_menu: MenuProgramaAreanaSelector::MenuArquivoDeEixo,
                     unit_of_measurement_text: None,
                     valid_range: 0..99,
-                    variable: (30, &self.model.gui_state.numero_do_programa_para_edicao_x),
+                    variable: (30, &self.model.gui_state.numero_do_programa_do_eixo_x),
                 })
             }
 
