@@ -453,7 +453,7 @@ impl Default for GuiState {
 ///
 
 pub struct DataModel {
-    pub arquivo_de_eixo_x: ArquivoDeEixo,
+    pub arquivo_de_eixo_00: ArquivoDeEixo,
     //pub arquivo_de_eixo_y: ArquivoDeEixo,
     pub configuracao_do_eixo_x: ConfiguracaoDoEixo,
     //pub configuracao_do_eixo_y: ConfiguracaoDoEixo,
@@ -471,7 +471,7 @@ impl DataModel {
 
     pub fn new() -> Self {
         Self {
-            arquivo_de_eixo_x: ArquivoDeEixo::default(),
+            arquivo_de_eixo_00: ArquivoDeEixo::default(),
             //arquivo_de_eixo_y: ArquivoDeEixo::default(),
             configuracao_do_eixo_x: ConfiguracaoDoEixo::default(),
             //configuracao_do_eixo_y: ConfiguracaoDoEixo::default(),
@@ -482,7 +482,7 @@ impl DataModel {
 
     pub fn send_all<'a>(&'a self, transport: &'a TransportLayer) -> SendAllIterator<'a> {
         let cmpp_data = CmppData {
-            arquivo_de_eixo: &self.arquivo_de_eixo_x,
+            arquivo_de_eixo: &self.arquivo_de_eixo_00,
             configuracao_de_eixo: &self.configuracao_do_eixo_x,
         };
 
@@ -492,7 +492,7 @@ impl DataModel {
     /// Saves data to EEPROM
     pub fn save_to_eeprom(&self) {
         let (next, _size) = self
-            .arquivo_de_eixo_x
+            .arquivo_de_eixo_00
             .save_into_eeprom(Self::INITIAL_ADDRESS);
 
         let (next, _size) = self.configuracao_do_eixo_x.save_into_eeprom(next);
@@ -502,7 +502,7 @@ impl DataModel {
     /// loads data from EEPROM
     pub fn load_from_eeprom(&mut self) {
         let (next, _address) = self
-            .arquivo_de_eixo_x
+            .arquivo_de_eixo_00
             .load_from_eeprom(Self::INITIAL_ADDRESS);
         let (next, _size) = self.configuracao_do_eixo_x.load_from_eeprom(next);
         let (_next, _size) = self.configuracao_do_equipamento.load_from_eeprom(next);
