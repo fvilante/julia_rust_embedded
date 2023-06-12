@@ -22,7 +22,7 @@ progmem! {
     //pub static progmem string CONFIGURACAO_DO_EQUIPAMENTO =     "Configuracao do equipamento ...";
     //pub static progmem string ROTINAS_DE_TESTES_E_VERIFICACAO = "Rotinas de testes e verificacao ...";
 
-    pub static progmem string EDITAR_PROGRAMA_EIXO_X = "Editar programa eixo X...";
+    pub static progmem string EDITAR_PROGRAMA_EIXO_X = "Editar numero do programa do eixo X: ";
     pub static progmem string CONFIGURACAO_EIXO_X = "Configuracao eixo X...";
     pub static progmem string CONFIGURACAO_DO_EQUIPAMENTO = "Configuracao do equipamento...";
 
