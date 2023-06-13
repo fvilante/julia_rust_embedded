@@ -29,12 +29,12 @@ impl Content {
     /// its decimal representation (ie: 65535)
     const SIZE: usize = 6;
 
-    fn from_raw(data: String<{ Self::SIZE }>) -> Self {
+    const fn from_raw(data: String<{ Self::SIZE }>) -> Self {
         Self { data }
     }
 
     /// New empty content
-    fn new() -> Self {
+    const fn new() -> Self {
         Self::from_raw(String::new())
     }
 
