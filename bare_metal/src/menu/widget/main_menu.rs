@@ -1,6 +1,7 @@
 use super::{
     execucao::MenuExecucaoControler,
     manual_mode::{ManualModeMenuControler, ManualModeState},
+    splash::show_communication_error_message,
     submenu_programa::menu_programa_controler::MenuProgramaControler,
     widget::Widget,
 };
@@ -147,10 +148,7 @@ impl<'a, F: FrontPanel> Widget for MainMenu<'a, F> {
                     lcd::print("Por favor aguarde a carga do programa X");
                     for response in self.model.send_all(&self.transport) {
                         if let Err(_e) = response {
-                            lcd::clear();
-                            lcd::set_cursor(0, 0);
-                            lcd::print("Erro de comunicacao serial");
-                            delay_ms(4000);
+                            show_communication_error_message();
                             break;
                         }
                     }

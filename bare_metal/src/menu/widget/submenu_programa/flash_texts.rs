@@ -9,6 +9,8 @@ progmem! {
     pub static progmem string MILIMETROS_POR_SEGUNDO = "mm/s";
     pub static progmem string MILIMETROS_POR_SEGUNDO_AO_QUADRADO = "mm/s2";
 
+    // SPLASH WINDOW
+    //pub static progmem string AGUARDE_CARGA_PROGRAMA_X = "Por favor aguarde a carga do programa X";
 
     // MENU PROGRAMA
 

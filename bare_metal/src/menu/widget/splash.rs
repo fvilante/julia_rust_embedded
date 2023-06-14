@@ -9,6 +9,13 @@ use crate::{
     microcontroler::{delay::delay_ms, timer::now},
 };
 
+pub fn show_communication_error_message() {
+    lcd::clear();
+    lcd::set_cursor(0, 0);
+    lcd::print("Erro de comunicacao serial");
+    delay_ms(4000);
+}
+
 progmem! {
     static progmem string TEXT0 = "Posijet Industria e Comercio Ltda.";
     pub static progmem string POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X = "Por favor aguarde a carga do programa X";
@@ -123,10 +130,7 @@ impl Splash<'_> {
                 // TODO: Move this effect to `update` method when possible
                 for response in self.model.send_all(&self.transport) {
                     if let Err(_e) = response {
-                        lcd::clear();
-                        lcd::set_cursor(0, 0);
-                        lcd::print("Erro de comunicacao serial");
-                        delay_ms(4000);
+                        show_communication_error_message();
                         break;
                     }
                 }
