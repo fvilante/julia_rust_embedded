@@ -10,7 +10,7 @@ use self::{
     memory_map::{BitAddress, BitPosition, BytePosition, WordAddress},
     new_proposal::{
         Acceleration, ActivationState, Adimensional, AxisMode, BinaryManipulator, ByteManipulator,
-        Displacement, FromCmpp, SignalLogic, Time, Velocity, WordManipulator, __Temp,
+        Displacement, FromCmpp, SignalLogic, Time, Velocity, WordManipulator,
     },
 };
 
@@ -137,35 +137,6 @@ pub mod memory_map {
 pub enum TLError {
     PacoteDeRetornoComErro(PacoteDeRetornoComErro),
     DLError(DLError),
-}
-
-pub mod manipulator {
-    use crate::protocol::datalink::datalink::{word16::Word16, Status};
-
-    use super::{
-        cmpp_value::{self, Bit, IntoCmppValue},
-        memory_map::{self, BitAddress, WordAddress},
-        TLError, TransportLayer,
-    };
-
-    pub struct BitSetter<'a> {
-        transport_layer: &'a TransportLayer<'a>,
-        memory_map: BitAddress,
-    }
-
-    impl<'a> BitSetter<'a> {
-        pub fn set<T>(&self, value: T) -> Result<Status, TLError>
-        where
-            T: IntoCmppValue<Bit>,
-        {
-            let properties = self.transport_layer.get_mechanical_properties();
-            let cmpp_value = value.to_cmpp_value(properties);
-            let word_address = self.memory_map;
-            self.transport_layer
-                .safe_datalink()
-                .send_bit(cmpp_value, word_address)
-        }
-    }
 }
 
 /// TODO: When possible refactor to abstract and generalize Manipulators. You shoul also
@@ -319,40 +290,6 @@ pub mod new_proposal {
             const T: u32 = 1024; // See: CMPP's protocol documentation
             let user_value = self.0;
             let cmpp_value: u32 = (user_value as u32 * 1000) / T;
-            self.0
-        }
-    }
-
-    //  ///////////////////////////////////////////////////////////////////////////////////
-    //
-    //      TEMP
-    //
-    //  ///////////////////////////////////////////////////////////////////////////////////
-
-    pub struct __Temp(pub u16);
-
-    impl From<Cursor> for __Temp {
-        fn from(value: Cursor) -> Self {
-            __Temp(0)
-        }
-    }
-
-    impl From<u16> for __Temp {
-        fn from(value: u16) -> Self {
-            __Temp(0)
-        }
-    }
-
-    impl FromCmpp<u16> for __Temp {
-        ///TODO: Fake implementation, not performing physical convertion
-        fn from_cmpp(value: u16, context: MechanicalProperties) -> Self {
-            Self(value)
-        }
-    }
-
-    impl ToCmpp<u16> for __Temp {
-        ///TODO: Fake implementation, not performing physical convertion
-        fn to_cmpp(&self, context: MechanicalProperties) -> u16 {
             self.0
         }
     }
@@ -755,6 +692,7 @@ impl<'a> SafeDatalink<'a> {
         }
     }
 
+    /// Sends a bit to the cmpp
     pub fn send_bit(&self, bit: Bit, map: BitAddress) -> Result<Status, TLError> {
         let bit_mask = 1 << (map.bit_position as u16);
         let response = match bit.into() {
@@ -764,6 +702,7 @@ impl<'a> SafeDatalink<'a> {
         Self::cast_map(response, |pacote_de_retorno| pacote_de_retorno.status)
     }
 
+    /// Sets a word in a given address of the cmpp
     pub fn set_word16(
         &self,
         word_value: Word16,
@@ -775,6 +714,7 @@ impl<'a> SafeDatalink<'a> {
         Self::cast_map(response, |pacote_de_retorno| pacote_de_retorno.status)
     }
 
+    /// Reads a word from the given address of the cmpp
     pub fn get_word16(&self, word_address: WordAddress) -> Result<Word16, TLError> {
         let response = self.datalink.get_word16(word_address.into());
         Self::cast_map(response, |pacote_de_retorno| pacote_de_retorno.data)
@@ -1357,10 +1297,6 @@ impl<'a> TransportLayer<'a> {
         Ok(pos_atual_user_value)
     }
 }
-
-///////////////////////////////////
-
-pub mod investigation_of_pattern {}
 
 //////////////////////////////////////////////////////
 // TESTS
