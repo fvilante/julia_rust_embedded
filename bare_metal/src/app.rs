@@ -147,7 +147,7 @@ pub fn run() -> ! {
     // ///////////////////////////////////////
     //
 
-    fn make_menu<'a>(
+    fn make_menu_controler<'a>(
         menu_programa_arena: &'a MenuProgramaArena,
         data_model: &'a DataModel,
         transport: &'a TransportLayer,
@@ -172,7 +172,7 @@ pub fn run() -> ! {
     }
 
     let menu_programa_arena = MenuProgramaArena::new(&data_model);
-    let menu_controler = make_menu(
+    let menu_controler = make_menu_controler(
         &menu_programa_arena,
         &data_model,
         &transport,

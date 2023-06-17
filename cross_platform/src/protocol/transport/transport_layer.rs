@@ -58,8 +58,6 @@ pub mod cmpp_value {
             }
         }
     }
-
-    pub struct Byte(pub u8);
 }
 
 pub mod memory_map {
