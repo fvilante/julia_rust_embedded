@@ -172,7 +172,7 @@ pub fn run() -> ! {
     }
 
     let menu_programa_arena = MenuProgramaArena::new(&data_model);
-    let menu = make_menu(
+    let menu_controler = make_menu(
         &menu_programa_arena,
         &data_model,
         &transport,
@@ -203,7 +203,7 @@ pub fn run() -> ! {
     fn start_main_loop(
         mut screen_buffer: ScreenBuffer,
         mut keyboard: impl Keyboard,
-        mut menu: impl Widget,
+        mut menu_controler: impl Widget,
         transport: &TransportLayer,
     ) -> ! {
         let fps = 30; // frames_per_second for lcd display redraw -> 30_fps = 200_milisecs
@@ -213,20 +213,20 @@ pub fn run() -> ! {
             if let Some(key) = keyboard.get_key() {
                 match key {
                     KeyCode::KEY_F2 => emit_print_go_signal(&transport),
-                    _ => menu.send_key(key),
+                    _ => menu_controler.send_key(key),
                 }
             }
             // Update calculations
-            menu.update();
+            menu_controler.update();
 
             // Render next frame
             if now() > next_frame {
                 next_frame = now() + (1000 / fps);
-                menu.draw(&mut screen_buffer, Point::new(0, 0));
+                menu_controler.draw(&mut screen_buffer, Point::new(0, 0));
                 screen_buffer.render();
             }
         }
     }
 
-    start_main_loop(screen_buffer, keyboard, menu, &transport)
+    start_main_loop(screen_buffer, keyboard, menu_controler, &transport)
 }
