@@ -19,8 +19,7 @@ pub fn show_communication_error_message() {
 
 progmem! {
     static progmem string TEXT0 = "Posijet Industria e Comercio Ltda.";
-    pub static progmem string POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X = "Por favor aguarde a carga do programa X";
-    pub static progmem string POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_Y = "Por favor aguarde a carga do programa Y";
+    pub static progmem string POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA = "Por favor aguarde a carga do programa ";
 }
 
 // SPLASH SCREEN RECIEPE (from on original TTC3100 Z80):
@@ -149,13 +148,20 @@ pub fn send_all_and_show_user_info_on_screen(
     transport_x: &TransportLayer,
     transport_y: &TransportLayer,
 ) {
+    fn message(line: u8, axis_name: u8) {
+        lcd::clear();
+        lcd::set_cursor(0, line);
+        for c in POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA.chars() {
+            lcd::print_u8(c as u8);
+        }
+        lcd::print_u8(axis_name)
+    }
+
     // **************************
     // Send all data to X-Axis
     // **************************
 
-    lcd::clear();
-    lcd::set_cursor(0, 1);
-    lcd::print("Por favor aguarde a carga do programa X");
+    message(1, b'X');
 
     // TODO: Choose the right `arquivo de eixo` and `config de eixo` to send. Consider
     // the cases when the system have more than one axis, and more than one program
@@ -169,10 +175,7 @@ pub fn send_all_and_show_user_info_on_screen(
     // Send all data to Y-Axis
     // **************************
 
-    lcd::clear();
-    lcd::set_cursor(0, 0);
-    lcd::print("Por favor aguarde a carga do programa Y");
-
+    message(0, b'Y');
     // TODO: Choose the right `arquivo de eixo` and `config de eixo` to send. Consider
     // the cases when the system have more than one axis, and more than one program
     let cmpp_data_y = CmppData {
