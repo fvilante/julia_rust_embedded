@@ -170,7 +170,7 @@ pub fn send_all_and_show_user_info_on_screen(
     // **************************
 
     lcd::clear();
-    lcd::set_cursor(0, 1);
+    lcd::set_cursor(0, 0);
     lcd::print("Por favor aguarde a carga do programa Y");
 
     // TODO: Choose the right `arquivo de eixo` and `config de eixo` to send. Consider
