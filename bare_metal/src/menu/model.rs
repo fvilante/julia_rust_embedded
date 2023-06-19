@@ -543,6 +543,7 @@ pub struct CmppData<'a> {
     pub configuracao_de_eixo: &'a ConfiguracaoDoEixo,
 }
 
+/// TODO: Eventually this function should be place in a better location instead of in this module.
 pub fn send_all(transport: &TransportLayer, data: &CmppData) {
     let CmppData {
         arquivo_de_eixo,

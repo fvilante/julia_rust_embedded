@@ -1,7 +1,7 @@
 use super::{
     execucao::MenuExecucaoControler,
     manual_mode::{ManualModeMenuControler, ManualModeState},
-    splash::show_communication_error_message,
+    splash::{send_all_and_show_user_info_on_screen, show_communication_error_message},
     submenu_programa::menu_programa_controler::MenuProgramaControler,
     widget::Widget,
 };
@@ -147,30 +147,11 @@ impl<'a, F: FrontPanel> Widget for MainMenu<'a, F> {
                 if self.menu_programa_controler.must_return_to_main_menu {
                     self.current_state = State::MainMenu;
                     self.menu_programa_controler.must_return_to_main_menu = false;
-                    // TODO: Choose the right `arquivo de eixo` and `config de eixo` to send. Consider
-                    // the cases when the system have more than one axis, and more than one program
-
-                    // send all data to cmpp when transitioning from menu_programa to main_menu
-                    // TODO: Place the below text in the Flash
-                    lcd::clear();
-                    lcd::set_cursor(0, 1);
-                    lcd::print("Por favor aguarde a carga do programa X");
-
-                    let cmpp_data_x = CmppData {
-                        arquivo_de_eixo: &self.model.arquivo_de_eixo_00,
-                        configuracao_de_eixo: &self.model.configuracao_do_eixo_x,
-                    };
-
-                    lcd::clear();
-                    lcd::set_cursor(0, 1);
-                    lcd::print("Por favor aguarde a carga do programa Y");
-                    send_all(&self.transport_x, &cmpp_data_x);
-
-                    let cmpp_data_y = CmppData {
-                        arquivo_de_eixo: &self.model.arquivo_de_eixo_00,
-                        configuracao_de_eixo: &self.model.configuracao_do_eixo_y,
-                    };
-                    send_all(&self.transport_y, &cmpp_data_y);
+                    send_all_and_show_user_info_on_screen(
+                        self.model,
+                        self.transport_x,
+                        self.transport_y,
+                    );
 
                     // saves data into the eeprom
                     self.model.save_to_eeprom();

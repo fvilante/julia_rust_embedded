@@ -21,7 +21,6 @@ progmem! {
     static progmem string TEXT0 = "Posijet Industria e Comercio Ltda.";
     pub static progmem string POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X = "Por favor aguarde a carga do programa X";
     pub static progmem string POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_Y = "Por favor aguarde a carga do programa Y";
-    static progmem string TEXT2 = "Por favor aguarde a carga do programa Y";
 }
 
 // SPLASH SCREEN RECIEPE (from on original TTC3100 Z80):
@@ -40,9 +39,8 @@ progmem! {
 enum State {
     Initial = 0,
     BrandName = 1,
-    LoadingX = 2,
-    LoadingY = 3,
-    End = 4,
+    Loading = 2,
+    End = 3,
 }
 
 impl State {
@@ -50,9 +48,8 @@ impl State {
         match state {
             0 => Self::Initial,
             1 => Self::BrandName,
-            2 => Self::LoadingX,
-            3 => Self::LoadingY,
-            4 => Self::End,
+            2 => Self::Loading,
+            3 => Self::End,
             _ => Self::End,
         }
     }
@@ -97,8 +94,7 @@ impl<'a> Splash<'a> {
         match current_state {
             State::Initial => 0,
             State::BrandName => 2000,
-            State::LoadingX => 2000,
-            State::LoadingY => 0,
+            State::Loading => 2000,
             State::End => 0,
         }
     }
@@ -132,38 +128,66 @@ impl Splash<'_> {
                 screen_buffer.set_cursor(Point::new(4, 0));
                 screen_buffer.print(FlashString::new(&TEXT0));
             }
-            State::LoadingX => {
-                screen_buffer.set_cursor(Point::new(0, 1));
-                screen_buffer.print(FlashString::new(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X));
-                screen_buffer.render();
-                // TODO: Move this effect to `update` method when possible
+            State::Loading => send_all_and_show_user_info_on_screen(
+                self.model,
+                //screen_buffer,
+                self.transport_x,
+                self.transport_y,
+            ),
 
-                // TODO: Choose the right `arquivo de eixo` and `config de eixo` to send. Consider
-                // the cases when the system have more than one axis, and more than one program
-                let cmpp_data_x = CmppData {
-                    arquivo_de_eixo: &self.model.arquivo_de_eixo_00,
-                    configuracao_de_eixo: &self.model.configuracao_do_eixo_x,
-                };
-                send_all(&self.transport_x, &cmpp_data_x);
-
-                screen_buffer.clear();
-                screen_buffer.set_cursor(Point::new(0, 0));
-                screen_buffer.print(FlashString::new(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_Y));
-                screen_buffer.render();
-
-                let cmpp_data_y = CmppData {
-                    arquivo_de_eixo: &self.model.arquivo_de_eixo_00,
-                    configuracao_de_eixo: &self.model.configuracao_do_eixo_y,
-                };
-                send_all(&self.transport_y, &cmpp_data_y);
-            }
-            State::LoadingY => {
-                screen_buffer.set_cursor(Point::new(0, 0));
-                screen_buffer.print(FlashString::new(&TEXT2));
-            }
             State::End => {
                 // do nothing
             }
         }
     }
+}
+
+/// TODO: Eventually this function should be place in a better location instead of in this module.
+pub fn send_all_and_show_user_info_on_screen(
+    model: &DataModel,
+    //screen_buffer: &mut ScreenBuffer,
+    transport_x: &TransportLayer,
+    transport_y: &TransportLayer,
+) {
+    // TODO: Check if it is necessary to move this effect to `update` method.
+
+    // TODO: Choose the right `arquivo de eixo` and `config de eixo` to send. Consider
+    // the cases when the system have more than one axis, and more than one program
+
+    // **************************
+    // Send all data to X-Axis
+    // **************************
+
+    //screen_buffer.set_cursor(Point::new(0, 1));
+    //screen_buffer.print(FlashString::new(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X));
+    //screen_buffer.render();
+
+    lcd::clear();
+    lcd::set_cursor(0, 1);
+    lcd::print("Por favor aguarde a carga do programa X");
+
+    let cmpp_data_x = CmppData {
+        arquivo_de_eixo: &model.arquivo_de_eixo_00,
+        configuracao_de_eixo: &model.configuracao_do_eixo_x,
+    };
+    send_all(&transport_x, &cmpp_data_x);
+
+    // **************************
+    // Send all data to Y-Axis
+    // **************************
+
+    //screen_buffer.clear();
+    //screen_buffer.set_cursor(Point::new(0, 0));
+    //screen_buffer.print(FlashString::new(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_Y));
+    //screen_buffer.render();
+
+    lcd::clear();
+    lcd::set_cursor(0, 1);
+    lcd::print("Por favor aguarde a carga do programa Y");
+
+    let cmpp_data_y = CmppData {
+        arquivo_de_eixo: &model.arquivo_de_eixo_00,
+        configuracao_de_eixo: &model.configuracao_do_eixo_y,
+    };
+    send_all(&transport_y, &cmpp_data_y);
 }
