@@ -149,23 +149,16 @@ pub fn send_all_and_show_user_info_on_screen(
     transport_x: &TransportLayer,
     transport_y: &TransportLayer,
 ) {
-    // TODO: Check if it is necessary to move this effect to `update` method.
-
-    // TODO: Choose the right `arquivo de eixo` and `config de eixo` to send. Consider
-    // the cases when the system have more than one axis, and more than one program
-
     // **************************
     // Send all data to X-Axis
     // **************************
-
-    //screen_buffer.set_cursor(Point::new(0, 1));
-    //screen_buffer.print(FlashString::new(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X));
-    //screen_buffer.render();
 
     lcd::clear();
     lcd::set_cursor(0, 1);
     lcd::print("Por favor aguarde a carga do programa X");
 
+    // TODO: Choose the right `arquivo de eixo` and `config de eixo` to send. Consider
+    // the cases when the system have more than one axis, and more than one program
     let cmpp_data_x = CmppData {
         arquivo_de_eixo: &model.arquivo_de_eixo_00,
         configuracao_de_eixo: &model.configuracao_do_eixo_x,
@@ -176,15 +169,12 @@ pub fn send_all_and_show_user_info_on_screen(
     // Send all data to Y-Axis
     // **************************
 
-    //screen_buffer.clear();
-    //screen_buffer.set_cursor(Point::new(0, 0));
-    //screen_buffer.print(FlashString::new(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_Y));
-    //screen_buffer.render();
-
     lcd::clear();
     lcd::set_cursor(0, 1);
     lcd::print("Por favor aguarde a carga do programa Y");
 
+    // TODO: Choose the right `arquivo de eixo` and `config de eixo` to send. Consider
+    // the cases when the system have more than one axis, and more than one program
     let cmpp_data_y = CmppData {
         arquivo_de_eixo: &model.arquivo_de_eixo_00,
         configuracao_de_eixo: &model.configuracao_do_eixo_y,
