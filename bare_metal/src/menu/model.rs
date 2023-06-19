@@ -514,15 +514,6 @@ impl DataModel {
         }
     }
 
-    pub fn send_all<'a>(&'a self, transport: &'a TransportLayer) -> SendAllIterator<'a> {
-        let cmpp_data = CmppData {
-            arquivo_de_eixo: &self.get_arquivo_de_eixo_by_ref(),
-            configuracao_de_eixo: &self.configuracao_do_eixo_x,
-        };
-
-        SendAllIterator::new(cmpp_data, transport)
-    }
-
     /// Saves data to EEPROM
     pub fn save_to_eeprom(&self) {
         let initial_address = self.get_initial_eeprom_address();
@@ -548,263 +539,192 @@ impl DataModel {
 /////
 
 pub struct CmppData<'a> {
-    arquivo_de_eixo: &'a ArquivoDeEixo,
-    configuracao_de_eixo: &'a ConfiguracaoDoEixo,
+    pub arquivo_de_eixo: &'a ArquivoDeEixo,
+    pub configuracao_de_eixo: &'a ConfiguracaoDoEixo,
 }
 
-/// Sends all local cmpp parameters to the cmpp board (iterator)
-pub struct SendAllIterator<'a> {
-    // counts the current item to sent (starts at index -1 and it pre-increments counter)
-    counter: i8,
-    cmpp_data: CmppData<'a>,
-    transport: &'a TransportLayer<'a>,
-}
+pub fn send_all(transport: &TransportLayer, data: &CmppData) {
+    let CmppData {
+        arquivo_de_eixo,
+        configuracao_de_eixo,
+    } = data;
 
-impl<'a> SendAllIterator<'a> {
-    pub fn new(cmpp_data: CmppData<'a>, transport: &'a TransportLayer) -> Self {
-        Self {
-            counter: -1,
-            cmpp_data,
-            transport,
-        }
-    }
-}
+    transport
+        .posicao_inicial()
+        .set(arquivo_de_eixo.posicao_inicial.get().into());
 
-impl<'a> Iterator for SendAllIterator<'a> {
-    type Item = Result<Status, TLError>;
+    transport
+        .posicao_final()
+        .set(arquivo_de_eixo.posicao_final.get().into());
 
-    fn next(&mut self) -> Option<Self::Item> {
-        let CmppData {
-            arquivo_de_eixo,
-            configuracao_de_eixo,
-        } = self.cmpp_data;
+    transport
+        .aceleracao_de_avanco()
+        .set(arquivo_de_eixo.aceleracao_de_avanco.get().into());
 
-        let transport = self.transport;
+    transport
+        .aceleracao_de_retorno()
+        .set(arquivo_de_eixo.aceleracao_de_retorno.get().into());
 
-        self.counter += 1; // pre-increment
+    transport
+        .velocidade_de_avanco()
+        .set(arquivo_de_eixo.velocidade_de_avanco.get().into());
 
-        match self.counter {
-            0 => Some(
-                transport
-                    .posicao_inicial()
-                    .set(arquivo_de_eixo.posicao_inicial.get().into()),
-            ),
-            1 => Some(
-                transport
-                    .posicao_final()
-                    .set(arquivo_de_eixo.posicao_final.get().into()),
-            ),
-            2 => Some(
-                transport
-                    .aceleracao_de_avanco()
-                    .set(arquivo_de_eixo.aceleracao_de_avanco.get().into()),
-            ),
-            3 => Some(
-                transport
-                    .aceleracao_de_retorno()
-                    .set(arquivo_de_eixo.aceleracao_de_retorno.get().into()),
-            ),
-            4 => Some(
-                transport
-                    .velocidade_de_avanco()
-                    .set(arquivo_de_eixo.velocidade_de_avanco.get().into()),
-            ),
-            5 => Some(
-                transport
-                    .velocidade_de_retorno()
-                    .set(arquivo_de_eixo.velocidade_de_retorno.get().into()),
-            ),
-            6 => Some(
-                transport
-                    .numero_de_mensagem_no_avanco()
-                    .set(arquivo_de_eixo.numero_de_mensagem_no_avanco.get().into()),
-            ),
-            7 => Some(
-                transport
-                    .numero_de_mensagem_no_retorno()
-                    .set(arquivo_de_eixo.numero_de_mensagem_no_retorno.get().into()),
-            ),
-            8 => Some(
-                transport
-                    .primeira_mensagem_no_avanco()
-                    .set(arquivo_de_eixo.primeira_mensagem_no_avanco.get().into()),
-            ),
-            9 => Some(
-                transport
-                    .ultima_mensagem_no_avanco()
-                    .set(arquivo_de_eixo.ultima_mensagem_no_avanco.get().into()),
-            ),
-            10 => Some(
-                transport
-                    .primeira_mensagem_no_retorno()
-                    .set(arquivo_de_eixo.primeira_mensagem_no_retorno.get().into()),
-            ),
-            11 => Some(
-                transport
-                    .ultima_mensagem_no_retorno()
-                    .set(arquivo_de_eixo.ultima_mensagem_no_retorno.get().into()),
-            ),
-            12 => Some(
-                transport
-                    .logica_do_sinal_de_impressao()
-                    .set(arquivo_de_eixo.logica_do_sinal_de_impressao.get().into()),
-            ),
-            13 => Some(
-                transport
-                    .largura_do_sinal_de_impressao()
-                    .set(arquivo_de_eixo.largura_do_sinal_de_impressao.get().into()),
-            ),
-            14 => Some(
-                transport
-                    .reversao_de_mensagem_via_serial()
-                    .set(arquivo_de_eixo.reversao_de_mensagem_via_serial.get().into()),
-            ),
-            15 => Some(
-                transport
-                    .selecao_de_mensagem_via_serial()
-                    .set(arquivo_de_eixo.selecao_de_mensagem_via_serial.get().into()),
-            ),
-            16 => Some(
-                transport
-                    .retardo_no_start_automatico()
-                    .set(arquivo_de_eixo.retardo_no_start_automatico.get().into()),
-            ),
-            17 => Some(
-                transport
-                    .retardo_no_start_externo()
-                    .set(arquivo_de_eixo.retardo_no_start_externo.get().into()),
-            ),
-            18 => Some(
-                transport
-                    .start_automatico_no_avanco()
-                    .set(arquivo_de_eixo.start_automatico_no_avanco.get().into()),
-            ),
-            19 => Some(
-                transport
-                    .start_automatico_no_retorno()
-                    .set(arquivo_de_eixo.start_automatico_no_retorno.get().into()),
-            ),
-            20 => Some(
-                transport
-                    .modo_de_trabalho_do_eixo()
-                    .set(arquivo_de_eixo.modo_de_trabalho_do_eixo.get().into()),
-            ),
-            21 => Some(
-                transport
-                    .antecipacao_da_saida_de_start()
-                    .set(arquivo_de_eixo.antecipacao_da_saida_de_start.get().into()),
-            ),
-            22 => Some(
-                transport
-                    .saida_de_start_no_avaco()
-                    .set(arquivo_de_eixo.saida_de_start_no_avaco.get().into()),
-            ),
-            23 => Some(
-                transport
-                    .saida_de_start_no_retorno()
-                    .set(arquivo_de_eixo.saida_de_start_no_retorno.get().into()),
-            ),
-            24 => Some(
-                transport
-                    .entrada_de_start_entre_eixos()
-                    .set(arquivo_de_eixo.entrada_de_start_entre_eixos.get().into()),
-            ),
-            25 => Some(
-                transport
-                    .retardo_do_start_entre_eixos()
-                    .set(arquivo_de_eixo.retardo_do_start_entre_eixos.get().into()),
-            ),
-            26 => Some(
-                transport
-                    .start_pelo_teclado_e_externo()
-                    .set(arquivo_de_eixo.start_pelo_teclado_e_externo.get().into()),
-            ),
-            27 => Some(
-                transport
-                    .retardo_no_sinal_de_impressao()
-                    .set(arquivo_de_eixo.retardo_no_sinal_de_impressao.get().into()),
-            ),
-            28 => Some(
-                transport
-                    .retardo_no_start_passo_a_passo()
-                    .set(arquivo_de_eixo.retardo_no_start_passo_a_passo.get().into()),
-            ),
-            29 => Some(
-                transport
-                    .start_automatico_passo_a_passo()
-                    .set(arquivo_de_eixo.start_automatico_passo_a_passo.get().into()),
-            ),
-            30 => Some(
-                transport
-                    .saida_de_start_passo_a_passo()
-                    .set(arquivo_de_eixo.saida_de_start_passo_a_passo.get().into()),
-            ),
-            31 => Some(
-                transport
-                    .janela_de_protecao_do_giro()
-                    .set(configuracao_de_eixo.janela_de_protecao_do_giro.get().into()),
-            ),
-            32 => Some(
-                transport
-                    .deslocamento_giro_do_motor()
-                    .set(configuracao_de_eixo.deslocamento_giro_do_motor.get().into()),
-            ),
-            33 => Some(
-                transport.giro_com_funcao_de_protecao().set(
-                    configuracao_de_eixo
-                        .giro_com_funcao_de_protecao
-                        .get()
-                        .into(),
-                ),
-            ),
-            34 => Some(
-                transport.giro_com_funcao_de_correcao().set(
-                    configuracao_de_eixo
-                        .giro_com_funcao_de_correcao
-                        .get()
-                        .into(),
-                ),
-            ),
-            35 => Some(
-                transport
-                    .logica_do_start_externo()
-                    .set(configuracao_de_eixo.logica_do_start_externo.get().into()),
-            ),
-            36 => Some(
-                transport.valor_da_posicao_de_referencia().set(
-                    configuracao_de_eixo
-                        .valor_da_posicao_de_referencia
-                        .get()
-                        .into(),
-                ),
-            ),
-            37 => Some(
-                transport
-                    .velocidade_para_referencia()
-                    .set(configuracao_de_eixo.velocidade_para_referencia.get().into()),
-            ),
-            38 => Some(
-                transport
-                    .aceleracao_para_referencia()
-                    .set(configuracao_de_eixo.aceleracao_para_referencia.get().into()),
-            ),
-            39 => Some(
-                transport.reducao_da_corrente_em_repouso().set(
-                    configuracao_de_eixo
-                        .reducao_da_corrente_em_repouso
-                        .get()
-                        .into(),
-                ),
-            ),
-            40 => Some(
-                transport.referencia_pelo_start_externo().set(
-                    configuracao_de_eixo
-                        .referencia_pelo_start_externo
-                        .get()
-                        .into(),
-                ),
-            ),
-            _ => None,
-        }
-    }
+    transport
+        .velocidade_de_retorno()
+        .set(arquivo_de_eixo.velocidade_de_retorno.get().into());
+
+    transport
+        .numero_de_mensagem_no_avanco()
+        .set(arquivo_de_eixo.numero_de_mensagem_no_avanco.get().into());
+
+    transport
+        .numero_de_mensagem_no_retorno()
+        .set(arquivo_de_eixo.numero_de_mensagem_no_retorno.get().into());
+
+    transport
+        .primeira_mensagem_no_avanco()
+        .set(arquivo_de_eixo.primeira_mensagem_no_avanco.get().into());
+
+    transport
+        .ultima_mensagem_no_avanco()
+        .set(arquivo_de_eixo.ultima_mensagem_no_avanco.get().into());
+
+    transport
+        .primeira_mensagem_no_retorno()
+        .set(arquivo_de_eixo.primeira_mensagem_no_retorno.get().into());
+
+    transport
+        .ultima_mensagem_no_retorno()
+        .set(arquivo_de_eixo.ultima_mensagem_no_retorno.get().into());
+
+    transport
+        .logica_do_sinal_de_impressao()
+        .set(arquivo_de_eixo.logica_do_sinal_de_impressao.get().into());
+
+    transport
+        .largura_do_sinal_de_impressao()
+        .set(arquivo_de_eixo.largura_do_sinal_de_impressao.get().into());
+
+    transport
+        .reversao_de_mensagem_via_serial()
+        .set(arquivo_de_eixo.reversao_de_mensagem_via_serial.get().into());
+
+    transport
+        .selecao_de_mensagem_via_serial()
+        .set(arquivo_de_eixo.selecao_de_mensagem_via_serial.get().into());
+
+    transport
+        .retardo_no_start_automatico()
+        .set(arquivo_de_eixo.retardo_no_start_automatico.get().into());
+
+    transport
+        .retardo_no_start_externo()
+        .set(arquivo_de_eixo.retardo_no_start_externo.get().into());
+
+    transport
+        .start_automatico_no_avanco()
+        .set(arquivo_de_eixo.start_automatico_no_avanco.get().into());
+
+    transport
+        .start_automatico_no_retorno()
+        .set(arquivo_de_eixo.start_automatico_no_retorno.get().into());
+
+    transport
+        .modo_de_trabalho_do_eixo()
+        .set(arquivo_de_eixo.modo_de_trabalho_do_eixo.get().into());
+
+    transport
+        .antecipacao_da_saida_de_start()
+        .set(arquivo_de_eixo.antecipacao_da_saida_de_start.get().into());
+
+    transport
+        .saida_de_start_no_avaco()
+        .set(arquivo_de_eixo.saida_de_start_no_avaco.get().into());
+
+    transport
+        .saida_de_start_no_retorno()
+        .set(arquivo_de_eixo.saida_de_start_no_retorno.get().into());
+
+    transport
+        .entrada_de_start_entre_eixos()
+        .set(arquivo_de_eixo.entrada_de_start_entre_eixos.get().into());
+
+    transport
+        .retardo_do_start_entre_eixos()
+        .set(arquivo_de_eixo.retardo_do_start_entre_eixos.get().into());
+
+    transport
+        .start_pelo_teclado_e_externo()
+        .set(arquivo_de_eixo.start_pelo_teclado_e_externo.get().into());
+
+    transport
+        .retardo_no_sinal_de_impressao()
+        .set(arquivo_de_eixo.retardo_no_sinal_de_impressao.get().into());
+
+    transport
+        .retardo_no_start_passo_a_passo()
+        .set(arquivo_de_eixo.retardo_no_start_passo_a_passo.get().into());
+
+    transport
+        .start_automatico_passo_a_passo()
+        .set(arquivo_de_eixo.start_automatico_passo_a_passo.get().into());
+
+    transport
+        .saida_de_start_passo_a_passo()
+        .set(arquivo_de_eixo.saida_de_start_passo_a_passo.get().into());
+
+    transport
+        .janela_de_protecao_do_giro()
+        .set(configuracao_de_eixo.janela_de_protecao_do_giro.get().into());
+
+    transport
+        .deslocamento_giro_do_motor()
+        .set(configuracao_de_eixo.deslocamento_giro_do_motor.get().into());
+
+    transport.giro_com_funcao_de_protecao().set(
+        configuracao_de_eixo
+            .giro_com_funcao_de_protecao
+            .get()
+            .into(),
+    );
+
+    transport.giro_com_funcao_de_correcao().set(
+        configuracao_de_eixo
+            .giro_com_funcao_de_correcao
+            .get()
+            .into(),
+    );
+
+    transport
+        .logica_do_start_externo()
+        .set(configuracao_de_eixo.logica_do_start_externo.get().into());
+
+    transport.valor_da_posicao_de_referencia().set(
+        configuracao_de_eixo
+            .valor_da_posicao_de_referencia
+            .get()
+            .into(),
+    );
+
+    transport
+        .velocidade_para_referencia()
+        .set(configuracao_de_eixo.velocidade_para_referencia.get().into());
+
+    transport
+        .aceleracao_para_referencia()
+        .set(configuracao_de_eixo.aceleracao_para_referencia.get().into());
+
+    transport.reducao_da_corrente_em_repouso().set(
+        configuracao_de_eixo
+            .reducao_da_corrente_em_repouso
+            .get()
+            .into(),
+    );
+
+    transport.referencia_pelo_start_externo().set(
+        configuracao_de_eixo
+            .referencia_pelo_start_externo
+            .get()
+            .into(),
+    );
 }

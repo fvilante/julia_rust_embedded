@@ -5,7 +5,10 @@ use super::{
     submenu_programa::menu_programa_controler::MenuProgramaControler,
     widget::Widget,
 };
-use crate::board::front_panel::FrontPanel;
+use crate::{
+    board::front_panel::FrontPanel,
+    menu::model::{send_all, CmppData},
+};
 
 use crate::geometry::point::Point;
 use crate::string::flash::FlashString;
@@ -146,12 +149,15 @@ impl<'a, F: FrontPanel> Widget for MainMenu<'a, F> {
                     lcd::clear();
                     lcd::set_cursor(0, 1);
                     lcd::print("Por favor aguarde a carga do programa X");
-                    for response in self.model.send_all(&self.transport) {
-                        if let Err(_e) = response {
-                            show_communication_error_message();
-                            break;
-                        }
-                    }
+
+                    // TODO: Choose the right `arquivo de eixo` and `config de eixo` to send. Consider
+                    // the cases when the system have more than one axis, and more than one program
+                    let cmpp_data = CmppData {
+                        arquivo_de_eixo: &self.model.arquivo_de_eixo_00,
+                        configuracao_de_eixo: &self.model.configuracao_do_eixo_x,
+                    };
+                    send_all(&self.transport, &cmpp_data);
+
                     // saves data into the eeprom
                     self.model.save_to_eeprom();
                 } else {

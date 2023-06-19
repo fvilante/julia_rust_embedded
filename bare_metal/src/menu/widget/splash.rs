@@ -2,6 +2,7 @@ use avr_progmem::progmem;
 use cross_platform::protocol::transport::transport_layer::TransportLayer;
 
 use crate::geometry::point::Point;
+use crate::menu::model::{send_all, CmppData};
 use crate::string::flash::FlashString;
 use crate::{
     board::{keypad::KeyCode, lcd},
@@ -128,12 +129,14 @@ impl Splash<'_> {
                 screen_buffer.set_cursor(Point::new(0, 1));
                 screen_buffer.print(FlashString::new(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X));
                 // TODO: Move this effect to `update` method when possible
-                for response in self.model.send_all(&self.transport) {
-                    if let Err(_e) = response {
-                        show_communication_error_message();
-                        break;
-                    }
-                }
+
+                // TODO: Choose the right `arquivo de eixo` and `config de eixo` to send. Consider
+                // the cases when the system have more than one axis, and more than one program
+                let cmpp_data = CmppData {
+                    arquivo_de_eixo: &self.model.arquivo_de_eixo_00,
+                    configuracao_de_eixo: &self.model.configuracao_do_eixo_x,
+                };
+                send_all(&self.transport, &cmpp_data);
             }
             State::LoadingY => {
                 screen_buffer.set_cursor(Point::new(0, 0));
