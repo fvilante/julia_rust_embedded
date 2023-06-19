@@ -238,12 +238,27 @@ impl SubmenuLayout for MenuPrograma<'_> {
                 })
             }
 
-            1 => MenuItemBuilder::make_simple_menu(SimpleMenu {
+            1 => {
+                MenuItemBuilder::make_simple_menu_with_parameter(SimpleMenuWithNumericalParameter {
+                    parameter_name: FlashString::new(&EDITAR_PROGRAMA_EIXO_Y),
+                    child_menu: MenuProgramaAreanaSelector::MenuArquivoDeEixo,
+                    unit_of_measurement_text: None,
+                    valid_range: 0..99,
+                    variable: (37, &self.model.gui_state.numero_do_programa_do_eixo_y),
+                })
+            }
+
+            2 => MenuItemBuilder::make_simple_menu(SimpleMenu {
                 parent_name: FlashString::new(&CONFIGURACAO_EIXO_X),
                 child_menu: MenuProgramaAreanaSelector::MenuConfiguracaoDeEixo,
             }),
 
-            2 => MenuItemBuilder::make_simple_menu(SimpleMenu {
+            3 => MenuItemBuilder::make_simple_menu(SimpleMenu {
+                parent_name: FlashString::new(&CONFIGURACAO_EIXO_Y),
+                child_menu: MenuProgramaAreanaSelector::MenuConfiguracaoDeEixo,
+            }),
+
+            4 => MenuItemBuilder::make_simple_menu(SimpleMenu {
                 parent_name: FlashString::new(&CONFIGURACAO_DO_EQUIPAMENTO),
                 child_menu: MenuProgramaAreanaSelector::MenuConfiguracaoDoEquipamento,
             }),

@@ -9,8 +9,6 @@ progmem! {
     pub static progmem string MILIMETROS_POR_SEGUNDO = "mm/s";
     pub static progmem string MILIMETROS_POR_SEGUNDO_AO_QUADRADO = "mm/s2";
 
-    // SPLASH WINDOW
-    //pub static progmem string AGUARDE_CARGA_PROGRAMA_X = "Por favor aguarde a carga do programa X";
 
     // MENU PROGRAMA
 
@@ -25,7 +23,9 @@ progmem! {
     //pub static progmem string ROTINAS_DE_TESTES_E_VERIFICACAO = "Rotinas de testes e verificacao ...";
 
     pub static progmem string EDITAR_PROGRAMA_EIXO_X = "Editar numero do programa do eixo X: ";
+    pub static progmem string EDITAR_PROGRAMA_EIXO_Y = "Editar numero do programa do eixo Y: ";
     pub static progmem string CONFIGURACAO_EIXO_X = "Configuracao eixo X...";
+    pub static progmem string CONFIGURACAO_EIXO_Y = "Configuracao eixo Y...";
     pub static progmem string CONFIGURACAO_DO_EQUIPAMENTO = "Configuracao do equipamento...";
 
 
