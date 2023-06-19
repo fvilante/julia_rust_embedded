@@ -457,7 +457,7 @@ pub struct DataModel {
     pub arquivo_de_eixo_01: ArquivoDeEixo,
     //pub arquivo_de_eixo_y: ArquivoDeEixo,
     pub configuracao_do_eixo_x: ConfiguracaoDoEixo,
-    //pub configuracao_do_eixo_y: ConfiguracaoDoEixo,
+    pub configuracao_do_eixo_y: ConfiguracaoDoEixo,
     pub configuracao_do_equipamento: ConfiguracaoDoEquipamento,
     // parametros the GUI (graphical user interface)
     pub gui_state: GuiState,
@@ -473,7 +473,7 @@ impl DataModel {
             arquivo_de_eixo_01: ArquivoDeEixo::default(),
             //arquivo_de_eixo_y: ArquivoDeEixo::default(),
             configuracao_do_eixo_x: ConfiguracaoDoEixo::default(),
-            //configuracao_do_eixo_y: ConfiguracaoDoEixo::default(),
+            configuracao_do_eixo_y: ConfiguracaoDoEixo::default(),
             configuracao_do_equipamento: ConfiguracaoDoEquipamento::default(),
             gui_state: GuiState::default(),
         }

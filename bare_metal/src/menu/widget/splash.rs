@@ -20,6 +20,7 @@ pub fn show_communication_error_message() {
 progmem! {
     static progmem string TEXT0 = "Posijet Industria e Comercio Ltda.";
     pub static progmem string POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X = "Por favor aguarde a carga do programa X";
+    pub static progmem string POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_Y = "Por favor aguarde a carga do programa Y";
     static progmem string TEXT2 = "Por favor aguarde a carga do programa Y";
 }
 
@@ -71,17 +72,23 @@ pub struct Splash<'a> {
     current_state: State,
     next_state_time_point: u32,
     model: &'a DataModel,
-    transport: &'a TransportLayer<'a>,
+    transport_x: &'a TransportLayer<'a>,
+    transport_y: &'a TransportLayer<'a>,
 }
 
 impl<'a> Splash<'a> {
-    pub fn new(model: &'a DataModel, transport: &'a TransportLayer<'a>) -> Self {
+    pub fn new(
+        model: &'a DataModel,
+        transport_x: &'a TransportLayer<'a>,
+        transport_y: &'a TransportLayer<'a>,
+    ) -> Self {
         let initial_state = State::Initial;
         Self {
             current_state: initial_state,
             next_state_time_point: now() as u32 + Self::get_time_to_wait_in(initial_state),
             model,
-            transport,
+            transport_x,
+            transport_y,
         }
     }
 
@@ -128,15 +135,27 @@ impl Splash<'_> {
             State::LoadingX => {
                 screen_buffer.set_cursor(Point::new(0, 1));
                 screen_buffer.print(FlashString::new(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_X));
+                screen_buffer.render();
                 // TODO: Move this effect to `update` method when possible
 
                 // TODO: Choose the right `arquivo de eixo` and `config de eixo` to send. Consider
                 // the cases when the system have more than one axis, and more than one program
-                let cmpp_data = CmppData {
+                let cmpp_data_x = CmppData {
                     arquivo_de_eixo: &self.model.arquivo_de_eixo_00,
                     configuracao_de_eixo: &self.model.configuracao_do_eixo_x,
                 };
-                send_all(&self.transport, &cmpp_data);
+                send_all(&self.transport_x, &cmpp_data_x);
+
+                screen_buffer.clear();
+                screen_buffer.set_cursor(Point::new(0, 0));
+                screen_buffer.print(FlashString::new(&POR_FAVOR_AGUARDE_CARGA_DO_PROGRAMA_Y));
+                screen_buffer.render();
+
+                let cmpp_data_y = CmppData {
+                    arquivo_de_eixo: &self.model.arquivo_de_eixo_00,
+                    configuracao_de_eixo: &self.model.configuracao_do_eixo_y,
+                };
+                send_all(&self.transport_y, &cmpp_data_y);
             }
             State::LoadingY => {
                 screen_buffer.set_cursor(Point::new(0, 0));

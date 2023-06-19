@@ -39,7 +39,8 @@ pub struct MainMenu<'a, F: FrontPanel> {
     menu_manual_controler: ManualModeMenuControler<'a>,
     menu_execucao_controler: MenuExecucaoControler<'a>,
     menu_programa_controler: MenuProgramaControler<'a>,
-    transport: &'a TransportLayer<'a>,
+    transport_x: &'a TransportLayer<'a>,
+    transport_y: &'a TransportLayer<'a>,
     model: &'a DataModel,
     //TODO: We're just controling 3 Leds (Execucao, Manual, Programa), better would be to wrap
     //the type 'FrontPanel' into an abstract class.
@@ -51,7 +52,8 @@ impl<'a, F: FrontPanel> MainMenu<'a, F> {
         menu_manual_controler: ManualModeMenuControler<'a>,
         menu_execucao_controler: MenuExecucaoControler<'a>,
         menu_programa_controler: MenuProgramaControler<'a>,
-        transport: &'a TransportLayer<'a>,
+        transport_x: &'a TransportLayer<'a>,
+        transport_y: &'a TransportLayer<'a>,
         model: &'a DataModel,
         front_panel_leds: &'a mut F,
     ) -> Self {
@@ -60,7 +62,8 @@ impl<'a, F: FrontPanel> MainMenu<'a, F> {
             menu_manual_controler,
             menu_execucao_controler,
             menu_programa_controler,
-            transport,
+            transport_x,
+            transport_y,
             model,
             front_panel_leds,
         }
@@ -144,19 +147,30 @@ impl<'a, F: FrontPanel> Widget for MainMenu<'a, F> {
                 if self.menu_programa_controler.must_return_to_main_menu {
                     self.current_state = State::MainMenu;
                     self.menu_programa_controler.must_return_to_main_menu = false;
+                    // TODO: Choose the right `arquivo de eixo` and `config de eixo` to send. Consider
+                    // the cases when the system have more than one axis, and more than one program
+
                     // send all data to cmpp when transitioning from menu_programa to main_menu
                     // TODO: Place the below text in the Flash
                     lcd::clear();
                     lcd::set_cursor(0, 1);
                     lcd::print("Por favor aguarde a carga do programa X");
 
-                    // TODO: Choose the right `arquivo de eixo` and `config de eixo` to send. Consider
-                    // the cases when the system have more than one axis, and more than one program
-                    let cmpp_data = CmppData {
+                    let cmpp_data_x = CmppData {
                         arquivo_de_eixo: &self.model.arquivo_de_eixo_00,
                         configuracao_de_eixo: &self.model.configuracao_do_eixo_x,
                     };
-                    send_all(&self.transport, &cmpp_data);
+
+                    lcd::clear();
+                    lcd::set_cursor(0, 1);
+                    lcd::print("Por favor aguarde a carga do programa Y");
+                    send_all(&self.transport_x, &cmpp_data_x);
+
+                    let cmpp_data_y = CmppData {
+                        arquivo_de_eixo: &self.model.arquivo_de_eixo_00,
+                        configuracao_de_eixo: &self.model.configuracao_do_eixo_y,
+                    };
+                    send_all(&self.transport_y, &cmpp_data_y);
 
                     // saves data into the eeprom
                     self.model.save_to_eeprom();

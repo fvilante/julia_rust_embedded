@@ -131,16 +131,26 @@ pub fn run() -> ! {
 
     const TIMEOUT_MS: u16 = 1000; // TODO: Maybe this value in future be calculated as a function of the connection baud rate
 
-    let mechanical_properties = MechanicalProperties {
+    let mechanical_properties_x = MechanicalProperties {
         pulses_per_motor_revolution: 400,
         linear_displacement_per_tooth_belt_mult_by_100: 508,
         number_of_tooths_of_motor_pulley: 16,
     };
 
-    let ch = data_model.configuracao_do_eixo_x.numero_do_canal.get();
-    let channel = Channel::from_u16(ch).unwrap_or_default();
-    let cmpp_axis = CmppAxis::new(baudrate, channel, TIMEOUT_MS, mechanical_properties);
-    let transport = cmpp_axis.get_transport_layer();
+    let mechanical_properties_y = MechanicalProperties {
+        pulses_per_motor_revolution: 400,
+        linear_displacement_per_tooth_belt_mult_by_100: 508,
+        number_of_tooths_of_motor_pulley: 16,
+    };
+
+    let ch_x = data_model.configuracao_do_eixo_x.numero_do_canal.get();
+    let ch_y = data_model.configuracao_do_eixo_y.numero_do_canal.get();
+    let channel_x = Channel::from_u16(ch_x).unwrap_or_default();
+    let channel_y = Channel::from_u16(ch_y).unwrap_or_default();
+    let cmpp_axis_x = CmppAxis::new(baudrate, channel_x, TIMEOUT_MS, mechanical_properties_x);
+    let cmpp_axis_y = CmppAxis::new(baudrate, channel_y, TIMEOUT_MS, mechanical_properties_y);
+    let transport_x = cmpp_axis_x.get_transport_layer();
+    let transport_y = cmpp_axis_y.get_transport_layer();
 
     // ///////////////////////////////////////
     //  Main menu mounting
@@ -150,7 +160,8 @@ pub fn run() -> ! {
     fn make_menu_controler<'a>(
         menu_programa_arena: &'a MenuProgramaArena,
         data_model: &'a DataModel,
-        transport: &'a TransportLayer,
+        transport_x: &'a TransportLayer,
+        transport_y: &'a TransportLayer,
         front_panel: &'a mut impl FrontPanel,
     ) -> impl Widget + 'a {
         // menu root
@@ -158,14 +169,15 @@ pub fn run() -> ! {
         // child menus
         let menu_programa_controler =
             MenuProgramaControler::new(initial_menu_selector, &menu_programa_arena);
-        let menu_manual_controler = ManualModeMenuControler::new(&transport);
-        let menu_execucao_controler = MenuExecucaoControler::new(&transport);
+        let menu_manual_controler = ManualModeMenuControler::new(&transport_x);
+        let menu_execucao_controler = MenuExecucaoControler::new(&transport_x);
         // parent menu
         MainMenu::new(
             menu_manual_controler,
             menu_execucao_controler,
             menu_programa_controler,
-            &transport,
+            &transport_x,
+            &transport_y,
             &data_model,
             front_panel,
         )
@@ -175,7 +187,8 @@ pub fn run() -> ! {
     let menu_controler = make_menu_controler(
         &menu_programa_arena,
         &data_model,
-        &transport,
+        &transport_x,
+        &transport_y,
         &mut front_panel,
     );
 
@@ -183,7 +196,7 @@ pub fn run() -> ! {
     //  Show initial splash window
     // ///////////////////////////////////////
     //
-    let mut splash_window = Splash::new(&data_model, &transport);
+    let mut splash_window = Splash::new(&data_model, &transport_x, &transport_y);
 
     while splash_window.is_running() {
         if let Some(key) = keyboard.get_key() {
@@ -228,5 +241,5 @@ pub fn run() -> ! {
         }
     }
 
-    start_main_loop(screen_buffer, keyboard, menu_controler, &transport)
+    start_main_loop(screen_buffer, keyboard, menu_controler, &transport_x)
 }
