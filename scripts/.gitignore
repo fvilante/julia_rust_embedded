@@ -1,0 +1,7 @@
+# Rust building information
+target/
+
+.vscode/
+
+# Libre-Calc (Alternative to Microsoft Excel) backup files
+*.ods#   

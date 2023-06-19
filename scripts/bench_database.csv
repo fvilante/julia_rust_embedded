@@ -1,0 +1,937 @@
+hash,message,.text,.data,.bss
+1135f2d,exclude `scripts` from workspace,30858,438,9
+e3bf322,`const` in some functions,30858,438,9
+08ed715,formating,30858,438,9
+f88bde1,implemented more than one `Arquivo de Eixo`,30846,438,9
+3fbae9a,naming,29458,438,9
+d78e489,minor change,29458,438,9
+4ddeb00,minor change,29458,438,9
+cb72ce6,removed unused code,29458,438,9
+8b324d6,doc,29458,438,9
+b53bb8c,Makefile new rule,29458,438,9
+ca8b2c2,bug version,29458,438,9
+2bf0a59,doc,29458,438,9
+641e6df,refactor,29458,438,9
+cf085f2,refactor,29458,438,9
+7d22ba2,bug fix,29412,438,9
+a5bf20c,doc: comments,29412,438,9
+9d846cf,dependency: update,29412,438,9
+6a6dbd1,doc,29412,438,9
+0dd70ab,dependencies: update,29412,438,9
+9870385,heapless dependency bump,29418,438,9
+963cd36,"Revert ""Merge: Added `git submodules`""",29418,438,9
+def1f13,refactor: simplification,29418,438,9
+6e9c257,Makefile change (reenab format rule),29418,438,9
+cd86faf,doc,29418,438,9
+d551838,naming,29418,438,9
+98b471e,propagation of `fatal_error`macro,29418,438,9
+3808f04,introduced `fatal_error` macro,29418,438,9
+bc2c931,small change,29418,438,9
+dbcb71f,doc,29418,438,9
+b705850,minor change,29418,438,9
+94ae3eb,Naming convention.,29418,438,9
+9ae87bf,Merge: Added `git submodules`,29418,438,9
+f484461,tuning of workspace dependency,29418,438,9
+ef1ed95,minor change in submodule,29418,438,9
+8395750,cargo.toml config: heapless submodule,29418,438,9
+e350f3d,added git submodule for `heapless` in the project,29418,438,9
+0b9432c,update dependency version: `heapless`,29418,438,9
+92f0e56,configured submodule in cargo.toml,29418,438,9
+a27207c,added _git submodule_ for progmem-avr-rust.,29536,454,9
+e90a030,refactor simplification,29536,454,9
+351f2d4,"Revert ""partial solution""",29602,454,9
+9bbced3,comment update,29838,454,9
+808aa4d,removed some`cargo clippy` warnings,29838,454,9
+7c4d891,partial solution,29838,454,9
+5de4314,bug version,29602,454,9
+5d9745d,menu_item_with_parameter initial experiment,29372,454,9
+b64503d,prepare menu item building mechanism,29266,454,9
+2f34c97,doc,29250,454,9
+231e685,makefile rule improvement,29250,454,9
+c8f70f4,removed automatic `format code` in the makefile,29250,454,9
+0b732d4,readme.md resoving linting warnings,29250,454,9
+6d5b9fb,`readme.md` added IDE config,29250,454,9
+62880f9,naming,29250,454,9
+9825ed3,naming: minor change,29250,454,9
+1543993,bugfix: avoiding using generics.,29250,454,9
+b016469,new MenuBuilder (BUGGY VERSION),32524,518,9
+2ceaf88,format fix,30170,454,9
+7415630,format,30170,454,9
+45d0671,abstract peripherals creation,30170,454,9
+815f3ac,removed unecessary code,30170,454,9
+9873ae3,front panel abstracted to its own trait,30174,454,9
+ffbd319,abstracted Keyboard into a trait,30174,454,9
+a8f0f77,refactor: extract main_menu creation's code to a function,30174,454,9
+5b50ed3,extract main_menu creation's code to a function,30174,454,9
+5b3bf6f,refactor: extract app main loop to a function,30174,454,9
+017bf43,refactor: adhere implementation to `Widget` trait,30026,454,9
+0d77fdc,doc,30026,454,9
+67e2d94,removed unused code,30026,454,9
+698cf36,naming: `MenuProgramaView`to `MenuProgramaArena`,30026,454,9
+938855c,refactor: Simplification by removing unecessary error code,30026,454,9
+ddf6003,refactor: Generalization of menu `Register` type,29772,454,9
+aa6ca76,minor fix,29772,454,9
+e9348ed,refactor: code simplification,29772,454,9
+b0f5f5a,doc,29832,454,9
+f2e9d17,Naming convention: `canvas` to `screen_buffer`,29832,454,9
+54d7fad,introduced `lcd` abstraction into `app`,29832,454,9
+39264f8,lcd interface visibility,30128,0,9
+20a695b,naming convention,30128,0,9
+4cc0ec0,removed unused code,30128,0,9
+1df905d,README.md now shows how to install `cargo-watch`,30128,0,9
+af781db,fix: correction in path in 'use' statements,30128,0,9
+4282c98,new `statistics` rule in the makefile,30128,0,9
+de1cce9,added `README.md` to `cross_platform` package,30128,0,9
+cdeba46,renamed package from `lib_1` to `cross_platform`,30128,0,9
+8c0d407,renamed package from `avr_main` to `bare_metal`,30128,0,9
+7540b40,Renamed Makefile rule: `x86_test` to just `test`,30128,0,9
+73966d7,removed unecessary lifetime,30128,0,9
+390d3db,"Revert ""const-ness of cursor removed""",30128,0,9
+0981799,const-ness of cursor removed,30132,0,9
+92d5f63,readme update,30128,0,9
+41f1079,"Revert ""refactor: :art: Removed unnecessary .cargo folder""",30128,0,9
+978cc5e,refactor: :art: Removed unnecessary .cargo folder,30128,0,9
+de7ec70,style: fix compiler warnings,30128,0,9
+d197846,typo,30128,0,9
+e998216,Be specific about `Lcd` driver being exposed,30128,0,9
+1d57a6a,doc,30128,0,9
+d2e6416,Introduced `Lcd` interface,30128,0,9
+044f928,lcd.rs code moved to its own module,30128,0,9
+d8fafae,doc,30128,0,9
+a87fa72,introduction of `Printable` trait,30128,0,9
+a23c4a1,doc,30128,0,9
+dcf10ba,doc,30128,0,9
+20d0a19,"Revert ""reduces `low-level lcd driver` latency""",30128,0,9
+a7a986b,reduces `low-level lcd driver` latency,30128,0,9
+d81369c,removed unnecessary syntax,30128,0,9
+f7fa26f,part 1,30128,0,9
+9b8d997,module renamed,30128,0,9
+63868a4,move file to another submodule,30128,0,9
+17a1b18,doc,30128,0,9
+dc6124a,Better naming for main entry_point file,30128,0,9
+6e67f21,move file,30128,0,9
+0cedafc,file name,30128,0,9
+b1a5ccb,Renamed all `mod.rs` files of the project.,30128,0,9
+7fd924e,moved module from module,30128,0,9
+a67fed3,minor change,30128,0,9
+083f833,removed unused code,30128,0,9
+1d2e1b4,doc fix,30128,0,9
+ea1b911,doc,30128,0,9
+881c6dc,doc,30128,0,9
+d7c3824,removed unused file,30128,0,9
+c299143,doc,30128,0,9
+02e77c6,removed unused code,30128,0,9
+6982557,extracted module to file,30128,0,9
+5ca572d,moved rectangle to new geometry module,30128,0,9
+be1bbfb,added .vscode folder to .gitignore,30128,0,9
+b4b0c3b,removed .vscode from tracking code,30128,0,9
+76fc716,extracted Point type to its own module,30128,0,9
+07b4dc3,removed unused file,30128,0,9
+b4c23fc,removed compiler warnigns,30128,0,9
+f7909dd,removed unused code,30128,0,9
+04041ed,naming convention,30128,0,9
+ebdd2e4,moved a function near to its application,30128,0,9
+22b2f53,extracted bitwise functions to a exclusive file,30128,0,9
+d41f56b,doc,30128,0,9
+05d7793,simplification,30128,0,9
+901d8ed,formating in eeprom code,30128,0,9
+253b9bd,removed unused code,30128,0,9
+82fbea9,doc,30128,0,9
+39c1865,naming convention,30128,0,9
+36992f4,naming convention,30128,0,9
+06f7c6e,format,30128,0,9
+c2ea280,typo,30128,0,9
+43d8b8d,doc,30128,0,9
+8a997ae,removed unused code,30128,0,9
+ddd265f,format,30128,0,9
+4b7030f,small fix,30128,0,9
+024f4bb,function `canvas::print_flash_string` generalized to `canvas::print_iterator`,30128,0,9
+7bd2fd0,Simplified return type of FlashStringIterator,30128,0,9
+b7d8268,Abstracted FlashString to just IntoIterable<char>,30186,0,9
+cce9bce,minor change,30186,0,9
+c724596,refactor simplification on `canvas.rs`,30186,0,9
+69b7b15,improved point type,30200,0,9
+7148633,removed unused code,30200,0,9
+2625ce7,removed `GenericString` type from code,30200,0,9
+56b4a8d,updated `avr-progmem` dependency,30922,0,9
+a834714,typo,30922,0,9
+46b293a,explicitly applied Widget for Caption,30922,0,9
+f5fb70f,registered idea on how to create .hex from .elf file.,30922,0,9
+3883e41,removed unused code,30922,0,9
+d142411,introduced rectangle type,30922,0,9
+ae17f49,"formating, refactor: small changes",30922,0,9
+c4e6459,naming convention,30946,0,9
+302e853,minor change,30946,0,9
+7815c45,refactor: extracted type convertion,30946,0,9
+6dd550e,Numero do canal pode agora ser programadado pelo usuario,30946,0,9
+930097e,formating,30904,0,9
+8b38075,Introduced user's capacity  to determine serial baudrate,30904,0,9
+d0970b5,doc,30922,0,9
+9959bd6,Added a sub-menus and a menu item.,30922,0,9
+a4feae1,small improviment in fatal error handling when rendering the menu,30422,0,9
+22eb06b,Extracted implicit trait,30246,0,9
+c4461fa,modificado baud_rate de 9600 para 2400.,30246,0,9
+74927e2,informa o usuario se erro de comunicacao c a placa cmpp,30246,0,9
+8e5ea5c,"melhorado formatacao do menu, em especial a identacao de alguns itens.",29944,0,9
+05dc941,removed unused code,29946,0,9
+f8db02c,removed unused variable in function signature,29946,0,9
+92c731c,removed warnings,29946,0,9
+5203bae,formating,29946,0,9
+12188d7,naming convention,29946,0,9
+895c5fa,Default cmpp channel defined as zero.,29946,0,9
+92e68ed,Simplification of cmpp initialization,29946,0,9
+0cf01f3,Type extracted to file,29862,0,9
+297b6be,Extracted initialization of peripherals to a new type,29862,0,9
+2e52938,simplified keyboard initialization,29858,0,9
+51bdb65,"fix: frontal panel leds does not on when keys `Execucao, Menual, Programa` are pressed.",29914,0,9
+18f6bbf,doc and formating,29914,0,9
+7529237,Input expander uses now interior mutability,29914,0,9
+f3a0219,correct initialization of shift registers input pins,29768,0,9
+d3c1103,input expander uses now iterior mutability,29768,0,9
+0240378,clean up,29776,0,9
+43188ae,problem solved,29810,0,9
+3dae83e,output expander now uses iterior mutability,29728,0,9
+6fe7b9a,better place to shiftout_init() and formating,29554,0,9
+937a351,"Led de execução tem que acender, e ficar aceso:",29474,0,9
+ac80f08,buggy version,29528,0,9
+99b1e37,fix,29344,0,9
+8adc041,`F2` key now sends print_go signal,29344,0,9
+cc81826,improved blink characters in the user interface on LCD,29310,0,9
+78bc16e,visibility,28614,0,9
+7dc191c,formating,28614,0,9
+9ab376b,removed unused code,28614,0,9
+9fd7f16,bugfix,28614,0,9
+9e1f64e,doc,28318,0,9
+2c63211,hotfix: now() changed from u16 to u64,28318,0,9
+e7a54fe,minor change,27954,0,5
+148b135,Added the presentation of the unit of measurement of the submenu on screeen.,27954,0,5
+2ab7b71,bugfix,26758,0,5
+d6ba03c,small bugfix,26758,0,5
+4731e21,doc,26758,0,5
+e67871b,change default parameters to reduce noise in the lab,26758,0,5
+d16b67e,simplified system initialization code,26762,0,5
+6f29e1e,removed the last trickies compiler warnings. Clear of warnings now.,26762,0,5
+1100dba,removed most of compiler warnings,26762,0,5
+c4a6f2a,doc,26762,0,5
+12d6684,submenu `Execucao` now presents the units of measurement refering to milimeters,26762,0,5
+f9f4547,introduced `rust-toolchain.toml` config file,26758,0,5
+ccb6cac,update `README.MD` file,26758,0,5
+48d5661,returned `#![feature(lang_items)]` flag,26758,0,5
+2ffe77d,"Revert ""removed `eh_personality` function (seems to be no more necessary)""",26758,0,5
+b013b62,Initial implemtation of 'clean' makefile rule.,26758,0,5
+4657719,removed unused code,26758,0,5
+46ef130,remove unused code on avr/main.rs,26758,0,5
+e45f385,removed panic handler (huge reduction of memory usage!),26758,0,5
+60d630d,removed `avr_std_stub` (it seems to be no more necessary),30090,1298,5
+60a0d61,removed `eh_personality` function (seems to be no more necessary),30090,1298,5
+e626ae1,organized `fn main`,30090,1298,5
+e471b94,naming convention,30018,1298,5
+00937da,Merge branch 'optimize' into dev,30018,1298,5
+a195ca8,Rule on Makefile to generate the assembly code from the .elf file,30018,1298,5
+938ddce,typo,30018,1298,5
+59c3a4c,doc,30018,1298,5
+0fce54a,Merge branch 'dev' into optimize,30018,1298,5
+c4cd507,Merge branch 'optimize' into dev,30018,1298,5
+fb8534c,C340) Idem C330 porem sem algumas funcoes de debug atribuidas as teclas de funcao do teclado (codigo de dev e nao de release),30018,1298,5
+4dc6e84,C330) Programa completo (C000) com tudo (basicamente é C320 mais todo sistema de menu),31054,1298,5
+0f9f40c,"C320) Idem 310 porem com model, e enviando tudo do model para cmpp via transport",8558,630,5
+aa6a223,C310) Idem 300 porem com canvas e keyboard (aplicacoes simples e primitivas com Canvas e Keyboard),5940,508,5
+f5e3cae,C300 (novamente) (ver abaixo),3654,226,5
+5ba3414,C230) Idem C110 porem com datalink varrendo em loop infinito  todos os 256 enderecos de memoria e imprimindo na tela do lcd o valor da word retornada pelo cmpp.,4018,226,5
+4cce122,"C300) Idem C110 porem inclui transport layer, utilizado em loop infinito apenas lendo a posicao inicial infinitamente",3654,226,5
+4c2e167,improvement,1404,0,5
+0afdd4b,inline(aways) = on,1404,0,5
+edc4926,C220) Idem C215 porem com a palavra #[inline(never)],1356,0,5
+4e9647b,C210) Idem C200 porem removido uma das chamadas da funcao,1356,0,5
+7ad3fe4,"C200) Idem C195, porem removido um grau de genericalidade da funcao que imprime",1368,0,5
+15cd36b,C195) Idem C192 porem adicionado uma nova string com também 1 caracter:,1388,0,5
+adba6b2,C192) Idem C190 porem adicionado uma nova string com também 1 caracter:,1378,0,5
+f354e80,C190) Idem C180 porem adicionado uma nova string com também 1 caracter:,1370,0,5
+53a8223,C180) Idem C170 porem a string anteriormente vazia incorporou 1 caracter:,1314,0,5
+8d12c13,C170) Idem C167 porem adicionado uma string de flash vazia,1268,0,5
+98afd84,C167) Idem a C165 porem extraido uma funcao para cuidar da impressao do texto,1268,0,5
+331b078,C165) Idem C160 porem adicionado 20 caracteres ao texto existente,1268,0,5
+e23b6dc,C160) Idem C150 porem adicionado 2 caracteres ao texto,1248,0,5
+d99e3e0,c150) Idem C130 porem com o texto armazenado na Flash,1246,0,5
+72951ea,C170) Idem C160 porem o loop de interacao para imprimir a string foi extraido para uma funcao fn print_flash_string {,1260,0,5
+7aec36e,C140) Idem C120 porem com o texto armazenado na Flash,1250,0,5
+be34077,"C130) Idem ao anterior porem imprimindo um caracter a mais ""Oi6""",1150,0,5
+405b1f0,C110) Somente a inicializacao do Lcd e loop infinito que nao faz nada,1134,0,5
+4de742c,C100) Somente um loop infinito que nao faz nada,1106,130,5
+3c65b2b,implemented standard unit of measurement convertion for cmpp data,31050,1298,5
+35f8261,`Menu Execucao` now can proccess `Stop`  key press,31050,1298,5
+bf4c4cc,Manual Mode menu now produces effect,29502,1248,5
+7a0599d,doc,29206,1248,5
+45a7d8f,modified default parameters of `arquivo de eixo`,29206,1248,5
+9a24000,feat: saves all data into eeprom when  user exits the `Menu Programa`,29204,1248,5
+41fa81c,feat: `Menu Execucao` now shows `posicao atual`,29186,1248,5
+492c880,cleanup in menu presentation (part 3),28732,1248,5
+8220a91,cleanup in menu presentation (part 2),28418,1208,5
+fbff047,cleanup in menu presentation (part 1),27818,1222,5
+1b39dab,code simplification,28450,1222,5
+99cb98f,bugfix: `numero de mensagens avanco e retorno` now working,28434,1222,5
+dc075ef,`start automatico no avanco e retorno` configured as enabled by default,28130,1222,5
+d2ea7ec,Invertion of ActivationLogic in menu representation,28114,1222,5
+fb90afd,now start from keyboard is working correctly,28114,1222,5
+2a7f99e,Removed some unstable cmpp methods.,28710,1222,5
+249af8b,improved the default values for `arquivo_de_eixo` and `configuracao de eixo`,28780,1222,5
+e297844,cmpp manipulator: remove __Temp manipulator (part 3/3),28286,1222,5
+07fb4c8,cmpp manipulator: remove __Temp manipulator (part 2),28420,1222,5
+31476bf,formating,28378,1222,5
+b53daca,removed unused code,28378,1222,5
+37962d3,Naming convention,28378,1222,5
+d1a6e3c,cmpp manipulator: remove __Temp manipulator (part 1),28378,1222,5
+a39b3f7,reintroduce menu in the entry point with the function to send_all data to cmpp,28360,1222,5
+641f4d6,added the ability to see what is flowing in the RX of the datalink,5566,232,5
+f060e6c,added example_00 which is a example of real control that works with a real cmpp motor,5508,232,5
+7af81cd,refactored some visibility,28026,1208,5
+8ff813c,Fix: wrong implementation of cmpp `Direction` in the datalink layer,28026,1208,5
+9401663,added syntactic sugar,28026,1208,5
+7c6dad6,Correction in cmpp memory addresses,28026,1208,5
+9a37dc2,simplification,28026,1208,5
+ef2ec05,Filled cmpp memory map address content,28026,1208,5
+98411c6,formating,27264,1208,5
+32d218c,removed unused code,27264,1208,5
+3ebbf73,removed unnecessary lifetime,27264,1208,5
+7cc150e,propagated `Word Manipulator` into TransportLayer methods,27264,1208,5
+a9a4593,Introduced `Word Manipulator` for TransportLayer,27264,1208,5
+2eecbcc,propagated BinaryManipulator in the TL methods,27264,1208,5
+c53e130,introduced generic `BinaryManipulator` for `TransportLayer`,26198,1184,5
+ec6904a,BinaryManipulator made generic,25158,1118,5
+a496549,clean up,25158,1118,5
+1018893,removed reference for next menu in ther splash window,25128,1118,5
+13eb399,removed the need for dynamic dispatch,6318,570,5
+852a735,re-inserted menu old code,6468,594,5
+0c24d46,feat: save and load `Configuracao de Eixo` into eeprom (complete),24108,1118,5
+54de825,feat: save and load `Configuracao de Eixo` into eeprom (partial),23492,1118,5
+7fa7b1a,Refactored eeprom read and write functions,23956,1118,5
+7dca7f4,bugfix: now is writing and reading `Arquivo de Eixo` from eeprom,23952,1118,5
+911ae77,Can save multiple parameters from ArquivoDeEixo on eeprom,23106,1082,5
+b6ce5e0,improved eeprom's arquivo_de_eixo loading and saving,22098,1098,5
+7586adf,removed compiler warnings,22070,1026,5
+72803bc,feat: introduced eeprom save and load parameters,22070,1026,5
+2a23776,eeprom auto-test code,22138,1062,5
+39d53ab,bugfix in number to hex_string convertion,21520,1026,5
+d12d7e2,`Send all` to cmpp is now an interator patern,21520,1026,5
+aa3654b,"feat: First connection between menu, model and transport layer.",22174,1026,5
+ab354cc,introduced API in the TransportLayer type,21840,1070,5
+b84bfdf,naming,21840,1070,5
+387b0eb,Merge branch 'bugfix_01' into dev,21840,1070,5
+0c222f4,"reduced OptionsBuffer, this reduce the amount of flash memory required",21840,1070,5
+ed85fe3,doc,22528,1072,5
+5b48019,type simplification,22528,1072,5
+33997ff,reduced retangular wave memory footprint (u32 -> u16),22528,1072,5
+cbba715,reducing timing epoch (function now) from  u64 to u32,22650,1072,5
+303b935,bugfix in keyboard debounce time,23024,1072,9
+b968ffe,Refactored keyboard timepoint from u64 to u8 to reduce memory footprint,22996,1072,9
+5109608,keymap array placed in progmem to reduce sram footprint,23386,1072,9
+79ca0e5,refactored lcd to improve and reduce memory footprint,23324,1104,9
+7d83768,reduced foot print of the function that converts numbers to its hexadecimal string representation,23324,1104,9
+fabe3ca,reduced memory foot print of now() function used in Datalink type,23342,1168,9
+42bfc43,reduce of the use of 'static str to reduce memory footprint,23522,1168,9
+746159e,review on cargo.toml,23522,1168,9
+dca5686,formating,23522,1168,9
+88d3c08,lifetime avoiding copy,23522,1168,9
+f8c258b,"Buggy Version (StackOverflow), trying to reduce memory footprint",23514,1168,9
+a964fad,removed old unused code,5476,648,9
+9795031,doc,5476,648,9
+5599559,naming convention,5476,648,9
+823c11f,Introduced ActivationState manipulator,5476,648,9
+dab63e7,extracted type word16 to module,5476,648,9
+04f85f7,improved type,5476,648,9
+9370c36,introduced Acceleration user unit,5476,648,9
+caf6a1e,exemple of use of transport_layer,5476,648,9
+9ff1c57,Improved error path in datalink layer,3856,382,9
+b1ab002,exemple code of using new cmpp's datalink and transport layer,3936,402,9
+36ac5bc,reduce visibility scope of unsafe function,3292,258,9
+cf1288d,marked unsafe function for Channel construction,3292,258,9
+8bfd2cf,removed unused code,3292,258,9
+ea76a2d,continuing propagating last changes,3292,258,9
+7ba3a01,propagate changes,3292,258,9
+902bd44,removed duplicated type Channel,3292,258,9
+ea72ca0,reenabled menu system compilation target,19100,948,9
+db89958,remove duplicated type `Word16`,3292,258,9
+57a8ebf,remove duplicated type `Word16`,3292,258,9
+5120264,small bug fix,3292,258,9
+ab484ac,minor change,3292,258,9
+fa0f020,clean up,3292,258,9
+933ee12,Test of `enum_dispatch` crate running direct on AVR platform,7542,848,9
+d026320,example on how to use `enum_dispatch` macro,3292,258,9
+42869f6,added enum dispatch lib,3292,258,9
+e6140db,introduced trait `IntoCmppValue` with `MechanicalProperties`,3292,258,9
+3a91356,naming convention,3292,258,9
+e82892b,decoder bugfix and refactor,3292,258,9
+f928eef,formating,2090,0,9
+0d69fdb,added more tests for cmpp codec,2090,0,9
+eb8041c,Merge branch 'datalink' into dev,2090,0,9
+a3fe075,small bugfix,2090,0,9
+6ae3bf3,"introduced decoder2 (experimental, not fully implemented)",2090,0,9
+d57e508,type rename,2090,0,9
+2c51014,checksum taken as reference,2090,0,9
+17b99ed,Refactor of 'Payload' and 'Channel' types and propagationg of this changes,2090,0,9
+d80bafe,developing new api for transport layer,1990,0,9
+7a9aac2,Temp: Partial implementation of transport layer,1990,0,9
+39e9bee,added tests to datalink,1990,0,9
+2ed1afa,"makefile ""verbose"" rule added (not not working yet as a rule, just working when typed direct into powershell the following:",1990,0,9
+2a4dbee,added new feature `datalink` layer,1990,0,9
+8fb8133,minor change,1990,0,9
+6882a6a,module extraction 'datalink',1990,0,9
+7174d4e,formating,1990,0,9
+18b113c,can communicate with cmpp board at 9600 at cmpp port CNT4,1990,0,9
+a740b0b,"Revert ""experiment: rx_buffering""",1230,0,9
+fb78c51,small change,1730,0,11
+1d314df,experiment: rx_buffering,2900,0,11
+558775f,setup development entry point,2550,0,9
+ea3eb6c,setup to cmpp module development,1230,0,9
+62206ae,removed platform specific code to increse memory performance,19100,948,9
+31d9cc4,doc,19100,948,9
+97e624e,this change improves type inference by Rust Analyzer,19100,948,9
+9c06904,naming convention,19100,948,9
+19ced2a,removed unecessary empty module,19100,948,9
+2b1f3b9,small change,19100,948,9
+161c1b8,added Cargo clippy rule on Makefile,19100,948,9
+75a4796,Simplification of 'Frame' by removing its 'SIZE' type parameter,19100,948,9
+83d50fe,improvement in Machine Model,19100,948,9
+4fe4a60,doc,18908,948,9
+1f08396,fix,18908,948,9
+5d25459,More struct's memory footprint optimization,18864,948,9
+bbb023b,bugfix,19738,948,9
+a06e026,bugfix: adequation to new api,19380,948,9
+b133658,"Revert ""Revert ""optimization of struct memory footprint""""",19380,948,9
+b1216f2,improved StatelessCursor api,19756,948,9
+b7f6770,"Revert ""optimization of struct memory footprint""",19802,948,9
+543440a,small change,19432,948,9
+158bae6,small change,19432,948,9
+1d76d9c,optimization of struct memory footprint,19432,948,9
+1296e63,formating,19802,948,9
+adb31f5,added stateless cursor,19802,948,9
+ac67ac0,removed unused state,19756,948,9
+b942ceb,integrated machine nodel into the menu specification,20896,948,9
+2518b0d,Merge branch 'master' into dev,19442,948,9
+74b0651,Merge branch 'bugfix',19442,948,9
+64342e8,Merge branch 'naming_convention_' into bugfix,19442,948,9
+44b7953,naming,19442,948,9
+7c3cf3d,naming,19442,948,9
+1d1600f,refactor in the LCD display driver to reduce unecessary code and state,19442,948,9
+38e21d2,bug_introduced: Machine Model being acessed through Submenu system,19520,984,14
+5b1c59d,"bugfix: partial activation of canvas as ""single buffer"" to reduce lcd flickering",19254,984,14
+86e4b11,bugfix: now enough memory space for machine model,18676,946,14
+a3b78c2,"Disabled double buffer. This make LCD flickering, but reduces ram memory consuption.",18530,946,14
+7d9163c,preparing machine model,19304,984,14
+f0ab450,"added submenu ""Programa"" and ""Configuracao de Eixo""",19410,984,14
+1ddcb67,Merge branch 'menu_navigation_go_back' into implementar_z80_literal_2,17648,984,14
+9ffa989,submenu now can navigate back and forward,17648,984,14
+d50f889,submenu navigation state is now a property of the submenu,17340,966,14
+57f053c,added submenu Register<T> (partial implementation),17062,966,14
+da8601b,doc,15384,966,14
+4e4b954,added some code to be used in future,15384,966,14
+8a8d166,type extraction,15384,966,14
+c2febcb,file rename,15384,966,14
+557d57f,trait extracted to file,15384,966,14
+bc4cf78,type extracted to file,15384,966,14
+7ceba52,file renamed,15384,966,14
+d1cdd0d,file renamed,15384,974,14
+615107f,flash texts extracted to an exclusive file,15384,974,14
+211dbde,file extracted to module,15384,974,14
+53b6c94,file moved to new module,15384,974,14
+1f8c2c1,sub-module extraction from file,15384,966,14
+51753ea,removed unused file,15384,966,14
+f161cc3,formating,15384,966,14
+ea7f865,naming,15384,966,14
+ba0fd82,removed unused imports,15384,966,14
+6f3e488,"Revert ""Revert ""entire file extracted to sub module""""",15384,966,14
+d317e9f,temp: file moved,15384,966,14
+318f543,"Revert ""entire file extracted to sub module""",15384,966,14
+093fd56,entire file extracted to sub module,15384,966,14
+9b3d5cd,created FieldBuilder,15384,966,14
+f4d490a,bug fix,15384,966,14
+5b9e965,"Revert ""Revert ""added rule to auto fix code on watch mode""""",15384,966,14
+f422588,file renamend,15384,966,14
+9bd1759,extracted type from file,15384,974,14
+e914342,"Revert ""added rule to auto fix code on watch mode""",15384,974,14
+82c7592,added rule to auto fix code on watch mode,15384,974,14
+fc5ab36,unused result now is used,15384,974,14
+dc54d77,removed unused code,15324,954,14
+9d915ba,comments,15324,954,14
+f0428c9,bugfix intertravamento de eixos,15324,954,14
+486a171,formating,15130,954,14
+b3ea873,"Revert ""result error match""",15130,954,14
+b2266a5,bug fix,15190,1046,14
+1bc4d63,naming,12880,954,14
+267c52d,removed unused unsafe block,12880,954,14
+a26a262,result error match,15190,1046,14
+0dd5dcd,naming,15130,954,14
+a35f74b,naming,15130,954,14
+d761855,naming,15130,954,14
+dbcec83,naming,15130,954,14
+29181d5,doc,15130,954,14
+529b3e3,enable warnings,15130,954,14
+07f045b,removed unused imports (`cargo fix`),15130,954,14
+aad6e41,bug fixx,15130,954,14
+4c225a4,unstable rule on makefile to run `cargo fix`,15130,954,14
+e77f404,"Revert ""MenuNavigation: you can go back to previous menu (A bug was introduced here)""",15130,954,14
+d501003,module extraction,16260,1018,14
+9af94c7,comments,16260,1006,14
+893fd68,MenuNavigation: you can go back to previous menu (A bug was introduced here),16260,1006,14
+4c1db1c,type moved from one module to another,15130,942,14
+a8075c7,improve formad of numerical field on menu items,15130,942,14
+65462e7,Make possible to save or escape save the sub menu_item values,15130,942,14
+48864e2,comments,14400,860,14
+fdbd254,Decoupled menu description from where raw data is stored,14400,860,14
+840fe36,naming,14240,860,14
+e6ee0ff,refactor: removed necessity of static variable in menu construction,14240,860,14
+0a3aeaf,doc,14030,888,14
+a3bf157,simplification; removed unused code,14030,888,14
+deacb8f,doc,14436,888,14
+8be2f45,Simplification on building optional field list,14436,888,14
+dc3be41,Propagated last change to other menu items constructions,14390,888,14
+d611b9c,Introduced MenuItemBuilder pattern,15102,912,14
+88413ed,naming convention,14362,930,14
+f9bd918,"added submenu as a child of ""INTERTRAVAMENTO PARA DOIS EIXO"" in the ""Arquivo de Eixo"" menu",14362,930,14
+34307fc,Added document generation in the 'doc' rule of Makefile,13770,924,14
+8be0a93,bugfix,13770,924,14
+0e9ac4c,Introduced sub_menu 'Configuracao da Impressora',13770,924,14
+7b5064d,introduced 'Configuracao de Ciclo',13254,922,14
+daee8d3,added submenu 'parametros de movimento' + 'prametros de impressao',12666,914,14
+cd8d21c,"""Arquivo de Programa"" literal names for submenus",12186,894,14
+49896e1,menu_item can b just a submenu title call,12662,876,14
+4c2b337,type integration,12532,876,14
+6b202d0,removed unecessary parameter,11972,876,14
+ad37163,type unification,11972,876,14
+73005f0,MenuItemWidget::field now allows None value,12514,876,14
+4d024f3,draft about how z80's menu spec is implemented in assembly,12426,876,14
+46f9d13,"loaded classic menu z80 TTC-3100 assets, and protocol v1 samples.",12426,876,14
+281ac86,introduced gource rule in makefile,12426,876,14
+0272d88,minor change,12426,876,14
+6d77641,Merge commit 'd5e074be3a74d782792c149dd42638f64c9ef38a' into menu3,12426,876,14
+d5e074b,added more mock parameters,12426,876,14
+fa28e4a,variable connected to the Option widget,12164,876,14
+b189159,doc,12132,876,14
+db36ae4,included variable in type,12132,876,14
+0092d22,removed unused code,12186,870,14
+1878faf,bugfix,12180,860,24
+b92bab5,"""Variable"" is Cell<T>",12180,860,24
+c8adad2,removed unused code,12374,860,14
+57641ea,minor changes,12374,860,14
+7d2ec7a,doc,12374,860,14
+c1b6cac,introduced SubMenuTrait,12374,860,14
+4508b7c,introduced new trait,12714,860,14
+20464a4,function to auto detect length,12470,860,14
+7b58d3e,type extraction,12224,860,14
+6f1e568,First working mockup for Recurssive Menu,12160,860,14
+de1652a,Aplied the concept of 'Arena' to SubMenu handler,11766,860,14
+2ecab2e,type extracted to file,11768,860,14
+ec0c8fe,file rename,11768,860,14
+7f1c774,reactivate disabled parameter (child submenu),11768,854,14
+f5d103b,removed unnecessary lifetimes,11706,854,14
+11e92ad,"Created menu handle, to abstract submenus",11680,854,14
+85339ec,"Revert ""introduced SubMenuTrait""",11938,854,14
+c54760e,introduced SubMenuTrait,11938,854,14
+eb3676c,removed unused code,11938,854,14
+9e0e1b7,type name swap and renaming,11938,854,14
+196838d,More responsability to SubMenuList,11938,854,14
+49ed1e7,solved problem of storing menu_items in flash memory,11740,830,14
+daa925e,extracted mutable reference from MenuItemArgs,11798,842,14
+5e9a049,Avoid use of Range<T> in struct `Format` because it is not `Copy`,11648,844,18
+bcde650,type extraction:,11656,844,18
+02b2cc9,minor change,1456,0,9
+cc29fb5,feat: FlashSlice introduced,1456,0,9
+deb550f,fix: now multiples lines in submenu works,11722,844,18
+3673359,minor change: doc,4242,526,14
+a9e6c6a,minor change,4242,526,14
+979aa32,fix: removed BEGIN_TOKEN and END_TOKEN from the field parsed,4226,526,14
+e2ed74d,doc,4198,526,14
+b2f4d56,removed unused code,4202,520,14
+2f16830,feat: new template string pattern to construct menu_items,4204,532,14
+d456dfc,minor change: formating,4182,548,14
+c058a50,templete string for menu_item construction now uses a memory efficient method,4166,542,14
+297df74,added methods to FlashString type,3322,456,14
+1da20c5,added find method in FlashString,3154,538,14
+af21bee,FlashString  interator now considers the indices not only the bytes,11196,784,18
+2c80f5b,minor change: naming convention,11024,784,18
+8fb7ce9,removed unsafe pointer,11024,784,18
+f04633f,doc,10860,782,14
+40049a5,added `Cursor` logic into a type,10860,782,14
+5ccb686,doc,10732,782,14
+5555580,type absorption and elimination,10732,782,14
+b897098,function handler promotion,10734,782,14
+481bd71,minor change: naming,10770,768,14
+5a21758,elimitaed `mutable variable reference` dependency in `Field` widget,10770,768,14
+389c722,naming convention,10836,768,14
+39ea439,naming convention,10836,768,14
+587730a,add Editable trait for Field type,10836,768,14
+94097f8,Implemented Editable trait for NumberInputEditorWidget,10836,768,14
+4841b3d,bugfix,10656,768,14
+03b77f0,add Editable trait to OptionalEditableWidget,10244,720,14
+1a97d95,aplied Widget trait into type,10556,768,14
+4577c67,removed lifetime from Field type,10556,768,14
+7ca591d,normalize and apply Widget trait,10604,768,14
+f05d32e,doc,10604,768,14
+3bd0eaa,naming convention,10604,768,14
+d5915ae,improved safety of format type,10604,768,14
+b00a78d,methods moved upstream,10340,768,14
+597b81b,type alias proxying,10340,768,14
+42402f4,breaking: removed reference and lifetime from a base type,12406,832,14
+9a96536,naming,13446,764,14
+23d3ad6,naming convention,13446,764,14
+b8de803,parameter grouping,13446,764,14
+1e435d2,naming convention,13404,764,14
+44f2978,"naming convention, function absortion",13404,764,14
+f31ac2c,naming convention,13448,926,14
+86fe657,separation of concerns,13448,926,14
+8f3d3ad,usize to u8,13520,926,14
+eef602a,method extraction and promotion,13522,926,14
+36120ea,naming convention,13578,926,14
+19baa1f,doc,13578,926,14
+74388e7,file rename,13578,926,14
+b9945a5,function extraction,13578,914,14
+5bcce70,separation of concerns,13584,914,14
+c460ad4,message memory footprint reduction,13584,914,14
+36476bd,doc,13630,914,14
+afb3e42,refactor: new parameter construction propagation,13630,914,14
+381b38f,naming convention,13620,914,14
+1093b06,minor change,13620,914,14
+9d9fe91,"refactor: simplification, struct extraction, doc",13620,914,14
+3f58df9,doc & renaming,14446,914,14
+6b2e615,doc,14446,914,14
+60f796b,type renaming,14446,914,14
+a98adf6,doc,14446,914,14
+740ce30,chore: introduced 'cargo format' in makefile 'watch mode',14564,926,14
+9af1bf7,code formatting,14564,926,14
+085914b,refactor: Cursor type moved from avr to pc lib,14564,926,14
+e866441,Merge branch 'refactor_cursor' into menu_recurssivo_4,14538,926,14
+1eaca0a,make type construction const,14538,926,14
+d03a694,doc,14538,926,14
+8a92a67,refactor: improved construction for Cursor type,14538,926,14
+c00b859,refactor: down casting of type from usize to u8,14552,926,14
+1a7c83c,removed unnecessary const cast,14508,926,14
+eede292,removed unnecessary method,14508,926,14
+c200fd5,minor change: idiomatic casting,14508,926,14
+7dbc590,chore: added 'paste' macro utilities as dependency,14508,926,14
+9926313,chore: disabled compiler warnings temporarily,14508,926,14
+ec14698,.gitignore: added local temp folder used in vscode plugin,14508,926,14
+5e5cdfe,bugfix: removed code causing memory violation,14508,926,14
+fae0e42,feat: panic_handler and some useful panic macros,15036,974,14
+09f5bed,refactor: corrected panic_handler to take correct message,14184,974,14
+c88afa6,refactor: added simplistic type convertion in utils. u32 -> u16,14242,1028,14
+8cb2670,temp: introduced panic_handler,14242,1028,14
+026aabf,minor change,12496,398,14
+3965b58,minor change,12488,398,14
+27e193e,refactoring: minor change,13562,398,14
+f473ae2,"refactor: In AVR side, substituted Accessor/Arena to change 'variable' in memory to just an raw_pointer (unsafe)",13022,398,14
+ed3039b,temp: implementing recursivo menu,13356,420,63
+479532a,minor change,14566,420,63
+55aa7e2,bugfix: make types compatible between AVR and PC interface contact for new Arena,14566,420,63
+9e9b47a,test: check error case,14566,420,63
+fa4b733,refactor: removed unnecessary mutability,14566,420,63
+9099dfa,feat: introduced falible function's alternatives to reduce client's code surface,14566,420,63
+b2c48e7,refactor: applied Copy trait to avoid explicity typing clone everywhere,14566,420,63
+7dc4341,test: added tests to rust aliasing check,14566,420,63
+1014026,formating: minor change,14566,420,63
+9d8fc25,refactor: converted RefCell to UnsafeCell,14566,420,63
+c59b6c6,test: mutability on arena,14566,420,63
+90bcc49,temp: changed Cell element to RefCell element,12778,398,67
+73a5513,temp: wrap arena database inside an RefCell,12752,398,45
+de53aaa,refactor: Arena was moved from AVR code to PC code,12752,398,41
+81c9389,Introduced Cell inside Arena database,12752,398,41
+f790ae7,removed 'static lifetimes,12752,398,41
+a12f56d,removed 'static lifetime from Accessor constructor,12752,398,41
+6bf5ebb,minor change,12752,398,41
+f005ce4,"introduced standard ""Cell"" replacing my hand-made equivalent code",12752,398,41
+53ed1cd,renaming,12752,398,41
+fa8ed44,removed unused code,12752,398,41
+a2c4d7c,refactor: remove lifetimes - Part 1,12752,440,14
+c7ed7ce,feat: New Accessor type to avoid the use and propagation of lifetimes,12558,398,14
+229a842,refactor: reabsorbed function on type. Elimination of helper functions.,12544,398,14
+d6d0435,removed unused code,12544,398,14
+31441b9,refactor: monomorphisation of data type,12544,398,14
+76a897f,refactor: reduced data structure memory footprint (part 2),13066,398,14
+95146de,refactor: reduced data structure memory foot print,12544,398,14
+1b50bc8,refactor-simplification: removing of generic static type parameter (part 2),13386,398,14
+d16f9d1,refactor-simplification: removing of generic static type parameter,13372,398,14
+f9b8203,doc,13270,406,14
+a9ba469,refactor: constructorfunctions  imported to class,13270,406,14
+1ec5393,temp: minor change,13270,406,14
+0ef4d92,refactor: function extraced from one file to another,13102,406,14
+ded94ea,minor change,13102,406,14
+356ac62,formating,13102,406,14
+1859c3b,refactor: function extraction,13102,406,14
+a3d8cb2,feat: Accessors can know be accessed behind a DataBase class,13048,406,14
+2f98e3d,feat: Accessor now can be use with non 'static lifetime variable,13044,406,14
+2b465d9,minor change: created indirect access to static variable through function,12928,412,22
+a895d50,feat: Optional Field can  be constructed with arbitrary quantity of discrete options,12928,412,22
+c3a1d4b,minor change,12666,404,22
+694292f,doc: removed comments that may become obsolate fast thus unmanaged,12614,404,22
+91c0a58,refactor: function extraction,12614,404,22
+af2b867,removed unused code,12666,404,22
+7f4bbcc,refactor: MenuItem construction simplification,11854,404,22
+9b6241d,refactor: function extraction,12054,404,16
+45c4aec,refactor: removed unused code,12054,404,16
+b348f1c,refactor: Accessor is made a trait instead of just a type,12054,404,16
+7b3a7c7,refactor: removed callback as an initialization method of menu item,12054,404,16
+499bc07,refactor: introduced lifetime for submenu and menuitem types,12726,404,20
+606d92d,refactor: simplified SubMenu (removed static polimorphism),12620,404,20
+db05d93,feat: Menu execucao,3836,0,14
+5b9a6b2,feat: Main menu + Menu Modo Manual,3670,0,14
+48d185b,temp: constructing main_menu inside new menu_manager concept,3654,0,14
+ab634c1,refactor: introduced type alias,4482,128,14
+dd4b495,feat: introduced helper function,4482,128,14
+f10b2dc,refactor: remove the need for an 'EmptyWidget',4482,128,14
+64222dc,feat: introduction of  'dynamic dispatch' in place of 'static dispatch',5056,140,14
+cd41b42,feat: now string can be abstracted from rest in flash or sram memory.,4158,0,14
+41a9f1a,minor change,3558,0,14
+94369c1,refactor: function extraction from type to another type,3558,0,14
+45e161d,refactor: simplification,3558,0,14
+0c49217,refactor: type transformation,3558,0,14
+9a58822,feat: introduction of menu_manager,3146,0,14
+95d6f04,feat: lcd rendering by specified frames_per_second rate,12446,404,20
+c69bab7,minor change,12276,404,20
+de0f841,refactor: simplification,12276,404,20
+8123222,refactor: formating,12252,404,20
+c1f5958,bugfix: retangular wave generator,12838,402,20
+496fc1c,refactor: improve type safety extracting to enum,12630,402,20
+5481be2,refactoring: simplification,12630,402,20
+1cd454f,refactor: improve iterability,12468,402,20
+404c123,formating,11958,402,20
+b627f8d,doc: added information of estimated size in bytes of some data structures,12022,402,20
+0eb18d6,minor change,12022,402,20
+0ddc7ee,refactor: make 'Point' generic,12022,402,20
+1e56dc6,minor change,12022,402,20
+2133817,refactor: bugfix and improvement of the rectangular wave generator,12022,402,20
+d6e0ed7,feat: MenuItem now is agnostic against Optional and Numerical fields widgets,11762,402,20
+136738a,refactor: makes 'Field' Widget payload's agnostic,10600,396,20
+c6cdb42,refactor: extracted type from type (drawing part) to make Field agnostic,10730,396,20
+d189968,refactor: extraction of function from type to type,10520,396,20
+9e7d7cd,refactor: extracted functions from a type to other types;,10534,396,20
+5ebdcb8,refactor: extracted new type named 'Numerical' from Field Widget,11214,396,20
+a2d1210,refact: function extraction,11340,396,20
+d0752c0,refactor: added Accessor<T> to Optional Widget,11340,396,20
+eec5e2d,feat: reintroduced Accessor<T> to abstract Field Widget memory access,11340,396,20
+573cc92,refact: removed unused file,11958,396,20
+7e042db,refactor: type renamed,11958,396,20
+e7a5cab,minor change,11958,396,20
+aca6e36,refact: extracted function to file (widget tests),4722,122,14
+bc9ec7e,refact: introduced an static polymorphic indirection,4714,122,14
+b138549,refactor: extracted sub-module from file,4714,122,14
+98a58d6,feat: introduced the Optional Widget,4714,122,14
+012466d,refactor: removed unused code,11344,396,20
+2a1311a,"feat: Field Widget features like number of digits, valid_range, etc",11522,396,20
+791a290,feat: Field widget now can initialize in arbitrary cursor position,13964,514,20
+c84a91e,refactory: function extraction,13784,492,14
+91cbe7a,refact: improved menu field type formating,13762,492,14
+c8ad76d,feat: SubMenu now saves data in memory,13016,492,14
+9452f8e,refactor: reduced type memory footprint,8752,0,14
+15c2fa8,refactor: removed unnecessary code,9546,0,14
+b5e2ba1,refactor: added menu scrolling,9648,0,14
+79fb791,refactor: removed Widget trait from Caption,9450,0,14
+8b67f34,temp: introduced menu scrolling,9450,0,14
+5c6a9a4,refactored: constructor of sub_menu,9464,0,14
+61bb8bf,refactor: extracted submenu type,8224,0,14
+d651c3c,feat: MenuItem and Field can now return back a value,8214,0,14
+d1e8f64,refactor: function extraction,6168,0,14
+c4052e8,refactor: file rename,6208,0,14
+55f20d1,minor change,6208,0,14
+958581a,refactor: file extraction,6208,0,14
+20278ac,feat: field can now save or cancel its editing value,6208,0,14
+3b0e8b7,minor changes,6762,0,14
+788e2c3,refactor: 'field' dependency of widget trait removed,6762,0,14
+947167b,feat: helper to convert u16 to string,6762,0,14
+cbf3092,bugfix: added dependencies,6762,0,14
+cc7b13f,feat: introduced Ram database,6762,0,14
+03d3525,feat: added print string to canvas type,4752,0,14
+e84345f,feat: added application DataBase,4752,0,14
+4eb4484,"feat: added sub-menu ""Programa""",6762,0,14
+f58d822,refact: removed one layer of abstraction,4124,0,14
+076b3b2,feat: added menu Execucao,3770,0,14
+144b0de,feat: added main_menu,3622,0,14
+830cc8e,feat: added Splash  Widget,6032,0,14
+37df949,refactor: moved code between files,3982,290,9
+2b7400c,minor change,3982,278,9
+6f2b496,minor change,3976,278,9
+a7fcb14,feat: parser of the string of menuitem construction,3962,268,9
+8684220,feat: conveter from flashstring to string,5604,0,14
+10bb21e,minor change,5604,0,14
+2bc3985,refactor: reincorporate external file,5604,0,14
+2686d53,rafactor: extracted some types and constants,5604,0,14
+ee4ce68,refactor: file renaming,5894,0,14
+2da95d5,refactor: removed indirect use statement,5894,0,14
+dc09556,refac: file renaming,5894,0,14
+8e7e58a,refactor: extraction of file sub-modules,5894,0,14
+81a2a14,refactor: modules extraction,5894,0,14
+91fa6bb,removed unused code,5894,0,14
+c30c261,feat: FlashString type working,7998,0,14
+a6f6dec,chore: makefile can now fast upload,2056,0,9
+de253fa,Proposal of solution to store text data in flash memory,2056,0,9
+af1b100,temp: investigation on introducing string in flash memory,8458,0,14
+2159565,"bugfix: menu, canvas rendeing",7456,0,14
+ca34b88,feat: introduced scrolled menu,7420,0,14
+29a817a,refactor: Simplification by introduzing 'heapless' lib in current code,6716,0,14
+b0d25ae,refactor: removed unused variable,6000,0,14
+bc5e239,refactor: simplification of 'caption' widget,6000,0,14
+2f336d9,Merge branch 'heapless' into menu,5998,0,14
+f7e47f4,lib-feat: added 'heapless' dependency,5998,0,14
+3134e61,feat: menu item editable,5998,0,14
+d04a858,feat: introduced 'Widget' trait,5722,0,14
+f09ffa6,minor change,4780,0,14
+c7a93b8,feat: introduced double buffer swap for lcd display,4742,0,14
+245da27,refactor: simplification,4060,0,9
+c17d3d7,feat: field widget now blinks char at cursor,3492,0,9
+0cab00f,feat: key pressed beep,3098,0,9
+2128593,feat: added debounce time to keyboard key pressed,3212,0,9
+f8aea3a,minor fix,2606,0,9
+a2794e8,minor change: changed entry point,2606,0,9
+5a4db78,timer frequency changed from 1hz to 1khz,1162,0,9
+ee76d93,feat: introduced 'now()' function mechanism,1162,0,9
+9fba92d,temp: preparing to add timer to project,1120,0,9
+7117ed3,reafactor: menu lcd (temp),2490,0,9
+88c63c0,feat: introduced front_panel controller,994,0,9
+1371c51,feat: introduced seminal structural elements for lcd menu module,1852,0,9
+5814a29,refactor: make keyboard api public,774,0,9
+938d8ce,bugfix,774,0,9
+5c9b165,minor change,774,0,9
+6c00f38,menu development setup,774,0,9
+871f89b,feat/test: very simple memory allocator; and vec! test,1048,0,209
+455f781,test: of Reader ADT executing on AVR target,772,0,9
+075f09f,feat: Added Dummy custom memory allocator for avr target,772,0,9
+615330e,refactor: sub-module extraction,772,0,9
+3bf7580,feat: introduced Reader abstract data type,772,0,9
+71e7911,feat: introduced profunctor algebraic data type,772,0,9
+159261b,feat: introduced cmpp device memory map file,1810,216,9
+a0dcfd6,removed unused file,1810,216,9
+329f88f,feat: transport layer transaction package function,1810,216,9
+0e4fb90,refactor: type renaming,1810,216,9
+ccca961,feat: transport layer frame construction,1810,216,9
+2b3e7d5,feat: improved channel type,1810,216,9
+176e95f,refactor: Channel type extraction,1810,216,9
+10a30da,feat: introduced transact packat function,1810,216,9
+a6d57ba,chore: file renaming,1810,216,9
+323d67e,feat: introduced bitmask type indirection,1810,216,9
+1f71ec4,feat: introduced word16 type,1810,216,9
+d013f03,refactor: function extraction,1810,216,9
+f7ba7e5,chore: file renaming,1810,216,9
+9903f5c,chore: Introduce rule in Mafile to watch all platforms,1810,216,9
+1874d16,refactor: extraction of common utils to plataform agnostic lib,1810,216,9
+d8721e8,feat: added master framer transport layer constructor,1810,216,9
+5e9119d,refactor: simplification,1810,216,9
+7ec97bc,test: added avr datalink transaction test,1810,216,9
+6e7784b,chore: Added Makefile rule watch & upload to avr,766,0,9
+2143d3f,feat: introduced datalink transact,766,0,9
+2823681,doc,766,0,9
+900231f,chore: added a division marker into Makefile output,766,0,9
+7eb9637,feat: introduced cmpp transact function,766,0,9
+8377411,refact: type renaming,766,0,9
+cf939aa,test: Add unit test,766,0,9
+000d986,refact: decoder us using type frame2 instead of DataSegment,766,0,9
+3485a77,refactor: type mapping from SegmentResult to frame2,766,0,9
+addb135,feat: introduced new frame type,766,0,9
+aa6b56d,refactor: checksum calc,766,0,9
+f7765df,refactor: extracted transact,766,0,9
+0015d0e,test: add unit test,766,0,9
+c67f960,refactor: extracting datalink transact to platform agnostic code,766,0,9
+2d99e0f,chore: added watch_avr to makefile,766,0,9
+755711a,feat: introduced mocked serial connection,766,0,9
+18261e3,feat: introduced Array type,766,0,9
+db416ba,fix: removed macro constructor for ringbuffer,766,0,9
+6addbb5,refactor: ring buffer now is generic,766,0,9
+82ae52d,feat: Add ring buffer (circular buffer),766,0,9
+0359494,fix: removed compiler warnings,766,0,9
+dac4b3b,refactor: extracted generic serial connection interface,766,0,9
+596d921,fix: by principle 'Segment decoder' must also return start_byte,766,0,9
+0cae1be,make it compile,766,0,9
+94eb5f9,naming convention,766,0,9
+ba73475,feat: introduced cmpp00lg casting,766,0,9
+bbe8274,chore: removed compiler warnings,2158,0,9
+4a165a4,refactor: function and module extraction,2158,0,9
+e668ad1,refactor: module extraction,2158,0,9
+f2d0d80,Merge branch 'transact_refactor' into dev,2158,0,9
+d321c52,function extraction,2158,0,9
+dbedc35,errata,2200,220,9
+f74ce8e,function extraction,2200,220,9
+089a9ed,removed unnecessary output,2200,220,9
+88be50b,refactor: file renamed,2196,244,9
+1478712,feat: added timeout to frame communication,2196,244,9
+98a84d9,feat: introduced datalink transaction,2054,236,9
+8136d75,refactor: StartByte type extraction,1184,0,14
+b1476cb,fix: implemented checksum in decoder algorithm,1184,0,14
+2920e78,fix: unnecessary cloning,1184,0,14
+90a33fb,fix: introduced checksum calc routine,1184,0,14
+e176b97,refactor: file renaming,1184,0,14
+85d1496,refactor: insertion & renaming,1184,0,14
+d41e784,refactor: file renamed,1184,0,14
+1397fc0,refactor: old file removed,1184,0,14
+057a4cf,refactor: completely refactored the datalink layer,1184,0,14
+b3a7633,tests: added unit test for datalink out (bug in checksum),1184,0,14
+6fd073d,doc: minor change,1184,0,14
+4c9baa7,test: first unit test added to the project,1184,0,14
+e0142bd,refactor: sub-module extraction,1184,0,14
+e3e203f,chore: removed all compiler warnings on datalink,1184,0,14
+245fe7b,chore: added watch rule to Makefile,1184,0,14
+19db003,chore: added test rule to Makefile,1184,0,14
+3a8e522,chore: added test rule into Makefile,1184,0,14
+e7a93dd,"chore: added a sub-module, plataform agnostic, dependency.",1184,0,14
+b96a833,bugfix: corrected flashing target file,1184,0,14
+449f788,chore: specifc build avr only for avr package,1340,0,9
+71311d4,doc: add comment,1340,0,9
+9f9f5ec,mono-repo: extracted to sub-crate,1340,0,9
+20ce076,refactor: extracted parameter from Makefile,1340,0,9
+8d28f66,minor changes,1340,0,9
+36b830f,minor: setup,1340,0,9
+64cf97e,refactor: wrapper around third-party hardware serial,1340,0,9
+2ab65db,feat: introduced datalink out stream,1340,0,9
+19c85f6,feat: introduced datalink input stream,1526,0,9
+c50c799,deleted unused files,1526,0,9
+7fe02e9,"feature: protocol posV1 parser, first stage",1610,0,9
+033858a,feat: introduced keypad low-level driver,2078,0,9
+182bfac,refactor: assure shift register's low-level initialization function is called at low level,1256,0,9
+a433b6b,bugfix: i was using reading input shift-register without initializing its pins.,1256,0,9
+fa14eed,feat: a wrapper class for lcd low-level driver,1026,0,9
+2c70258,doc: minor changes,1314,0,9
+e419138,refactor:  output_expander,1314,0,9
+e45c401,feat: introduced mid-level inpuit expander abstraction,1484,0,9
+ab3cc5b,feat: introduced high level abstraction for io,822,0,9
+e968523,format: removed unused code,822,0,9
+d4a4d81,feat: mid abstraction over low level shift register out,822,0,9
+07c9f6b,disabled keyboard module (which is under construction),822,0,9
+1896eb0,format: to avoid compiler warnings,822,0,9
+a78abe7,refactor: introduced new common helper functions,822,0,9
+7c6c78b,file rename,822,0,9
+114eb98,non-working implementation of keyboard,822,0,9
+3954ab7,non-tested code for read shift register inputs,1070,0,9
+32403a1,refactor: removed unused code,1340,0,9
+cddf707,Merge branch 'serial',1340,0,9
+801ab2d,feat: introduce serial port communication,1340,0,9
+8cc82ad,Merge branch 'lcd-driver',1184,0,14
+a2da418,doc: demo on how use lcd driver,1184,0,14
+7695098,feat: starts lcd without cursor blinking,984,0,14
+751e84e,bugfix: lcd setcursor function,984,0,14
+85895b3,feat: introduction of lcd driver,972,0,14
+5e99da5,feat: introduced new common function,690,0,9
+92b0d2a,Merge branch 'refactor',690,0,9
+3cd37b5,doc: added notes about shift-register output speed,690,0,9
+a2266e6,refactor: removed unused code,690,0,9
+fa4c20e,feat: introduced shift-register out driver,692,0,9
+26f3d61,refactor: internalized delay micro seconds,532,0,10
+447633e,doc: updated readme,532,0,10
+ae13fa9,bugfix: makefile rule wrong name,532,0,10
+4996b58,bugfix: delay implementation not correctly,532,0,10
+597d286,chore: remove unimportant compiler warnings,532,0,10
+953e158,chore: renamed rule of Makefile,532,0,10
+bcee3c8,feat: internalized delay_ms function,0,0,0
+e71f542,refactor: extracted timer,0,0,0
+114fafe,refactor: extracted sub-modules,0,0,0
+d9a4693,refactor: use my own code to toggle led,0,0,0
+d3625fe,added 'building' structure,0,0,0
+680b7a7,minor: removed unused code,0,0,0
+d5ab510,minor: added git temp folder to .gitignore,0,0,0
+63f8179,feat: introduced timing interruption control,0,0,0
+c486012,refactor: extracted code from main,0,0,0
+f900d4b,refactor: casting to improve code efficiency,0,0,0
+87f321d,refactor: extracted board,0,0,0
+6611955,refactor: removed unused code,0,0,0
+0c0239f,refactor: extracted modules,0,0,0
+69e538d,refactor: extracted eeprom module,0,0,0
+d840f6a,refactor: extracted eeprom functions,0,0,0
+0f3d202,extracted 'read/write register' functions,0,0,0
+65d835c,revert some changes in avr-size makefile call,0,0,0
+eb56564,small correction in makefile,0,0,0
+e1ae897,Initial Commit,0,0,0
