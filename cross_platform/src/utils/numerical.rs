@@ -52,11 +52,11 @@ pub fn convert_u16_to_string_decimal(value: u16) -> String<5> {
 }
 
 /// Equals std::clamp but with constant function attribute
-pub const fn const_clamp<T>(data: T, min: T, max: T) -> T
+pub fn const_clamp<T>(data: T, min: T, max: T) -> T
 where
     T: Sized,
-    T: ~const Destruct,
-    T: ~const PartialOrd,
+    T: Destruct,
+    T: PartialOrd,
 {
     assert!(min <= max);
     if data < min {
@@ -68,12 +68,12 @@ where
     }
 }
 
-pub const fn usize_to_u8_clamper(data: usize) -> u8 {
+pub fn usize_to_u8_clamper(data: usize) -> u8 {
     let clamped_u8 = const_clamp(data, u8::MIN as usize, u8::MAX as usize) as u8;
     clamped_u8
 }
 
-pub const fn u32_to_u16_clamper(data: u32) -> u16 {
+pub fn u32_to_u16_clamper(data: u32) -> u16 {
     let clamped_u8 = const_clamp(data, u16::MIN as u32, u16::MAX as u32) as u16;
     clamped_u8
 }

@@ -62,8 +62,8 @@ impl Iterator for FlashTemplateIterator {
                 Some(new_reminder)
             };
             // removed BEGIN_TOKEN and END_TOKEN from the field
-            const BEGIN_TOKEN_LENGTH: u8 = usize_to_u8_clamper(BEGIN_TOKEN.len());
-            const END_TOKEN_LENGTH: u8 = usize_to_u8_clamper(END_TOKEN.len());
+            let BEGIN_TOKEN_LENGTH: u8 = usize_to_u8_clamper(BEGIN_TOKEN.len());
+            let END_TOKEN_LENGTH: u8 = usize_to_u8_clamper(END_TOKEN.len());
             let field = field.sub_string(BEGIN_TOKEN_LENGTH..field.len() - (END_TOKEN_LENGTH));
             return Some(TemplateKind::Field(field));
             // NOTE: We will ignore the second Start_Token in the case of an Start_Token -> Start_Token -> End_Token
