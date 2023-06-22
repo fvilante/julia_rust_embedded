@@ -440,15 +440,12 @@ impl EepromStorable for ConfiguracaoDoEquipamento {
 pub struct GuiState {
     /// TODO: Should use u8 instead of u16 here.
     pub numero_do_programa_do_eixo_x: Cell<u16>,
-    /// TODO: Should use u8 instead of u16 here.
-    pub numero_do_programa_do_eixo_y: Cell<u16>,
 }
 
 impl Default for GuiState {
     fn default() -> Self {
         Self {
             numero_do_programa_do_eixo_x: Cell::new(0),
-            numero_do_programa_do_eixo_y: Cell::new(1),
         }
     }
 }
@@ -458,6 +455,7 @@ impl Default for GuiState {
 pub struct DataModel {
     pub arquivo_de_eixo_00: ArquivoDeEixo,
     pub arquivo_de_eixo_01: ArquivoDeEixo,
+    //pub arquivo_de_eixo_y: ArquivoDeEixo,
     pub configuracao_do_eixo_x: ConfiguracaoDoEixo,
     pub configuracao_do_eixo_y: ConfiguracaoDoEixo,
     pub configuracao_do_equipamento: ConfiguracaoDoEquipamento,
@@ -473,6 +471,7 @@ impl DataModel {
         Self {
             arquivo_de_eixo_00: ArquivoDeEixo::default(),
             arquivo_de_eixo_01: ArquivoDeEixo::default(),
+            //arquivo_de_eixo_y: ArquivoDeEixo::default(),
             configuracao_do_eixo_x: ConfiguracaoDoEixo::default(),
             configuracao_do_eixo_y: ConfiguracaoDoEixo::default(),
             configuracao_do_equipamento: ConfiguracaoDoEquipamento::default(),
