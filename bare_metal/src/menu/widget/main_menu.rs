@@ -84,8 +84,8 @@ impl<'a> MainMenu<'a> {
     }
 }
 
-impl<'a> MainMenu<'a> {
-    pub fn send_key(&mut self, key: KeyCode) {
+impl<'a> Widget for MainMenu<'a> {
+    fn send_key(&mut self, key: KeyCode) {
         match self.current_state {
             State::MainMenu => match key {
                 KeyCode::KEY_MANUAL => {
@@ -118,7 +118,7 @@ impl<'a> MainMenu<'a> {
         }
     }
 
-    pub fn update(&mut self) {
+    fn update(&mut self) {
         match self.current_state {
             State::MainMenu => {
                 // Reset frontend leds
@@ -163,7 +163,7 @@ impl<'a> MainMenu<'a> {
         }
     }
 
-    pub fn draw(&mut self, screen_buffer: &mut ScreenBuffer, start_point: Point) {
+    fn draw(&self, screen_buffer: &mut ScreenBuffer, start_point: Point) {
         match self.current_state {
             State::MainMenu => self.draw_main_menu(screen_buffer),
             State::Manual => self.menu_manual_controler.draw(screen_buffer, start_point),
