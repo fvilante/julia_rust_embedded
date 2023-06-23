@@ -9,6 +9,7 @@ use crate::menu::widget::main_menu::MainMenu;
 use crate::menu::widget::manual_mode::ManualModeMenuControler;
 use crate::menu::widget::splash::Splash;
 use crate::menu::widget::submenu_programa::spec::{MenuProgramaArena, MenuProgramaHandle};
+use crate::menu::widget::widget::Widget;
 use crate::microcontroler::timer::now;
 use crate::microcontroler::{serial, timer};
 use cross_platform::protocol::datalink::datalink::Datalink;
