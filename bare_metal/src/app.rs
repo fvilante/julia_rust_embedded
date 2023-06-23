@@ -182,26 +182,33 @@ pub fn run() -> ! {
     //  Main loop
     // ////////////////////////////////////////////////////////////////////
 
-    //
-    let fps = 30; // 200 milisecs
-    let mut next_frame = now() + (1000 / fps);
+    fn start_main_loop<T: Widget>(
+        mut screen_buffer: ScreenBuffer,
+        mut keyboard: Keyboard,
+        mut menu: T,
+        transport: &TransportLayer,
+    ) -> ! {
+        let fps = 30; // frames_per_second for lcd display redraw -> 30_fps = 200_milisecs
+        let mut next_frame = now() + (1000 / fps);
+        loop {
+            // Proccess keystrokes
+            if let Some(key) = keyboard.get_key() {
+                match key {
+                    KeyCode::KEY_F2 => emit_print_go_signal(&transport),
+                    _ => menu.send_key(key),
+                }
+            }
+            // Update calculations
+            menu.update();
 
-    loop {
-        // Proccess keystrokes
-        if let Some(key) = keyboard.get_key() {
-            match key {
-                KeyCode::KEY_F2 => emit_print_go_signal(&transport),
-                _ => main_menu_controler.send_key(key),
+            // Render next frame
+            if now() > next_frame {
+                next_frame = now() + (1000 / fps);
+                menu.draw(&mut screen_buffer, Point::new(0, 0));
+                screen_buffer.render();
             }
         }
-        // Update calculations
-        main_menu_controler.update();
-
-        // Render next frame
-        if now() > next_frame {
-            next_frame = now() + (1000 / fps);
-            main_menu_controler.draw(&mut screnn_buffer, Point::new(0, 0));
-            screnn_buffer.render();
-        }
     }
+
+    start_main_loop(screnn_buffer, keyboard, main_menu_controler, &transport)
 }
