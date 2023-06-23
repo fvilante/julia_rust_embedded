@@ -9,6 +9,9 @@ exclude = [
     "scripts"
 ]
 
+# Not sure about why this parameter is necessary
+resolver = "2"
+
 # Note(fv): Below lines seems to be unecessary. Check if it is possible to remove it in future
 
 # Configure the build for minimal size - AVRs have very little program memory
