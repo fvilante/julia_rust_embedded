@@ -183,7 +183,7 @@ pub fn run() -> ! {
     }
 
     let menu_programa_arena = MenuProgramaArena::new(&data_model);
-    let menu_controler = make_menu_controler(
+    let mut menu_controler = make_menu_controler(
         &menu_programa_arena,
         &data_model,
         &transport_x,
@@ -212,33 +212,26 @@ pub fn run() -> ! {
     //  Main loop
     // ////////////////////////////////////////////////////////////////////
 
-    fn start_main_loop(
-        mut screen_buffer: ScreenBuffer,
-        mut keyboard: impl Keyboard,
-        mut menu_controler: impl Widget,
-        transport: &TransportLayer,
-    ) -> ! {
-        let fps = 30; // frames_per_second for lcd display redraw -> 30_fps = 200_milisecs
-        let mut next_frame = now() + (1000 / fps);
-        loop {
-            // Proccess keystrokes
-            if let Some(key) = keyboard.get_key() {
-                match key {
-                    KeyCode::KEY_F2 => emit_print_go_signal(&transport),
-                    _ => menu_controler.send_key(key),
-                }
-            }
-            // Update calculations
-            menu_controler.update();
+    //
+    let fps = 30; // 200 milisecs
+    let mut next_frame = now() + (1000 / fps);
 
-            // Render next frame
-            if now() > next_frame {
-                next_frame = now() + (1000 / fps);
-                menu_controler.draw(&mut screen_buffer, Point::new(0, 0));
-                screen_buffer.render();
+    loop {
+        // Proccess keystrokes
+        if let Some(key) = keyboard.get_key() {
+            match key {
+                KeyCode::KEY_F2 => emit_print_go_signal(&transport_x),
+                _ => menu_controler.send_key(key),
             }
         }
-    }
+        // Update calculations
+        menu_controler.update();
 
-    start_main_loop(screen_buffer, keyboard, menu_controler, &transport_x);
+        // Render next frame
+        if now() > next_frame {
+            next_frame = now() + (1000 / fps);
+            menu_controler.draw(&mut screen_buffer, Point::new(0, 0));
+            screen_buffer.render();
+        }
+    }
 }
