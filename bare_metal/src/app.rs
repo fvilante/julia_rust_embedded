@@ -240,5 +240,5 @@ pub fn run() -> ! {
         }
     }
 
-    start_main_loop(screen_buffer, keyboard, menu_controler, &transport_x)
+    start_main_loop(screen_buffer, keyboard, menu_controler, &transport_x);
 }

@@ -1,18 +1,16 @@
 use super::{
     execucao::MenuExecucaoControler,
     manual_mode::{ManualModeMenuControler, ManualModeState},
-    splash::{send_all_and_show_user_info_on_screen},
+    splash::send_all_and_show_user_info_on_screen,
     submenu_programa::menu_programa_controler::MenuProgramaControler,
     widget::Widget,
 };
-use crate::{
-    board::front_panel::FrontPanel,
-};
+use crate::board::front_panel::FrontPanel;
 
 use crate::geometry::point::Point;
 use crate::string::flash::FlashString;
 use crate::{
-    board::{keypad::KeyCode},
+    board::keypad::KeyCode,
     menu::{model::DataModel, screen_buffer::ScreenBuffer},
 };
 use avr_progmem::progmem;
