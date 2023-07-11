@@ -1,6 +1,6 @@
 use core::panic::PanicInfo;
 
-use crate::board::lcd;
+
 
 /// PANIC HANDLER
 /// ATTENTION: Do not call it directly, instead use the [`fatal_error!`] macro

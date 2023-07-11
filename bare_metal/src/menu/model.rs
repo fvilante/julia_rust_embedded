@@ -2,8 +2,7 @@ use core::cell::Cell;
 
 use cross_platform::{
     protocol::{
-        datalink::datalink::Status,
-        transport::transport_layer::{TLError, TransportLayer},
+        transport::transport_layer::{TransportLayer},
     },
     utils::cursor::Cursor,
 };

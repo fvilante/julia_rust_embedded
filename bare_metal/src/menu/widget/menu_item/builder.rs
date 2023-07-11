@@ -6,7 +6,7 @@ use super::{
     super::{field::field::Field, field::numerical::Format, field::optional::OptionsBuffer},
     menu_item::MenuItemWidget,
 };
-use avr_progmem::string::PmString;
+
 use core::{cell::Cell, ops::Range};
 use cross_platform::utils::cursor::Cursor;
 use heapless::Vec;

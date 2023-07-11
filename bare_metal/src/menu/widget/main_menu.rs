@@ -1,21 +1,19 @@
 use super::{
     execucao::MenuExecucaoControler,
     manual_mode::{ManualModeMenuControler, ManualModeState},
-    splash::{send_all_and_show_user_info_on_screen, show_communication_error_message},
+    splash::{send_all_and_show_user_info_on_screen},
     submenu_programa::menu_programa_controler::MenuProgramaControler,
     widget::Widget,
 };
 use crate::{
     board::front_panel::FrontPanel,
-    menu::model::{send_all, CmppData},
 };
 
 use crate::geometry::point::Point;
 use crate::string::flash::FlashString;
 use crate::{
-    board::{keypad::KeyCode, lcd},
+    board::{keypad::KeyCode},
     menu::{model::DataModel, screen_buffer::ScreenBuffer},
-    microcontroler::delay::delay_ms,
 };
 use avr_progmem::progmem;
 use cross_platform::protocol::transport::transport_layer::TransportLayer;
