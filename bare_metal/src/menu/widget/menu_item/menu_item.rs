@@ -18,20 +18,20 @@ use super::super::{
 
 //
 
-pub struct MenuItemWidget<'a> {
+pub struct MenuItemWidget {
     point_and_caption: (Point1d, Caption),
     //TODO: Check if is it possible to remove 'pub' visibility in below line
-    pub point_and_field: Option<(Point1d, Field<'a>)>,
+    pub point_and_field: Option<(Point1d, Field)>,
     pub child: Option<MenuProgramaAreanaSelector>,
     unit_of_measurement: Option<(Point1d, Caption)>,
 }
 
-impl<'a> MenuItemWidget<'a> {
+impl MenuItemWidget {
     /// NOTE: client should put point1 and point2 in the same line
     /// point1 = position of caption, point2 = position of field
     pub fn new(
         point_and_text: (Point1d, FlashString),
-        point_and_field: Option<(Point1d, Field<'a>)>,
+        point_and_field: Option<(Point1d, Field)>,
         child: Option<MenuProgramaAreanaSelector>,
         unit_of_measurement: Option<(Point1d, FlashString)>,
     ) -> Self {
@@ -50,7 +50,7 @@ impl<'a> MenuItemWidget<'a> {
     }
 }
 
-impl Saveble for MenuItemWidget<'_> {
+impl Saveble for MenuItemWidget {
     fn restore_value(&mut self) {
         self.set_edit_mode(false); // terminate the edition
         let Some((_, field)) = &mut self.point_and_field else { return();};
@@ -64,7 +64,7 @@ impl Saveble for MenuItemWidget<'_> {
     }
 }
 
-impl MenuItemWidget<'_> {
+impl MenuItemWidget {
     pub fn send_key(&mut self, key: KeyCode) {
         if self.is_in_edit_mode() {
             match key {
@@ -112,7 +112,7 @@ impl MenuItemWidget<'_> {
     }
 }
 
-impl MenuItemWidget<'_> {
+impl MenuItemWidget {
     pub fn set_edit_mode(&mut self, value: bool) {
         if let Some((_, field)) = &mut self.point_and_field {
             field.set_edit_mode(value);

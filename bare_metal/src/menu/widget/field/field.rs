@@ -21,26 +21,26 @@ use super::{
 ///
 /// Abstracts all kind of fields existent offering an equal interface for all of them (Note: New Fields
 /// may be added in the future)
-pub enum Field<'a> {
-    Numerical(NumberInputEditorWidget<'a>),
-    Optional(OptionEditorWidget<'a>),
+pub enum Field {
+    Numerical(NumberInputEditorWidget),
+    Optional(OptionEditorWidget),
 }
 
-impl<'a> Field<'a> {
-    pub fn from_numerical(variable: &'a Cell<u16>, format: Format) -> Self {
+impl Field {
+    pub fn from_numerical(variable: *mut u16, format: Format) -> Self {
         const INITIAL_EDITING_MODE: bool = false; // does not start in edit mode
         let numerical_field = NumberInputEditorWidget::new(variable, format, INITIAL_EDITING_MODE);
         Self::Numerical(numerical_field)
     }
 
-    pub fn from_optional(variable: &'a Cell<Cursor>, options: OptionsBuffer) -> Self {
+    pub fn from_optional(variable: *mut Cursor, options: OptionsBuffer) -> Self {
         const INITIAL_EDITING_MODE: bool = false; // does not start in edit mode
         let optional = OptionEditorWidget::new(variable, options, INITIAL_EDITING_MODE);
         Self::Optional(optional)
     }
 }
 
-impl Saveble for Field<'_> {
+impl Saveble for Field {
     fn restore_value(&mut self) {
         match self {
             Self::Numerical(x) => x.restore_value(),
@@ -56,7 +56,7 @@ impl Saveble for Field<'_> {
     }
 }
 
-impl Widget for Field<'_> {
+impl Widget for Field {
     fn send_key(&mut self, key: KeyCode) {
         match self {
             Self::Numerical(x) => x.send_key(key),
@@ -79,7 +79,7 @@ impl Widget for Field<'_> {
     }
 }
 
-impl Editable for Field<'_> {
+impl Editable for Field {
     fn set_edit_mode(&mut self, value: bool) {
         match self {
             Self::Numerical(x) => x.set_edit_mode(value),
