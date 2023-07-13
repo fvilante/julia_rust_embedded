@@ -1,11 +1,6 @@
 use core::cell::Cell;
 
-use cross_platform::{
-    protocol::{
-        transport::transport_layer::{TransportLayer},
-    },
-    utils::cursor::Cursor,
-};
+use cross_platform::{protocol::transport::transport_layer::TransportLayer, utils::cursor::Cursor};
 
 use crate::{fatal_error, microcontroler::eeprom::EepromAddress};
 

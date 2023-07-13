@@ -9,7 +9,7 @@ use crate::geometry::point::Point;
 use crate::menu::widget::widget::Widget;
 use crate::microcontroler::ratangular_wave::RectangularWave;
 use crate::{
-    board::{keypad::KeyCode},
+    board::keypad::KeyCode,
     menu::{
         screen_buffer::ScreenBuffer,
         widget::submenu_programa::spec::{MenuProgramaAreanaSelector, MenuProgramaArena},

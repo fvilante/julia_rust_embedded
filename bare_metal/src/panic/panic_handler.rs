@@ -1,7 +1,5 @@
 use core::panic::PanicInfo;
 
-
-
 /// PANIC HANDLER
 /// ATTENTION: Do not call it directly, instead use the [`fatal_error!`] macro
 #[panic_handler]
