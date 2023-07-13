@@ -9,7 +9,7 @@ use crate::geometry::point::Point;
 use crate::menu::widget::widget::Widget;
 use crate::microcontroler::ratangular_wave::RectangularWave;
 use crate::{
-    board::keypad::KeyCode,
+    board::{keypad::KeyCode},
     menu::{
         screen_buffer::ScreenBuffer,
         widget::submenu_programa::spec::{MenuProgramaAreanaSelector, MenuProgramaArena},
@@ -31,7 +31,7 @@ pub struct MenuProgramaControler<'a> {
     /// State of widgets which are currently mounted and therefore visible on screen.
     /// TODO: Is not necessary to have two MenuItemWidget states on memory but just one. Introduce some logic when possible
     /// to optimize this.
-    mounted: [MenuItemWidget; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
+    mounted: [MenuItemWidget<'a>; 2], // TOTAL_NUMBER_OF_LINES_IN_LCD as usize],
     /// Stores the path of menu jumps that user perform, so you can go back to previous menu
     navigation_path: Vec<MenuProgramaAreanaSelector, 7>,
     /// Main menu reads this bit, if it is set then it will render the main menu. When menu_menu pass control
@@ -106,7 +106,7 @@ impl<'a> MenuProgramaControler<'a> {
     }
 
     /// Get mounted item for a particular lcd line (mutable reference)
-    fn get_mounted_item_for_lcd_line_mut(&mut self, lcd_line: LcdLine) -> &mut MenuItemWidget {
+    fn get_mounted_item_for_lcd_line_mut(&mut self, lcd_line: LcdLine) -> &mut MenuItemWidget<'a> {
         if let Some(elem) = self.mounted.get_mut(lcd_line as u8 as usize) {
             return elem;
         } else {
@@ -115,7 +115,7 @@ impl<'a> MenuProgramaControler<'a> {
         }
     }
 
-    fn get_mounted_item_for_lcd_line(&self, lcd_line: LcdLine) -> &MenuItemWidget {
+    fn get_mounted_item_for_lcd_line(&self, lcd_line: LcdLine) -> &MenuItemWidget<'a> {
         if let Some(elem) = self.mounted.get(lcd_line as u8 as usize) {
             return elem;
         } else {
@@ -125,7 +125,7 @@ impl<'a> MenuProgramaControler<'a> {
     }
 
     /// Get mounted item for the lcd line selected by the user
-    fn get_selected_menu_item(&mut self) -> &mut MenuItemWidget {
+    fn get_selected_menu_item(&mut self) -> &mut MenuItemWidget<'a> {
         let selected_line = self
             .retrieve_current_menu_navigation_state()
             .get()

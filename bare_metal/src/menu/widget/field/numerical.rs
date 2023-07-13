@@ -256,20 +256,19 @@ impl NumberInputEditor {
 }
 
 /// This [`Widget`] manages the edition of an number (unsigned integer) by the user using the keyboard and lcd display
-pub struct NumberInputEditorWidget {
+pub struct NumberInputEditorWidget<'a> {
     number_editor: NumberInputEditor,
     /// This class is responsible to generate the blinking character effect
     blink: RectangularWave,
     is_in_edit_mode_: bool,
-    /// Position on memory that will interact with the widget
-    variable: *mut u16,
+    variable: &'a Cell<u16>,
 }
 
-impl NumberInputEditorWidget {
-    pub fn new(variable: *mut u16, format: Format, is_in_edit_mode_: bool) -> Self {
+impl<'a> NumberInputEditorWidget<'a> {
+    pub fn new(variable: &'a Cell<u16>, format: Format, is_in_edit_mode_: bool) -> Self {
         const T_ON: u16 = 600;
         const T_OFF: u16 = 300;
-        let initial_value = unsafe { *variable }.clone();
+        let initial_value = variable.get();
         Self {
             number_editor: NumberInputEditor::from_u16(initial_value, format.clone()),
             blink: RectangularWave::new(T_ON, T_OFF),
@@ -279,23 +278,21 @@ impl NumberInputEditorWidget {
     }
 }
 
-impl Saveble for NumberInputEditorWidget {
+impl Saveble for NumberInputEditorWidget<'_> {
     /// Restore initial value, discard edited value
     fn restore_value(&mut self) {
-        let initial_value = unsafe { *self.variable }.clone();
+        let initial_value = self.variable.get();
         self.number_editor.set_u16(initial_value, None);
     }
 
     /// Save value being edited
     fn save_value(&mut self) {
         let edited_value = self.number_editor.as_u16_clamped();
-        unsafe {
-            *self.variable = edited_value;
-        }
+        self.variable.set(edited_value);
     }
 }
 
-impl Editable for NumberInputEditorWidget {
+impl Editable for NumberInputEditorWidget<'_> {
     fn set_edit_mode(&mut self, value: bool) {
         self.is_in_edit_mode_ = value
     }
@@ -305,7 +302,7 @@ impl Editable for NumberInputEditorWidget {
     }
 }
 
-impl Widget for NumberInputEditorWidget {
+impl Widget for NumberInputEditorWidget<'_> {
     fn send_key(&mut self, key: KeyCode) {
         if self.is_in_edit_mode() {
             let content_editor = &mut self.number_editor.content_editor;

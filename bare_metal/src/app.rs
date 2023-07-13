@@ -109,6 +109,7 @@ pub fn run() -> ! {
     let baudrate_code = data_model
         .configuracao_do_equipamento
         .velocidade_de_comunicacao
+        .get()
         .get_current();
     let baudrate = if baudrate_code == B2400_CODE {
         2400
@@ -142,8 +143,8 @@ pub fn run() -> ! {
         number_of_tooths_of_motor_pulley: 16,
     };
 
-    let ch_x = data_model.configuracao_do_eixo_x.numero_do_canal;
-    let ch_y = data_model.configuracao_do_eixo_y.numero_do_canal;
+    let ch_x = data_model.configuracao_do_eixo_x.numero_do_canal.get();
+    let ch_y = data_model.configuracao_do_eixo_y.numero_do_canal.get();
     let channel_x = Channel::from_u16(ch_x).unwrap_or_default();
     let channel_y = Channel::from_u16(ch_y).unwrap_or_default();
     let cmpp_axis_x = CmppAxis::new(baudrate, channel_x, TIMEOUT_MS, mechanical_properties_x);

@@ -19,25 +19,25 @@ pub struct SimpleMenu {
 /// TODO: Improve this construction (ie: why (col, text) instead of an iterator of Captions and/or Fields ?)
 /// TODO: Abstract string, use IntoIterator<Item = u8>.
 /// TODO: Verify if is there there a way to avoid the Option<T> in the `unit_of_measurement` field
-pub struct NumericalParameter {
+pub struct NumericalParameter<'a> {
     pub parameter_name: FlashString,
-    pub variable: (u8, *mut u16), // (collunm_position, text)
+    pub variable: (u8, &'a Cell<u16>), // (collunm_position, text)
     pub valid_range: Range<u16>,
     pub unit_of_measurement_text: Option<(u8, FlashString)>, // (collunm_position, text)
 }
 
-pub struct OptionalParameter {
+pub struct OptionalParameter<'a> {
     pub parameter_name: FlashString,
-    pub variable: (u8, *mut Cursor), // (collunm_position, text)
+    pub variable: (u8, &'a Cell<Cursor>), // (collunm_position, text)
     pub options_list: OptionsBuffer,
 }
 
 /// TODO: Make construction methods `const fn` this may improve flash code's size
 pub struct MenuItemBuilder;
 
-pub struct SimpleMenuWithNumericalParameter {
+pub struct SimpleMenuWithNumericalParameter<'a> {
     pub parameter_name: FlashString,
-    pub variable: (u8, *mut u16), // (collunm_position, text)
+    pub variable: (u8, &'a Cell<u16>), // (collunm_position, text)
     pub valid_range: Range<u16>,
     pub unit_of_measurement_text: Option<(u8, FlashString)>, // (collunm_position, text)
     pub child_menu: MenuProgramaAreanaSelector,
@@ -53,7 +53,7 @@ impl MenuItemBuilder {
         Some(menu_item)
     }
 
-    pub fn make_simple_menu<'a>(ctor: SimpleMenu) -> Option<MenuItemWidget> {
+    pub fn make_simple_menu<'a>(ctor: SimpleMenu) -> Option<MenuItemWidget<'a>> {
         // prepare
         let point1 = Self::POINT1;
         let text = ctor.parent_name;

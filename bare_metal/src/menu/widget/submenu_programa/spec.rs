@@ -7,7 +7,6 @@
 /// to improve and to make the operation of add submenus or menuitems a lot more easier.
 /// By for example using macros! etc
 use core::{cell::Cell, u8};
-use cross_platform::utils::cursor::Cursor;
 
 use crate::{
     menu::widget::menu_item::builder::{
@@ -235,11 +234,7 @@ impl SubmenuLayout for MenuPrograma<'_> {
                     child_menu: MenuProgramaAreanaSelector::MenuArquivoDeEixo,
                     unit_of_measurement_text: None,
                     valid_range: 0..99,
-                    variable: (
-                        37,
-                        &self.model.gui_state.numero_do_programa_do_eixo_x as *const u16
-                            as *mut u16,
-                    ),
+                    variable: (37, &self.model.gui_state.numero_do_programa_do_eixo_x),
                 })
             }
 
@@ -322,22 +317,14 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
         match index {
             0 => MenuItemBuilder::make_numerical_parameter(NumericalParameter {
                 parameter_name: FlashString::new(&POSICAO_INICIAL),
-                variable: (
-                    30,
-                    &self.model.get_arquivo_de_eixo_by_ref().posicao_inicial as *const u16
-                        as *mut u16,
-                ),
+                variable: (30, &self.model.get_arquivo_de_eixo_by_ref().posicao_inicial),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((35, FlashString::new(&MILIMETROS))),
             }),
 
             1 => MenuItemBuilder::make_numerical_parameter(NumericalParameter {
                 parameter_name: FlashString::new(&POSICAO_FINAL),
-                variable: (
-                    30,
-                    &self.model.get_arquivo_de_eixo_by_ref().posicao_final as *const u16
-                        as *mut u16,
-                ),
+                variable: (30, &self.model.get_arquivo_de_eixo_by_ref().posicao_final),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((35, FlashString::new(&MILIMETROS))),
             }),
@@ -346,8 +333,7 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
                 parameter_name: FlashString::new(&ACELERACAO_DE_AVANCO),
                 variable: (
                     30,
-                    &self.model.get_arquivo_de_eixo_by_ref().aceleracao_de_avanco as *const u16
-                        as *mut u16,
+                    &self.model.get_arquivo_de_eixo_by_ref().aceleracao_de_avanco,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((
@@ -363,7 +349,7 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .aceleracao_de_retorno as *const u16 as *mut u16,
+                        .aceleracao_de_retorno,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((
@@ -376,8 +362,7 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
                 parameter_name: FlashString::new(&VELOCIDADE_DE_AVANCO),
                 variable: (
                     30,
-                    &self.model.get_arquivo_de_eixo_by_ref().velocidade_de_avanco as *const u16
-                        as *mut u16,
+                    &self.model.get_arquivo_de_eixo_by_ref().velocidade_de_avanco,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((35, FlashString::new(&MILIMETROS_POR_SEGUNDO))),
@@ -390,7 +375,7 @@ impl SubmenuLayout for MenuParametrosDeMovimento<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .velocidade_de_retorno as *const u16 as *mut u16,
+                        .velocidade_de_retorno,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((35, FlashString::new(&MILIMETROS_POR_SEGUNDO))),
@@ -423,7 +408,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .numero_de_mensagem_no_avanco as *const u16 as *mut u16,
+                        .numero_de_mensagem_no_avanco,
                 ),
                 valid_range: 0..99,
                 unit_of_measurement_text: None,
@@ -436,7 +421,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .velocidade_de_retorno as *const u16 as *mut u16,
+                        .velocidade_de_retorno,
                 ),
                 valid_range: 0..99,
                 unit_of_measurement_text: None,
@@ -449,7 +434,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .primeira_mensagem_no_avanco as *const u16 as *mut u16,
+                        .primeira_mensagem_no_avanco,
                 ),
                 valid_range: 0..99,
                 unit_of_measurement_text: Some((38, FlashString::new(&MILIMETROS))),
@@ -462,7 +447,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .primeira_mensagem_no_avanco as *const u16 as *mut u16,
+                        .primeira_mensagem_no_avanco,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((38, FlashString::new(&MILIMETROS))),
@@ -475,7 +460,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .ultima_mensagem_no_avanco as *const u16 as *mut u16,
+                        .ultima_mensagem_no_avanco,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((38, FlashString::new(&MILIMETROS))),
@@ -488,7 +473,7 @@ impl SubmenuLayout for MenuParametrosDeImpressao<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .ultima_mensagem_no_retorno as *const u16 as *mut u16,
+                        .ultima_mensagem_no_retorno,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((38, FlashString::new(&MILIMETROS))),
@@ -521,7 +506,7 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .retardo_no_start_automatico as *const u16 as *mut u16,
+                        .retardo_no_start_automatico,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((38, FlashString::new(&MILI_SEGUNDOS))),
@@ -534,7 +519,7 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .retardo_no_start_externo as *const u16 as *mut u16,
+                        .retardo_no_start_externo,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((38, FlashString::new(&MILI_SEGUNDOS))),
@@ -547,8 +532,7 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .start_automatico_no_avanco as *const Cursor
-                        as *mut Cursor,
+                        .start_automatico_no_avanco,
                 ),
                 options_list: Options::ligado_desligado(),
             }),
@@ -560,8 +544,7 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .start_automatico_no_retorno as *const Cursor
-                        as *mut Cursor,
+                        .start_automatico_no_retorno,
                 ),
                 options_list: Options::ligado_desligado(),
             }),
@@ -573,8 +556,7 @@ impl SubmenuLayout for MenuParametrosDeCiclo<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .modo_de_trabalho_do_eixo as *const Cursor
-                        as *mut Cursor,
+                        .modo_de_trabalho_do_eixo,
                 ),
                 options_list: Options::continuo_passo_a_passo(),
             }),
@@ -606,8 +588,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .logica_do_sinal_de_impressao as *const Cursor
-                        as *mut Cursor,
+                        .logica_do_sinal_de_impressao,
                 ),
                 options_list: Options::aberto_fechado(),
             }),
@@ -619,8 +600,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .largura_do_sinal_de_impressao as *const u16
-                        as *mut u16,
+                        .largura_do_sinal_de_impressao,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((38, FlashString::new(&MILI_SEGUNDOS))),
@@ -633,8 +613,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
                     &self
                         .model
                         .arquivo_de_eixo_00
-                        .reversao_de_mensagem_via_serial as *const Cursor
-                        as *mut Cursor,
+                        .reversao_de_mensagem_via_serial,
                 ),
                 options_list: Options::ligado_desligado(),
             }),
@@ -646,8 +625,7 @@ impl SubmenuLayout for MenuConfiguracaoDaImpressora<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .selecao_de_mensagem_via_serial as *const Cursor
-                        as *mut Cursor,
+                        .selecao_de_mensagem_via_serial,
                 ),
                 options_list: Options::ligado_desligado(),
             }),
@@ -679,8 +657,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .antecipacao_da_saida_de_start as *const u16
-                        as *mut u16,
+                        .antecipacao_da_saida_de_start,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((38, FlashString::new(&MILI_SEGUNDOS))),
@@ -693,8 +670,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .saida_de_start_no_avaco as *const Cursor
-                        as *mut Cursor,
+                        .saida_de_start_no_avaco,
                 ),
                 options_list: Options::ligado_desligado(),
             }),
@@ -706,8 +682,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .saida_de_start_no_retorno as *const Cursor
-                        as *mut Cursor,
+                        .saida_de_start_no_retorno,
                 ),
                 options_list: Options::ligado_desligado(),
             }),
@@ -719,8 +694,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .entrada_de_start_entre_eixos as *const Cursor
-                        as *mut Cursor,
+                        .entrada_de_start_entre_eixos,
                 ),
                 options_list: Options::ligado_desligado(),
             }),
@@ -732,7 +706,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .retardo_do_start_entre_eixos as *const u16 as *mut u16,
+                        .retardo_do_start_entre_eixos,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((38, FlashString::new(&MILI_SEGUNDOS))),
@@ -745,8 +719,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .start_pelo_teclado_e_externo as *const Cursor
-                        as *mut Cursor,
+                        .start_pelo_teclado_e_externo,
                 ),
                 options_list: Options::ligado_desligado(),
             }),
@@ -758,8 +731,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .retardo_no_start_passo_a_passo as *const u16
-                        as *mut u16,
+                        .retardo_no_start_passo_a_passo,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: Some((38, FlashString::new(&MILI_SEGUNDOS))),
@@ -772,8 +744,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .start_automatico_passo_a_passo as *const Cursor
-                        as *mut Cursor,
+                        .start_automatico_passo_a_passo,
                 ),
                 options_list: Options::ligado_desligado(),
             }),
@@ -785,8 +756,7 @@ impl SubmenuLayout for MenuIntertravamentoParaDoisEixos<'_> {
                     &self
                         .model
                         .get_arquivo_de_eixo_by_ref()
-                        .saida_de_start_passo_a_passo as *const Cursor
-                        as *mut Cursor,
+                        .saida_de_start_passo_a_passo,
                 ),
                 options_list: Options::continuo_passo_a_passo(),
             }),
@@ -815,10 +785,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
         match index {
             0 => MenuItemBuilder::make_numerical_parameter(NumericalParameter {
                 parameter_name: FlashString::new(&NUMERO_DO_CANAL_X),
-                variable: (
-                    33,
-                    &self.model.configuracao_do_eixo_x.numero_do_canal as *const u16 as *mut u16,
-                ),
+                variable: (33, &self.model.configuracao_do_eixo_x.numero_do_canal),
                 valid_range: 0..99, // TODO: test define range as `0..64`
                 unit_of_measurement_text: None,
             }),
@@ -827,8 +794,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                 parameter_name: FlashString::new(&NUMERO_DE_PULSO_DO_GIRO_X),
                 variable: (
                     33,
-                    &self.model.configuracao_do_eixo_x.numero_de_pulso_do_giro as *const u16
-                        as *mut u16,
+                    &self.model.configuracao_do_eixo_x.numero_de_pulso_do_giro,
                 ),
                 valid_range: 0..999,
                 unit_of_measurement_text: None,
@@ -838,8 +804,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                 parameter_name: FlashString::new(&JANELA_DE_PROTECAO_DO_GITO_X),
                 variable: (
                     33,
-                    &self.model.configuracao_do_eixo_x.janela_de_protecao_do_giro as *const u16
-                        as *mut u16,
+                    &self.model.configuracao_do_eixo_x.janela_de_protecao_do_giro,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: None,
@@ -849,8 +814,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                 parameter_name: FlashString::new(&DESLOCAMENTO_GIRO_DO_MOTOR_X),
                 variable: (
                     33,
-                    &self.model.configuracao_do_eixo_x.deslocamento_giro_do_motor as *const u16
-                        as *mut u16,
+                    &self.model.configuracao_do_eixo_x.deslocamento_giro_do_motor,
                 ),
                 valid_range: 0..0xFFFF,
                 unit_of_measurement_text: None,
@@ -863,8 +827,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                     &self
                         .model
                         .configuracao_do_eixo_x
-                        .giro_com_funcao_de_protecao as *const Cursor
-                        as *mut Cursor,
+                        .giro_com_funcao_de_protecao,
                 ),
                 options_list: Options::ligado_desligado(),
             }),
@@ -876,8 +839,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                     &self
                         .model
                         .configuracao_do_eixo_x
-                        .giro_com_funcao_de_correcao as *const Cursor
-                        as *mut Cursor,
+                        .giro_com_funcao_de_correcao,
                 ),
                 options_list: Options::ligado_desligado(),
             }),
@@ -886,8 +848,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                 parameter_name: FlashString::new(&LOGICA_DO_START_EXTERNO),
                 variable: (
                     32,
-                    &self.model.configuracao_do_eixo_x.logica_do_start_externo as *const Cursor
-                        as *mut Cursor,
+                    &self.model.configuracao_do_eixo_x.logica_do_start_externo,
                 ),
                 options_list: Options::aberto_fechado(),
             }),
@@ -899,8 +860,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                     &self
                         .model
                         .configuracao_do_eixo_x
-                        .valor_da_posicao_de_referencia as *const u16
-                        as *mut u16,
+                        .valor_da_posicao_de_referencia,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: None,
@@ -910,8 +870,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                 parameter_name: FlashString::new(&VELOCIDADE_PARA_REFERENCIA_X),
                 variable: (
                     33,
-                    &self.model.configuracao_do_eixo_x.velocidade_para_referencia as *const u16
-                        as *mut u16,
+                    &self.model.configuracao_do_eixo_x.velocidade_para_referencia,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: None,
@@ -921,8 +880,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                 parameter_name: FlashString::new(&ACELERACAO_PARA_REFERENCIA_X),
                 variable: (
                     33,
-                    &self.model.configuracao_do_eixo_x.aceleracao_para_referencia as *const u16
-                        as *mut u16,
+                    &self.model.configuracao_do_eixo_x.aceleracao_para_referencia,
                 ),
                 valid_range: 0..9999,
                 unit_of_measurement_text: None,
@@ -935,8 +893,7 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                     &self
                         .model
                         .configuracao_do_eixo_x
-                        .reducao_da_corrente_em_repouso as *const Cursor
-                        as *mut Cursor,
+                        .reducao_da_corrente_em_repouso,
                 ),
                 options_list: Options::ligado_desligado(),
             }),
@@ -948,18 +905,14 @@ impl SubmenuLayout for MenuConfiguracaoDeEixo<'_> {
                     &self
                         .model
                         .configuracao_do_eixo_x
-                        .referencia_pelo_start_externo as *const Cursor
-                        as *mut Cursor,
+                        .referencia_pelo_start_externo,
                 ),
                 options_list: Options::ligado_desligado(),
             }),
 
             12 => MenuItemBuilder::make_optional_parameter(OptionalParameter {
                 parameter_name: FlashString::new(&MODO_TURBO_X),
-                variable: (
-                    32,
-                    &self.model.configuracao_do_eixo_x.modo_turbo as *const Cursor as *mut Cursor,
-                ),
+                variable: (32, &self.model.configuracao_do_eixo_x.modo_turbo),
                 options_list: Options::ligado_desligado(),
             }),
 
@@ -992,8 +945,7 @@ impl SubmenuLayout for MenuConfiguracaoDoEquipamento<'_> {
                     &self
                         .model
                         .configuracao_do_equipamento
-                        .velocidade_de_comunicacao as *const Cursor
-                        as *mut Cursor,
+                        .velocidade_de_comunicacao,
                 ),
                 options_list: Options::baudrate_2400_9600(),
             }),
@@ -1006,8 +958,7 @@ impl SubmenuLayout for MenuConfiguracaoDoEquipamento<'_> {
                     &self
                         .model
                         .configuracao_do_equipamento
-                        .velocidade_de_comunicacao as *const Cursor
-                        as *mut Cursor,
+                        .velocidade_de_comunicacao,
                 ),
                 options_list: Options::baudrate_2400_9600(),
             }),

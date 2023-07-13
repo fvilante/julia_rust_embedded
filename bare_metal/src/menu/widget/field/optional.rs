@@ -32,19 +32,19 @@ pub fn make_options_buffer_from_array<const ARRAY_SIZE: usize>(
     options
 }
 
-pub struct OptionEditorWidget {
+pub struct OptionEditorWidget<'a> {
     options: OptionsBuffer,
     editing_selection: Cursor,
     blink: RectangularWave,
     is_in_edit_mode_: bool,
-    variable: *mut Cursor,
+    variable: &'a Cell<Cursor>,
 }
 
-impl OptionEditorWidget {
-    pub fn new(variable: *mut Cursor, options: OptionsBuffer, is_in_edit_mode_: bool) -> Self {
+impl<'a> OptionEditorWidget<'a> {
+    pub fn new(variable: &'a Cell<Cursor>, options: OptionsBuffer, is_in_edit_mode_: bool) -> Self {
         const T_ON: u16 = 600;
         const T_OFF: u16 = 300;
-        let initial_value = unsafe { *variable }.clone();
+        let initial_value = variable.get();
         Self {
             options: options.clone(),
             editing_selection: initial_value,
@@ -76,21 +76,19 @@ impl OptionEditorWidget {
     }
 }
 
-impl Saveble for OptionEditorWidget {
+impl Saveble for OptionEditorWidget<'_> {
     fn restore_value(&mut self) {
-        let initial_value = unsafe { *self.variable }.clone();
+        let initial_value = self.variable.get();
         self.editing_selection = initial_value;
     }
 
     fn save_value(&mut self) {
         let edited_value = self.editing_selection;
-        unsafe {
-            *self.variable = edited_value;
-        };
+        self.variable.set(edited_value);
     }
 }
 
-impl Editable for OptionEditorWidget {
+impl Editable for OptionEditorWidget<'_> {
     fn set_edit_mode(&mut self, value: bool) {
         self.is_in_edit_mode_ = value;
     }
@@ -100,7 +98,7 @@ impl Editable for OptionEditorWidget {
     }
 }
 
-impl Widget for OptionEditorWidget {
+impl Widget for OptionEditorWidget<'_> {
     fn send_key(&mut self, key: KeyCode) {
         match key {
             // navigation_key left and right
