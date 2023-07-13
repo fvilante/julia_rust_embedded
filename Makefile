@@ -54,7 +54,7 @@ fast: build upload_fast size
 full: check test build upload_fast size
 
 avr_bloat:
-	cargo bloat --package bare_metal $(BASE) -n 1000
+	cargo bloat --package bare_metal $(BASE) 
 
 clippy:
 	cargo clippy --package bare_metal $(BASE)  
