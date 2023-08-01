@@ -18,20 +18,20 @@ pub fn run() -> ! {
     let peripherals = PeripheralsAvrHardware::new();
 
     // lcd display buffer
-    let mut screen_buffer = peripherals.get_screen_buffer();
+    let mut lcd = peripherals.get_screen_buffer();
 
     loop {
-        screen_buffer.clear();
+        lcd.clear();
         let h = hmac_sha256::HMAC::mac(b"hello", b"key");
-        print_hex(&mut screen_buffer, &h);
-        screen_buffer.render();
+        print_hex(&mut lcd, &h);
+        lcd.render();
 
         delay_ms(1000);
 
-        screen_buffer.clear();
+        lcd.clear();
         let h = hmac_sha256::Hash::hash(b"hello");
-        print_hex(&mut screen_buffer, &h);
-        screen_buffer.render();
+        print_hex(&mut lcd, &h);
+        lcd.render();
 
         delay_ms(1000);
     }
