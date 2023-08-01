@@ -24,7 +24,7 @@ opt-level = "s"
 panic = "abort"
 codegen-units = 1
 debug = true
-lto = "fat"
-opt-level = "z"
+lto = true  # as far as i know "fat" and "true" is synonimous
+opt-level = "s"
 overflow-checks = false
 
