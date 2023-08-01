@@ -1,28 +1,8 @@
-
-
-
-
 use crate::board::peripherals::Peripherals;
 use crate::board::peripherals::PeripheralsAvrHardware;
-
-
-
 use crate::menu::screen_buffer::ScreenBuffer;
-
-
-
-
-
-
-
-
 use crate::microcontroler::delay::delay_ms;
-
-use crate::microcontroler::{serial};
-
-
-
-
+use crate::microcontroler::serial;
 use cross_platform::utils::numerical::convert_u8_to_str_hex;
 
 fn print_hex(lcd_: &mut ScreenBuffer, data: &[u8]) {
@@ -35,8 +15,6 @@ fn print_hex(lcd_: &mut ScreenBuffer, data: &[u8]) {
 
 /// Entry point of the main application
 pub fn run() -> ! {
-    // Serial port
-    serial::init(2400);
     let peripherals = PeripheralsAvrHardware::new();
 
     // lcd display buffer
