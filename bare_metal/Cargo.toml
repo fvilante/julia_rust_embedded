@@ -7,6 +7,9 @@ edition = "2021"
 
 
 [dependencies]
+#noble-secp256k1 = { git = "https://github.com/xphoniex/noble-secp256k1-rs", default-features = false, features = ["8-bit"] }
+hmac-sha256 = { version = "1.1.6", default-features = false, features = ["opt_size"] }
+
 cross_platform = { path = "../cross_platform" }
 # ruduino "default-features = false" meaning => to disable the dependency of avr-std-stub inside ruduino which implements a default panic_handler. 
 #We want to abort the use of this handler, because we want our own panic_handler.

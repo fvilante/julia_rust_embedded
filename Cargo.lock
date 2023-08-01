@@ -139,6 +139,7 @@ dependencies = [
  "embedded-hal",
  "enum_dispatch",
  "heapless 0.7.16",
+ "hmac-sha256",
  "paste",
  "ruduino",
 ]
@@ -277,6 +278,12 @@ dependencies = [
  "spin",
  "stable_deref_trait",
 ]
+
+[[package]]
+name = "hmac-sha256"
+version = "1.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3688e69b38018fec1557254f64c8dc2cc8ec502890182f395dbb0aa997aa5735"
 
 [[package]]
 name = "itoa"
