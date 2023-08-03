@@ -7,13 +7,13 @@ use cross_platform::utils::numerical::convert_u8_to_str_hex;
 
 /// Prints hex string into the lcd display
 fn print_hex(lcd_: &mut ScreenBuffer, data: &[u8]) {
-    lcd.clear();
+    lcd_.clear();
     for byte in data.into_iter() {
         let (high, low) = convert_u8_to_str_hex(byte.clone());
         lcd_.print_char(high);
         lcd_.print_char(low);
     }
-    lcd.render();
+    lcd_.render();
 }
 
 /// Entry point of the main application
