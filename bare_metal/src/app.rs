@@ -5,6 +5,10 @@ use crate::microcontroler::delay::delay_ms;
 use crate::microcontroler::serial;
 use cross_platform::utils::numerical::convert_u8_to_str_hex;
 
+// expected:
+// mac = 9307b3b915efb5171ff14d8cb55fbcc798c6c0ef1456d66ded1a6aa723a58b7b
+// hash = 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
+
 /// Prints hex string into the lcd display
 fn print_hex(lcd_: &mut ScreenBuffer, data: &[u8]) {
     lcd_.clear();
