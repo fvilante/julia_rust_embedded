@@ -21,8 +21,8 @@ use super::{
 /// Abstraction over the platform specific hardware instantiation
 /// TODO: Move to a better place
 pub trait Peripherals {
-    fn get_keyboard(&self) -> impl Keyboard + '_;
-    fn get_front_panel(&self) -> impl FrontPanel + '_;
+    fn get_keyboard<'a>(&'a self) -> KeyboardAvrDriver<'a>;
+    fn get_front_panel<'a>(&'a self) -> FrontPanelAvrHardware<'a>;
     fn get_screen_buffer(&self) -> ScreenBuffer;
 }
 
@@ -55,12 +55,12 @@ impl PeripheralsAvrHardware {
 }
 
 impl Peripherals for PeripheralsAvrHardware {
-    fn get_keyboard(&self) -> impl Keyboard + '_ {
+    fn get_keyboard<'a>(&'a self) -> KeyboardAvrDriver<'a> {
         let keyboard = KeyboardAvrDriver::new(&self.output_expander, &self.input_expander);
         keyboard
     }
 
-    fn get_front_panel(&self) -> impl FrontPanel + '_ {
+    fn get_front_panel<'a>(&'a self) -> FrontPanelAvrHardware<'a> {
         // Leds from the frontal panel
         let front_panel = FrontPanelAvrHardware::new(&self.output_expander);
         front_panel
